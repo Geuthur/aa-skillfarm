@@ -1,0 +1,466 @@
+{% extends 'skillfarm/base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load static %}
+
+{% block page_title %}Skillfarm Details{% endblock %}
+{% block page_topic %}<h1 class="page-header text-center">{% translate "Skillfarm Filter" %}</h1>{% endblock page_topic %}
+
+{% block skillfarm_block %}
+<div class="card-body bg-primary rounded-top d-flex">
+    <h3>{% translate "Skillfarm Filter" %} </h3>
+    <div class="ms-auto">
+        <a class="nav-link py-0" href="{% url 'skillfarm:character_admin' %}">
+            <span class="btn btn-secondary">{% translate 'Skillfarm Overview' %}</span>
+        </a>
+    </div>
+</div>
+<div class="card-body bg-secondary tab-content rounded-bottom">
+    <div class="d-flex justify-content-between align-items-center">
+        <span id="next-update" class="text-end"></span>
+    </div>
+
+    <div class="tab-content">
+        {% include 'skillfarm/partials/table/filter.html' %}
+    </div>
+</div>
+
+<div class="modal modal-xl fade" id="skillInfoModal" tabindex="-1" aria-labelledby="skillInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="skillInfoModalLabel">Skill Set Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Extractor details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="switchSkillSetModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="switchSkillSetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="switchSkillSetModalLabel">Skill Set Filter</h5>
+            </div>
+            <div class="modal-hint card-body">
+                <p class="text-muted">Select the skills you want to filter for this character.<br>
+                You can add multiple skills to the filter.<br>
+                If no skills are selected, the filter will be disabled.</p>
+            </div>
+            <div class="modal-body">
+                <!-- Add search field and list for selected items inside the modal -->
+                <div class="mb-3">
+                    <input type="text" id="skillSearch" class="form-control" placeholder="Search skills...">
+                </div>
+                <div class="mb-3">
+                    <select id="skillSetSelect" class="form-select" multiple></select>
+                </div>
+                <ul id="selectedSkillsList" class="list-group"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="submitSkillSet" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_javascript %}
+{% include 'skillfarm/bundles/table-css.html' %}
+<script type="application/javascript">
+    // Extract the 'main' parameter from the current URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const mainParam = urlParams.get('main');
+
+    // Construct the skillfarmUrl with the 'main' parameter
+    let skillfarmUrl = '/skillfarm/api/account/{{ character_pk }}/filter/';
+    if (mainParam) {
+        skillfarmUrl += '?main=' + mainParam;
+    }
+
+	let skillfarmSettings = {
+        skillfarmUrl: skillfarmUrl,
+		switchSkillSetpUrl: '{% url "skillfarm:skillset" character_id=1337 %}',
+		csrfToken: '{% csrf_token %}',
+        switchAlarm: '{% translate "Edit Skillset" %}',
+        alarmActivated: '{% translate "Notification Activated" %}',
+        alarmDeactivated: '{% translate "Notification Deactivated" %}',
+        characterPk: '{{ character_pk }}',
+        updateInterval: '{{ update_interval }}',
+	};
+</script>
+<script src3333="{% static 'skillfarm/js/skillfarm.js' %}">
+/* global skillfarmSettings */
+/* global bootstrap */
+
+document.addEventListener('DOMContentLoaded', function() {
+    var csrfToken = skillfarmSettings.csrfToken;
+    var urlAlarm = skillfarmSettings.switchSkillSetpUrl;
+    var url = skillfarmSettings.skillfarmUrl;
+    var switchAlarm = skillfarmSettings.switchAlarm;
+    var alarmActivated = skillfarmSettings.alarmActivated;
+    var alarmDeactivated = skillfarmSettings.alarmDeactivated;
+    var characterPk = skillfarmSettings.characterPk;
+
+    function switchSkillSetpUrl(characterId) {
+        return urlAlarm
+            .replace('1337', characterId)
+    }
+
+    var confirmModal = document.getElementById('confirmModal');
+    var confirmRequest = document.getElementById('confirm-request');
+    var finalizeActionButton = document.getElementById('finalizeActionButton');
+
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var confirmText = button.getAttribute('data-confirm-text');
+        var formId = button.getAttribute('data-form-id');
+
+        confirmRequest.textContent = confirmText;
+
+        finalizeActionButton.onclick = function () {
+            document.getElementById(formId).submit();
+            var modal = bootstrap.Modal.getInstance(confirmModal);
+            modal.hide();
+        };
+    });
+
+    // Initialize DataTable
+    var table = $('#skillfarm-details').DataTable({
+        'order': [[1, 'desc']],
+        'pageLength': 25,
+        'columnDefs': [
+            { 'orderable': false, 'targets': 'no-sort' }
+        ],
+        createdRow: function(row, data, dataIndex) {
+            $('td:eq(3)', row).addClass('text-end');
+        }
+    });
+
+    // Fetch data using AJAX
+    $.ajax({
+        url: url,
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            data.forEach(item => {
+                const skillList = item.skills;
+
+                item.characters.forEach(character => {
+                    const row = [];
+
+                    // Character
+                    const characterCell = `
+                        <td>
+                            <img src="https://images.evetech.net/characters/${character.character_id}/portrait?size=32" class="rounded-circle" style="margin-right: 5px; width: 32px; height: 32px;">
+                            ${character.character_name}
+                        </td>
+                    `;
+
+                    // Serialize skills to JSON string
+                    const skillsetJson = JSON.stringify(character.skillset);
+
+                    const skillCell = `
+                        <td>
+                            <button class="btn btn-primary btn-sm btn-square" style="margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#skillInfoModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skillset='${skillsetJson}' onclick="showSkillInfoModal(this)">
+                                <span class="fas fa-info"></span>
+                            </button>
+                        </td>
+                    `;
+
+                    // Status
+                    const statusCell = `
+                        <td>
+                            <img src="/static/skillfarm/images/${character.skillset && character.skillset.length > 0 ? 'green' : 'red'}.png" style="width: 24px; height: 24px;" title="${character.skillset && character.skillset.length > 0 ? 'Active' : 'Inactive'}" data-tooltip-toggle="tooltip">
+                        </td>
+                    `;
+
+                    // Actions
+                    const actionsCell = `
+                        <td class="text-end">
+                            <form class="d-inline" method="post" action="${switchSkillSetpUrl(character.character_id)}" id="switchAlarmForm${character.character_id}">
+                                ${csrfToken}
+                                <input type="hidden" name="character_pk" value="${characterPk}">
+                                <button type="button" class="btn btn-primary btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${switchAlarm}" data-bs-target="#switchSkillSetModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skills="${skillList}" data-skillset="${character.skillset}">
+                                    <span class="fas fa-pencil"></span>
+                                </button>
+                            </form>
+                        </td>
+                    `;
+
+                    row.push(characterCell, skillCell, statusCell, actionsCell);
+                    table.row.add(row).draw();
+                });
+            });
+
+            // Reinitialize tooltips on draw
+            table.on('draw', function () {
+                $('[data-tooltip-toggle="tooltip"]').tooltip();
+            });
+            // Init tooltips
+            $('[data-tooltip-toggle="tooltip"]').tooltip();
+        },
+        error: function(error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+
+    // Function to update the skill set select options
+    function updateSkillSetOptions(searchValue = '') {
+        var selectedSkillsList = document.getElementById('selectedSkillsList');
+        var selectedSkills = Array.from(selectedSkillsList.querySelectorAll('li')).map(item => item.getAttribute('data-skill'));
+
+        var skillSetSelect = document.getElementById('skillSetSelect');
+        var options = skillSetSelect.options;
+        for (var i = 0; i < options.length; i++) {
+            var option = options[i];
+            if (selectedSkills.includes(option.value)) {
+                option.style.display = 'none';
+            } else if (option.textContent.toLowerCase().includes(searchValue.toLowerCase())) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        }
+    }
+
+    // Handle search and add to list
+    document.getElementById('skillSearch').addEventListener('input', function() {
+        var searchValue = this.value.toLowerCase();
+        updateSkillSetOptions(searchValue);
+    });
+
+    // Handle adding selected skill to list
+    document.getElementById('skillSetSelect').addEventListener('change', function() {
+        var selectedSkill = this.value;
+        if (selectedSkill) {
+            var selectedSkillsList = document.getElementById('selectedSkillsList');
+            var existingItems = selectedSkillsList.querySelectorAll('li');
+            var alreadySelected = Array.from(existingItems).some(item => item.getAttribute('data-skill') === selectedSkill);
+
+            if (!alreadySelected) {
+                var listItem = document.createElement('li');
+                listItem.textContent = selectedSkill;
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.setAttribute('data-skill', selectedSkill);
+
+                // Add remove button
+                var removeButton = document.createElement('button');
+                removeButton.className = 'btn btn-danger btn-sm';
+                removeButton.textContent = 'Remove';
+                removeButton.addEventListener('click', function() {
+                    selectedSkillsList.removeChild(listItem);
+                    updateSkillSetOptions(document.getElementById('skillSearch').value);
+                });
+
+                listItem.appendChild(removeButton);
+                selectedSkillsList.appendChild(listItem);
+                updateSkillSetOptions(document.getElementById('skillSearch').value);
+            }
+        }
+    });
+    // Initial call to update options on page load
+    updateSkillSetOptions();
+
+    // Handle modal submission
+    document.getElementById('submitSkillSet').addEventListener('click', function(event) {
+        var characterId = document.querySelector('#switchSkillSetModal').getAttribute('data-character-id');
+        var selectedSkillsList = document.getElementById('selectedSkillsList');
+        var selectedSkills = [];
+        selectedSkillsList.querySelectorAll('li').forEach(function(item) {
+            var skill = item.getAttribute('data-skill');
+            if (skill && skill.trim() !== '') {
+                selectedSkills.push(skill);
+            }
+        });
+
+        // Create form dynamically
+        const switchSkillSetForm = document.createElement('form');
+        switchSkillSetForm.method = 'post';
+        switchSkillSetForm.action = switchSkillSetpUrl(characterId);
+        switchSkillSetForm.id = 'switchSkillSetForm';
+        switchSkillSetForm.className = 'd-inline';
+        switchSkillSetForm.innerHTML = skillfarmSettings.csrfToken +
+            '<input type="hidden" name="character_pk" value="' + characterId + '">' +
+            '<input type="hidden" name="skill_set" value="' + selectedSkills.join(',') + '">';
+
+        document.body.appendChild(switchSkillSetForm);
+        switchSkillSetForm.submit();
+    });
+
+    // Set character ID and populate skills when modal is shown
+    $('#switchSkillSetModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var characterId = button.data('character-id');
+        var characterName = button.data('character-name');
+        var skills = button.data('skills');
+        var skillsetJson = button.data('skillset');
+
+        var modal = $(this);
+        modal.attr('data-character-id', characterId);
+
+        // Update modal title
+        var modalTitle = modal.find('.modal-title');
+        modalTitle.text(`Skill Set Filter - ${characterName}`);
+
+        // Convert skills and skillsetJson to arrays if they are comma-separated strings and not empty
+        if (typeof skills === 'string') {
+            skills = skills.split(',');
+        } else {
+            skills = null;
+        }
+
+        if (typeof skillsetJson === 'string') {
+            skillsetJson = skillsetJson.split(',');
+        } else {
+            skillsetJson = null;
+        }
+
+        // Populate skill set select options
+        var skillSetSelect = document.getElementById('skillSetSelect');
+        skillSetSelect.innerHTML = '';
+
+        if (!skills) {
+            var option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'No Skill Filter active';
+            skillSetSelect.appendChild(option);
+        } else {
+            skills.forEach(skill => {
+                var option = document.createElement('option');
+                option.value = skill;
+                option.textContent = skill;
+                skillSetSelect.appendChild(option);
+            });
+        }
+
+        // Populate selected skills list with active skill filters
+        var selectedSkillsList = document.getElementById('selectedSkillsList');
+        selectedSkillsList.innerHTML = '';
+        if (skillsetJson && skillsetJson.length > 0) {
+            skillsetJson.forEach(skill => {
+                if (skill.trim() !== '') {
+                    var listItem = document.createElement('li');
+                    listItem.textContent = skill;
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    listItem.setAttribute('data-skill', skill);
+
+                    // Add remove button
+                    var removeButton = document.createElement('button');
+                    removeButton.className = 'btn btn-danger btn-sm';
+                    removeButton.textContent = 'Remove';
+                    removeButton.addEventListener('click', function() {
+                        selectedSkillsList.removeChild(listItem);
+                        updateSkillSetOptions();
+                    });
+
+                    listItem.appendChild(removeButton);
+                    selectedSkillsList.appendChild(listItem);
+                }
+            });
+        }
+    });
+});
+
+function showSkillInfoModal(button) {
+    const characterId = button.getAttribute('data-character-id');
+    const characterName = button.getAttribute('data-character-name');
+    const skillSet = JSON.parse(button.getAttribute('data-skillset'));
+
+    const modalTitle = document.querySelector('#skillInfoModalLabel');
+    modalTitle.textContent = `Skill Farm Filters - ${characterName}`;
+
+    const modalBody = document.querySelector('#skillInfoModal .modal-body');
+    modalBody.innerHTML = ''; // Clear previous content
+
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'table table-striped';
+
+    // Create table header
+    const thead = document.createElement('thead');
+    thead.innerHTML = ``;
+    table.appendChild(thead);
+
+    // Create table body
+    const tbody = document.createElement('tbody');
+
+    if (!skillSet || skillSet.length === 0) {
+        // If no skills, show message
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>No Skill Filter active</td>
+        `;
+        tbody.appendChild(tr);
+    } else {
+        // Populate table body with skillset
+        skillSet.forEach(skill => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${skill}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    table.appendChild(tbody);
+    modalBody.appendChild(table);
+}
+
+
+</script>
+{% include 'bundles/datatables-js-bs5.html' %}
+{% endblock %}
+{% block extra_css %}
+<style>
+    .progress-outer {
+        position: relative;
+        background: #fff;
+        border-radius: 50px;
+        box-shadow: 0 0 10px rgba(0, 219, 231, 0.7);
+        overflow: hidden; /* Ensure the inner progress bar doesn't overflow */
+    }
+    .progress {
+        height: 27px;
+        margin: 0;
+        overflow: visible;
+        border-radius: 50px;
+        background: #eaedf3;
+        box-shadow: inset 0 10px 10px rgba(244, 245, 250, 0.9);
+    }
+    .progress .progress-bar {
+        border-radius: 50px;
+    }
+    .progress .progress-value {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        letter-spacing: 2px;
+        -webkit-text-stroke: 1px #000;
+    }
+    .progress-bar.active {
+        animation: reverse progress-bar-stripes 0.40s linear infinite, animate-positive 2s;
+    }
+    @-webkit-keyframes animate-positive {
+        0% { width: 0%; }
+    }
+    @keyframes animate-positive {
+        0% { width: 0%; }
+    }
+</style>
+{% endblock %}
+
+{% block extra_script %}
+{% endblock %}

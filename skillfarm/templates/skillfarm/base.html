@@ -1,0 +1,36 @@
+{% extends 'allianceauth/base-bs5.html' %}
+{% load i18n %}
+{% block main_css %}
+{% endblock main_css %}
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block page_title %} Skillfarm {% endblock %}
+
+{% block header_nav_brand %}
+    <a class="nav-link text-white link-light link-underline link-underline-opacity-0" href="{% url 'skillfarm:index' %}">Skillfarm</a>
+{% endblock header_nav_brand %}
+
+{% block header_nav_collapse_left %}
+    {% include 'skillfarm/partials/navigation.html' %}
+{% endblock header_nav_collapse_left %}
+
+{% block header_nav_collapse_right %}
+    {% include 'skillfarm/partials/administration.html' %}
+{% endblock header_nav_collapse_right %}
+
+{% block content %}
+    {% include 'bundles/datatables-css-bs5.html' %}
+    <div class="allianceauth-skillfarm-plugin">
+        <div class="card" id="skillfarm_block">
+        {% block skillfarm_block %}{% endblock %}
+        </div>
+        <br>
+    </div>
+{% endblock %}
+
+{% block extra_javascript %}
+{% endblock %}
+
+{% block extra_script %}
+{% endblock %}
