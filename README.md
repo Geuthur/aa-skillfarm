@@ -1,9 +1,6 @@
-# Template module for AllianceAuth.<a name="aa-skillfarm"></a>
+# Skillfarm module for AllianceAuth.<a name="aa-skillfarm"></a>
 
-> \[!DANGER\]
-> Before you create Models, etc remove the 0001_initial.py from migrations folder if you dont have created own one.
-
-A Template App that templating skillfarm to skillfarm
+The Skillfarm Tracker Module for Alliance Auth tracks skill queues, sends notifications if skills finished and highlights them, making skill management easier for Skillfarms.
 
 ______________________________________________________________________
 
@@ -21,11 +18,15 @@ ______________________________________________________________________
 
 ## Features<a name="features"></a>
 
-- Skillqueue
-- Notififcation System
-- Filtered Skills
+- Graphical Design
+- Skillfarm Information Sheet
+- Filter Skills for each Character
+- Characters Overview
+- Highlight finished Skills
 
 ## Upcoming<a name="upcoming"></a>
+
+- Notififcation System
 
 ## Installation<a name="installation"></a>
 
@@ -45,7 +46,6 @@ pip install aa-skillfarm
 
 Configure your Alliance Auth settings (`local.py`) as follows:
 
-- Add `'allianceauth.corputils',` to `INSTALLED_APPS`
 - Add `'eveuniverse',` to `INSTALLED_APPS`
 - Add `'memberaudit',` to `INSTALLED_APPS`
 - Add `'skillfarm',` to `INSTALLED_APPS`

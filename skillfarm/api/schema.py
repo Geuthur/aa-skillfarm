@@ -35,7 +35,9 @@ class SkillFarm(Schema):
     active: Optional[bool]
     notification: Optional[bool]
     last_update: Optional[datetime]
+    skillset: Any
     skills: Any
+    skill_names: Any
 
 
 class SkillFarmFilter(Schema):

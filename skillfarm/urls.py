@@ -15,11 +15,6 @@ urlpatterns = [
         views.skillfarm,
         name="skillfarm",
     ),
-    path(
-        "<int:character_pk>/filter/",
-        views.skillfarmfilter,
-        name="skillfarmfilter",
-    ),
     path("character_admin/", views.character_admin, name="character_admin"),
     path(
         "switch_alarm/<int:character_id>/",

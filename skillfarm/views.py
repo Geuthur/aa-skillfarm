@@ -2,8 +2,6 @@
 
 from datetime import datetime
 
-from memberaudit.models import Character
-
 # Django
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -11,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as trans
 from django.views.decorators.http import require_POST
 from esi.decorators import token_required
+from memberaudit.models import Character
 
 from allianceauth.authentication.models import UserProfile
 
@@ -60,23 +59,6 @@ def skillfarm(request, character_pk):
     }
     context = add_info_to_context(request, context)
     return render(request, "skillfarm/skillfarm.html", context=context)
-
-
-@login_required
-@permission_required("skillfarm.basic_access")
-def skillfarmfilter(request, character_pk):
-    """
-    Skillfarm Filter View
-    """
-    current_year = datetime.now().year
-    years = [current_year - i for i in range(6)]
-
-    context = {
-        "years": years,
-        "character_pk": character_pk,
-    }
-    context = add_info_to_context(request, context)
-    return render(request, "skillfarm/skillset.html", context=context)
 
 
 @login_required
@@ -153,7 +135,7 @@ def switch_alarm(request, character_id: list):
         messages.error(request, msg)
         return redirect("skillfarm:skillfarm", character_pk=character_pk)
 
-    msg = trans("Alarm/s successfully switched")
+    msg = trans("Alarm/s successfully updated")
     messages.info(request, msg)
 
     return redirect("skillfarm:skillfarm", character_pk=character_pk)
@@ -171,7 +153,7 @@ def skillset(request, character_id: list):
     if not perm:
         msg = trans("Permission Denied")
         messages.error(request, msg)
-        return redirect("skillfarm:skillfarmfilter", character_pk=0)
+        return redirect("skillfarm:skillfarm", character_pk=0)
 
     if character_id == 0:
         characters = get_alts_queryset(main)
@@ -191,9 +173,9 @@ def skillset(request, character_id: list):
     except SkillFarmAudit.DoesNotExist:
         msg = trans("Character/s not found")
         messages.error(request, msg)
-        return redirect("skillfarm:skillfarmfilter", character_pk=0)
+        return redirect("skillfarm:skillfarm", character_pk=0)
 
-    msg = trans("Alarm/s successfully switched")
+    msg = trans("Skillset successfully updated")
     messages.info(request, msg)
 
-    return redirect("skillfarm:skillfarmfilter", character_pk=0)
+    return redirect("skillfarm:skillfarm", character_pk=0)

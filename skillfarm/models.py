@@ -3,10 +3,9 @@
 import datetime
 from typing import List
 
-from memberaudit.models import Character
-
 from django.db import models
 from django.utils import timezone
+from memberaudit.models import Character
 
 from skillfarm import app_settings
 from skillfarm.hooks import get_extension_logger
@@ -45,7 +44,7 @@ class SkillFarmAudit(models.Model):
     objects = SkillFarmManager()
 
     def __str__(self):
-        return f"{self.character.character_name}'s Character Data"
+        return f"{self.character.eve_character.character_name}'s Character Data"
 
     class Meta:
         default_permissions = ()

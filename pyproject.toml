@@ -6,7 +6,7 @@ requires = [
 
 [project]
 name = "aa-skillfarm"
-description = "Here is your description"
+description = "A Skillfarm Tracker Module for Alliance Auth"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
@@ -19,7 +19,7 @@ classifiers = [
     "Framework :: Django :: 4.0",
     "Framework :: Django :: 4.2",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
@@ -43,10 +43,10 @@ optional-dependencies.tests-allianceauth-latest = [
     "coverage",
     "django-webtest",
 ]
-urls.Changelog = "https://github.com/Geuthur/aa-assets/blob/master/CHANGELOG.md"
-urls.Homepage = "https://github.com/Geuthur/aa-assets"
-urls.Source = "https://github.com/Geuthur/aa-assets"
-urls.Tracker = "https://github.com/Geuthur/aa-assets/issues"
+urls.Changelog = "https://github.com/Geuthur/aa-skillfarm/blob/master/CHANGELOG.md"
+urls.Homepage = "https://github.com/Geuthur/aa-skillfarm"
+urls.Source = "https://github.com/Geuthur/aa-skillfarm"
+urls.Tracker = "https://github.com/Geuthur/aa-skillfarm/issues"
 
 [tool.hatch.build]
 include = [
@@ -77,4 +77,5 @@ known_django = [
     "django_webtest",
     "esi",
     "eveuniverse",
+    "memberaudit",
 ]

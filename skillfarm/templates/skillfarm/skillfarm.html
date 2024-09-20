@@ -30,22 +30,12 @@
     </div>
 </div>
 
-<div class="modal modal-xl fade" id="skillInfoModal" tabindex="-1" aria-labelledby="skillInfoModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="skillInfoModalLabel">Skill Queue Information</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Extractor details will be populated here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+{% include 'skillfarm/partials/modals/skillqueue.html' %}
+
+{% include 'skillfarm/partials/modals/skillfilter.html' %}
+
+{% include 'skillfarm/partials/modals/skillset.html' %}
+
 {% endblock %}
 
 {% block extra_javascript %}
@@ -63,6 +53,7 @@
 
 	let skillfarmSettings = {
         skillfarmUrl: skillfarmUrl,
+		switchSkillSetpUrl: '{% url "skillfarm:skillset" character_id=1337 %}',
 		switchAlarmUrl: '{% url "skillfarm:switch_alarm" character_id=1337 %}',
 		csrfToken: '{% csrf_token %}',
         characterPk: '{{ character_pk }}',
@@ -70,9 +61,10 @@
         // Translations
 		switchAlarmConfirmText: '{% translate "Are you sure to Switch Alarm" %}',
         switchAlarmText: '{% translate "Toggle Alarm" %}',
+        switchSkillsetText: '{% translate "Edit Skillset" %}',
         alarmActivatedText: '{% translate "Notification Activated" %}',
         alarmDeactivatedText: '{% translate "Notification Deactivated" %}',
-        skillqueueInfoText: '{% translate "Skill Queue Information" %}',
+        skillqueueInfoText: '{% translate "Skill Farm Information" %}',
         notUpdatedText: '{% translate "Not Updated Yet" %}'
 
 	};
