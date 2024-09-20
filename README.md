@@ -114,6 +114,9 @@ LOGGING["loggers"].update(LOGGING_SKILLFARM["loggers"])
 
 ## Highlights<a name="highlights"></a>
 
+![Screenshot 2024-09-21 012026](https://github.com/user-attachments/assets/8de03a03-c8b4-4e42-91c2-d78b2ea6a62a)
+![Screenshot 2024-09-21 012008](https://github.com/user-attachments/assets/567197cc-c55f-4b0e-b470-d4ceeadcfb15)
+
 > \[!NOTE\]
 > Contributing
 > You want to improve the project?
