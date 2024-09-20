@@ -20,8 +20,8 @@ ______________________________________________________________________
 
 - Graphical Design
 - Skillfarm Information Sheet
-    - Filtered Skill Queue
-    - Filtered Skills
+  - Filtered Skill Queue
+  - Filtered Skills
 - Filter Skills for each Character
 - Characters Overview
 - Highlight finished Skills
@@ -74,10 +74,10 @@ python manage.py migrate
 
 With the Following IDs you can set up the permissions for the Skillfarm
 
-| ID             | Description                    |                                                            |
-| :------------- | :----------------------------- | :--------------------------------------------------------- |
+| ID             | Description                     |                                                           |
+| :------------- | :------------------------------ | :-------------------------------------------------------- |
 | `basic_access` | Can access the Skillfarm module | All Members with the Permission can access the Skillfarm. |
-| `admin_access` | Has access to all characters   | Can see all Skillfarm Characters.                          |
+| `admin_access` | Has access to all characters    | Can see all Skillfarm Characters.                         |
 
 ### Step 6 - (Optional) Setting up Compatibilies<a name="step6"></a>
 
