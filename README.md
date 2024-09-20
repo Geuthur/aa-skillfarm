@@ -4,7 +4,7 @@ The Skillfarm Tracker Module for Alliance Auth tracks skill queues, sends notifi
 
 ______________________________________________________________________
 
-- [AA Template](#aa-skillfarm)
+- [AA Skillfarm](#aa-skillfarm)
   - [Features](#features)
   - [Upcoming](#upcoming)
   - [Installation](#features)
@@ -20,6 +20,8 @@ ______________________________________________________________________
 
 - Graphical Design
 - Skillfarm Information Sheet
+    - Filtered Skill Queue
+    - Filtered Skills
 - Filter Skills for each Character
 - Characters Overview
 - Highlight finished Skills
@@ -31,7 +33,7 @@ ______________________________________________________________________
 ## Installation<a name="installation"></a>
 
 > \[!NOTE\]
-> AA Template needs at least Alliance Auth v4.0.0
+> AA Skillfarm needs at least Alliance Auth v4.0.0
 > Please make sure to update your Alliance Auth before you install this APP
 
 ### Step 1 - Install the Package<a name="step1"></a>
@@ -70,12 +72,12 @@ python manage.py migrate
 
 ### Step 5 - Setting up Permissions<a name="step5"></a>
 
-With the Following IDs you can set up the permissions for the Template
+With the Following IDs you can set up the permissions for the Skillfarm
 
-| ID             | Description                    |                                                          |
-| :------------- | :----------------------------- | :------------------------------------------------------- |
-| `basic_access` | Can access the Template module | All Members with the Permission can access the Template. |
-| `admin_access` | Has access to all characters   | Can see all Skillfarm Characters.                        |
+| ID             | Description                    |                                                            |
+| :------------- | :----------------------------- | :--------------------------------------------------------- |
+| `basic_access` | Can access the Skillfarm module | All Members with the Permission can access the Skillfarm. |
+| `admin_access` | Has access to all characters   | Can see all Skillfarm Characters.                          |
 
 ### Step 6 - (Optional) Setting up Compatibilies<a name="step6"></a>
 
