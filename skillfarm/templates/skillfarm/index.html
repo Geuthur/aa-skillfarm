@@ -1,12 +1,29 @@
 {% extends 'skillfarm/base.html' %}
 {% load i18n %}
 {% load humanize %}
+{% load static %}
 {% block skillfarm_block %}
     <div class="card-title bg-primary rounded-top px-2">
-        <h3>Skillfarm</h3>
+        <h3>Skillfarm Guide</h3>
     </div>
     <div class="card-body">
-        Welcome to Skillfarm.
+        <div id="container">
+            <br>
+            <li>Click on the <button class="btn btn-warning btn-sm btn-square"><span class="fas fa-pencil"></span></button> Button to Set the Filters</li>
+            <li>Click on the <button class="btn btn-primary btn-sm btn-square"><span class="fas fa-info"></span></button> Button to see the Progress of all Skill Queue</li>
+            <li>Click on the <button class="btn btn-primary btn-sm btn-square"><span class="fas fa-bullhorn"></span></button> Button to Activate the Notification</li>
+            <br>
+            <div class="line-container">
+                <div class="line-text"><h4>FAQ</h4></div>
+                <hr class="custom-line">
+            </div>
+            <span class="text-decoration-line-through">Q: {% translate "I don't get any notification?" %}</span> <br>
+            <span class="text-decoration-line-through">A: {% translate "Be sure your Character has Notification on you can check it if it is green <i class='fa-solid fa-bullhorn' style='margin-left: 5px; color: green;'></i>" %}</span><br>
+            <br>
+            Q: {% translate "My Skill Queue is not filtering?" %} <br>
+            A: {% translate "Be sure you have set a Filter you can check if a Filter is active with the Status Icon <img src='/static/skillfarm/images/green.png' style='width: 24px; height: 24px;'>" %}<br>
+            <br>
+        </div>
     </div>
 {% endblock skillfarm_block %}
 

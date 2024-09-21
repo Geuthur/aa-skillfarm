@@ -5,12 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var csrfToken = skillfarmSettings.csrfToken;
     var urlAlarm = skillfarmSettings.switchAlarmUrl;
     var urlSkillset = skillfarmSettings.switchSkillSetpUrl;
+    var urlDeleteChar = skillfarmSettings.deleteCharUrl;
     var url = skillfarmSettings.skillfarmUrl;
     var characterPk = skillfarmSettings.characterPk;
     // Translations
     var switchAlarmText = skillfarmSettings.switchAlarmConfirmText;
     var switchAlarm = skillfarmSettings.switchAlarmText;
     var switchSkillset = skillfarmSettings.switchSkillsetText;
+    var deleteChar = skillfarmSettings.deleteCharText;
+    var deleteCharConfirm = skillfarmSettings.deleteCharConfirmText;
     var alarmActivated = skillfarmSettings.alarmActivatedText;
     var alarmDeactivated = skillfarmSettings.alarmDeactivatedText;
     var notupdated = skillfarmSettings.notUpdatedText;
@@ -22,6 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function switchSkillSetpUrl(characterId) {
         return urlSkillset
+            .replace('1337', characterId);
+    }
+
+    function deleteCharUrl(characterId) {
+        return urlDeleteChar
             .replace('1337', characterId);
     }
 
@@ -138,6 +146,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${csrfToken}
                                 <button type="button" class="btn btn-warning btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${switchSkillset}" data-bs-target="#switchSkillSetModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skills="${skillList}" data-skillset="${character.skillset}">
                                     <span class="fas fa-pencil"></span>
+                                </button>
+                            </form>
+
+                            <form class="d-inline" method="post" action="${deleteCharUrl(character.character_id)}" id="deleteCharForm${character.character_id}">
+                                ${csrfToken}
+                                <input type="hidden" name="character_pk" value="${characterPk}">
+
+                                <button type="button" class="btn btn-danger btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${deleteChar}" data-bs-target="#confirmModal" data-confirm-text="${deleteCharConfirm} for ${character.character_name}?" data-form-id="deleteCharForm${character.character_id}">
+                                    <span class="fas fa-trash-alt"></span>
                                 </button>
                             </form>
                         </td>

@@ -55,18 +55,23 @@
         skillfarmUrl: skillfarmUrl,
 		switchSkillSetpUrl: '{% url "skillfarm:skillset" character_id=1337 %}',
 		switchAlarmUrl: '{% url "skillfarm:switch_alarm" character_id=1337 %}',
+        deleteCharUrl: '{% url "skillfarm:remove_char" character_id=1337 %}',
 		csrfToken: '{% csrf_token %}',
         characterPk: '{{ character_pk }}',
         updateInterval: '{{ update_interval }}',
         // Translations
 		switchAlarmConfirmText: '{% translate "Are you sure to Switch Alarm" %}',
         switchAlarmText: '{% translate "Toggle Alarm" %}',
-        switchSkillsetText: '{% translate "Edit Skillset" %}',
+        notUpdatedText: '{% translate "Not Updated Yet" %}',
+
         alarmActivatedText: '{% translate "Notification Activated" %}',
         alarmDeactivatedText: '{% translate "Notification Deactivated" %}',
-        skillqueueInfoText: '{% translate "Skill Farm Information" %}',
-        notUpdatedText: '{% translate "Not Updated Yet" %}'
 
+        switchSkillsetText: '{% translate "Edit Skillset" %}',
+        skillqueueInfoText: '{% translate "Skill Farm Information" %}',
+
+        deleteCharText: '{% translate "Delete Character" %}',
+        deleteCharConfirmText: '{% translate "Are you sure to delete this Character" %}',
 	};
 </script>
 <script src="{% static 'skillfarm/js/skillfarm.js' %}"></script>

@@ -48,7 +48,6 @@ class SkillFarmApiEndpoints:
 
             skills_queue_dict = defaultdict(list)
             skills_dict = defaultdict(list)
-            update_status = None
             characters_dict = []
             output = []
 
@@ -66,6 +65,17 @@ class SkillFarmApiEndpoints:
                     character__eve_character__character_id=character.character.eve_character.character_id
                 )
 
+                try:
+                    memberaudit = Character.objects.get(
+                        eve_character=character.character.eve_character
+                    )
+
+                    update_status = memberaudit.update_status_as_dict()
+                    update_status = update_status.get("skill_queue", None)
+                    update_status = update_status.run_finished_at
+                except Character.DoesNotExist:
+                    update_status = None
+
                 # Filter Skills from Skillset
                 try:
                     skillset = SkillFarmSetup.objects.get(
@@ -81,13 +91,6 @@ class SkillFarmApiEndpoints:
                     skills = CharacterSkill.objects.select_related(
                         "character__eve_character", "eve_type"
                     ).filter(character_filters)
-
-                    memberaudit = Character.objects.get(
-                        eve_character=character.character.eve_character
-                    )
-
-                    update_status = memberaudit.update_status_as_dict()
-                    update_status = update_status.get("skill_queue", None)
 
                     for entry in skills:
                         character_obj = entry.character.eve_character
@@ -141,7 +144,7 @@ class SkillFarmApiEndpoints:
                         "corporation_name": character.character.eve_character.corporation_name,
                         "active": character.active,
                         "notification": character.notification,
-                        "last_update": update_status.run_finished_at,
+                        "last_update": update_status,
                         "skillset": skillset.skillset if skillset else [],
                         "skillqueue": skillqueue_data,
                         "skills": skills_data,
