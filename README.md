@@ -1,5 +1,12 @@
 # Skillfarm module for AllianceAuth.<a name="aa-skillfarm"></a>
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Geuthur/aa-skillfarm/master.svg)](https://results.pre-commit.ci/latest/github/Geuthur/aa-skillfarm/master)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Tests](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml/badge.svg)](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml)
+[![codecov](https://codecov.io/gh/Geuthur/aa-skillfarm/graph/badge.svg?token=5CWREOQKGZ)](https://codecov.io/gh/Geuthur/aa-skillfarm)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W810Q5J4)
+
 The Skillfarm Tracker Module for Alliance Auth tracks skill queues, sends notifications if skills finished and highlights them, making skill management easier for Skillfarms.
 
 ______________________________________________________________________
