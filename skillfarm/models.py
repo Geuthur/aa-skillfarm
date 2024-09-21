@@ -53,7 +53,6 @@ class SkillFarmAudit(models.Model):
     def get_esi_scopes(cls) -> List[str]:
         """Return list of required ESI scopes to fetch."""
         return [
-            "publicData",
             "esi-skills.read_skills.v1",
             "esi-skills.read_skillqueue.v1",
         ]
