@@ -54,6 +54,8 @@ class SkillFarmAudit(models.Model):
         """Return list of required ESI scopes to fetch."""
         return [
             "publicData",
+            "esi-skills.read_skills.v1",
+            "esi-skills.read_skillqueue.v1",
         ]
 
     def is_active(self):
