@@ -26,12 +26,13 @@ ______________________________________________________________________
 ## Features<a name="features"></a>
 
 - Graphical Design
+- Characters Overview
 - Skillfarm Information Sheet
   - Filtered Skill Queue
   - Filtered Skills
+  - Highlight finished Skills
 - Filter Skills for each Character
-- Characters Overview
-- Highlight finished Skills
+- No Active Training hint
 
 ## Upcoming<a name="upcoming"></a>
 

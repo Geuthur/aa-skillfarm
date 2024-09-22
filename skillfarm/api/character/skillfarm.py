@@ -47,6 +47,7 @@ class SkillFarmApiEndpoints:
                 characters = [main]
 
             skills_queue_dict = defaultdict(list)
+            skills_queue_dict_filtered = defaultdict(list)
             skills_dict = defaultdict(list)
             characters_dict = []
             output = []
@@ -55,9 +56,11 @@ class SkillFarmApiEndpoints:
                 eve_group__eve_category__id=16
             ).values_list("name", flat=True)
 
-            # Get all Characters
+            # Get all Characters and related data in one query
             audit = SkillFarmAudit.objects.filter(
                 character__eve_character__in=characters
+            ).select_related(
+                "character__eve_character",
             )
 
             for character in audit:
@@ -88,9 +91,13 @@ class SkillFarmApiEndpoints:
                     character_filters &= Q(eve_type__name__in=skillset.skillset)
 
                     # Get all Skills for the current character if skillset is defined
-                    skills = CharacterSkill.objects.select_related(
-                        "character__eve_character", "eve_type"
-                    ).filter(character_filters)
+                    skills = CharacterSkill.objects.filter(
+                        character_filters,
+                        character__eve_character=character.character.eve_character,
+                    ).select_related(
+                        "eve_type",
+                        "character",
+                    )
 
                     for entry in skills:
                         character_obj = entry.character.eve_character
@@ -99,25 +106,23 @@ class SkillFarmApiEndpoints:
                         dict_data = {
                             "skill": f"{entry.eve_type.name} {level}",
                             "level": entry.active_skill_level,
+                            "skillpoints": entry.skillpoints_in_skill,
                         }
 
                         skills_dict[character_obj].append(dict_data)
 
                 # Get all Skill Queue for the current character
-                skillsqueue = CharacterSkillqueueEntry.objects.select_related(
-                    "character__eve_character", "eve_type"
-                ).filter(character_filters)
+                skillsqueue = CharacterSkillqueueEntry.objects.filter(
+                    character__eve_character=character.character.eve_character
+                ).select_related(
+                    "eve_type",
+                    "character",
+                )
+                skillsqueue_filtered = skillsqueue.filter(character_filters)
 
-                skills_data = []
-
-                if character.character.eve_character in skills_dict:
-                    skills_data = skills_dict[character.character.eve_character]
-
-                # Add the skillqueue to the dict
-                for entry in skillsqueue:
+                def process_skill_queue_entry(entry):
                     character_obj = entry.character.eve_character
                     level = arabic_number_to_roman(entry.finished_level)
-
                     dict_data = {
                         "skill": f"{entry.eve_type.name} {level}",
                         "start_sp": entry.level_start_sp,
@@ -126,15 +131,25 @@ class SkillFarmApiEndpoints:
                         "start_date": entry.start_date,
                         "finish_date": entry.finish_date,
                     }
+                    return character_obj, dict_data
 
+                if character.character.eve_character in skills_dict:
+                    skills_data = skills_dict[character.character.eve_character]
+
+                # Process all skill queue entries and filtered skill queue entries in one loop
+                for entry in skillsqueue:
+                    character_obj, dict_data = process_skill_queue_entry(entry)
                     skills_queue_dict[character_obj].append(dict_data)
+                    if entry in skillsqueue_filtered:
+                        skills_queue_dict_filtered[character_obj].append(dict_data)
 
-                skillqueue_data = []
-
-                if character.character.eve_character in skills_queue_dict:
-                    skillqueue_data = skills_queue_dict[
-                        character.character.eve_character
-                    ]
+                skills_data = skills_dict.get(character.character.eve_character, [])
+                skillqueue_data = skills_queue_dict.get(
+                    character.character.eve_character, []
+                )
+                skillqueuefiltered_data = skills_queue_dict_filtered.get(
+                    character.character.eve_character, []
+                )
 
                 characters_dict.append(
                     {
@@ -146,6 +161,7 @@ class SkillFarmApiEndpoints:
                         "notification": character.notification,
                         "last_update": update_status,
                         "skillset": skillset.skillset if skillset else [],
+                        "skillqueuefiltered": skillqueuefiltered_data,
                         "skillqueue": skillqueue_data,
                         "skills": skills_data,
                     }
