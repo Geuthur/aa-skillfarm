@@ -111,7 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
             progressPercent = 100;
         }
 
-        console.log(progressPercent);
         return progressPercent;
     }
 
@@ -459,14 +458,32 @@ function showskillQueueModal(button) {
     // Populate skill queue table body with skills
     skillQueue.forEach(skill => {
         // Calculate progress
-        const totalSP = skill.end_sp;
-        const gainedSP = skill.start_sp;
-        const trainedSP = skill.trained_sp;
+        var totalSP = skill.end_sp;
+        var gainedSP = skill.start_sp;
+        var trainedSP = skill.trained_sp;
+        var startDate = new Date(skill.start_date);
+        var endDate = new Date(skill.finish_date);
+        const currentDate = new Date();
 
         // Set progressPercent to 0 if trainedSP is equal to gainedSP
         let progressPercent = 0;
-        if (gainedSP !== trainedSP) {
+        if (currentDate > endDate) {
+            progressPercent = 100;
+        } else if (currentDate < startDate) {
+            let totalDuration = endDate - startDate;
+            let elapsedDuration = currentDate - startDate;
+            progressPercent = (elapsedDuration / totalDuration) * 100;
+        } else if (currentDate > startDate) {
+            let totalDuration = endDate - startDate;
+            let elapsedDuration = currentDate - startDate;
+            progressPercent = (elapsedDuration / totalDuration) * 100;
+        } else if (gainedSP !== trainedSP) {
             progressPercent = (trainedSP / totalSP) * 100;
+        }
+
+        // Ensure it cannot be less than 0
+        if (progressPercent < 0) {
+            progressPercent = 0;
         }
 
         const tr = document.createElement('tr');

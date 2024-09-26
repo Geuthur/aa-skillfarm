@@ -75,7 +75,8 @@ class SkillFarmApiEndpoints:
 
                     update_status = memberaudit.update_status_as_dict()
                     update_status = update_status.get("skill_queue", None)
-                    update_status = update_status.run_finished_at
+                    if update_status is not None:
+                        update_status = update_status.run_finished_at
                 except Character.DoesNotExist:
                     update_status = None
 
