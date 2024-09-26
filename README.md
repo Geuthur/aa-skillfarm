@@ -15,6 +15,7 @@ ______________________________________________________________________
   - [Features](#features)
   - [Upcoming](#upcoming)
   - [Installation](#features)
+    - [Step 0 - Check dependencies are installed](#step0)
     - [Step 1 - Install the Package](#step1)
     - [Step 2 - Configure Alliance Auth](#step2)
     - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
@@ -44,6 +45,10 @@ ______________________________________________________________________
 > AA Skillfarm needs at least Alliance Auth v4.0.0
 > Please make sure to update your Alliance Auth before you install this APP
 
+### Step 0 - Check dependencies are installed<a name="step0"></a>
+
+- Skillfarm needs the app [django-eveuniverse](https://apps.allianceauth.org/apps/detail/django-eveuniverse) and [aa-memberaudit](https://apps.allianceauth.org/apps/detail/aa-memberaudit) to function. Please make sure it is installed.
+
 ### Step 1 - Install the Package<a name="step1"></a>
 
 Make sure you're in your virtual environment (venv) of your Alliance Auth then install the pakage.
@@ -56,8 +61,6 @@ pip install aa-skillfarm
 
 Configure your Alliance Auth settings (`local.py`) as follows:
 
-- Add `'eveuniverse',` to `INSTALLED_APPS`
-- Add `'memberaudit',` to `INSTALLED_APPS`
 - Add `'skillfarm',` to `INSTALLED_APPS`
 
 ### Step 3 - Add the Scheduled Tasks<a name="step3"></a>
