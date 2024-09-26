@@ -1,5 +1,23 @@
 # Changelog
 
+## \[0.1.4\] - 2024-09-26
+
+### Fixed
+
+- Progress Bar not shown correctly if Date is over the End Date
+- API Crash if memberaudit has no update
+
+### Changed
+
+- Progress Bar calculate in first step per skillpoints if the system detect something is wrong it calculate per date
+- Add Step 0 Check dependencies are installed to README
+
+## \[0.1.3\] - 2024-09-26
+
+### Fixed
+
+- Migration missing
+
 ## \[0.1.2\] - 2024-09-22
 
 ### Added
