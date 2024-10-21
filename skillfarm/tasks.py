@@ -63,9 +63,11 @@ def update_char_skillqueue(
     self, character_id, force_refresh=False, chain=[]
 ):  # pylint: disable=unused-argument, dangerous-default-value
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    return CharacterSkillqueueEntry.objects.update_or_create_esi(
+    CharacterSkillqueueEntry.objects.update_or_create_esi(
         character, force_refresh=force_refresh
     )
+    character.last_update_skillqueue = timezone.now()
+    character.save()
 
 
 @shared_task(
@@ -79,6 +81,6 @@ def update_char_skills(
     self, character_id, force_refresh=False, chain=[]
 ):  # pylint: disable=unused-argument, dangerous-default-value
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    return CharacterSkill.objects.update_or_create_esi(
-        character, force_refresh=force_refresh
-    )
+    CharacterSkill.objects.update_or_create_esi(character, force_refresh=force_refresh)
+    character.last_update_skills = timezone.now()
+    character.save()
