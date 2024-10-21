@@ -10,13 +10,14 @@ from django.utils.translation import gettext_lazy as trans
 from django.views.decorators.http import require_POST
 from esi.decorators import token_required
 from eveuniverse.models import EveMarketPrice
-from memberaudit.models import Character
 
 from allianceauth.authentication.models import UserProfile
+from allianceauth.eveonline.models import EveCharacter
 
 from skillfarm.api.helpers import get_alts_queryset, get_character
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.tasks import update_character_skillfarm
 
 logger = get_extension_logger(__name__)
 
@@ -80,19 +81,18 @@ def character_admin(request):
 @permission_required("skillfarm.basic_access")
 def add_char(request, token):
     try:
-        character = Character.objects.get(
-            eve_character__character_id=token.character_id
-        )
+        character = EveCharacter.objects.get_character_by_id(token.character_id)
         char, _ = SkillFarmAudit.objects.update_or_create(
             character=character, defaults={"character": character}
         )
-    except Character.DoesNotExist:
-        msg = trans("Member Audit Character not found")
+        update_character_skillfarm.apply_async(args=[char.character.character_id])
+    except SkillFarmAudit.DoesNotExist:
+        msg = trans("Character not found")
         messages.error(request, msg)
         return redirect("skillfarm:skillfarm", character_pk=0)
 
     msg = trans("{character_name} successfully added to Skillfarm System").format(
-        character_name=char.character.eve_character.character_name,
+        character_name=char.character.character_name,
     )
     messages.success(request, msg)
     return redirect("skillfarm:skillfarm", character_pk=0)
@@ -114,9 +114,7 @@ def remove_char(request, character_id: list):
         return redirect("skillfarm:skillfarm", character_pk=character_pk)
 
     try:
-        character = SkillFarmAudit.objects.get(
-            character__eve_character__character_id=character_id
-        )
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
         character.delete()
     except SkillFarmAudit.DoesNotExist:
         msg = trans("Character/s not found")
@@ -124,7 +122,7 @@ def remove_char(request, character_id: list):
         return redirect("skillfarm:skillfarm", character_pk=character_pk)
 
     msg = trans("{character_name} successfully Deleted").format(
-        character_name=character.character.eve_character.character_name,
+        character_name=character.character.character_name,
     )
     messages.success(request, msg)
 
@@ -154,7 +152,7 @@ def switch_alarm(request, character_id: list):
 
     try:
         characters = SkillFarmAudit.objects.filter(
-            character__eve_character__character_id__in=characters
+            character__character_id__in=characters
         )
         if characters:
             for c in characters:
@@ -189,9 +187,7 @@ def skillset(request, character_id: list):
 
     try:
         skillset_list = skillset_data.split(",") if skillset_data else None
-        character = SkillFarmAudit.objects.get(
-            character__eve_character__character_id=character_id
-        )
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
         SkillFarmSetup.objects.update_or_create(
             character=character, defaults={"skillset": skillset_list}
         )
@@ -201,7 +197,7 @@ def skillset(request, character_id: list):
         return redirect("skillfarm:skillfarm", character_pk=0)
 
     msg = trans("{character_name} Skillset successfully updated").format(
-        character_name=character.character.eve_character.character_name,
+        character_name=character.character.character_name,
     )
     messages.success(request, msg)
     return redirect("skillfarm:skillfarm", character_pk=0)
@@ -211,9 +207,14 @@ def skillset(request, character_id: list):
 @permission_required("voicesofwar.basic_access")
 def skillfarm_calc(request):
     skillfarm_dict = {}
-    plex = EveMarketPrice.objects.get(eve_type_id=44992)
-    injector = EveMarketPrice.objects.get(eve_type_id=40520)
-    extractor = EveMarketPrice.objects.get(eve_type_id=40519)
+    try:
+        plex = EveMarketPrice.objects.get(eve_type_id=44992)
+        injector = EveMarketPrice.objects.get(eve_type_id=40520)
+        extractor = EveMarketPrice.objects.get(eve_type_id=40519)
+    except EveMarketPrice.DoesNotExist:
+        context = {"error": True}
+
+        return render(request, "skillfarm/calc.html", context=context)
 
     month = plex.average_price * 500
     month12 = plex.average_price * 300
