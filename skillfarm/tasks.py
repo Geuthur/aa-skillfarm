@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from allianceauth.services.tasks import QueueOnce
 
-from skillfarm.app_settings import SKILLFARM_UPDATE_PERIOD
+from skillfarm.app_settings import SKILLFARM_STALE_STATUS
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models import CharacterSkill, CharacterSkillqueueEntry, SkillFarmAudit
@@ -35,7 +35,7 @@ def update_character_skillfarm(
     self, character_id, force_refresh=True
 ):  # pylint: disable=unused-argument
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_UPDATE_PERIOD)
+    skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_STALE_STATUS)
     que = []
     mindt = timezone.now() - datetime.timedelta(days=90)
     logger.debug(
