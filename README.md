@@ -47,7 +47,7 @@ ______________________________________________________________________
 
 ### Step 0 - Check dependencies are installed<a name="step0"></a>
 
-- Skillfarm needs the app [django-eveuniverse](https://apps.allianceauth.org/apps/detail/django-eveuniverse) and [aa-memberaudit](https://apps.allianceauth.org/apps/detail/aa-memberaudit) to function. Please make sure it is installed.
+- Skillfarm needs the app [django-eveuniverse](https://apps.allianceauth.org/apps/detail/django-eveuniverse) to function. Please make sure it is installed.
 
 ### Step 1 - Install the Package<a name="step1"></a>
 
@@ -85,18 +85,21 @@ python manage.py migrate
 
 With the Following IDs you can set up the permissions for the Skillfarm
 
-| ID             | Description                     |                                                           |
-| :------------- | :------------------------------ | :-------------------------------------------------------- |
-| `basic_access` | Can access the Skillfarm module | All Members with the Permission can access the Skillfarm. |
-| `admin_access` | Has access to all characters    | Can see all Skillfarm Characters.                         |
+| ID             | Description                                      |                                                           |
+| :------------- | :----------------------------------------------- | :-------------------------------------------------------- |
+| `basic_access` | Can access the Skillfarm module                  | All Members with the Permission can access the Skillfarm. |
+| `corp_access`  | Has access to all characters in the corporation. | Can see all Skillfarm Characters from own Corporation.    |
+| `admin_access` | Has access to all characters                     | Can see all Skillfarm Characters.                         |
 
 ### Step 6 - (Optional) Setting up Compatibilies<a name="step6"></a>
 
 The Following Settings can be setting up in the `local.py`
 
-- SKILLFARM_APP_NAME:          `"YOURNAME"`     - Set the name of the APP
+- SKILLFARM_APP_NAME:            `"YOURNAME"`     - Set the name of the APP
 
-- SKILLFARM_LOGGER_USE:        `True / False`   - Set to use own Logger File
+- SKILLFARM_LOGGER_USE:          `True / False`   - Set to use own Logger File
+
+- SKILLFARM_STALE_STATUS:        `3`              - Set the Stale Status for Skillfarm Character in hours
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 

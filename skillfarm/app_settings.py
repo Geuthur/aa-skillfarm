@@ -35,3 +35,11 @@ SKILLFARM_LOGGER_USE = clean_setting("SKILLFARM_LOGGER_USE", False)
 
 # Max Time to set Char Inactive
 SKILLFARM_CHAR_MAX_INACTIVE_DAYS = clean_setting("SKILLFARM_CHAR_MAX_INACTIVE_DAYS", 3)
+
+# Batch Size for Bulk Methods
+SKILLFARM_BULK_METHODS_BATCH_SIZE = clean_setting(
+    "SKILLFARM_BULK_METHODS_BATCH_SIZE", 500
+)
+
+# Update Period for Skillfarm in Hours
+SKILLFARM_STALE_STATUS = clean_setting("SKILLFARM_STALE_STATUS", 3)

@@ -1,5 +1,22 @@
 # Changelog
 
+## \[0.3.0\] - 2024-10-21
+
+### Fixed
+
+- EveMarketPrice Error on Skillfarm Calculator
+- Wrong CSS Design on Skillfarm Calculator
+
+### Added
+
+- CharaccterSkill Model
+- CharacterQueue Model
+- EveMarketPrice Error Handler for Skillfarm Calculator
+
+### Removed
+
+- Memeberaudit dependency
+
 ## \[0.1.4\] - 2024-09-26
 
 ### Fixed

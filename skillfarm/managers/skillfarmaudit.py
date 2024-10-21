@@ -3,7 +3,6 @@ from django.db import models
 
 from allianceauth.eveonline.models import EveCharacter
 
-# AA Voices of War
 from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)
@@ -16,12 +15,16 @@ class SkillfarmQuerySet(models.QuerySet):
             logger.debug("Returning all characters for superuser %s.", user)
             return self
 
+        if user.has_perm("skillfarm.admin_access"):
+            logger.debug("Returning all characters for admin %s.", user)
+            return self
+
         try:
             char = user.profile.main_character
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if user.has_perm("ledger.admin_access"):
+            if user.has_perm("skillfarm.corp_access"):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug(
@@ -48,12 +51,16 @@ class SkillFarmManager(models.Manager):
             logger.debug("Returning all characters for superuser %s.", user)
             return qs.all()
 
+        if user.has_perm("skillfarm.admin_access"):
+            logger.debug("Returning all characters for admin %s.", user)
+            return qs.all()
+
         try:
             char = user.profile.main_character
             assert char
             queries = [models.Q(character_ownership__user=user)]
 
-            if user.has_perm("ledger.admin_access"):
+            if user.has_perm("skillfarm.corp_access"):
                 queries.append(models.Q(corporation_id=char.corporation_id))
 
             logger.debug(
