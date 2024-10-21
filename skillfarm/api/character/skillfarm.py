@@ -160,7 +160,7 @@ class SkillFarmApiEndpoints:
             tags=self.tags,
         )
         def get_character_admin(request):
-            chars_visible = SkillFarmAudit.objects.visible_characters(request.user)
+            chars_visible = SkillFarmAudit.objects.visible_eve_characters(request.user)
 
             if chars_visible is None:
                 return 403, "Permission Denied"
