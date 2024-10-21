@@ -57,7 +57,6 @@ INSTALLED_APPS += [
     "allianceauth.corputils",
     PACKAGE,
     "eveuniverse",
-    "memberaudit",
 ]
 # By default, apps are prevented from having public views for security reasons.
 # If you want to allow specific apps to have public views,
