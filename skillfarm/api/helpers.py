@@ -2,10 +2,19 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from allianceauth.eveonline.models import EveCharacter
 
-from skillfarm import models
 from skillfarm.hooks import get_extension_logger
+from skillfarm.models import SkillFarmAudit
 
 logger = get_extension_logger(__name__)
+
+
+def arabic_number_to_roman(value) -> str:
+    """Map to convert arabic to roman numbers (1 to 5 only)"""
+    my_map = {0: "-", 1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}
+    try:
+        return my_map[value]
+    except KeyError:
+        return "-"
 
 
 def get_character(request, character_id):
@@ -24,7 +33,7 @@ def get_character(request, character_id):
         ).get(character_id=request.user.profile.main_character.character_id)
 
     # check access
-    visible = models.SkillFarmAudit.objects.visible_eve_characters(request.user)
+    visible = SkillFarmAudit.objects.visible_eve_characters(request.user)
     if main_char not in visible:
         perms = False
     return perms, main_char
