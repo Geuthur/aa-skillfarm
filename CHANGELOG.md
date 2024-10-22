@@ -2,6 +2,12 @@
 
 ## \[0.3.1\] - 2024-10-22
 
+### Added
+
+- Skill Extraction Checker
+- FInished Skill Checker
+- Notification System
+
 ### Changed
 
 - Skilltraining Bool now handled by geuthuris_active property
@@ -12,6 +18,7 @@
 - ChararcterQueue is_active property not working correctly
 - Last Update was not implemented to new system
 - Skillfarm Overview error
+- Missing Models in init
 
 ## \[0.3.0\] - 2024-10-21
 
