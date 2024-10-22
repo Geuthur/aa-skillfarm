@@ -34,10 +34,11 @@ ______________________________________________________________________
   - Highlight finished Skills
 - Filter Skills for each Character
 - No Active Training hint
+- Notification System
 
 ## Upcoming<a name="upcoming"></a>
 
-- Notififcation System
+- Hide Character in Overview
 
 ## Installation<a name="installation"></a>
 
@@ -95,11 +96,12 @@ With the Following IDs you can set up the permissions for the Skillfarm
 
 The Following Settings can be setting up in the `local.py`
 
-- SKILLFARM_APP_NAME:            `"YOURNAME"`     - Set the name of the APP
-
-- SKILLFARM_LOGGER_USE:          `True / False`   - Set to use own Logger File
-
-- SKILLFARM_STALE_STATUS:        `3`              - Set the Stale Status for Skillfarm Character in hours
+| Setting Name                      | Descriptioon                                          | Default       |
+| --------------------------------- | ----------------------------------------------------- | ------------- |
+| `SKILLFARM_APP_NAME`              | Set the name of the APP                               | `"Skillfarm"` |
+| `SKILLFARM_LOGGER_USE`            | Set to use own Logger File `True/False`               | `False`       |
+| `SKILLFARM_STALE_STATUS`          | Set the Stale Status for Skillfarm Character in hours | `3`           |
+| `SKILLFARM_NOTIFICATION_COOLDOWN` | Set the Stale Status for Skillfarm Character in days  | `14`          |
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 
