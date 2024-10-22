@@ -58,7 +58,7 @@ class SkillFarmApiEndpoints:
 
             # Get all Characters and related data in one query
             audit = SkillFarmAudit.objects.filter(
-                character__in=characters
+                character__in=characters, active=True
             ).select_related(
                 "character",
             )
@@ -149,6 +149,11 @@ class SkillFarmApiEndpoints:
                         "skillqueue": skillqueue_data,
                         "skills": skills_data,
                         "is_active": any(entry.is_active for entry in skillsqueue),
+                        "extraction_ready": (
+                            any(entry.is_exc_ready for entry in skills)
+                            if skillset
+                            else False
+                        ),
                     }
                 )
 

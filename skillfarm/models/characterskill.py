@@ -33,3 +33,24 @@ class CharacterSkill(models.Model):
 
     def __str__(self) -> str:
         return f"{self.character}-{self.eve_type.name}"
+
+    @property
+    def is_exc_ready(self) -> bool:
+        """Check if skill extraction is ready."""
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models import SkillFarmSetup
+
+        try:
+            character = SkillFarmSetup.objects.get(character=self.character)
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None:
+            skills = CharacterSkill.objects.filter(
+                character=self.character,
+                eve_type__name__in=character.skillset,
+            )
+            for skill in skills:
+                if skill.trained_skill_level == 5:
+                    return True
+        return False
