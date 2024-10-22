@@ -77,6 +77,30 @@ class SkillFarmAudit(models.Model):
         except Exception:  # pylint: disable=broad-exception-caught
             return False
 
+    def finished_skills(self) -> list[str]:
+        """Check if a character has a skill finished from filter."""
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models import CharacterSkill
+
+        skill_names = []
+        try:
+            character = SkillFarmSetup.objects.get(
+                character__character_id=self.character.character_id
+            )
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None:
+            skills = CharacterSkill.objects.filter(
+                character__character_id=self.character.character_id,
+                eve_type__name__in=character.skillset,
+            )
+
+            for skill in skills:
+                if skill.trained_skill_level == 5:
+                    skill_names.append(skill.eve_type.name)
+        return skill_names
+
 
 class SkillFarmSetup(models.Model):
     id = models.AutoField(primary_key=True)
