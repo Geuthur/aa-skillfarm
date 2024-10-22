@@ -73,6 +73,11 @@ CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
     "task": "skillfarm.tasks.update_all_skillfarm",
     "schedule": crontab(minute=0, hour="*/1"),
 }
+
+CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
+    "task": "skillfarm.tasks.check_skillfarm_notifications",
+    "schedule": crontab(minute=0, hour="*/12"),
+}
 ```
 
 ### Step 4 - Migration to AA<a name="step4"></a>
