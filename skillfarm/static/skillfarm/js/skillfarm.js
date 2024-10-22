@@ -486,6 +486,11 @@ function showskillQueueModal(button) {
             progressPercent = 0;
         }
 
+        // Set progressPercent to 0 if skill is not active
+        if (!skill.is_active) {
+            progressPercent = 0;
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${skill.skill}</td>
@@ -495,11 +500,11 @@ function showskillQueueModal(button) {
                     <div class="progress-value" style="position: absolute; width: 100%; text-align: center;">${progressPercent.toFixed(0)}%</div>
                 </div>
             </td>
-            <td data-order="${skill.start_date ? new Date(skill.start_date).getTime() : ''}">
-                ${skill.start_date ? new Date(skill.start_date).toLocaleString() : 'No Active Training'}
+            <td data-order="${skill.is_active ? new Date(skill.start_date).getTime() : ''}">
+                ${skill.is_active ? new Date(skill.start_date).toLocaleString() : '-'}
             </td>
-            <td data-order="${skill.finish_date ? new Date(skill.finish_date).getTime() : ''}">
-                ${skill.finish_date ? new Date(skill.finish_date).toLocaleString() : 'No Active Training'}
+            <td data-order="${skill.is_active ? new Date(skill.finish_date).getTime() : ''}">
+                ${skill.is_active ? new Date(skill.finish_date).toLocaleString() : '-'}
             </td>
         `;
         skillQueueTbody.appendChild(tr);
