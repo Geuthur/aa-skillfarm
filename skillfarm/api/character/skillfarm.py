@@ -105,6 +105,7 @@ class SkillFarmApiEndpoints:
                 ).select_related(
                     "eve_type",
                 )
+
                 skillsqueue_filtered = skillsqueue.filter(character_filters)
 
                 def process_skill_queue_entry(entry):
@@ -147,6 +148,7 @@ class SkillFarmApiEndpoints:
                         "skillqueuefiltered": skillqueuefiltered_data,
                         "skillqueue": skillqueue_data,
                         "skills": skills_data,
+                        "is_active": any(entry.is_active for entry in skillsqueue),
                     }
                 )
 

@@ -38,6 +38,7 @@ class SkillFarm(Schema):
     skillset: Any
     skills: Any
     skill_names: Any
+    is_active: Optional[bool]
 
 
 class SkillFarmFilter(Schema):
