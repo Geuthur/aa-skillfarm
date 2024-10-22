@@ -1,5 +1,18 @@
 # Changelog
 
+## \[0.3.1\] - 2024-10-22
+
+### Changed
+
+- Skilltraining Bool now handled by geuthuris_active property
+- JS ´No Active Training´ function to new is_active property
+
+### Fixed
+
+- ChararcterQueue is_active property not working correctly
+- Last Update was not implemented to new system
+- Skillfarm Overview error
+
 ## \[0.3.0\] - 2024-10-21
 
 ### Fixed
