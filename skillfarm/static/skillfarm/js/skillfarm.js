@@ -83,35 +83,45 @@ document.addEventListener('DOMContentLoaded', function() {
         var skillqueueJson = JSON.parse(skillqueue);
         var skillsJson = JSON.parse(skills);
 
+        // If there are no skills, return the total progress bar
         if (skillsJson.length === 0) {
             return totalProgressbar(skillqueue);
         }
 
-        // Extract unique skill names without levels and optional hyphen from the skillqueue
-        var uniqueSkillNames = [...new Set(skillqueueJson.map(skill => skill.skill.replace(/\s[IV-]*$/, '')))];
+        // Calculate the progress percentage for each skill individually
+        var totalProgressPercent = 0;
+        var skillCount = skillqueueJson.length;
+        var currentDate = new Date();
 
-        // Find the highest end_sp for each unique skill name
-        var totalEndSp = uniqueSkillNames.reduce((total, skillName) => {
-            var highestSkill = skillqueueJson
-                .filter(skill => skill.skill.replace(/\s[IV-]*$/, '') === skillName)
-                .reduce((prev, current) => (prev.end_sp > current.end_sp) ? prev : current);
-            return total + highestSkill.end_sp;
-        }, 0);
+        skillqueueJson.forEach(skill => {
+            var startDate = new Date(skill.start_date);
+            var endDate = new Date(skill.finish_date);
+            var skillDuration = endDate - startDate;
+            var skillTrainedDuration = Math.min(currentDate - startDate, skillDuration);
 
-        // Sum the skillpoints of all skills in the skills array
-        var totalSkillpoints = skillsJson.reduce((total, skill) => total + skill.skillpoints, 0);
+            var skillProgressPercent = (skillTrainedDuration / skillDuration) * 100;
 
-        // Calculate the progress percentage
-        var progressPercent = (totalSkillpoints / totalEndSp) * 100;
+            // Ensure the progress percentage is between 0 and 100
+            if (!isFinite(skillProgressPercent) || skillProgressPercent < 0) {
+                skillProgressPercent = 0;
+            } else if (skillProgressPercent > 100) {
+                skillProgressPercent = 100;
+            }
 
-        // Handle cases where progressPercent is Infinity or exceeds 100%
-        if (!isFinite(progressPercent)) {
-            progressPercent = 100;
-        } else if (progressPercent > 100) {
-            progressPercent = 100;
+            totalProgressPercent += skillProgressPercent;
+        });
+
+        // Calculate the average progress percentage
+        var averageProgressPercent = totalProgressPercent / skillCount;
+
+        // Ensure the final progress percentage is between 0 and 100
+        if (!isFinite(averageProgressPercent) || averageProgressPercent < 0) {
+            averageProgressPercent = 0;
+        } else if (averageProgressPercent > 100) {
+            averageProgressPercent = 100;
         }
 
-        return progressPercent;
+        return averageProgressPercent;
     }
 
     function hasActiveTraining(skillqueueJson) {
@@ -143,7 +153,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const skillqueueFilteredJson = JSON.stringify(character.skillqueuefiltered);
                     const skillqueueJson = JSON.stringify(character.skillqueue);
                     const skillsJson = JSON.stringify(character.skills);
-                    const hasSkillLevel5 = JSON.parse(skillsJson).some(skill => skill.level === 5);
+
+                    const is_extraction_ready = character.extraction_ready;
 
                     const progressBarHtml = `
                     <div class="progress-outer flex-grow-1 me-2">
@@ -166,8 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     `;
 
-                    const skillStatus = JSON.parse(skillsJson).some(skill => skill.level === 5) ? '<img src="/static/skillfarm/images/skillExtractor.png" class="rounded-circle" style="width: 32px">' : '';
-                    const skillStatusWarning = JSON.parse(skillsJson).some(skill => skill.level === 5) ? 'bg-warning' : '';
+                    const skillStatus = is_extraction_ready ? '<img src="/static/skillfarm/images/skillExtractor.png" class="rounded-circle" style="width: 32px">' : '';
+                    const skillStatusWarning = is_extraction_ready ? 'bg-warning' : '';
                     const skillListHtml = `
                         <button class="btn btn-primary btn-sm btn-square ${skillStatusWarning}" data-bs-toggle="modal" data-bs-target="#skillQueueModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skillqueue='${skillqueueFilteredJson}' data-skills='${skillsJson}' onclick="showskillQueueModal(this)">
                             <span class="fas fa-info"></span>
@@ -486,8 +497,7 @@ function showskillQueueModal(button) {
             progressPercent = 0;
         }
 
-        // Set progressPercent to 0 if skill is not active
-        if (!skill.is_active) {
+        if (!skill.is_active && !skill.start_date) {
             progressPercent = 0;
         }
 
@@ -501,10 +511,10 @@ function showskillQueueModal(button) {
                 </div>
             </td>
             <td data-order="${skill.is_active ? new Date(skill.start_date).getTime() : ''}">
-                ${skill.is_active ? new Date(skill.start_date).toLocaleString() : '-'}
+                ${skill.start_date ? new Date(skill.start_date).toLocaleString() : '-'}
             </td>
             <td data-order="${skill.is_active ? new Date(skill.finish_date).getTime() : ''}">
-                ${skill.is_active ? new Date(skill.finish_date).toLocaleString() : '-'}
+                ${skill.start_date ? new Date(skill.finish_date).toLocaleString() : '-'}
             </td>
         `;
         skillQueueTbody.appendChild(tr);
