@@ -55,6 +55,7 @@
         skillfarmUrl: skillfarmUrl,
 		switchSkillSetpUrl: '{% url "skillfarm:skillset" character_id=1337 %}',
 		switchAlarmUrl: '{% url "skillfarm:switch_alarm" character_id=1337 %}',
+        switchStatusUrl: '{% url "skillfarm:switch_activity" character_id=1337 %}',
         deleteCharUrl: '{% url "skillfarm:remove_char" character_id=1337 %}',
 		csrfToken: '{% csrf_token %}',
         characterPk: '{{ character_pk }}',
@@ -62,6 +63,8 @@
         // Translations
 		switchAlarmConfirmText: '{% translate "Are you sure to Switch Alarm" %}',
         switchAlarmText: '{% translate "Toggle Alarm" %}',
+        switchStatusText: '{% translate "Toggle Activity" %}',
+        switchStatusConfirmText: '{% translate "Are you sure to Switch Activity" %}',
         notUpdatedText: '{% translate "Not Updated Yet" %}',
         noActiveTrainingText: '{% translate "No Active Training" %}',
 
