@@ -110,7 +110,9 @@ class SkillFarmAudit(models.Model):
         if self.last_notification < timezone.now() - datetime.timedelta(
             days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN
         ):
-            self.delete()
+            self.last_notification = None
+            self.notification_sent = False
+            self.save()
             return False
         return True
 
