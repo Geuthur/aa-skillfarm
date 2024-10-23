@@ -38,7 +38,7 @@ class CharacterSkill(models.Model):
     def is_exc_ready(self) -> bool:
         """Check if skill extraction is ready."""
         # pylint: disable=import-outside-toplevel
-        from skillfarm.models.skillfarmaudit import SkillFarmSetup
+        from skillfarm.models.skillfarmsetup import SkillFarmSetup
 
         try:
             character = SkillFarmSetup.objects.get(character=self.character)

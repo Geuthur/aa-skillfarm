@@ -16,7 +16,8 @@ from skillfarm.api.helpers import (
 )
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.characterskill import CharacterSkill
-from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.models.skillfarmsetup import SkillFarmSetup
 from skillfarm.models.skillqueue import CharacterSkillqueueEntry
 
 logger = get_extension_logger(__name__)

@@ -64,6 +64,7 @@ class SkillFarmAudit(models.Model):
         """Check if a character has a skill finished from filter."""
         # pylint: disable=import-outside-toplevel
         from skillfarm.models.characterskill import CharacterSkill
+        from skillfarm.models.skillfarmsetup import SkillFarmSetup
 
         skill_names = []
         try:
@@ -115,21 +116,3 @@ class SkillFarmAudit(models.Model):
             self.save()
             return False
         return True
-
-
-class SkillFarmSetup(models.Model):
-    id = models.AutoField(primary_key=True)
-
-    character = models.OneToOneField(
-        SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_setup"
-    )
-
-    skillset = models.JSONField(default=dict, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.skillset}'s Skill Setup"
-
-    objects = SkillFarmManager()
-
-    class Meta:
-        default_permissions = ()

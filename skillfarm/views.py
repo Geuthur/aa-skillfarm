@@ -16,7 +16,8 @@ from allianceauth.eveonline.models import EveCharacter
 
 from skillfarm.api.helpers import get_alts_queryset, get_character
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.models.skillfarmsetup import SkillFarmSetup
 from skillfarm.tasks import update_character_skillfarm
 
 logger = get_extension_logger(__name__)
