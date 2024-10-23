@@ -89,12 +89,13 @@ def update_char_skills(
     character.save()
 
 
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument, too-many-locals
 @shared_task(bind=True, base=QueueOnce)
 def check_skillfarm_notifications(self, runs: int = 0):
     characters = SkillFarmAudit.objects.select_related("character").all()
     owner_ids = {}
     warnings = {}
+    notified_characters = []
 
     for character in characters:
         skill_names = character.finished_skills()
@@ -136,9 +137,7 @@ def check_skillfarm_notifications(self, runs: int = 0):
                 warnings[main_id] = []
 
             warnings[main_id].append(msg)
-            character.notification_sent = True
-            character.last_notification = timezone.now()
-            character.save()
+            notified_characters.append(character)
 
     if warnings:
         for main_id, warnings in warnings.items():
@@ -154,6 +153,14 @@ def check_skillfarm_notifications(self, runs: int = 0):
                 user=owner.user,
                 level="warning",
             )
+
+            # Set notification_sent to True for all characters that were notified
+            for character in notified_characters:
+                if character.character.character_id in owner_ids[main_id]:
+                    character.notification_sent = True
+                    character.last_notification = timezone.now()
+                    character.save()
+
             runs = runs + 1
 
     logger.info("Queued %s Skillfarm Notifications", runs)
