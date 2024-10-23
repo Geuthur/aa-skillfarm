@@ -7,7 +7,7 @@ from skillfarm.providers import esi
 from skillfarm.task_helper import NotModifiedError, etag_results
 
 if TYPE_CHECKING:
-    from skillfarm.models import SkillFarmAudit
+    from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 from skillfarm.hooks import get_extension_logger
 

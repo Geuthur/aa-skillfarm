@@ -63,7 +63,7 @@ class SkillFarmAudit(models.Model):
     def finished_skills(self) -> list[str]:
         """Check if a character has a skill finished from filter."""
         # pylint: disable=import-outside-toplevel
-        from skillfarm.models import CharacterSkill
+        from skillfarm.models.characterskill import CharacterSkill
 
         skill_names = []
         try:

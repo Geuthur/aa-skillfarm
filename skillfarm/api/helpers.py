@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from allianceauth.eveonline.models import EveCharacter
 
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 logger = get_extension_logger(__name__)
 
