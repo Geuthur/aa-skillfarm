@@ -1,17 +1,21 @@
 # Changelog
 
-## \[0.3.1\] - 2024-10-22
+## \[0.3.1\] - 2024-10-23
 
 ### Added
 
 - Skill Extraction Checker
 - FInished Skill Checker
 - Notification System
+- Activity Switcher
+- Inactive Character Table
 
 ### Changed
 
 - Skilltraining Bool now handled by geuthuris_active property
 - JS ´No Active Training´ function to new is_active property
+- Add Character init force update
+- CSS Improvments
 
 ### Fixed
 
@@ -19,6 +23,7 @@
 - Last Update was not implemented to new system
 - Skillfarm Overview error
 - Missing Models in init
+- Empty Queue not be deleted
 
 ## \[0.3.0\] - 2024-10-21
 
