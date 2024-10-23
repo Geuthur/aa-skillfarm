@@ -106,7 +106,7 @@ The Following Settings can be setting up in the `local.py`
 | `SKILLFARM_APP_NAME`              | Set the name of the APP                               | `"Skillfarm"` |
 | `SKILLFARM_LOGGER_USE`            | Set to use own Logger File `True/False`               | `False`       |
 | `SKILLFARM_STALE_STATUS`          | Set the Stale Status for Skillfarm Character in hours | `3`           |
-| `SKILLFARM_NOTIFICATION_COOLDOWN` | Set the Stale Status for Skillfarm Character in days  | `14`          |
+| `SKILLFARM_NOTIFICATION_COOLDOWN` | Set the Stale Status for Skillfarm Character in days  | `3`           |
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 
