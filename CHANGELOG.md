@@ -16,6 +16,7 @@
 - JS ´No Active Training´ function to new is_active property
 - Add Character init force update
 - CSS Improvments
+- Update only active characters
 
 ### Fixed
 

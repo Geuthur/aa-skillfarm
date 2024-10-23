@@ -26,7 +26,7 @@ logger = get_extension_logger(__name__)
 @shared_task
 @when_esi_is_available
 def update_all_skillfarm(runs: int = 0):
-    characters = SkillFarmAudit.objects.select_related("character").all()
+    characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
     for character in characters:
         update_character_skillfarm.apply_async(args=[character.character.character_id])
         runs = runs + 1
