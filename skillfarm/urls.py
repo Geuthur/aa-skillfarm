@@ -27,6 +27,11 @@ urlpatterns = [
         name="switch_alarm",
     ),
     path(
+        "switch_activity/<int:character_id>/",
+        views.switch_activity,
+        name="switch_activity",
+    ),
+    path(
         "skillset/<int:character_id>/",
         views.skillset,
         name="skillset",

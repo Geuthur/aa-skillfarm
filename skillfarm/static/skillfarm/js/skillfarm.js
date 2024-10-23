@@ -5,17 +5,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var csrfToken = skillfarmSettings.csrfToken;
     var urlAlarm = skillfarmSettings.switchAlarmUrl;
     var urlSkillset = skillfarmSettings.switchSkillSetpUrl;
+    var urlStatus = skillfarmSettings.switchStatusUrl;
     var urlDeleteChar = skillfarmSettings.deleteCharUrl;
     var url = skillfarmSettings.skillfarmUrl;
     var characterPk = skillfarmSettings.characterPk;
     // Translations
     var switchAlarmText = skillfarmSettings.switchAlarmConfirmText;
     var switchAlarm = skillfarmSettings.switchAlarmText;
+
     var switchSkillset = skillfarmSettings.switchSkillsetText;
+
+    var switchStatus = skillfarmSettings.switchStatusText;
+    var switchStatusText = skillfarmSettings.switchStatusConfirmText;
+
     var deleteChar = skillfarmSettings.deleteCharText;
     var deleteCharConfirm = skillfarmSettings.deleteCharConfirmText;
+
     var alarmActivated = skillfarmSettings.alarmActivatedText;
     var alarmDeactivated = skillfarmSettings.alarmDeactivatedText;
+
     var notupdated = skillfarmSettings.notUpdatedText;
     var noActiveTraining = skillfarmSettings.noActiveTrainingText;
 
@@ -26,6 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function switchSkillSetpUrl(characterId) {
         return urlSkillset
+            .replace('1337', characterId);
+    }
+
+    function switchStatusUrl(characterId) {
+        return urlStatus
             .replace('1337', characterId);
     }
 
@@ -54,6 +67,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize DataTable
     var table = $('#skillfarm-details').DataTable({
+        order: [[0, 'asc']],
+        pageLength: 50,
+        columnDefs: [
+            { 'orderable': false, 'targets': 'no-sort' }
+        ],
+        createdRow: function(row, data, dataIndex) {
+            $('td:eq(5)', row).addClass('text-end');
+        }
+    });
+
+    // Initialize DataTable
+    var inactive = $('#skillfarm-inactive').DataTable({
         order: [[0, 'asc']],
         pageLength: 50,
         columnDefs: [
@@ -172,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const skillCell = `
                         <td>
                             <div class="d-flex align-items-center">
-                                ${hasActiveTraining(skillqueueJson) ? progressBarHtml : noActiveTrainingHtml}
+                                ${character.is_active ? progressBarHtml : noActiveTrainingHtml}
                             </div>
                         </td>
                     `;
@@ -217,6 +242,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>
                             </form>
 
+                            <form class="d-inline" method="post" action="${switchStatusUrl(character.character_id)}" id="switchStatusForm${character.character_id}">
+                                ${csrfToken}
+                                <input type="hidden" name="character_pk" value="${characterPk}">
+
+                                <button type="button" class="btn btn-primary btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${switchStatus}" data-bs-target="#confirmModal" data-confirm-text="${switchStatusText} for ${character.character_name}?" data-form-id="switchStatusForm${character.character_id}">
+                                    <span class="fas fa-toggle-off"></span>
+                                </button>
+                            </form>
+
                             <form class="d-inline" method="post" action="${deleteCharUrl(character.character_id)}" id="deleteCharForm${character.character_id}">
                                 ${csrfToken}
                                 <input type="hidden" name="character_pk" value="${characterPk}">
@@ -229,7 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
 
                     row.push(characterCell, skillCell, skillListHtml, lastUpdatedCell, filterstatusCell, actionsCell);
-                    table.row.add(row).draw();
+
+                    // Add row to the table
+                    if (character.active){
+                        table.row.add(row).draw();
+                    } else {
+                        inactive.row.add(row).draw();
+                    }
                 });
             });
 

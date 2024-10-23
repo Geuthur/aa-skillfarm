@@ -85,7 +85,9 @@ def add_char(request, token):
         char, _ = SkillFarmAudit.objects.update_or_create(
             character=character, defaults={"character": character}
         )
-        update_character_skillfarm.apply_async(args=[char.character.character_id])
+        update_character_skillfarm.apply_async(
+            args=[char.character.character_id], kwargs={"force_refresh": True}
+        )
     except SkillFarmAudit.DoesNotExist:
         msg = trans("Character not found")
         messages.error(request, msg)
@@ -166,6 +168,39 @@ def switch_alarm(request, character_id: list):
         return redirect("skillfarm:skillfarm", character_pk=character_pk)
 
     msg = trans("Alarm/s successfully updated")
+    messages.success(request, msg)
+
+    return redirect("skillfarm:skillfarm", character_pk=character_pk)
+
+
+@login_required
+@permission_required("skillfarm.basic_access")
+@require_POST
+def switch_activity(request, character_id: list):
+    # Retrieve character_pk from GET parameters
+    character_pk = int(request.POST.get("character_pk", 0))
+
+    # Check Permission
+    perm, _ = get_character(request, character_id)
+
+    if not perm:
+        msg = trans("Permission Denied")
+        messages.error(request, msg)
+        return redirect("skillfarm:skillfarm", character_pk=character_pk)
+
+    try:
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        character.active = not character.active
+        character.save()
+    except SkillFarmAudit.DoesNotExist:
+        msg = trans("Character/s not found")
+        messages.error(request, msg)
+        return redirect("skillfarm:skillfarm", character_pk=character_pk)
+
+    msg = trans("{character_name} successfully switched {mode}").format(
+        character_name=character.character.character_name,
+        mode="Active" if character.active else "Inactive",
+    )
     messages.success(request, msg)
 
     return redirect("skillfarm:skillfarm", character_pk=character_pk)
