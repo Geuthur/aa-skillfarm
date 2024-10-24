@@ -5,17 +5,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var csrfToken = skillfarmSettings.csrfToken;
     var urlAlarm = skillfarmSettings.switchAlarmUrl;
     var urlSkillset = skillfarmSettings.switchSkillSetpUrl;
+    var urlStatus = skillfarmSettings.switchStatusUrl;
     var urlDeleteChar = skillfarmSettings.deleteCharUrl;
     var url = skillfarmSettings.skillfarmUrl;
     var characterPk = skillfarmSettings.characterPk;
     // Translations
     var switchAlarmText = skillfarmSettings.switchAlarmConfirmText;
     var switchAlarm = skillfarmSettings.switchAlarmText;
+
     var switchSkillset = skillfarmSettings.switchSkillsetText;
+
+    var switchStatus = skillfarmSettings.switchStatusText;
+    var switchStatusText = skillfarmSettings.switchStatusConfirmText;
+
     var deleteChar = skillfarmSettings.deleteCharText;
     var deleteCharConfirm = skillfarmSettings.deleteCharConfirmText;
+
     var alarmActivated = skillfarmSettings.alarmActivatedText;
     var alarmDeactivated = skillfarmSettings.alarmDeactivatedText;
+
     var notupdated = skillfarmSettings.notUpdatedText;
     var noActiveTraining = skillfarmSettings.noActiveTrainingText;
 
@@ -26,6 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function switchSkillSetpUrl(characterId) {
         return urlSkillset
+            .replace('1337', characterId);
+    }
+
+    function switchStatusUrl(characterId) {
+        return urlStatus
             .replace('1337', characterId);
     }
 
@@ -64,6 +77,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Initialize DataTable
+    var inactive = $('#skillfarm-inactive').DataTable({
+        order: [[0, 'asc']],
+        pageLength: 50,
+        columnDefs: [
+            { 'orderable': false, 'targets': 'no-sort' }
+        ],
+        createdRow: function(row, data, dataIndex) {
+            $('td:eq(5)', row).addClass('text-end');
+        }
+    });
+
     function totalProgressbar (skillqueue) {
         var skillJson = JSON.parse(skillqueue);
         var totalSP = 0;
@@ -83,35 +108,45 @@ document.addEventListener('DOMContentLoaded', function() {
         var skillqueueJson = JSON.parse(skillqueue);
         var skillsJson = JSON.parse(skills);
 
+        // If there are no skills, return the total progress bar
         if (skillsJson.length === 0) {
             return totalProgressbar(skillqueue);
         }
 
-        // Extract unique skill names without levels and optional hyphen from the skillqueue
-        var uniqueSkillNames = [...new Set(skillqueueJson.map(skill => skill.skill.replace(/\s[IV-]*$/, '')))];
+        // Calculate the progress percentage for each skill individually
+        var totalProgressPercent = 0;
+        var skillCount = skillqueueJson.length;
+        var currentDate = new Date();
 
-        // Find the highest end_sp for each unique skill name
-        var totalEndSp = uniqueSkillNames.reduce((total, skillName) => {
-            var highestSkill = skillqueueJson
-                .filter(skill => skill.skill.replace(/\s[IV-]*$/, '') === skillName)
-                .reduce((prev, current) => (prev.end_sp > current.end_sp) ? prev : current);
-            return total + highestSkill.end_sp;
-        }, 0);
+        skillqueueJson.forEach(skill => {
+            var startDate = new Date(skill.start_date);
+            var endDate = new Date(skill.finish_date);
+            var skillDuration = endDate - startDate;
+            var skillTrainedDuration = Math.min(currentDate - startDate, skillDuration);
 
-        // Sum the skillpoints of all skills in the skills array
-        var totalSkillpoints = skillsJson.reduce((total, skill) => total + skill.skillpoints, 0);
+            var skillProgressPercent = (skillTrainedDuration / skillDuration) * 100;
 
-        // Calculate the progress percentage
-        var progressPercent = (totalSkillpoints / totalEndSp) * 100;
+            // Ensure the progress percentage is between 0 and 100
+            if (!isFinite(skillProgressPercent) || skillProgressPercent < 0) {
+                skillProgressPercent = 0;
+            } else if (skillProgressPercent > 100) {
+                skillProgressPercent = 100;
+            }
 
-        // Handle cases where progressPercent is Infinity or exceeds 100%
-        if (!isFinite(progressPercent)) {
-            progressPercent = 100;
-        } else if (progressPercent > 100) {
-            progressPercent = 100;
+            totalProgressPercent += skillProgressPercent;
+        });
+
+        // Calculate the average progress percentage
+        var averageProgressPercent = totalProgressPercent / skillCount;
+
+        // Ensure the final progress percentage is between 0 and 100
+        if (!isFinite(averageProgressPercent) || averageProgressPercent < 0) {
+            averageProgressPercent = 0;
+        } else if (averageProgressPercent > 100) {
+            averageProgressPercent = 100;
         }
 
-        return progressPercent;
+        return averageProgressPercent;
     }
 
     function hasActiveTraining(skillqueueJson) {
@@ -143,7 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const skillqueueFilteredJson = JSON.stringify(character.skillqueuefiltered);
                     const skillqueueJson = JSON.stringify(character.skillqueue);
                     const skillsJson = JSON.stringify(character.skills);
-                    const hasSkillLevel5 = JSON.parse(skillsJson).some(skill => skill.level === 5);
+
+                    const is_extraction_ready = character.extraction_ready;
 
                     const progressBarHtml = `
                     <div class="progress-outer flex-grow-1 me-2">
@@ -161,13 +197,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const skillCell = `
                         <td>
                             <div class="d-flex align-items-center">
-                                ${hasActiveTraining(skillqueueJson) ? progressBarHtml : noActiveTrainingHtml}
+                                ${character.is_active ? progressBarHtml : noActiveTrainingHtml}
                             </div>
                         </td>
                     `;
 
-                    const skillStatus = JSON.parse(skillsJson).some(skill => skill.level === 5) ? '<img src="/static/skillfarm/images/skillExtractor.png" class="rounded-circle" style="width: 32px">' : '';
-                    const skillStatusWarning = JSON.parse(skillsJson).some(skill => skill.level === 5) ? 'bg-warning' : '';
+                    const skillStatus = is_extraction_ready ? '<img src="/static/skillfarm/images/skillExtractor.png" class="rounded-circle" style="width: 32px">' : '';
+                    const skillStatusWarning = is_extraction_ready ? 'bg-warning' : '';
                     const skillListHtml = `
                         <button class="btn btn-primary btn-sm btn-square ${skillStatusWarning}" data-bs-toggle="modal" data-bs-target="#skillQueueModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skillqueue='${skillqueueFilteredJson}' data-skills='${skillsJson}' onclick="showskillQueueModal(this)">
                             <span class="fas fa-info"></span>
@@ -206,6 +242,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>
                             </form>
 
+                            <form class="d-inline" method="post" action="${switchStatusUrl(character.character_id)}" id="switchStatusForm${character.character_id}">
+                                ${csrfToken}
+                                <input type="hidden" name="character_pk" value="${characterPk}">
+
+                                <button type="button" class="btn btn-primary btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${switchStatus}" data-bs-target="#confirmModal" data-confirm-text="${switchStatusText} for ${character.character_name}?" data-form-id="switchStatusForm${character.character_id}">
+                                    <span class="fas fa-toggle-off"></span>
+                                </button>
+                            </form>
+
                             <form class="d-inline" method="post" action="${deleteCharUrl(character.character_id)}" id="deleteCharForm${character.character_id}">
                                 ${csrfToken}
                                 <input type="hidden" name="character_pk" value="${characterPk}">
@@ -218,7 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
 
                     row.push(characterCell, skillCell, skillListHtml, lastUpdatedCell, filterstatusCell, actionsCell);
-                    table.row.add(row).draw();
+
+                    // Add row to the table
+                    if (character.active){
+                        table.row.add(row).draw();
+                    } else {
+                        inactive.row.add(row).draw();
+                    }
                 });
             });
 
@@ -486,6 +537,10 @@ function showskillQueueModal(button) {
             progressPercent = 0;
         }
 
+        if (!skill.is_active && !skill.start_date) {
+            progressPercent = 0;
+        }
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${skill.skill}</td>
@@ -495,11 +550,11 @@ function showskillQueueModal(button) {
                     <div class="progress-value" style="position: absolute; width: 100%; text-align: center;">${progressPercent.toFixed(0)}%</div>
                 </div>
             </td>
-            <td data-order="${skill.start_date ? new Date(skill.start_date).getTime() : ''}">
-                ${skill.start_date ? new Date(skill.start_date).toLocaleString() : 'No Active Training'}
+            <td data-order="${skill.is_active ? new Date(skill.start_date).getTime() : ''}">
+                ${skill.start_date ? new Date(skill.start_date).toLocaleString() : '-'}
             </td>
-            <td data-order="${skill.finish_date ? new Date(skill.finish_date).getTime() : ''}">
-                ${skill.finish_date ? new Date(skill.finish_date).toLocaleString() : 'No Active Training'}
+            <td data-order="${skill.is_active ? new Date(skill.finish_date).getTime() : ''}">
+                ${skill.start_date ? new Date(skill.finish_date).toLocaleString() : '-'}
             </td>
         `;
         skillQueueTbody.appendChild(tr);

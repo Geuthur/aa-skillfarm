@@ -32,12 +32,10 @@ ______________________________________________________________________
   - Filtered Skill Queue
   - Filtered Skills
   - Highlight finished Skills
+  - No Active Training hint
 - Filter Skills for each Character
-- No Active Training hint
-
-## Upcoming<a name="upcoming"></a>
-
-- Notififcation System
+- Notification System
+- Enable/Disable Characters
 
 ## Installation<a name="installation"></a>
 
@@ -72,6 +70,11 @@ CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
     "task": "skillfarm.tasks.update_all_skillfarm",
     "schedule": crontab(minute=0, hour="*/1"),
 }
+
+CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
+    "task": "skillfarm.tasks.check_skillfarm_notifications",
+    "schedule": crontab(minute=0, hour="*/12"),
+}
 ```
 
 ### Step 4 - Migration to AA<a name="step4"></a>
@@ -95,11 +98,12 @@ With the Following IDs you can set up the permissions for the Skillfarm
 
 The Following Settings can be setting up in the `local.py`
 
-- SKILLFARM_APP_NAME:            `"YOURNAME"`     - Set the name of the APP
-
-- SKILLFARM_LOGGER_USE:          `True / False`   - Set to use own Logger File
-
-- SKILLFARM_STALE_STATUS:        `3`              - Set the Stale Status for Skillfarm Character in hours
+| Setting Name                      | Descriptioon                                           | Default       |
+| --------------------------------- | ------------------------------------------------------ | ------------- |
+| `SKILLFARM_APP_NAME`              | Set the name of the APP                                | `"Skillfarm"` |
+| `SKILLFARM_LOGGER_USE`            | Set to use own Logger File `True/False`                | `False`       |
+| `SKILLFARM_STALE_STATUS`          | Set the Stale Status for Skillfarm Character in hours  | `3`           |
+| `SKILLFARM_NOTIFICATION_COOLDOWN` | Number of days to wait before resending a notification | `3`           |
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 

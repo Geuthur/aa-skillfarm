@@ -41,4 +41,4 @@ class CharacterSkillqueueEntry(models.Model):
     @property
     def is_active(self) -> bool:
         """Returns true when this skill is currently being trained"""
-        return bool(self.finish_date) and self.queue_position == 0
+        return bool(self.finish_date) and self.finish_date > self.start_date

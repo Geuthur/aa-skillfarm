@@ -43,3 +43,6 @@ SKILLFARM_BULK_METHODS_BATCH_SIZE = clean_setting(
 
 # Update Period for Skillfarm in Hours
 SKILLFARM_STALE_STATUS = clean_setting("SKILLFARM_STALE_STATUS", 3)
+
+# Set Notification Cooldown in Days
+SKILLFARM_NOTIFICATION_COOLDOWN = clean_setting("SKILLFARM_NOTIFICATION_COOLDOWN", 3)

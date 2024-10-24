@@ -26,9 +26,10 @@ class SkillFarmAudit(models.Model):
     )
 
     notification = models.BooleanField(default=False)
+    notification_sent = models.BooleanField(default=False)
+    last_notification = models.DateTimeField(null=True, default=None, blank=True)
 
     last_update_skills = models.DateTimeField(null=True, default=None, blank=True)
-
     last_update_skillqueue = models.DateTimeField(null=True, default=None, blank=True)
 
     objects = SkillFarmManager()
@@ -59,6 +60,30 @@ class SkillFarmAudit(models.Model):
             return token
         return False
 
+    def finished_skills(self) -> list[str]:
+        """Check if a character has a skill finished from filter."""
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models.characterskill import CharacterSkill
+        from skillfarm.models.skillfarmsetup import SkillFarmSetup
+
+        skill_names = []
+        try:
+            character = SkillFarmSetup.objects.get(character=self)
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None:
+            skills = CharacterSkill.objects.filter(
+                character=self,
+                eve_type__name__in=character.skillset,
+            )
+
+            for skill in skills:
+                if skill.trained_skill_level == 5:
+                    skill_names.append(skill.eve_type.name)
+        return skill_names
+
+    @property
     def is_active(self):
         time_ref = timezone.now() - datetime.timedelta(
             days=app_settings.SKILLFARM_CHAR_MAX_INACTIVE_DAYS
@@ -77,45 +102,17 @@ class SkillFarmAudit(models.Model):
         except Exception:  # pylint: disable=broad-exception-caught
             return False
 
+    @property
+    def is_cooldown(self) -> bool:
+        """Check if a character has a notification cooldown."""
+        if self.last_notification is None:
+            return False
 
-class SkillFarmSetup(models.Model):
-    id = models.AutoField(primary_key=True)
-
-    character = models.OneToOneField(
-        SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_setup"
-    )
-
-    skillset = models.JSONField(default=dict, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.skillset}'s Skill Setup"
-
-    objects = SkillFarmManager()
-
-    class Meta:
-        default_permissions = ()
-
-
-class SkillFarmNotification(models.Model):
-    """Skillfarm Notification model for app"""
-
-    id = models.AutoField(primary_key=True)
-
-    character = models.OneToOneField(
-        SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_notification"
-    )
-
-    message = models.TextField()
-
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    objects = SkillFarmManager()
-
-    def __str__(self):
-        return f"{self.character.character.character_name}'s Notification"
-
-    class Meta:
-        default_permissions = ()
-        ordering = ["-timestamp"]
-        verbose_name = "Skillfarm Notification"
-        verbose_name_plural = "Skillfarm Notifications"
+        if self.last_notification < timezone.now() - datetime.timedelta(
+            days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN
+        ):
+            self.last_notification = None
+            self.notification_sent = False
+            self.save()
+            return False
+        return True

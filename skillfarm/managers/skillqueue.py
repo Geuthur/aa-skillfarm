@@ -7,7 +7,7 @@ from skillfarm.providers import esi
 from skillfarm.task_helper import NotModifiedError, etag_results
 
 if TYPE_CHECKING:
-    from skillfarm.models import SkillFarmAudit
+    from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 from skillfarm.hooks import get_extension_logger
 
@@ -21,7 +21,7 @@ class SkillqueueManager(models.Manager):
         """Update or create skills queue for a character from ESI."""
         skillqueue = self._fetch_data_from_esi(character, force_refresh=force_refresh)
 
-        if not skillqueue:
+        if skillqueue is None:
             return False
 
         entries = []
@@ -52,7 +52,7 @@ class SkillqueueManager(models.Manager):
     ) -> list[dict]:
         logger.debug("%s: Fetching skill queue from ESI", character)
 
-        skillqueue = []
+        skillqueue = None
         token = character.get_token()
         try:
             skillqueue_data = esi.client.Skills.get_characters_character_id_skillqueue(

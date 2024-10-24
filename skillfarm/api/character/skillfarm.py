@@ -16,7 +16,8 @@ from skillfarm.api.helpers import (
 )
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.characterskill import CharacterSkill
-from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.models.skillfarmsetup import SkillFarmSetup
 from skillfarm.models.skillqueue import CharacterSkillqueueEntry
 
 logger = get_extension_logger(__name__)
@@ -105,6 +106,7 @@ class SkillFarmApiEndpoints:
                 ).select_related(
                     "eve_type",
                 )
+
                 skillsqueue_filtered = skillsqueue.filter(character_filters)
 
                 def process_skill_queue_entry(entry):
@@ -147,6 +149,12 @@ class SkillFarmApiEndpoints:
                         "skillqueuefiltered": skillqueuefiltered_data,
                         "skillqueue": skillqueue_data,
                         "skills": skills_data,
+                        "is_active": any(entry.is_active for entry in skillsqueue),
+                        "extraction_ready": (
+                            any(entry.is_exc_ready for entry in skills)
+                            if skillset
+                            else False
+                        ),
                     }
                 )
 
@@ -160,7 +168,7 @@ class SkillFarmApiEndpoints:
             tags=self.tags,
         )
         def get_character_admin(request):
-            chars_visible = SkillFarmAudit.objects.visible_characters(request.user)
+            chars_visible = SkillFarmAudit.objects.visible_eve_characters(request.user)
 
             if chars_visible is None:
                 return 403, "Permission Denied"
