@@ -123,7 +123,7 @@ repos:
           )
 
   - repo: https://github.com/eslint/eslint
-    rev: v9.13.0
+    rev: v9.14.0
     hooks:
       - id: eslint
         name: ESLint
@@ -203,7 +203,7 @@ repos:
           - --target-version=4.2  # Minimum supported Django version for AA. Update as needed.
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.18.0
+    rev: v3.19.0
     hooks:
       - id: pyupgrade
         name: PyUpgrade
@@ -249,7 +249,7 @@ repos:
           - --target-version=py38  # Minimum required Python version for AA. Update as needed.
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.19.0
+    rev: 1.19.1
     hooks:
       - id: blacken-docs
         name: Blacken docs
@@ -284,7 +284,7 @@ repos:
         description: Format the tox.ini file.
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 2.4.3
+    rev: v2.5.0
     hooks:
       - id: pyproject-fmt
         name: pyproject.toml formatter
@@ -295,7 +295,7 @@ repos:
           - tox==4.15.0  # https://github.com/tox-dev/tox/releases/latest
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.21
+    rev: v0.22
     hooks:
       - id: validate-pyproject
         name: Validate pyproject.toml
