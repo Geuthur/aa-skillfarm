@@ -1,5 +1,11 @@
 # Changelog
 
+## \[0.3.2\] - 2024-11-09 - HOTFIX
+
+### Fixed
+
+- Template Tag Error
+
 ## \[0.3.1\] - 2024-10-23
 
 ### Added
