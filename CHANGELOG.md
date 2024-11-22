@@ -8,11 +8,14 @@
 
 ### Changed
 
-- ETag System for Tasks will be deactivated till it works correctly.
+- Inactive characters are now updated normally instead of never.
+- Inactive characters are now automaticly moved to Inactive Tab.
+- Removed the Status Switch button cause it now automaticly set inactive chars, the code will stay and will be removed in future.
 
 ### Fixed
 
-- SkillQueue not updating correctly.
+- Skillqueue not updating correctly.
+- Missing Set new ETag Header on not modified error
 
 ## \[0.3.2\] - 2024-11-09 - HOTFIX
 
