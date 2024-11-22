@@ -39,3 +39,8 @@ def register_urls():
     """Register app urls"""
 
     return UrlHook(urls, "skillfarm", r"^skillfarm/")
+
+
+@hooks.register("charlink")
+def register_charlink_hook():
+    return "skillfarm.thirdparty.charlink_hook"
