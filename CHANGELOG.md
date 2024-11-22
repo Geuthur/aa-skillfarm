@@ -1,5 +1,19 @@
 # Changelog
 
+## \[0.3.2\] - 2024-11-22
+
+### Added
+
+- Char Link integration.
+
+### Changed
+
+- ETag System for Tasks will be deactivated till it works correctly.
+
+### Fixed
+
+- SkillQueue not updating correctly.
+
 ## \[0.3.1\] - 2024-10-23
 
 ### Added
