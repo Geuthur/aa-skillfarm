@@ -129,6 +129,7 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
         and not etags_incomplete
     ):
         logger.debug("Etag: No modified Data for %s", operation.operation.operation_id)
+        set_etag_header(operation, headers)
         raise NotModifiedError()
 
     if force_refresh:
@@ -186,10 +187,12 @@ def handle_page_results(
 def etag_results(operation, token, force_refresh=False):
     _start_tm = time.perf_counter()
     operation.request_config.also_return_response = True
+
     if token:
         operation.future.request.headers["Authorization"] = (
             "Bearer " + token.valid_access_token()
         )
+
     if "page" in operation.operation.params:
         current_page = 1
         total_pages = 1
@@ -200,12 +203,14 @@ def etag_results(operation, token, force_refresh=False):
     else:
         if not force_refresh:
             inject_etag_header(operation)
+
         try:
             results, headers = operation.result()
         except HTTPNotModified as e:
-            logger.debug("ETag: Not Modified %s", operation.operation.operation_id)
+            logger.debug("ETag: HTTPNotModified %s", operation.operation.operation_id)
             set_etag_header(operation, e.response)
             raise NotModifiedError() from e
+
         handle_etag_headers(operation, headers, force_refresh, etags_incomplete=False)
     logger.debug(
         "ESI_TIME: OVERALL %s %s %s",
