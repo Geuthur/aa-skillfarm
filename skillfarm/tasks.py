@@ -35,7 +35,7 @@ def update_all_skillfarm(runs: int = 0):
 
 @shared_task(bind=True, base=QueueOnce)
 def update_character_skillfarm(
-    self, character_id, force_refresh=False
+    self, character_id, force_refresh=True
 ):  # pylint: disable=unused-argument
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_STALE_STATUS)
