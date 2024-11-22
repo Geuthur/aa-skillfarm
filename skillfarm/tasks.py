@@ -40,14 +40,22 @@ def update_character_skillfarm(
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_STALE_STATUS)
     que = []
-    mindt = timezone.now() - datetime.timedelta(days=90)
+    mindt = timezone.now() - datetime.timedelta(days=7)
     logger.debug(
         "Processing Audit Updates for %s", format(character.character.character_name)
     )
     if (character.last_update_skillqueue or mindt) <= skip_date or force_refresh:
+        # Update Inactive Characters every 7 days
+        if not character.active and mindt <= character.last_update_skillqueue:
+            que.append(
+                update_char_skillqueue.si(character_id, force_refresh=force_refresh)
+            )
         que.append(update_char_skillqueue.si(character_id, force_refresh=force_refresh))
 
     if (character.last_update_skills or mindt) <= skip_date or force_refresh:
+        # Update Inactive Characters every 7 days
+        if not character.active and mindt <= character.last_update_skills:
+            que.append(update_char_skills.si(character_id, force_refresh=force_refresh))
         que.append(update_char_skills.si(character_id, force_refresh=force_refresh))
 
     enqueue_next_task(que)
