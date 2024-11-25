@@ -16,6 +16,8 @@
 
 - Skillqueue not updating correctly.
 - Missing Set new ETag Header on not modified error
+- bootstrap editable wrong path
+- missing `bootstrap editable` CSS
 
 ## \[0.3.2\] - 2024-11-09 - HOTFIX
 
