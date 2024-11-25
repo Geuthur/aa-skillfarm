@@ -242,15 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>
                             </form>
 
-                            <form class="d-inline" method="post" action="${switchStatusUrl(character.character_id)}" id="switchStatusForm${character.character_id}">
-                                ${csrfToken}
-                                <input type="hidden" name="character_pk" value="${characterPk}">
-
-                                <button type="button" class="btn btn-primary btn-sm btn-square" data-bs-toggle="modal" data-tooltip-toggle="tooltip" title="${switchStatus}" data-bs-target="#confirmModal" data-confirm-text="${switchStatusText} for ${character.character_name}?" data-form-id="switchStatusForm${character.character_id}">
-                                    <span class="fas fa-toggle-off"></span>
-                                </button>
-                            </form>
-
                             <form class="d-inline" method="post" action="${deleteCharUrl(character.character_id)}" id="deleteCharForm${character.character_id}">
                                 ${csrfToken}
                                 <input type="hidden" name="character_pk" value="${characterPk}">
@@ -265,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     row.push(characterCell, skillCell, skillListHtml, lastUpdatedCell, filterstatusCell, actionsCell);
 
                     // Add row to the table
-                    if (character.active){
+                    if (character.is_active && character.active) {
                         table.row.add(row).draw();
                     } else {
                         inactive.row.add(row).draw();

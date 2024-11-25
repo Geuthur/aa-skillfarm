@@ -26,7 +26,7 @@ logger = get_extension_logger(__name__)
 @shared_task
 @when_esi_is_available
 def update_all_skillfarm(runs: int = 0):
-    characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
+    characters = SkillFarmAudit.objects.select_related("character").all()
     for character in characters:
         update_character_skillfarm.apply_async(args=[character.character.character_id])
         runs = runs + 1
@@ -35,12 +35,12 @@ def update_all_skillfarm(runs: int = 0):
 
 @shared_task(bind=True, base=QueueOnce)
 def update_character_skillfarm(
-    self, character_id, force_refresh=False
+    self, character_id, force_refresh=True
 ):  # pylint: disable=unused-argument
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_STALE_STATUS)
     que = []
-    mindt = timezone.now() - datetime.timedelta(days=90)
+    mindt = timezone.now() - datetime.timedelta(days=7)
     logger.debug(
         "Processing Audit Updates for %s", format(character.character.character_name)
     )

@@ -1,5 +1,24 @@
 # Changelog
 
+## \[0.3.3\] - 2024-11-25
+
+### Added
+
+- Char Link integration.
+
+### Changed
+
+- Inactive characters are now updated normally instead of never.
+- Inactive characters are now automaticly moved to Inactive Tab.
+- Removed the Status Switch button cause it now automaticly set inactive chars, the code will stay and will be removed in future.
+
+### Fixed
+
+- Skillqueue not updating correctly.
+- Missing Set new ETag Header on not modified error
+- bootstrap editable wrong path
+- missing `bootstrap editable` CSS
+
 ## \[0.3.2\] - 2024-11-09 - HOTFIX
 
 ### Fixed
