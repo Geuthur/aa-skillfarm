@@ -1,6 +1,6 @@
 # Changelog
 
-## \[0.3.3\] - 2024-11-25
+## [0.3.3] - 2024-11-25
 
 ### Added
 
@@ -19,13 +19,13 @@
 - bootstrap editable wrong path
 - missing `bootstrap editable` CSS
 
-## \[0.3.2\] - 2024-11-09 - HOTFIX
+## [0.3.2] - 2024-11-09 - HOTFIX
 
 ### Fixed
 
 - Template Tag Error
 
-## \[0.3.1\] - 2024-10-23
+## [0.3.1] - 2024-10-23
 
 ### Added
 
@@ -51,7 +51,7 @@
 - Missing Models in init
 - Empty Queue not be deleted
 
-## \[0.3.0\] - 2024-10-21
+## [0.3.0] - 2024-10-21
 
 ### Fixed
 
@@ -68,7 +68,7 @@
 
 - Memeberaudit dependency
 
-## \[0.1.4\] - 2024-09-26
+## [0.1.4] - 2024-09-26
 
 ### Fixed
 
@@ -80,13 +80,13 @@
 - Progress Bar calculate in first step per skillpoints if the system detect something is wrong it calculate per date
 - Add Step 0 Check dependencies are installed to README
 
-## \[0.1.3\] - 2024-09-26
+## [0.1.3] - 2024-09-26
 
 ### Fixed
 
 - Migration missing
 
-## \[0.1.2\] - 2024-09-22
+## [0.1.2] - 2024-09-22
 
 ### Added
 
@@ -107,7 +107,7 @@
   - Performance Optimations
   - Added Skillqueue & Skillqueue Filtered
 
-## \[0.1.1\] - 2024-09-22
+## [0.1.1] - 2024-09-22
 
 ### Added
 
@@ -115,7 +115,7 @@
   - esi-skills.read_skills.v1
   - esi-skills.read_skillqueue.v1
 
-## \[0.1.0\] - 2024-09-21
+## [0.1.0] - 2024-09-21
 
 ### Added
 

@@ -39,7 +39,7 @@ ______________________________________________________________________
 
 ## Installation<a name="installation"></a>
 
-> \[!NOTE\]
+> [!NOTE]
 > AA Skillfarm needs at least Alliance Auth v4.0.0
 > Please make sure to update your Alliance Auth before you install this APP
 
@@ -135,7 +135,7 @@ LOGGING["loggers"].update(LOGGING_SKILLFARM["loggers"])
 ![skillfarm1](https://github.com/user-attachments/assets/b7a99b75-39c0-4349-84ae-89c5c48262c2)
 ![Screenshot 2024-09-21 012008](https://github.com/user-attachments/assets/567197cc-c55f-4b0e-b470-d4ceeadcfb15)
 
-> \[!NOTE\]
+> [!NOTE]
 > Contributing
 > You want to improve the project?
 > Just Make a [Pull Request](https://github.com/Geuthur/aa-skillfarm/pulls) with the Guidelines.
