@@ -13,7 +13,10 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.notifications import notify
 from allianceauth.services.tasks import QueueOnce
 
-from skillfarm.app_settings import SKILLFARM_STALE_STATUS
+from skillfarm.app_settings import (
+    SKILLFARM_NOTIFICATION_COOLDOWN,
+    SKILLFARM_STALE_STATUS,
+)
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models import CharacterSkill, CharacterSkillqueueEntry, SkillFarmAudit
@@ -144,7 +147,7 @@ def check_skillfarm_notifications(self, runs: int = 0):
         if (
             character.last_notification is not None
             and character.last_notification
-            < timezone.now() - datetime.timedelta(days=1)
+            < timezone.now() - datetime.timedelta(days=SKILLFARM_NOTIFICATION_COOLDOWN)
         ):
             logger.debug(
                 "Notification Reseted for %s",
