@@ -7,6 +7,7 @@
 - Skillqueue hint if Skill is maybe Extraction ready
 - ESI Information hint for Updating SkillQueue
 - Skillqueue Extraction Notification
+- German Translation
 
 ### Changed
 
