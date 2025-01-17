@@ -2,6 +2,7 @@
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.utils import timezone
 from eveuniverse.models import EveType
 
 from skillfarm.hooks import get_extension_logger
@@ -42,3 +43,22 @@ class CharacterSkillqueueEntry(models.Model):
     def is_active(self) -> bool:
         """Returns true when this skill is currently being trained"""
         return bool(self.finish_date) and self.finish_date > self.start_date
+
+    @property
+    def is_skillqueue_ready(self) -> bool:
+        """Check if skill from skillqueue is rdy from end date."""
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models.skillfarmsetup import SkillFarmSetup
+
+        try:
+            character = SkillFarmSetup.objects.get(character=self.character)
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None and self.is_active:
+            if (
+                self.finish_date <= timezone.now()
+                and self.eve_type.name in character.skillset
+            ):
+                return True
+        return False

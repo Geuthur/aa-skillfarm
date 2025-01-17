@@ -21,6 +21,9 @@
         <span class="pb-2">
             <i class="fa-solid fa-bullhorn"></i> Notification <span class="text-success">ON</span>/<span class="text-danger">OFF</span>
         </span>
+        <div class="pb-2">
+            <button class="btn btn-primary btn-sm btn-square"><i class="fa-solid fa-info"></i></button>{% trans "ESI Skillqueue will only update on Character Login" %}
+        </div>
     </div>
     <div class="tab-content">
         {% include 'skillfarm/partials/table/skillfarm.html' %}
@@ -32,9 +35,6 @@
         <h3>{% translate "Inactive Characters" %} </h3>
     </div>
     <div class="card-body bg-secondary tab-content rounded-bottom">
-        <div class="pb-2">
-            <button class="btn btn-primary btn-sm btn-square"><i class="fa-solid fa-info"></i></button>{% trans "Characters here are excluded from beeing updated" %}
-        </div>
         <div class="tab-content">
             {% include 'skillfarm/partials/table/inactive.html' %}
         </div>
@@ -87,6 +87,9 @@
 
         deleteCharText: '{% translate "Delete Character" %}',
         deleteCharConfirmText: '{% translate "Are you sure to delete this Character" %}',
+
+        skillExtractionReadyText: '{% translate "Extraction Ready" %}',
+        skillExtractionReadyQueueText: '{% translate "Please Check Character" %}',
 	};
 </script>
 <script src="{% static 'skillfarm/js/skillfarm.js' %}"></script>

@@ -71,12 +71,20 @@ class SkillFarmApiEndpoints:
 
                 update_status = character.last_update_skillqueue
 
+                # Get all Skill Queue for the current character
+                skillsqueue = CharacterSkillqueueEntry.objects.filter(
+                    character=character
+                ).select_related(
+                    "eve_type",
+                )
+
                 # Filter Skills from Skillset
                 try:
                     skillset = SkillFarmSetup.objects.get(character=character)
                 except SkillFarmSetup.DoesNotExist:
                     skillset = None
 
+                # Fetch all Skills that match the skillset
                 if skillset and skillset.skillset is not None:
                     character_filters &= Q(eve_type__name__in=skillset.skillset)
 
@@ -100,13 +108,6 @@ class SkillFarmApiEndpoints:
 
                         skills_dict[character_obj].append(dict_data)
 
-                # Get all Skill Queue for the current character
-                skillsqueue = CharacterSkillqueueEntry.objects.filter(
-                    character=character
-                ).select_related(
-                    "eve_type",
-                )
-
                 skillsqueue_filtered = skillsqueue.filter(character_filters)
 
                 def process_skill_queue_entry(entry):
@@ -125,7 +126,7 @@ class SkillFarmApiEndpoints:
                 if character in skills_dict:
                     skills_data = skills_dict[character]
 
-                # Process all skill queue entries and filtered skill queue entries in one loop
+                # Process all skill queue entries and filtered skill queue entries
                 for entry in skillsqueue:
                     character_obj, dict_data = process_skill_queue_entry(entry)
                     skills_queue_dict[character_obj].append(dict_data)
@@ -152,8 +153,11 @@ class SkillFarmApiEndpoints:
                         "is_active": any(entry.is_active for entry in skillsqueue),
                         "extraction_ready": (
                             any(entry.is_exc_ready for entry in skills)
-                            if skillset
+                            if skillset and skills_data
                             else False
+                        ),
+                        "extraction_ready_queue": any(
+                            entry.is_skillqueue_ready for entry in skillsqueue
                         ),
                     }
                 )
