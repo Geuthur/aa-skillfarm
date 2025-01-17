@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from allianceauth.authentication.models import CharacterOwnership
 from allianceauth.notifications import notify
 from allianceauth.services.tasks import QueueOnce
 
@@ -93,56 +92,34 @@ def update_char_skills(
 @shared_task(bind=True, base=QueueOnce)
 def check_skillfarm_notifications(self, runs: int = 0):
     characters = SkillFarmAudit.objects.select_related("character").all()
-    owner_ids = {}
     warnings = {}
     notified_characters = []
 
+    # Create a dictionary to map main characters to their alts
+    main_to_alts = {}
     for character in characters:
-        skill_names = character.finished_skills()
+        main_character = (
+            character.character.character_ownership.user.profile.main_character
+        )
+        if main_character not in main_to_alts:
+            main_to_alts[main_character] = []
+        main_to_alts[main_character].append(character)
 
-        if skill_names and character.notification and not character.is_cooldown:
-            character_id = character.character.character_id
-
-            # Determine if the character_id is part of any main character's alts
-            main_id = None
-            for main, alts in owner_ids.items():
-                if character_id in alts:
-                    main_id = main
-                    break
-
-            if main_id is None:
-                try:
-                    owner = CharacterOwnership.objects.get(
-                        character__character_id=character_id
-                    )
-                    main = owner.user.profile.main_character
-                    alts = main.character_ownership.user.character_ownerships.all()
-
-                    owner_ids[main.character_id] = alts.values_list(
-                        "character__character_id", flat=True
-                    )
-
-                    main_id = main.character_id
-                except CharacterOwnership.DoesNotExist:
-                    continue
-                except AttributeError:
-                    continue
-
-            msg = _("%(charname)s: %(skillname)s") % {
-                "charname": character.character.character_name,
-                "skillname": ", ".join(skill_names),
-            }
-
-            if main_id not in warnings:
-                warnings[main_id] = []
-
-            warnings[main_id].append(msg)
-            notified_characters.append(character)
+    for main_character, alts in main_to_alts.items():
+        for alt in alts:
+            if alt.notification and not alt.is_cooldown:
+                skill_names = alt.get_finished_skills()
+                if skill_names:
+                    msg = alt._generate_notification(skill_names)
+                    warnings[main_character] = msg
+                    notified_characters.append(alt)
 
     if warnings:
-        for main_id, warnings in warnings.items():
-            msg = "\n".join(warnings)
-            owner = CharacterOwnership.objects.get(character__character_id=main_id)
+        for main_character, msg in warnings.items():
+            logger.debug(
+                "Skilltraining has been finished for %s",
+                main_character.character_name,
+            )
             title = _("Skillfarm Notifications")
             full_message = format_html(
                 "Following Skills have finished training: \n{}", msg
@@ -150,17 +127,31 @@ def check_skillfarm_notifications(self, runs: int = 0):
             notify(
                 title=title,
                 message=full_message,
-                user=owner.user,
+                user=main_character.character_ownership.user,
                 level="warning",
             )
 
             # Set notification_sent to True for all characters that were notified
             for character in notified_characters:
-                if character.character.character_id in owner_ids[main_id]:
-                    character.notification_sent = True
-                    character.last_notification = timezone.now()
-                    character.save()
+                character.notification_sent = True
+                character.last_notification = timezone.now()
+                character.save()
 
             runs = runs + 1
+
+    # Reset notification for characters that have not been notified for more than a day
+    for character in characters:
+        if (
+            character.last_notification is not None
+            and character.last_notification
+            < timezone.now() - datetime.timedelta(days=1)
+        ):
+            logger.debug(
+                "Notification Reseted for %s",
+                character.character.character_name,
+            )
+            character.last_notification = None
+            character.notification_sent = False
+            character.save()
 
     logger.info("Queued %s Skillfarm Notifications", runs)
