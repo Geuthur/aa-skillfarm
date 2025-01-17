@@ -21,13 +21,14 @@
         <span class="pb-2">
             <i class="fa-solid fa-bullhorn"></i> Notification <span class="text-success">ON</span>/<span class="text-danger">OFF</span>
         </span>
-        <div class="pb-2">
-            <button class="btn btn-primary btn-sm btn-square"><i class="fa-solid fa-info"></i></button>{% trans "ESI Skillqueue will only update on Character Login" %}
-        </div>
     </div>
     <div class="tab-content">
         {% include 'skillfarm/partials/table/skillfarm.html' %}
     </div>
+    <button class="btn btn-primary btn-sm btn-square">
+        <i class="fa-solid fa-info"></i>
+    </button>
+        <span class="text-muted">{% trans "ESI Skillqueue will only update on Character Login" %}</span>
 </div>
 
 <div class="pt-4">
