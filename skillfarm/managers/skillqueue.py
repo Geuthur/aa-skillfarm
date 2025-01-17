@@ -63,7 +63,7 @@ class SkillqueueManager(models.Manager):
                 skillqueue_data, token, force_refresh=force_refresh
             )
         except NotModifiedError:
-            logger.debug(
+            logger.info(
                 "No New Skillque data for: %s", character.character.character_name
             )
 
@@ -74,8 +74,8 @@ class SkillqueueManager(models.Manager):
         self.filter(character=character).delete()
 
         if not entries:
-            logger.debug("%s: Skill queue is empty", character)
+            logger.info("%s: Skill queue is empty", character)
             return
 
         self.bulk_create(entries)
-        logger.debug("%s: Updated %s skill queue/s", character, len(entries))
+        logger.info("%s: Updated %s skill queue/s", character, len(entries))
