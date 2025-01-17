@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.4] - 2025-01-17
+
+### Added
+
+- Skillqueue hint if Skill is maybe Extraction ready
+- ESI Information hint for Updating SkillQueue
+- Skillqueue Extraction Notification
+- German Translation
+
+### Changed
+
+- Changed Skill Task log Information from debug to info
+- Notification Checker Task improved
+
+### Fixed
+
+- Character are not displayed in some cases #10
+- Skillfarm Notification Task not reset Notification Cooldown
+
 ## [0.3.3] - 2024-11-25
 
 ### Added

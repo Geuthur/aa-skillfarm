@@ -4,6 +4,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from allianceauth.eveonline.models import EveCharacter, Token
 
@@ -60,8 +61,8 @@ class SkillFarmAudit(models.Model):
             return token
         return False
 
-    def finished_skills(self) -> list[str]:
-        """Check if a character has a skill finished from filter."""
+    def skill_extraction(self) -> list[str]:
+        """Check if a character has a skill extraction ready and return skill names."""
         # pylint: disable=import-outside-toplevel
         from skillfarm.models.characterskill import CharacterSkill
         from skillfarm.models.skillfarmsetup import SkillFarmSetup
@@ -82,6 +83,47 @@ class SkillFarmAudit(models.Model):
                 if skill.trained_skill_level == 5:
                     skill_names.append(skill.eve_type.name)
         return skill_names
+
+    def skillqueue_extraction(self) -> list[str]:
+        """Check if a character has a skillqueue Extraction ready and return skill names."""
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models.skillfarmsetup import SkillFarmSetup
+        from skillfarm.models.skillqueue import CharacterSkillqueueEntry
+
+        skill_names = []
+        try:
+            character = SkillFarmSetup.objects.get(character=self)
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None:
+            skillqueue = CharacterSkillqueueEntry.objects.filter(character=self)
+
+            for skill in skillqueue:
+                if skill.is_skillqueue_ready:
+                    skill_names.append(skill.eve_type.name)
+        return skill_names
+
+    def _generate_notification(self, skill_names: list[str]) -> str:
+        """Generate notification for the user."""
+        msg = _("%(charname)s: %(skillname)s") % {
+            "charname": self.character.character_name,
+            "skillname": ", ".join(skill_names),
+        }
+        return msg
+
+    def get_finished_skills(self) -> list[str]:
+        """Return a list of finished skills."""
+        skill_names = set()
+        skills = self.skill_extraction()
+        skillqueue = self.skillqueue_extraction()
+
+        if skillqueue:
+            skill_names.update(skillqueue)
+        if skills:
+            skill_names.update(skills)
+
+        return list(skill_names)
 
     @property
     def is_active(self):
@@ -106,13 +148,5 @@ class SkillFarmAudit(models.Model):
     def is_cooldown(self) -> bool:
         """Check if a character has a notification cooldown."""
         if self.last_notification is None:
-            return False
-
-        if self.last_notification < timezone.now() - datetime.timedelta(
-            days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN
-        ):
-            self.last_notification = None
-            self.notification_sent = False
-            self.save()
             return False
         return True

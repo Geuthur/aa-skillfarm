@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var notupdated = skillfarmSettings.notUpdatedText;
     var noActiveTraining = skillfarmSettings.noActiveTrainingText;
 
+    var skillExtractionReady = skillfarmSettings.skillExtractionReadyText;
+    var skillExtractionReadyQueue = skillfarmSettings.skillExtractionReadyQueueText;
+
     function switchAlarmUrl(characterId) {
         return urlAlarm
             .replace('1337', characterId);
@@ -180,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const skillsJson = JSON.stringify(character.skills);
 
                     const is_extraction_ready = character.extraction_ready;
+                    const is_skillqueue_ready = character.extraction_ready_queue;
 
                     const progressBarHtml = `
                     <div class="progress-outer flex-grow-1 me-2">
@@ -202,13 +206,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     `;
 
-                    const skillStatus = is_extraction_ready ? '<img src="/static/skillfarm/images/skillExtractor.png" class="rounded-circle" style="width: 32px">' : '';
-                    const skillStatusWarning = is_extraction_ready ? 'bg-warning' : '';
+                    const skillStatus = is_extraction_ready ? `<img src="/static/skillfarm/images/skillExtractor.png" title="${skillExtractionReady}" class="rounded-circle" style="width: 32px">` : ``;
+                    let skillQueueStatus = '';
+                    if (!is_extraction_ready) {
+                        skillQueueStatus = is_skillqueue_ready ? `<img src="/static/skillfarm/images/skillExtractorMaybe.png" title="${skillExtractionReadyQueue}" class="rounded-circle opacity-50" style="width: 32px">` : ``;
+                    }
+                    const skillStatusWarning = (is_extraction_ready || is_skillqueue_ready) ? 'bg-warning' : '';
                     const skillListHtml = `
                         <button class="btn btn-primary btn-sm btn-square ${skillStatusWarning}" data-bs-toggle="modal" data-bs-target="#skillQueueModal" data-character-id="${character.character_id}" data-character-name="${character.character_name}" data-skillqueue='${skillqueueFilteredJson}' data-skills='${skillsJson}' onclick="showskillQueueModal(this)">
                             <span class="fas fa-info"></span>
                         </button>
                         ${skillStatus}
+                        ${skillQueueStatus}
                     `;
 
                     // Last Updated
