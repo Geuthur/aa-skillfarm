@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.4.1] - 2025-01-18
+
+### Changed
+
+- force_refresh from true to false in `update_character_skillfarm` task
+
+### Fixed
+
+- SKillqueue Extraction Ready Bool are true if Skill is 4 instead of 5
+
 ## [0.3.4] - 2025-01-17
 
 ### Added

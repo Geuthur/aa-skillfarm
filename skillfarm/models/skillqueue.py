@@ -60,5 +60,6 @@ class CharacterSkillqueueEntry(models.Model):
                 self.finish_date <= timezone.now()
                 and self.eve_type.name in character.skillset
             ):
-                return True
+                if self.finished_level == 5:
+                    return True
         return False
