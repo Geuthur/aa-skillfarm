@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.5] - 2025-02-17
+
+### Fixed
+
+- Skillfarm Notification only sent one Character per Main Character should be all Characters that finished a skill.
+
 ## [0.3.4.1] - 2025-01-18
 
 ### Changed
