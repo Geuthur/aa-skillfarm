@@ -235,7 +235,7 @@ def _get_extraction_icon(skills, skillqueue) -> str:
         color = "red"
     elif skillqueue is True:
         image = "skillExtractorMaybe.png"
-        title = _("Please check your Character maybe a Skill is ready for extraction")
+        title = _("Please check your Character a Skill should be ready for extraction")
         div_id = "skillfarm-skill-extractor-maybe"
         icon = "fas fa-question"
         color = "orange"
