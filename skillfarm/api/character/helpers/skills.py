@@ -3,7 +3,7 @@ from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit
 
 
 def _get_character_skills(character: SkillFarmAudit) -> dict:
-    """Calculate the total of the progress bars for all skills in the skill queue."""
+    """Get all Skills for the current character"""
     skillset = get_skillset(character)
     skills_dict = []
     extraction_ready = False

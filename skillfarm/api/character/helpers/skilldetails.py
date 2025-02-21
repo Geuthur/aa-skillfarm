@@ -1,3 +1,5 @@
+import math
+
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -17,7 +19,7 @@ def _calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
     finish_date = skill.finish_date
 
     if totalsp == 0:
-        return _generate_progress_bar(0)
+        return 0
 
     current_date = timezone.now()
     total_duration = (finish_date - start_date).total_seconds()
@@ -34,51 +36,22 @@ def _calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
     elif progress > 100:
         progress = 100
 
-    return _generate_progress_bar(progress)
+    return progress
 
 
-def _calculate_progress_bar(skillqueue):
+def _calculate_sum_progress_bar(skillqueue: dict):
     """Calculate the progress bar for the skillqueue"""
-    totalsp = 0
-    trainedsp = 0
-
-    for skill in skillqueue:
-        totalsp += skill["end_sp"]
-        trainedsp += skill["trained_sp"]
-
-    if totalsp == 0:
-        return _generate_progress_bar(0)
-
-    progress = trainedsp / totalsp * 100
-
-    return _generate_progress_bar(progress)
-
-
-def _calculate_sum_progress_bar(skillqueue, skills):
-    """Calculate the progress bar for the skillqueue"""
-    if not skills:
-        return _calculate_progress_bar(skillqueue)
-
-    if skillqueue is None or len(skillqueue) == 0:
-        return _generate_progress_bar(0)
-
     # Calculate the progress percentage for each skill individually
     total_progress_percent = 0
     skill_count = len(skillqueue)
-    current_date = timezone.now()
+
+    if skill_count == 0:
+        return _generate_progress_bar(0)
 
     for skill in skillqueue:
-        if skill["start_date"] or skill["finish_date"] == "-":
+        if skill["start_date"] and skill["finish_date"] == "-":
             continue
-
-        skill_duration = (skill["finish_date"] - skill["start_date"]).total_seconds()
-        skill_trained_duration = min(
-            (current_date - skill["start_date"]).total_seconds(), skill_duration
-        )
-
-        skill_progress_percent = (skill_trained_duration / skill_duration) * 100
-
-        total_progress_percent += skill_progress_percent
+        total_progress_percent += skill["progress"]["value"]
 
     # Calculate the average progress percentage
     average_progress_percent = total_progress_percent / skill_count
@@ -88,6 +61,9 @@ def _calculate_sum_progress_bar(skillqueue, skills):
         average_progress_percent = 0
     elif average_progress_percent > 100:
         average_progress_percent = 100
+
+    # Round the average progress percentage to the nearest whole number
+    average_progress_percent = math.ceil(average_progress_percent)
 
     return _generate_progress_bar(average_progress_percent)
 

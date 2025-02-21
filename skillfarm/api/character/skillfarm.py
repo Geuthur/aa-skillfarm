@@ -14,7 +14,10 @@ from skillfarm.api.character.helpers.skilldetails import (
     _get_skillinfo_actions,
     _skillfarm_actions,
 )
-from skillfarm.api.character.helpers.skillqueue import _get_character_skillqueue
+from skillfarm.api.character.helpers.skillqueue import (
+    _get_character_skillqueue,
+    _get_character_skillqueue_single,
+)
 from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import (
     get_alts_queryset,
@@ -153,12 +156,13 @@ class SkillFarmApiEndpoints:
                     "actions": actions,
                 }
 
+                # Generate the progress bar for the skill queue
                 if skillqueue["is_training"] is False:
                     details["details"]["progress"] = _("No Active Training")
                     inactive_dict.append(details)
                 else:
                     details["details"]["progress"] = _calculate_sum_progress_bar(
-                        skillqueue=skillqueue["skillqueue"], skills=skills["skills"]
+                        skillqueue=skillqueue["skillqueue"]
                     )
                     details_dict.append(details)
 
@@ -209,13 +213,14 @@ class SkillFarmApiEndpoints:
                 return 403, "Permission Denied"
 
             skills = _get_character_skills(character)
-            skillqueue = _get_character_skillqueue(character)
+            skillqueue = _get_character_skillqueue_single(character)
 
             context = {
                 "title": _("Skill Info"),
                 "character_id": character.character.character_id,
                 "character_name": character.character.character_name,
                 "skillqueue": skillqueue["skillqueue"],
+                "skillqueue_filtered": skillqueue["skillqueue_filtered"],
                 "skills": skills["skills"],
             }
 
