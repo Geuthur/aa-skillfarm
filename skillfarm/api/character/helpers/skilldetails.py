@@ -51,12 +51,6 @@ def _calculate_progress_bar(skillqueue):
 
     progress = trainedsp / totalsp * 100
 
-    # Ensure the progress percentage is between 0 and 100
-    if progress < 0:
-        progress = 0
-    elif progress > 100:
-        progress = 100
-
     return _generate_progress_bar(progress)
 
 
@@ -76,22 +70,13 @@ def _calculate_sum_progress_bar(skillqueue, skills):
     for skill in skillqueue:
         if skill["start_date"] or skill["finish_date"] == "-":
             continue
-        start_date_str = str(skill["start_date"])
-        end_date_str = str(skill["finish_date"])
-        start_date = timezone.datetime.fromisoformat(start_date_str)
-        end_date = timezone.datetime.fromisoformat(end_date_str)
-        skill_duration = (end_date - start_date).total_seconds()
+
+        skill_duration = (skill["finish_date"] - skill["start_date"]).total_seconds()
         skill_trained_duration = min(
-            (current_date - start_date).total_seconds(), skill_duration
+            (current_date - skill["start_date"]).total_seconds(), skill_duration
         )
 
         skill_progress_percent = (skill_trained_duration / skill_duration) * 100
-
-        # Ensure the progress percentage is between 0 and 100
-        if skill_progress_percent < 0:
-            skill_progress_percent = 0
-        elif skill_progress_percent > 100:
-            skill_progress_percent = 100
 
         total_progress_percent += skill_progress_percent
 
