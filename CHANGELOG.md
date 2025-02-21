@@ -1,16 +1,68 @@
 # Changelog
 
-## [0.3.5] - 2025-02-17
+## [0.5.0] - 2025-02-17
+
+### Added
+
+- Alliance Auth
+  - Use `django_sri` hash integrity by [@ppfeuer](https://github.com/ppfeufer)
+    - Min. requirements: Alliance Auth >= 4.6.0
+- Models
+  - `name` field to all models
+  - `has_no_skillqueue` and `last_check` to SkillQueue model
+- API
+  - Progressbar, Skills, Skillqueue helper
+  - SkillSet API Endpoint
+- Forms
+  - SkillSetForm
+  - ConfirmForm
+- Interactive Button System
+- EveMarketPrice Data Fetch if not exist
+- Admin Site for Characters
+- JavsScript
+  - `calculator.js`
+  - `skillfarm-confirm.js`
+  - `skillfarm-skillset.js`
+  - `modal-system.js`
+  - `overview.js`
 
 ### Fixed
 
 - Skillfarm Notification only sent one Character per Main Character should be all Characters that finished a skill.
+- old `voicesofwar` permission view error
+
+### Changed
+
+- Skillfarm CSS
+  - table hover
+  - table striped
+- Refactor Templates Structure
+- Refactor API Endpoints
+- Refactor Views
+- Refactor Javascript
+- Button Generation handled by Python
+- Moved X-Editable to `libs` folder
+- Overview Design
+- etag name from `etag` to `skillfarm`
+- Models
+  - renamed `skillfarmaudit.py` to `skillfarm.py`
+  - `SkillFarmSetup` moved to `skillfarm.py`
+  - `CharacterSkillqueueEntry` moved to `characterskill.py`
+
+### Removed
+
+- Unnecessary Functions
+- Single Character View
+- Unnecessary Templates
+- Django 4.0 Supprt
+- Activity Switcher
 
 ## [0.3.4.1] - 2025-01-18
 
 ### Changed
 
 - force_refresh from true to false in `update_character_skillfarm` task
+- All JS moved to js folder
 
 ### Fixed
 

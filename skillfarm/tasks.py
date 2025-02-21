@@ -19,7 +19,11 @@ from skillfarm.app_settings import (
 )
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models import CharacterSkill, CharacterSkillqueueEntry, SkillFarmAudit
+from skillfarm.models.skillfarm import (
+    CharacterSkill,
+    CharacterSkillqueueEntry,
+    SkillFarmAudit,
+)
 from skillfarm.task_helper import enqueue_next_task, no_fail_chain
 
 logger = get_extension_logger(__name__)
@@ -124,8 +128,9 @@ def check_skillfarm_notifications(self, runs: int = 0):
     if warnings:
         for main_character, msg in warnings.items():
             logger.debug(
-                "Skilltraining has been finished for %s",
+                "Skilltraining has been finished for %s Skills: %s",
                 main_character.character_name,
+                msg,
             )
             title = _("Skillfarm Notifications")
             full_message = format_html(

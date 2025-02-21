@@ -40,7 +40,7 @@ ______________________________________________________________________
 ## Installation<a name="installation"></a>
 
 > [!NOTE]
-> AA Skillfarm needs at least Alliance Auth v4.0.0
+> AA Skillfarm needs at least Alliance Auth v4.6.0
 > Please make sure to update your Alliance Auth before you install this APP
 
 ### Step 0 - Check dependencies are installed<a name="step0"></a>

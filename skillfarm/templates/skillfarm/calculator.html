@@ -1,0 +1,118 @@
+{% extends 'skillfarm/base.html' %}
+{% load i18n %}
+{% load humanize %}
+
+{% block page_topic %}
+    <h1 class="page-header text-center">{{ page_title }}</h1>
+{% endblock page_topic %}
+
+{% block skillfarm_block %}
+    <div class="card">
+        <div class="container-fluid">
+            <div class="card-body">
+                <div id="container">
+                    <div id="fieldcontents">
+                        {% if not error %}
+                            <h5 class="border-bottom pb-2">
+                                {% translate "Single Price" %}
+                                <span class="text-muted float-end small">{% translate "last update" %}: {{ skillfarm.plex.updated_at }}</span>
+                            </h5>
+                            <ul class="price-list">
+                                <li>
+                                    <span class="item-name">{{ skillfarm.injektor.eve_type.name }}:</span>
+                                    <span id="injektor" class="editable-click" data-original="{{ skillfarm.injektor.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.injektor.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                </li>
+                                <li>
+                                    <span class="item-name">{{ skillfarm.extratkor.eve_type.name }}:</span>
+                                    <span id="extratkor" class="editable-click" data-original="{{ skillfarm.extratkor.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.extratkor.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                </li>
+                                <li>
+                                    <span class="item-name">{{ skillfarm.plex.eve_type.name }}:</span>
+                                    <span id="plex" class="editable-click" data-original="{{ skillfarm.plex.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.plex.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                </li>
+                            </ul>
+                            <h5 class="border-bottom pb-2">{% translate "Monthly Profit" %}
+                                <button class="btn btn-sm btn-primary btn-square" title="Calculated with 3.5 Skill Injektors" data-tooltip-toggle="skillfarm-tooltip" data-bs-placement="top">
+                                    <span class="fas fa-info"></span>
+                                </button>
+                            </h5>
+                            <ul class="price-list">
+                                <li>
+                                    <span class="item-name">{% translate "Profit Month Abo" %}:</span>
+                                    <span id="plex" class="price {% if skillfarm.calc.month >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ skillfarm.calc.month|floatformat:0|intcomma }} <span class="text-white">ISK</span>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span class="item-name">{% translate "Profit 12 Month Abo" %}:</span>
+                                    <span id="plex" class="price {% if skillfarm.calc.month12 >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ skillfarm.calc.month12|floatformat:0|intcomma }} <span class="text-white">ISK</span>
+                                    </span>
+                                </li>
+                                <li>
+                                    <span class="item-name">{% translate "Profit 24 Month Abo" %}:</span>
+                                    <span id="plex" class="price {% if skillfarm.calc.month24 >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ skillfarm.calc.month24|floatformat:0|intcomma }} <span class="text-white">ISK</span>
+                                    </span>
+                                </li>
+                            </ul>
+                            <div class="d-flex align-items-center">
+                                <h2 class="mb-0">{% translate "Calculation" %}</h2>
+                                <div class="ms-3">
+                                    <label for="duration" class="form-label d-inline"></label>
+                                    <select class="btn btn-secondary form-select d-inline w-auto" id="duration" required>
+                                        <option value="1">{% translate "Monthly" %}</option>
+                                        <option value="12">{% translate "12 Months" %}</option>
+                                        <option value="24">{% translate "24 Months" %}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <form id="calculator-form">
+                                <div class="row">
+                                    <div class="col-md-6 py-2">
+                                        <label for="injector-amount" class="form-label">{% translate "Skill Injector Amount" %}</label>
+                                        <input type="number" class="form-control" id="injector-amount">
+                                    </div>
+                                    <div class="col-md-6 py-2">
+                                        <label for="extractor-amount" class="form-label">{% translate "Skill Exctractor Amount" %}</label>
+                                        <input type="number" class="form-control" id="extractor-amount">
+                                    </div>
+                                </div>
+                                <div class="form-check py-2">
+                                    <input class="form-check-input" type="checkbox" id="custom-plex-checkbox">
+                                    <label class="form-check-label" for="custom-plex-checkbox">
+                                        {% translate "Use custom PLEX amount" %}
+                                    </label>
+                                </div>
+                                <div class="col-md-6 py-2" id="custom-plex-amount-container" style="display: none;">
+                                    <label for="custom-plex-amount" class="form-label">{% translate "Custom PLEX Amount" %}</label>
+                                    <input type="number" class="form-control" id="custom-plex-amount">
+                                </div>
+                                <button type="button" class="btn btn-primary mb-2" id="calculate">{% translate "Calculate" %}</button>
+                            </form>
+                            <h3 class="d-none text-danger" id="error">
+                                {% translate "Please fill out at least one field: Skill Injector or Extractor" %}
+                            <h3>
+                            <span class="d-none" id="result-text">
+                                {% translate "Result:" %}
+                            </span>
+                            <span id="result" class="mt-3">
+                                <!-- Result will be displayed here -->
+                            </span>
+                        {% else %}
+                            <span>
+                                {% translate "An error occurred while fetching the market data. Please ensure that EveMarketPrice is updated. Please inform an admin." %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_javascript %}
+    {% include 'skillfarm/bundles/x-editable.html' %}
+    {% include 'skillfarm/bundles/settings-bundle.html' %}
+    {% include 'skillfarm/bundles/calculator-bundle.html' %}
+{% endblock %}

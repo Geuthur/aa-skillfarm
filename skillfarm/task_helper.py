@@ -64,18 +64,22 @@ class NotModifiedError(Exception):
 
 
 def get_etag_key(operation):
-    return "etag-" + operation._cache_key()
+    """Get ETag Key"""
+    return "skillfarm-" + operation._cache_key()
 
 
 def get_etag_header(operation):
+    """Get Cached ETag"""
     return cache.get(get_etag_key(operation), False)
 
 
 def del_etag_header(operation):
+    """Delete Cached ETag"""
     return cache.delete(get_etag_key(operation), False)
 
 
 def inject_etag_header(operation):
+    """Inject ETag header"""
     etag = get_etag_header(operation)
     logger.debug(
         "ETag: get_etag %s - %s - etag:%s",
@@ -88,6 +92,7 @@ def inject_etag_header(operation):
 
 
 def rem_etag_header(operation):
+    """Remove ETag header"""
     logger.debug(
         "ETag: rem_etag %s - %s",
         operation.operation.operation_id,
@@ -100,6 +105,7 @@ def rem_etag_header(operation):
 
 
 def set_etag_header(operation, headers):
+    """Set ETag header"""
     etag_key = get_etag_key(operation)
     etag = headers.headers.get("ETag", None)
     if etag is not None:
@@ -116,6 +122,7 @@ def set_etag_header(operation, headers):
 
 
 def stringify_params(operation):
+    """Stringify Operation Params"""
     out = []
     for p, v in operation.future.request.params.items():
         out.append(f"{p}: {v}")
@@ -123,13 +130,13 @@ def stringify_params(operation):
 
 
 def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
+    """Handle ETag headers"""
     if (
         get_etag_header(operation) == headers.headers.get("ETag")
         and not force_refresh
         and not etags_incomplete
     ):
         logger.debug("Etag: No modified Data for %s", operation.operation.operation_id)
-        set_etag_header(operation, headers)
         raise NotModifiedError()
 
     if force_refresh:
@@ -153,6 +160,7 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
 def handle_page_results(
     operation, current_page, total_pages, etags_incomplete, force_refresh
 ):
+    """Handle multiple page results and use Cache if possible"""
     results = []
     while current_page <= total_pages:
         operation.future.request.params["page"] = current_page
@@ -185,14 +193,13 @@ def handle_page_results(
 
 
 def etag_results(operation, token, force_refresh=False):
+    """Handle ETag results"""
     _start_tm = time.perf_counter()
     operation.request_config.also_return_response = True
-
     if token:
         operation.future.request.headers["Authorization"] = (
             "Bearer " + token.valid_access_token()
         )
-
     if "page" in operation.operation.params:
         current_page = 1
         total_pages = 1
@@ -203,14 +210,12 @@ def etag_results(operation, token, force_refresh=False):
     else:
         if not force_refresh:
             inject_etag_header(operation)
-
         try:
             results, headers = operation.result()
         except HTTPNotModified as e:
-            logger.debug("ETag: HTTPNotModified %s", operation.operation.operation_id)
+            logger.debug("ETag: Not Modified %s", operation.operation.operation_id)
             set_etag_header(operation, e.response)
             raise NotModifiedError() from e
-
         handle_etag_headers(operation, headers, force_refresh, etags_incomplete=False)
     logger.debug(
         "ESI_TIME: OVERALL %s %s %s",
