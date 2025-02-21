@@ -47,7 +47,8 @@
 - Models
   - renamed `skillfarmaudit.py` to `skillfarm.py`
   - `SkillFarmSetup` moved to `skillfarm.py`
-  - `CharacterSkillqueueEntry` moved to `characterskill.py`
+  - `CharacterSkillqueueEntry` moved to `skillfarm.py`
+  - `CharacterSkill` moved to `skillfarm.py`
 
 ### Removed
 
