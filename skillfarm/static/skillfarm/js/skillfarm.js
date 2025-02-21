@@ -11,10 +11,10 @@ const SkillFarmAjax = (() => {
                 columns: [
                     { data: 'character.character_html' },
                     { data: 'details.progress' },
-                    { data: 'details.is_extraction_ready' },
+                    { data: 'details.is_extraction_ready', orderable: false },
                     { data: 'details.last_update' },
-                    { data: 'details.is_filter' },
-                    { data: 'actions' },
+                    { data: 'details.is_filter', orderable: false },
+                    { data: 'actions', orderable: false },
                 ],
                 order: [[0, 'asc']],
                 pageLength: 25,
