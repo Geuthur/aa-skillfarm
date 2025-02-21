@@ -12,18 +12,18 @@ def _get_character_skillqueue(character: SkillFarmAudit) -> dict:
     # Get all Skill Queue for the current character
     skillset = get_skillset(character)
 
-    if skillset is None:
-        skillqueue = CharacterSkillqueueEntry.objects.filter(
-            character=character
-        ).select_related("eve_type")
-    else:
-        skillqueue = CharacterSkillqueueEntry.objects.filter(
-            character=character, eve_type__name__in=skillset
-        ).select_related("eve_type")
+    skillqueue = CharacterSkillqueueEntry.objects.filter(
+        character=character
+    ).select_related("eve_type")
+
+    # Check if any skill is active before applying skillset filter
+    skillqueue_training = any(skill.is_active for skill in skillqueue)
+
+    if skillset:
+        skillqueue = skillqueue.filter(eve_type__name__in=skillset)
 
     skillqueue_dict = []
     skillqueue_ready = False
-    skillqueue_training = False
 
     for skill in skillqueue:
         level = arabic_number_to_roman(skill.finished_level)
@@ -34,25 +34,26 @@ def _get_character_skillqueue(character: SkillFarmAudit) -> dict:
             progress = _calculate_single_progress_bar(skill)
 
         if skill.start_date is None:
-            skill.start_date = "-"
+            start_date = "-"
+        else:
+            start_date = skill.start_date.strftime("%Y-%m-%d %H:%M")
         if skill.finish_date is None:
-            skill.finish_date = "-"
+            end_date = "-"
+        else:
+            end_date = skill.finish_date.strftime("%Y-%m-%d %H:%M")
 
         dict_data = {
             "skill": f"{skill.eve_type.name} {level}",
             "start_sp": skill.level_start_sp,
             "end_sp": skill.level_end_sp,
             "trained_sp": skill.training_start_sp,
-            "start_date": skill.start_date,
-            "finish_date": skill.finish_date,
+            "start_date": start_date,
+            "finish_date": end_date,
             "progress": progress,
         }
 
         if skill.is_skillqueue_ready:
             skillqueue_ready = True
-
-        if skill.is_active:
-            skillqueue_training = True
 
         skillqueue_dict.append(dict_data)
 

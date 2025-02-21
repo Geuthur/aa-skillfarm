@@ -144,8 +144,8 @@ class SkillFarmApiEndpoints:
                     "details": {
                         "active": character.active,
                         "notification": character.notification,
-                        "last_update": lazy.str_normalize_time(
-                            evetime=character.last_update_skillqueue, hours=True
+                        "last_update": character.last_update_skillqueue.strftime(
+                            "%Y-%m-%d %H:%M"
                         ),
                         "is_extraction_ready": skillinfo_html,
                         "is_filter": skillqueue.get("is_filter", ""),
@@ -153,11 +153,7 @@ class SkillFarmApiEndpoints:
                     "actions": actions,
                 }
 
-                if (
-                    skills["skills"]
-                    and not skillqueue["skillqueue"]
-                    or skillqueue["is_training"] is False
-                ):
+                if skillqueue["is_training"] is False:
                     details["details"]["progress"] = _("No Active Training")
                     inactive_dict.append(details)
                 else:
