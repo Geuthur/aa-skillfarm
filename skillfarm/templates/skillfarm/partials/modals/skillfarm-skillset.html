@@ -20,11 +20,9 @@
                     {% csrf_token %}
                     <fieldset class="skillfarm-skillset-form">
                         <h6 class="text-muted">
-                            {% blocktrans %}
-                                Select the skills you want to filter for this character.
-                                You can add multiple skills to the filter.
-                                If no skills are selected, the filter will be disabled.
-                            {% endblocktrans %}
+                            {% translate "Select the skills you want to filter for this character." %}
+                            {% translate "You can add multiple skills to the filter." %}
+                            {% translate "If no skills are selected, the filter will be disabled." %}
                         </h6>
                         <div class="mb-3">
                             <input type="text" id="skillSearch" class="form-control" placeholder="{% translate 'Search skills...' %}">
