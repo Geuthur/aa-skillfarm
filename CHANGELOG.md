@@ -29,7 +29,7 @@
 ### Fixed
 
 - Skillfarm Notification only sent one Character per Main Character should be all Characters that finished a skill.
-- old `voicesofwar` permission view error
+- old `voicesofwar` permission view error [#13](https://github.com/Geuthur/aa-skillfarm/issues/13)
 
 ### Changed
 
