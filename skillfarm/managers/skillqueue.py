@@ -1,23 +1,15 @@
-from typing import TYPE_CHECKING
-
 from django.db import models, transaction
 from eveuniverse.models import EveType
 
+from skillfarm.hooks import get_extension_logger
 from skillfarm.providers import esi
 from skillfarm.task_helper import NotModifiedError, etag_results
-
-if TYPE_CHECKING:
-    from skillfarm.models.skillfarmaudit import SkillFarmAudit
-
-from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)
 
 
 class SkillqueueManager(models.Manager):
-    def update_or_create_esi(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
-    ):
+    def update_or_create_esi(self, character, force_refresh: bool = False):
         """Update or create skills queue for a character from ESI."""
         skillqueue = self._fetch_data_from_esi(character, force_refresh=force_refresh)
 
@@ -32,6 +24,7 @@ class SkillqueueManager(models.Manager):
             )
             entries.append(
                 self.model(
+                    name=character.name,
                     character=character,
                     eve_type=eve_type_instance,
                     finish_date=entry.get("finish_date"),
@@ -48,7 +41,7 @@ class SkillqueueManager(models.Manager):
         return True
 
     def _fetch_data_from_esi(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
+        self, character, force_refresh: bool = False
     ) -> list[dict]:
         logger.debug("%s: Fetching skill queue from ESI", character)
 

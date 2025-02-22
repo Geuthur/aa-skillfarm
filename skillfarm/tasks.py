@@ -19,7 +19,11 @@ from skillfarm.app_settings import (
 )
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models import CharacterSkill, CharacterSkillqueueEntry, SkillFarmAudit
+from skillfarm.models.skillfarm import (
+    CharacterSkill,
+    CharacterSkillqueueEntry,
+    SkillFarmAudit,
+)
 from skillfarm.task_helper import enqueue_next_task, no_fail_chain
 
 logger = get_extension_logger(__name__)
@@ -109,19 +113,24 @@ def check_skillfarm_notifications(self, runs: int = 0):
         main_to_alts[main_character].append(character)
 
     for main_character, alts in main_to_alts.items():
+        msg_items = []
         for alt in alts:
             if alt.notification and not alt.is_cooldown:
                 skill_names = alt.get_finished_skills()
                 if skill_names:
+                    # Create and Add Notification Message
                     msg = alt._generate_notification(skill_names)
-                    warnings[main_character] = msg
+                    msg_items.append(msg)
                     notified_characters.append(alt)
-
+        if msg_items:
+            # Add each message to Main Character
+            warnings[main_character] = "\n".join(msg_items)
     if warnings:
         for main_character, msg in warnings.items():
             logger.debug(
-                "Skilltraining has been finished for %s",
+                "Skilltraining has been finished for %s Skills: %s",
                 main_character.character_name,
+                msg,
             )
             title = _("Skillfarm Notifications")
             full_message = format_html(

@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load static %}
+{% load bootstrap %}
+
+<!-- Approve Request Modal -->
+<div class="modal fade" id="skillfarm-skillset" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span id="modal-title" class="fs-5">
+                    <!-- Modal Title -->
+                </span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <span id="modal-request-text">
+                    <!-- Modal Request Text -->
+                </span>
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="skillfarm-skillset-form">
+                        <h6 class="text-muted">
+                            {% translate "Select the skills you want to filter for this character." %}
+                            {% translate "You can add multiple skills to the filter." %}
+                            {% translate "If no skills are selected, the filter will be disabled." %}
+                        </h6>
+                        <div class="mb-3">
+                            <input type="text" id="skillSearch" class="form-control" placeholder="{% translate 'Search skills...' %}">
+                        </div>
+                        <div class="mb-3">
+                            <select id="skillSetSelect" class="form-select" multiple="">
+                                {% for skill in forms.skillset.fields.skills.queryset %}
+                                    <option value="{{ skill.id }}">{{ skill.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <ul id="selectedSkills" class="list-group">
+                                <!-- Selected skills will be added here -->
+                            </ul>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-button-cancel-skillset-request" type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-hand"></i> {% trans "Cancel" %}
+                </button>
+
+                <button id="modal-button-confirm-skillset-request" type="button" class="btn btn-success">
+                    <i class="fa-solid fa-check"></i> {% trans "Confirm" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

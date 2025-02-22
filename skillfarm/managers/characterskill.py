@@ -1,6 +1,4 @@
 # Django
-from typing import TYPE_CHECKING
-
 from django.db import models, transaction
 from eveuniverse.models import EveType
 
@@ -9,16 +7,11 @@ from skillfarm.hooks import get_extension_logger
 from skillfarm.providers import esi
 from skillfarm.task_helper import NotModifiedError, etag_results
 
-if TYPE_CHECKING:
-    from skillfarm.models.skillfarmaudit import SkillFarmAudit
-
 logger = get_extension_logger(__name__)
 
 
 class CharacterSkillManager(models.Manager):
-    def update_or_create_esi(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
-    ):
+    def update_or_create_esi(self, character, force_refresh: bool = False):
         """Update or create skills for a character from ESI."""
         skills = self._fetch_data_from_esi(character, force_refresh=force_refresh)
 
@@ -42,9 +35,7 @@ class CharacterSkillManager(models.Manager):
             new_ids = incoming_ids.difference(existing_ids)
             EveType.objects.bulk_get_or_create_esi(ids=list(new_ids))
 
-    def _fetch_data_from_esi(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
-    ) -> dict:
+    def _fetch_data_from_esi(self, character, force_refresh: bool = False) -> dict:
         logger.debug("%s: Fetching skills from ESI", character)
 
         skills_info = []
@@ -65,7 +56,7 @@ class CharacterSkillManager(models.Manager):
         return skills_info
 
     @transaction.atomic()
-    def _atomic_write(self, character: "SkillFarmAudit", skills_list: dict):
+    def _atomic_write(self, character, skills_list: dict):
         incoming_ids = set(skills_list.keys())
         exiting_ids = set(
             self.filter(character=character).values_list("eve_type_id", flat=True)
@@ -95,12 +86,11 @@ class CharacterSkillManager(models.Manager):
         if not obsolete_ids and not create_ids and not update_ids:
             logger.debug("%s: No changes in skills", character)
 
-    def _create_from_dict(
-        self, character: "SkillFarmAudit", skills_list: dict, create_ids: set
-    ):
+    def _create_from_dict(self, character, skills_list: dict, create_ids: set):
         logger.debug("%s: Storing %s new skills", character, len(create_ids))
         skills = [
             self.model(
+                name=character.name,
                 character=character,
                 eve_type=EveType.objects.get(id=skill_info.get("skill_id")),
                 active_skill_level=skill_info.get("active_skill_level"),
@@ -112,9 +102,7 @@ class CharacterSkillManager(models.Manager):
         ]
         self.bulk_create(skills, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)
 
-    def _update_from_dict(
-        self, character: "SkillFarmAudit", skills_list: dict, update_ids: set
-    ):
+    def _update_from_dict(self, character, skills_list: dict, update_ids: set):
         logger.debug("%s: Updating %s skills", character, len(update_ids))
         update_pks = list(
             self.filter(character=character, eve_type_id__in=update_ids).values_list(
