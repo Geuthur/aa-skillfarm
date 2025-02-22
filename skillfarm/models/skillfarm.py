@@ -2,15 +2,19 @@
 
 import datetime
 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from eveuniverse.models import EveType
 
 from allianceauth.eveonline.models import EveCharacter, Token
 
 from skillfarm import app_settings
 from skillfarm.hooks import get_extension_logger
+from skillfarm.managers.characterskill import CharacterSkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
+from skillfarm.managers.skillqueue import SkillqueueManager
 
 logger = get_extension_logger(__name__)
 
@@ -18,7 +22,7 @@ logger = get_extension_logger(__name__)
 class SkillFarmAudit(models.Model):
     """Character Audit model for app"""
 
-    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
 
     active = models.BooleanField(default=True)
 
@@ -63,10 +67,6 @@ class SkillFarmAudit(models.Model):
 
     def skill_extraction(self) -> list[str]:
         """Check if a character has a skill extraction ready and return skill names."""
-        # pylint: disable=import-outside-toplevel
-        from skillfarm.models.characterskill import CharacterSkill
-        from skillfarm.models.skillfarmsetup import SkillFarmSetup
-
         skill_names = []
         try:
             character = SkillFarmSetup.objects.get(character=self)
@@ -86,10 +86,6 @@ class SkillFarmAudit(models.Model):
 
     def skillqueue_extraction(self) -> list[str]:
         """Check if a character has a skillqueue Extraction ready and return skill names."""
-        # pylint: disable=import-outside-toplevel
-        from skillfarm.models.skillfarmsetup import SkillFarmSetup
-        from skillfarm.models.skillqueue import CharacterSkillqueueEntry
-
         skill_names = []
         try:
             character = SkillFarmSetup.objects.get(character=self)
@@ -150,3 +146,121 @@ class SkillFarmAudit(models.Model):
         if self.last_notification is None:
             return False
         return True
+
+
+class SkillFarmSetup(models.Model):
+    """Skillfarm Character Skill Setup model for app"""
+
+    id = models.AutoField(primary_key=True)
+
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    character = models.OneToOneField(
+        "SkillFarmAudit", on_delete=models.CASCADE, related_name="skillfarm_setup"
+    )
+
+    skillset = models.JSONField(default=dict, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.skillset}'s Skill Setup"
+
+    objects = SkillFarmManager()
+
+    class Meta:
+        default_permissions = ()
+
+
+class CharacterSkill(models.Model):
+    """Skillfarm Character Skill model for app"""
+
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    character = models.ForeignKey(
+        "SkillFarmAudit", on_delete=models.CASCADE, related_name="character_skills"
+    )
+    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
+
+    active_skill_level = models.PositiveIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
+    skillpoints_in_skill = models.PositiveBigIntegerField()
+    trained_skill_level = models.PositiveBigIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
+
+    objects = CharacterSkillManager()
+
+    class Meta:
+        default_permissions = ()
+
+    def __str__(self) -> str:
+        return f"{self.character}-{self.eve_type.name}"
+
+    @property
+    def is_exc_ready(self) -> bool:
+        """Check if skill extraction is ready."""
+        try:
+            character = SkillFarmSetup.objects.get(character=self.character)
+        except SkillFarmSetup.DoesNotExist:
+            character = None
+
+        if character and character.skillset is not None:
+            skills = CharacterSkill.objects.filter(
+                character=self.character,
+                eve_type__name__in=character.skillset,
+            )
+            for skill in skills:
+                if skill.trained_skill_level == 5:
+                    return True
+        return False
+
+
+class CharacterSkillqueueEntry(models.Model):
+    """Skillfarm Skillqueue model for app"""
+
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    character = models.ForeignKey(
+        "SkillFarmAudit",
+        on_delete=models.CASCADE,
+        related_name="skillqueue",
+    )
+
+    queue_position = models.PositiveIntegerField(db_index=True)
+    finish_date = models.DateTimeField(default=None, null=True)
+    finished_level = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    level_end_sp = models.PositiveIntegerField(default=None, null=True)
+    level_start_sp = models.PositiveIntegerField(default=None, null=True)
+    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
+    start_date = models.DateTimeField(default=None, null=True)
+    training_start_sp = models.PositiveIntegerField(default=None, null=True)
+
+    # TODO: Add to Notification System
+    has_no_skillqueue = models.BooleanField(default=False)
+    last_check = models.DateTimeField(default=None, null=True)
+
+    objects = SkillqueueManager()
+
+    class Meta:
+        default_permissions = ()
+
+    def __str__(self) -> str:
+        return f"{self.character}-{self.queue_position}"
+
+    @property
+    def is_active(self) -> bool:
+        """Returns true when this skill is currently being trained"""
+        return bool(self.finish_date) and self.finish_date > self.start_date
+
+    @property
+    def is_skillqueue_ready(self) -> bool:
+        """Check if skill from skillqueue is rdy from end date."""
+        if (
+            self.is_active
+            and self.finish_date <= timezone.now()
+            and self.finished_level == 5
+        ):
+            return True
+        return False

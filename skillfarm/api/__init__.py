@@ -10,8 +10,8 @@ logger = get_extension_logger(__name__)
 
 api = NinjaAPI(
     title="Geuthur API",
-    version="0.1.0",
-    urls_namespace="skillfarm:new_api",
+    version="0.2.0",
+    urls_namespace="skillfarm:api",
     auth=django_auth,
     csrf=True,
     openapi_url=settings.DEBUG and "/openapi.json" or "",

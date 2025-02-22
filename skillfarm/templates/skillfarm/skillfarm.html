@@ -3,141 +3,50 @@
 {% load humanize %}
 {% load static %}
 
-{% block page_title %}Skillfarm Details{% endblock %}
-{% block page_topic %}<h1 class="page-header text-center">{% translate "Skillfarm Details" %}</h1>{% endblock page_topic %}
+{% block page_topic %}<h1 class="page-header text-center">{{ page_title }}</h1>{% endblock page_topic %}
 
 {% block skillfarm_block %}
-<div class="card-header bg-primary rounded-top d-flex">
-    <h3>{% translate "Skillfarm Details" %} </h3>
-    <div class="ms-auto">
-        <a class="nav-link py-0" href="{% url 'skillfarm:character_admin' %}">
-            <span class="btn btn-secondary">{% translate 'Skillfarm Overview' %}</span>
-        </a>
-    </div>
-</div>
-
-<div class="card-body bg-secondary tab-content rounded-bottom">
-    <div class="d-flex justify-content-between align-items-center">
-        <span class="pb-2">
-            <i class="fa-solid fa-bullhorn"></i> Notification <span class="text-success">ON</span>/<span class="text-danger">OFF</span>
-        </span>
-    </div>
-    <div class="tab-content">
-        {% include 'skillfarm/partials/table/skillfarm.html' %}
-    </div>
-    <button class="btn btn-primary btn-sm btn-square">
-        <i class="fa-solid fa-info"></i>
-    </button>
-        <span class="text-muted">{% trans "ESI Skillqueue will only update on Character Login" %}</span>
-</div>
-
-<div class="pt-4">
-    <div class="card-header bg-primary rounded-top">
-        <h3>{% translate "Inactive Characters" %} </h3>
-    </div>
-    <div class="card-body bg-secondary tab-content rounded-bottom">
-        <div class="tab-content">
-            {% include 'skillfarm/partials/table/inactive.html' %}
+    <!-- Skillfarm Details -->
+    <div class="card">
+        <div class="card-header bg-primary rounded-top">
+            <h3>{% translate "Skillfarm" %} </h3>
+        </div>
+        <div class="card-body bg-secondary tab-content rounded-bottom">
+            <div class="tab-content">
+                {% include 'skillfarm/partials/table/skillfarm.html' %}
+            </div>
+            <button class="btn btn-primary btn-sm btn-square">
+                <i class="fa-solid fa-info"></i>
+            </button>
+            <span class="text-muted">{% trans "ESI Skillqueue will only update on Character Login" %}</span>
         </div>
     </div>
-</div>
-
-{% include 'skillfarm/partials/modals/skillqueue.html' %}
-
-{% include 'skillfarm/partials/modals/skillfilter.html' %}
-
-{% include 'skillfarm/partials/modals/skillset.html' %}
+    <!-- Inactive Characters -->
+    <div class="pt-4">
+        <div class="card">
+            <div class="card-header bg-primary rounded-top">
+                <h3>{% translate "Inactive Characters" %} </h3>
+            </div>
+            <div class="card-body bg-secondary tab-content rounded-bottom">
+                <div class="tab-content">
+                    {% include 'skillfarm/partials/table/inactive.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for viewing requests -->
+    {% include 'skillfarm/partials/modals/skillfarm-confirm.html' %}
+    {% include 'skillfarm/partials/modals/skillfarm-skillset.html' %}
+    {% include 'skillfarm/partials/modals/modal.html' with name="ViewSkill" %}
 
 {% endblock %}
 
 {% block extra_javascript %}
-{% include 'skillfarm/bundles/table-css.html' %}
-<script type="application/javascript">
-    // Extract the 'main' parameter from the current URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const mainParam = urlParams.get('main');
-
-    // Construct the skillfarmUrl with the 'main' parameter
-    let skillfarmUrl = '/skillfarm/api/account/{{ character_pk }}/skillfarm/';
-    if (mainParam) {
-        skillfarmUrl += '?main=' + mainParam;
-    }
-
-	let skillfarmSettings = {
-        skillfarmUrl: skillfarmUrl,
-		switchSkillSetpUrl: '{% url "skillfarm:skillset" character_id=1337 %}',
-		switchAlarmUrl: '{% url "skillfarm:switch_alarm" character_id=1337 %}',
-        switchStatusUrl: '{% url "skillfarm:switch_activity" character_id=1337 %}',
-        deleteCharUrl: '{% url "skillfarm:remove_char" character_id=1337 %}',
-		csrfToken: '{% csrf_token %}',
-        characterPk: '{{ character_pk }}',
-        updateInterval: '{{ update_interval }}',
-        // Translations
-		switchAlarmConfirmText: '{% translate "Are you sure to Switch Alarm" %}',
-        switchAlarmText: '{% translate "Toggle Alarm" %}',
-        switchStatusText: '{% translate "Toggle Activity" %}',
-        switchStatusConfirmText: '{% translate "Are you sure to Switch Activity" %}',
-        notUpdatedText: '{% translate "Not Updated Yet" %}',
-        noActiveTrainingText: '{% translate "No Active Training" %}',
-
-        alarmActivatedText: '{% translate "Notification Activated" %}',
-        alarmDeactivatedText: '{% translate "Notification Deactivated" %}',
-
-        switchSkillsetText: '{% translate "Edit Skillset" %}',
-        skillqueueInfoText: '{% translate "Skill Farm Information" %}',
-
-        deleteCharText: '{% translate "Delete Character" %}',
-        deleteCharConfirmText: '{% translate "Are you sure to delete this Character" %}',
-
-        skillExtractionReadyText: '{% translate "Extraction Ready" %}',
-        skillExtractionReadyQueueText: '{% translate "Please Check Character" %}',
-	};
+{% include 'skillfarm/bundles/modal-bundle.html' %}
+<script>
+    setupModal('#modalViewSkillContainer', 'ajax_skillview', '#modalViewSkillContent', '#modalViewSkillLoader');
 </script>
-<script src="{% static 'skillfarm/js/skillfarm.js' %}"></script>
 {% include 'bundles/datatables-js-bs5.html' %}
-{% endblock %}
-{% block extra_css %}
-<style>
-    .progress-outer {
-        position: relative;
-        background: #fff;
-        border-radius: 50px;
-        box-shadow: 0 0 10px rgba(0, 219, 231, 0.7);
-        overflow: hidden; /* Ensure the inner progress bar doesn't overflow */
-    }
-    .progress {
-        height: 27px;
-        margin: 0;
-        overflow: visible;
-        border-radius: 50px;
-        background: #eaedf3;
-        box-shadow: inset 0 10px 10px rgba(244, 245, 250, 0.9);
-    }
-    .progress .progress-bar {
-        border-radius: 50px;
-    }
-    .progress .progress-value {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 16px;
-        font-weight: bold;
-        color: #fff;
-        letter-spacing: 2px;
-        -webkit-text-stroke: 1px #000;
-    }
-    .progress-bar.active {
-        animation: reverse progress-bar-stripes 0.40s linear infinite, animate-positive 2s;
-    }
-    @-webkit-keyframes animate-positive {
-        0% { width: 0%; }
-    }
-    @keyframes animate-positive {
-        0% { width: 0%; }
-    }
-</style>
-{% endblock %}
-
-{% block extra_script %}
+{% include 'skillfarm/bundles/settings-bundle.html' %}
+{% include 'skillfarm/bundles/skillfarm-bundle.html' %}
 {% endblock %}

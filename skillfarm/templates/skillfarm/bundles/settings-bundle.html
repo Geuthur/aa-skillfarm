@@ -1,0 +1,27 @@
+{% load i18n %}
+{% load skillfarm %}
+
+{% skillfarm_static 'css/skillfarm.css' %}
+
+<script type="application/javascript">
+	let SkillfarmSettings = {
+		csrfToken: '{% csrf_token %}',
+        characterPk: '{{ character_id }}',
+        updateInterval: '{{ update_interval }}',
+        // URLs
+        DetailsUrl: '{% url "skillfarm:api:get_details" character_id=character_id %}',
+        SkillSetupUrl: '{% url "skillfarm:api:get_skillsetup" character_id=12345 %}',
+        OverviewUrl: '{% url "skillfarm:api:get_character_overview" character_id=character_id %}',
+
+        // Translations
+        translations: {
+            character: '{% translate "Character" %}',
+            progress: '{% translate "Progress" %}',
+            skillInfo: '{% translate "Skill Info" %}',
+            lastUpdated: '{% translate "Last Updated" %}',
+            filter: '{% translate "Filter" %}',
+            actions: '{% translate "Actions" %}',
+            errorLoadingData: '{% translate "Error loading data:" %}',
+        },
+	};
+</script>

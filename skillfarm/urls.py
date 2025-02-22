@@ -8,7 +8,19 @@ from skillfarm.api import api
 app_name: str = "skillfarm"
 
 urlpatterns = [
+    # -- Views
     path("", views.index, name="index"),
+    path(
+        "<int:character_id>/view/skillfarm/",
+        views.skillfarm,
+        name="skillfarm",
+    ),
+    path(
+        "<int:character_id>/view/overview/",
+        views.character_overview,
+        name="character_overview",
+    ),
+    # -- Administration
     path("char/add/", views.add_char, name="add_char"),
     path(
         "char/delete/<int:character_id>/",
@@ -16,20 +28,9 @@ urlpatterns = [
         name="remove_char",
     ),
     path(
-        "<int:character_pk>/",
-        views.skillfarm,
-        name="skillfarm",
-    ),
-    path("character_admin/", views.character_admin, name="character_admin"),
-    path(
         "switch_alarm/<int:character_id>/",
         views.switch_alarm,
         name="switch_alarm",
-    ),
-    path(
-        "switch_activity/<int:character_id>/",
-        views.switch_activity,
-        name="switch_activity",
     ),
     path(
         "skillset/<int:character_id>/",

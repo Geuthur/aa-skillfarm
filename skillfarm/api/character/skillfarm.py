@@ -1,177 +1,49 @@
-from collections import defaultdict
-from typing import List
-
 from ninja import NinjaAPI
 
-from django.db.models import Q
-from eveuniverse.models import EveType
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 from allianceauth.authentication.models import UserProfile
 
-from skillfarm.api import schema
+from skillfarm.api.character.helpers.skilldetails import (
+    _calculate_sum_progress_bar,
+    _get_extraction_icon,
+    _get_notification_icon,
+    _get_skillinfo_actions,
+    _skillfarm_actions,
+)
+from skillfarm.api.character.helpers.skillqueue import (
+    _get_character_skillqueue,
+    _get_character_skillqueue_single,
+)
+from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import (
-    arabic_number_to_roman,
     get_alts_queryset,
     get_character,
+    get_main_character,
 )
+from skillfarm.helpers import lazy
 from skillfarm.hooks import get_extension_logger
-from skillfarm.models.characterskill import CharacterSkill
-from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.models.skillfarmsetup import SkillFarmSetup
-from skillfarm.models.skillqueue import CharacterSkillqueueEntry
+from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
 
 logger = get_extension_logger(__name__)
 
 
-# pylint: disable=duplicate-code
 class SkillFarmApiEndpoints:
     tags = ["SkillFarm"]
 
-    # pylint: disable=too-many-locals, too-many-statements
+    # pylint: disable=too-many-statements, too-many-locals
     def __init__(self, api: NinjaAPI):
         @api.get(
-            "account/{character_id}/skillfarm/",
-            response={200: List[schema.SkillFarmFilter], 403: str},
+            "{character_id}/overview/",
+            response={200: dict, 403: str},
             tags=self.tags,
         )
-        def get_character_skillfarm(request, character_id: int):
-            request_main = request.GET.get("main", False)
-            perm, main = get_character(request, character_id)
-
-            if perm is False:
-                return 403, "Permission Denied"
-
-            # Create the Ledger
-            if character_id == 0 or request_main:
-                characters = get_alts_queryset(main)
-            else:
-                characters = [main]
-
-            skills_queue_dict = defaultdict(list)
-            skills_queue_dict_filtered = defaultdict(list)
-            skills_dict = defaultdict(list)
-            characters_dict = []
-            output = []
-
-            skill_names = EveType.objects.filter(
-                eve_group__eve_category__id=16
-            ).values_list("name", flat=True)
-
-            # Get all Characters and related data in one query
-            audit = SkillFarmAudit.objects.filter(
-                character__in=characters
-            ).select_related(
-                "character",
-            )
-
-            for character in audit:
-                character_filters = Q(
-                    character__character__character_id=character.character.character_id
-                )
-
-                update_status = character.last_update_skillqueue
-
-                # Get all Skill Queue for the current character
-                skillsqueue = CharacterSkillqueueEntry.objects.filter(
-                    character=character
-                ).select_related(
-                    "eve_type",
-                )
-
-                # Filter Skills from Skillset
-                try:
-                    skillset = SkillFarmSetup.objects.get(character=character)
-                except SkillFarmSetup.DoesNotExist:
-                    skillset = None
-
-                # Fetch all Skills that match the skillset
-                if skillset and skillset.skillset is not None:
-                    character_filters &= Q(eve_type__name__in=skillset.skillset)
-
-                    # Get all Skills for the current character if skillset is defined
-                    skills = CharacterSkill.objects.filter(
-                        character_filters,
-                        character=character,
-                    ).select_related(
-                        "eve_type",
-                    )
-
-                    for entry in skills:
-                        character_obj = entry.character
-                        level = arabic_number_to_roman(entry.active_skill_level)
-
-                        dict_data = {
-                            "skill": f"{entry.eve_type.name} {level}",
-                            "level": entry.active_skill_level,
-                            "skillpoints": entry.skillpoints_in_skill,
-                        }
-
-                        skills_dict[character_obj].append(dict_data)
-
-                skillsqueue_filtered = skillsqueue.filter(character_filters)
-
-                def process_skill_queue_entry(entry):
-                    character_obj = entry.character
-                    level = arabic_number_to_roman(entry.finished_level)
-                    dict_data = {
-                        "skill": f"{entry.eve_type.name} {level}",
-                        "start_sp": entry.level_start_sp,
-                        "end_sp": entry.level_end_sp,
-                        "trained_sp": entry.training_start_sp,
-                        "start_date": entry.start_date,
-                        "finish_date": entry.finish_date,
-                    }
-                    return character_obj, dict_data
-
-                if character in skills_dict:
-                    skills_data = skills_dict[character]
-
-                # Process all skill queue entries and filtered skill queue entries
-                for entry in skillsqueue:
-                    character_obj, dict_data = process_skill_queue_entry(entry)
-                    skills_queue_dict[character_obj].append(dict_data)
-                    if entry in skillsqueue_filtered:
-                        skills_queue_dict_filtered[character_obj].append(dict_data)
-
-                skills_data = skills_dict.get(character, [])
-                skillqueue_data = skills_queue_dict.get(character, [])
-                skillqueuefiltered_data = skills_queue_dict_filtered.get(character, [])
-
-                characters_dict.append(
-                    {
-                        "character_id": character.character.character_id,
-                        "character_name": character.character.character_name,
-                        "corporation_id": character.character.corporation_id,
-                        "corporation_name": character.character.corporation_name,
-                        "active": character.active,
-                        "notification": character.notification,
-                        "last_update": update_status,
-                        "skillset": skillset.skillset if skillset else [],
-                        "skillqueuefiltered": skillqueuefiltered_data,
-                        "skillqueue": skillqueue_data,
-                        "skills": skills_data,
-                        "is_active": any(entry.is_active for entry in skillsqueue),
-                        "extraction_ready": (
-                            any(entry.is_exc_ready for entry in skills)
-                            if skillset and skills_data
-                            else False
-                        ),
-                        "extraction_ready_queue": any(
-                            entry.is_skillqueue_ready for entry in skillsqueue
-                        ),
-                    }
-                )
-
-            output.append({"skills": skill_names, "characters": characters_dict})
-
-            return output
-
-        @api.get(
-            "account/skillfarm/admin/",
-            response={200: List[schema.CharacterAdmin], 403: str},
-            tags=self.tags,
-        )
-        def get_character_admin(request):
+        # pylint: disable=unused-argument
+        def get_character_overview(request, character_id: int):
+            """Get Character SkillFarm Overview"""
             chars_visible = SkillFarmAudit.objects.visible_eve_characters(request.user)
 
             if chars_visible is None:
@@ -183,21 +55,175 @@ class SkillFarmApiEndpoints:
                 main_character__isnull=False, main_character__character_id__in=chars_ids
             )
 
-            character_dict = {}
+            overview_dict = {}
 
             for character in users_char_ids:
                 # pylint: disable=broad-exception-caught
                 try:
-                    character_dict[character.main_character.character_id] = {
+                    button = format_html(
+                        '<a href="{}"><button class="btn btn-primary btn-sm" title="'
+                        + _("Show Skillfarm")
+                        + '" data-tooltip-toggle="skillfarm-tooltip" ><span class="fas fa-eye"></span></button></a>',
+                        reverse(
+                            "skillfarm:skillfarm",
+                            kwargs={
+                                "character_id": character.main_character.character_id
+                            },
+                        ),
+                    )
+
+                    portrait = lazy.get_character_portrait_url(
+                        character_id=character.main_character.character_id,
+                        character_name=character.main_character.character_name,
+                        as_html=True,
+                    )
+
+                    overview_dict[character.main_character.character_id] = {
+                        "portrait": portrait,
                         "character_id": character.main_character.character_id,
                         "character_name": character.main_character.character_name,
                         "corporation_id": character.main_character.corporation_id,
                         "corporation_name": character.main_character.corporation_name,
+                        "action": button,
                     }
                 except AttributeError:
                     continue
 
-            output = []
-            output.append({"character": character_dict})
+            return overview_dict
+
+        @api.get(
+            "{character_id}/details/",
+            response={200: dict, 403: str},
+            tags=self.tags,
+        )
+        def get_details(request, character_id: int):
+            """Get Character SkillFarm Details"""
+            perm, main = get_main_character(request, character_id)
+
+            if perm is False:
+                return 403, "Permission Denied"
+
+            characters = get_alts_queryset(main)
+
+            audit_chars = SkillFarmAudit.objects.filter(
+                character__in=characters
+            ).select_related("character")
+
+            details_dict = []
+            inactive_dict = []
+
+            for character in audit_chars:
+                char_portrait = lazy.get_character_portrait_url(
+                    character_id=character.character.character_id,
+                    character_name=character.character.character_name,
+                    as_html=True,
+                )
+                notification = _get_notification_icon(character.notification)
+
+                char = f"{char_portrait} {character.character.character_name} {notification}"
+
+                skills = _get_character_skills(character)
+                skillqueue = _get_character_skillqueue(character)
+
+                skillextraction = _get_extraction_icon(
+                    skills=skills["is_extraction_ready"],
+                    skillqueue=skillqueue["skillqueue_ready"],
+                )
+
+                skillinfo = _get_skillinfo_actions(character=character, request=request)
+
+                skillinfo_html = f"{skillinfo} {skillextraction}"
+
+                actions = _skillfarm_actions(
+                    character=character, perms=perm, request=request
+                )
+
+                details = {
+                    "character": {
+                        "character_html": char,
+                        "character_id": character.character.character_id,
+                        "character_name": character.character.character_name,
+                    },
+                    "details": {
+                        "active": character.active,
+                        "notification": character.notification,
+                        "last_update": character.last_update_skillqueue.strftime(
+                            "%Y-%m-%d %H:%M"
+                        ),
+                        "is_extraction_ready": skillinfo_html,
+                        "is_filter": skillqueue.get("is_filter", ""),
+                    },
+                    "actions": actions,
+                }
+
+                # Generate the progress bar for the skill queue
+                if skillqueue["is_training"] is False:
+                    details["details"]["progress"] = _("No Active Training")
+                    inactive_dict.append(details)
+                else:
+                    details["details"]["progress"] = _calculate_sum_progress_bar(
+                        skillqueue=skillqueue["skillqueue"]
+                    )
+                    details_dict.append(details)
+
+            output = {
+                "details": details_dict,
+                "inactive": inactive_dict,
+            }
 
             return output
+
+        @api.get(
+            "{character_id}/skillsetup/",
+            response={200: dict, 403: str},
+            tags=self.tags,
+        )
+        def get_skillsetup(request, character_id: int):
+            """Get Character SkillSet"""
+            perm, character = get_character(request, character_id)
+
+            if perm is False:
+                return 403, "Permission Denied"
+
+            output = {}
+
+            try:
+                skillfilter = SkillFarmSetup.objects.get(character=character)
+                skillset = skillfilter.skillset
+                output = {
+                    "character_id": character.character.character_id,
+                    "character_name": character.character.character_name,
+                    "skillset": skillset,
+                }
+            except SkillFarmSetup.DoesNotExist:
+                pass
+
+            return output
+
+        @api.get(
+            "{character_id}/skillinfo/",
+            response={200: dict, 403: str},
+            tags=self.tags,
+        )
+        def get_skillinfo_details(request, character_id: int):
+            """Get Character Skills and SkillQueue"""
+            perm, character = get_character(request, character_id)
+
+            if perm is False:
+                return 403, "Permission Denied"
+
+            skills = _get_character_skills(character)
+            skillqueue = _get_character_skillqueue_single(character)
+
+            context = {
+                "title": _("Skill Info"),
+                "character_id": character.character.character_id,
+                "character_name": character.character.character_name,
+                "skillqueue": skillqueue["skillqueue"],
+                "skillqueue_filtered": skillqueue["skillqueue_filtered"],
+                "skills": skills["skills"],
+            }
+
+            return render(
+                request, "skillfarm/partials/modals/view_skillqueue.html", context
+            )
