@@ -189,13 +189,11 @@ def _get_skillinfo_actions(character: SkillFarmAudit, request):
 def _get_extraction_icon(skills, skillqueue) -> str:
     """Get the extraction icon"""
     if skills is True:
-        image = "skillExtractor.png"
         title = _("Skill Extraction Ready")
         div_id = "skillfarm-skill-extractor"
         icon = "fas fa-exclamation-triangle"
         color = "red"
     elif skillqueue is True:
-        image = "skillExtractorMaybe.png"
         title = _("Please check your Character a Skill should be ready for extraction")
         div_id = "skillfarm-skill-extractor-maybe"
         icon = "fas fa-question"
@@ -203,7 +201,7 @@ def _get_extraction_icon(skills, skillqueue) -> str:
     else:
         return ""
     return (
-        f"<img src='/static/skillfarm/images/{image}' data-tooltip-toggle='skillfarm-tooltip' class='rounded-circle' id='"
+        "<img src='/static/skillfarm/images/skillExtractor.png' data-tooltip-toggle='skillfarm-tooltip' class='rounded-circle' id='"
         + div_id
         + "'style='width: 32px'>"
         + f"<i class='{icon}' style='margin-left: 5px; color: {color}' title='"
