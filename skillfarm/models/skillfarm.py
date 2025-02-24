@@ -80,7 +80,10 @@ class SkillFarmAudit(models.Model):
             )
 
             for skill in skills:
-                if skill.trained_skill_level == 5:
+                if (
+                    skill.trained_skill_level == 5
+                    and skill.eve_type.name in character.skillset
+                ):
                     skill_names.append(skill.eve_type.name)
         return skill_names
 
@@ -96,7 +99,10 @@ class SkillFarmAudit(models.Model):
             skillqueue = CharacterSkillqueueEntry.objects.filter(character=self)
 
             for skill in skillqueue:
-                if skill.is_skillqueue_ready:
+                if (
+                    skill.is_skillqueue_ready
+                    and skill.eve_type.name in character.skillset
+                ):
                     skill_names.append(skill.eve_type.name)
         return skill_names
 
