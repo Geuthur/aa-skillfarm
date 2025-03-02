@@ -143,6 +143,13 @@ class SkillFarmAudit(models.Model):
     @property
     def is_cooldown(self) -> bool:
         """Check if a character has a notification cooldown."""
+        if (
+            self.last_notification is not None
+            and self.last_notification
+            < timezone.now()
+            - datetime.timedelta(days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN)
+        ):
+            return False
         if self.last_notification is None:
             return False
         return True
