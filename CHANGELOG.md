@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2025-02-24
+
+## Fixed
+
+- All finished Skills are notificated instead of only filtered [#15](https://github.com/Geuthur/aa-skillfarm/issues/15)
+
 ## [0.5.0] - 2025-02-22
 
 ### Added
