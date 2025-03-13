@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.utils.html import format_html
@@ -75,7 +73,7 @@ def get_alts_queryset(main_char, corporations=None):
         return EveCharacter.objects.filter(pk=main_char.pk)
 
 
-def get_skillset(character: SkillFarmAudit) -> Optional[dict]:
+def get_skillset(character: SkillFarmAudit) -> dict | None:
     """Get the skillset for the character"""
     try:
         skillfilter = SkillFarmSetup.objects.get(character=character)
