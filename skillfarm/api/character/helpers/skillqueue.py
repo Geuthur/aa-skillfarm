@@ -1,8 +1,11 @@
 from skillfarm.api.character.helpers.skilldetails import (
     _calculate_single_progress_bar,
-    _generate_progress_bar,
 )
-from skillfarm.api.helpers import arabic_number_to_roman, get_skillset
+from skillfarm.api.helpers import (
+    arabic_number_to_roman,
+    generate_progressbar,
+    get_skillset,
+)
 from skillfarm.helpers import lazy
 from skillfarm.models.skillfarm import CharacterSkillqueueEntry, SkillFarmAudit
 
@@ -53,7 +56,7 @@ def _get_character_skillqueue(character: SkillFarmAudit) -> dict:
             "trained_sp": skill.training_start_sp,
             "start_date": start_date,
             "finish_date": end_date,
-            "progress": {"html": _generate_progress_bar(progress), "value": progress},
+            "progress": {"html": generate_progressbar(progress), "value": progress},
         }
 
         skillqueue_dict.append(dict_data)
@@ -105,7 +108,7 @@ def _get_character_skillqueue_single(character: SkillFarmAudit) -> dict:
             "trained_sp": skill.training_start_sp,
             "start_date": start_date,
             "finish_date": end_date,
-            "progress": {"html": _generate_progress_bar(progress), "value": progress},
+            "progress": {"html": generate_progressbar(progress), "value": progress},
         }
 
         if skillset is not None:

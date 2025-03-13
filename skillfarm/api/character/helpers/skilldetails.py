@@ -1,11 +1,13 @@
-import math
-
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from skillfarm.api.helpers import generate_button, generate_settings
+from skillfarm.api.helpers import (
+    generate_button,
+    generate_progressbar,
+    generate_settings,
+)
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import CharacterSkillqueueEntry, SkillFarmAudit
 
@@ -31,12 +33,9 @@ def _calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
         progress = (elapsed_duration / total_duration) * 100
 
     # Ensure the progress percentage is between 0 and 100
-    if progress < 0:
-        progress = 0
-    elif progress > 100:
-        progress = 100
+    progress = max(progress, 0)
 
-    return progress
+    return round(progress, 2)
 
 
 def _calculate_sum_progress_bar(skillqueue: dict):
@@ -46,7 +45,7 @@ def _calculate_sum_progress_bar(skillqueue: dict):
     skill_count = len(skillqueue)
 
     if skill_count == 0:
-        return _generate_progress_bar(0)
+        return generate_progressbar(0)
 
     for skill in skillqueue:
         if skill["start_date"] and skill["finish_date"] == "-":
@@ -56,41 +55,7 @@ def _calculate_sum_progress_bar(skillqueue: dict):
     # Calculate the average progress percentage
     average_progress_percent = total_progress_percent / skill_count
 
-    # Ensure the final progress percentage is between 0 and 100
-    if average_progress_percent < 0:
-        average_progress_percent = 0
-    elif average_progress_percent > 100:
-        average_progress_percent = 100
-
-    # Round the average progress percentage to the nearest whole number
-    average_progress_percent = math.ceil(average_progress_percent)
-
-    return _generate_progress_bar(average_progress_percent)
-
-
-def _generate_progress_bar(progress) -> str:
-    """Generate a progress bar"""
-    progress_value = f"{progress:.0f}"
-    value = int(progress_value)
-    if value > 50:
-        progress_value = format_html('<span class="text-white)">{}%</span>', value)
-    else:
-        progress_value = format_html('<span class="text-dark">{}%</span>', value)
-
-    progressbar = format_html(
-        """
-        <div class="progress-outer flex-grow-1 me-2">
-            <div class="progress" style="position: relative;">
-                <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: {}%; box-shadow: -1px 3px 5px rgba(0, 180, 231, 0.9);"></div>
-                <div class="fw-bold fs-6 text-center position-absolute top-50 start-50 translate-middle">{}</div>
-            </div>
-        </div>
-        """,
-        progress,
-        progress_value,
-    )
-
-    return progressbar
+    return generate_progressbar(average_progress_percent)
 
 
 # pylint: disable=too-many-arguments, too-many-positional-arguments

@@ -110,3 +110,27 @@ def generate_settings(
         "action": action,
         "ajax": ajax,
     }
+
+
+def generate_progressbar(progress) -> str:
+    """Generate a progress bar"""
+    value = round(progress, 2)
+    if value > 50:
+        progress_value = format_html('<span class="text-white)">{}%</span>', value)
+    else:
+        progress_value = format_html('<span class="text-dark">{}%</span>', value)
+
+    progressbar = format_html(
+        """
+        <div class="progress-outer flex-grow-1 me-2">
+            <div class="progress" style="position: relative;">
+                <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: {}%; box-shadow: -1px 3px 5px rgba(0, 180, 231, 0.9);"></div>
+                <div class="fw-bold fs-6 text-center position-absolute top-50 start-50 translate-middle">{}</div>
+            </div>
+        </div>
+        """,
+        value,
+        progress_value,
+    )
+
+    return progressbar

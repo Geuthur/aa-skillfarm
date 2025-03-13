@@ -20,6 +20,7 @@ class SkillFarmAuditAdmin(admin.ModelAdmin):
         "_character__character_id",
         "_character__character_name",
         "_last_update_skillqueue",
+        "_last_update_skills",
     )
 
     list_display_links = (
@@ -63,12 +64,6 @@ class SkillFarmAuditAdmin(admin.ModelAdmin):
     @admin.display(description="Last Update Skills", ordering="last_update_skills")
     def _last_update_skills(self, obj: SkillFarmAudit):
         return obj.last_update_skills
-
-    @admin.display(
-        description="Last Update Payments", ordering="last_update_notification"
-    )
-    def _last_update_payments(self, obj: SkillFarmAudit):
-        return obj.last_notification
 
     # pylint: disable=unused-argument
     def has_add_permission(self, request):

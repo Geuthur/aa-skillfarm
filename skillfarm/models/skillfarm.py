@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from eveuniverse.models import EveType
 
-from allianceauth.eveonline.models import EveCharacter, Token
+from allianceauth.eveonline.models import EveCharacter
 
 from skillfarm import app_settings
 from skillfarm.hooks import get_extension_logger
@@ -52,18 +52,6 @@ class SkillFarmAudit(models.Model):
             "esi-skills.read_skills.v1",
             "esi-skills.read_skillqueue.v1",
         ]
-
-    def get_token(self) -> Token:
-        """Helper method to get a valid token for a specific character with specific scopes."""
-        token = (
-            Token.objects.filter(character_id=self.character.character_id)
-            .require_scopes(self.get_esi_scopes())
-            .require_valid()
-            .first()
-        )
-        if token:
-            return token
-        return False
 
     def skill_extraction(self) -> list[str]:
         """Check if a character has a skill extraction ready and return skill names."""
@@ -256,7 +244,7 @@ class CharacterSkillqueueEntry(models.Model):
 
     @property
     def is_skillqueue_ready(self) -> bool:
-        """Check if skill from skillqueue is rdy from end date."""
+        """Check if skill finish date is below the actual date."""
         if (
             self.is_active
             and self.finish_date <= timezone.now()
