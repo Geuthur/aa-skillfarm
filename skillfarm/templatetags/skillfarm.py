@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from django.conf import settings
 from django.template.defaulttags import register
@@ -14,7 +13,7 @@ logger = get_extension_logger(__name__)
 
 
 @register.simple_tag
-def skillfarm_static(relative_file_path: str, script_type: str = None) -> Optional[str]:
+def skillfarm_static(relative_file_path: str, script_type: str = None) -> str | None:
     """
     Versioned static URL
 

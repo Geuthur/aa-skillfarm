@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any
 
 from ninja import Schema
 
@@ -13,16 +13,16 @@ class SkillFarm(Schema):
     character_name: str
     corporation_id: int
     corporation_name: str
-    active: Optional[bool]
-    notification: Optional[bool]
-    last_update: Optional[datetime]
+    active: bool | None
+    notification: bool | None
+    last_update: datetime | None
     skillset: Any
     skills: Any
     skill_names: Any
-    is_active: Optional[bool]
-    extraction_ready: Optional[bool]
+    is_active: bool | None
+    extraction_ready: bool | None
 
 
 class SkillFarmFilter(Schema):
-    characters: List[Any]
-    skills: List[Any]
+    characters: list[Any]
+    skills: list[Any]
