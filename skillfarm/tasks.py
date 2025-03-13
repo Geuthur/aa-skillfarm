@@ -14,7 +14,6 @@ from allianceauth.notifications import notify
 from allianceauth.services.tasks import QueueOnce
 
 from skillfarm.app_settings import (
-    SKILLFARM_NOTIFICATION_COOLDOWN,
     SKILLFARM_STALE_STATUS,
 )
 from skillfarm.decorators import when_esi_is_available
@@ -125,6 +124,7 @@ def check_skillfarm_notifications(self, runs: int = 0):
         if msg_items:
             # Add each message to Main Character
             warnings[main_character] = "\n".join(msg_items)
+
     if warnings:
         for main_character, msg in warnings.items():
             logger.debug(
@@ -150,20 +150,4 @@ def check_skillfarm_notifications(self, runs: int = 0):
                 character.save()
 
             runs = runs + 1
-
-    # Reset notification for characters that have not been notified for more than a day
-    for character in characters:
-        if (
-            character.last_notification is not None
-            and character.last_notification
-            < timezone.now() - datetime.timedelta(days=SKILLFARM_NOTIFICATION_COOLDOWN)
-        ):
-            logger.debug(
-                "Notification Reseted for %s",
-                character.character.character_name,
-            )
-            character.last_notification = None
-            character.notification_sent = False
-            character.save()
-
     logger.info("Queued %s Skillfarm Notifications", runs)
