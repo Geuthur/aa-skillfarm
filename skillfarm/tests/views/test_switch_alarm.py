@@ -69,3 +69,17 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["message"], "Permission Denied")
+
+    def test_switch_alarm_invalid(self):
+        request = self.factory.post(
+            reverse("skillfarm:switch_alarm", args=[1001]), data=None
+        )
+        request.user = self.no_audit_user
+
+        response = switch_alarm(request, character_id=1001)
+
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertFalse(response_data["success"])
+        self.assertEqual(response_data["message"], "Invalid Form")
