@@ -13,7 +13,7 @@ from eveuniverse.models import EveMarketPrice
 from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
 
-from skillfarm import forms
+from skillfarm import forms, tasks
 from skillfarm.api.helpers import get_character
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
@@ -87,23 +87,17 @@ def character_overview(request, character_id=None):
 @permission_required("skillfarm.basic_access")
 def add_char(request, token):
     """Add Character to Skillfarm"""
-    # pylint: disable=import-outside-toplevel
-    from skillfarm.tasks import update_character_skillfarm
+    character = EveCharacter.objects.get_character_by_id(token.character_id)
+    char, _ = SkillFarmAudit.objects.update_or_create(
+        character=character, defaults={"name": token.character_name}
+    )
+    tasks.update_character_skillfarm.apply_async(
+        args=[char.character.character_id], kwargs={"force_refresh": True}
+    )
 
-    try:
-        character = EveCharacter.objects.get_character_by_id(token.character_id)
-        char, _ = SkillFarmAudit.objects.update_or_create(
-            character=character, defaults={"name": token.character_name}
-        )
-        update_character_skillfarm.apply_async(
-            args=[char.character.character_id], kwargs={"force_refresh": True}
-        )
-    except SkillFarmAudit.DoesNotExist:
-        msg = trans("Character not found")
-        messages.error(request, msg)
-        return redirect("skillfarm:index")
-
-    msg = trans("{character_name} successfully added to Skillfarm System").format(
+    msg = trans(
+        "{character_name} successfully added or updated to Skillfarm System"
+    ).format(
         character_name=char.character.character_name,
     )
     messages.success(request, msg)
@@ -145,7 +139,7 @@ def remove_char(request, character_id: list):
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
-def switch_alarm(request, character_id: list):
+def switch_alarm(request, character_id: int):
     """Switch Character Notification Alarm"""
     # Check Permission
     perm, __ = get_character(request, character_id)
@@ -158,18 +152,11 @@ def switch_alarm(request, character_id: list):
             )
 
         character_id = form.cleaned_data["character_id"]
-        characters = [character_id]
 
         try:
-            characters = SkillFarmAudit.objects.filter(
-                character__character_id__in=characters
-            )
-            if characters:
-                for c in characters:
-                    c.notification = not c.notification
-                    c.save()
-            else:
-                raise SkillFarmAudit.DoesNotExist
+            character = SkillFarmAudit.objects.get(character__character_id=character_id)
+            character.notification = not character.notification
+            character.save()
             msg = trans("Alarm/s successfully updated")
         except SkillFarmAudit.DoesNotExist:
             msg = "Character/s not found"
