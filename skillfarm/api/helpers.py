@@ -25,7 +25,7 @@ def get_main_character(request, character_id):
     perms = True
     try:
         main_char = EveCharacter.objects.get(character_id=character_id)
-    except ObjectDoesNotExist:
+    except EveCharacter.DoesNotExist:
         main_char = EveCharacter.objects.select_related(
             "character_ownership",
             "character_ownership__user__profile",
@@ -44,7 +44,7 @@ def get_character(request, character_id):
     perms = True
     try:
         character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    except ObjectDoesNotExist:
+    except SkillFarmAudit.DoesNotExist:
         return False, None
 
     # check access
