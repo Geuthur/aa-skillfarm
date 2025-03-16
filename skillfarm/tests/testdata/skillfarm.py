@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from django.contrib.auth.models import User
 
 from allianceauth.authentication.backends import StateBackend
