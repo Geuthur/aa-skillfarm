@@ -3,7 +3,6 @@
 import datetime
 
 # Third Party
-# pylint: disable=no-name-in-module
 from celery import chain, shared_task
 
 from django.utils import timezone
@@ -41,7 +40,7 @@ _update_skillfarm_params = {
 }
 
 
-@shared_task
+@shared_task(**TASK_DEFAULTS_ONCE)
 @when_esi_is_available
 def update_all_skillfarm(runs: int = 0):
     characters = SkillFarmAudit.objects.select_related("character").all()
@@ -52,6 +51,7 @@ def update_all_skillfarm(runs: int = 0):
 
 
 @shared_task(**_update_skillfarm_params)
+@when_esi_is_available
 def update_character_skillfarm(
     character_id, force_refresh=False
 ):  # pylint: disable=unused-argument
