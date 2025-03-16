@@ -165,6 +165,7 @@ def switch_alarm(request, character_id: int):
             )
     else:
         msg = "Invalid Form"
+        return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
 
 
