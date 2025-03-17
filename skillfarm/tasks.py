@@ -107,7 +107,7 @@ def update_char_skills(character_id, force_refresh=False):
 # pylint: disable=unused-argument, too-many-locals
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
-    characters = SkillFarmAudit.objects.select_related("character").all()
+    characters = SkillFarmAudit.objects.all()
     notified_characters = []
 
     # Create a dictionary to map main characters to their alts
