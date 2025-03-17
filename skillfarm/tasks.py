@@ -3,8 +3,7 @@
 import datetime
 
 # Third Party
-# pylint: disable=no-name-in-module
-from celery import shared_task
+from celery import chain, shared_task
 
 from django.utils import timezone
 from django.utils.html import format_html
@@ -13,9 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.notifications import notify
 from allianceauth.services.tasks import QueueOnce
 
-from skillfarm.app_settings import (
-    SKILLFARM_STALE_STATUS,
-)
+from skillfarm import app_settings
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import (
@@ -23,12 +20,27 @@ from skillfarm.models.skillfarm import (
     CharacterSkillqueueEntry,
     SkillFarmAudit,
 )
-from skillfarm.task_helper import enqueue_next_task, no_fail_chain
 
 logger = get_extension_logger(__name__)
 
+MAX_RETRIES_DEFAULT = 3
 
-@shared_task
+# Default params for all tasks.
+TASK_DEFAULTS = {
+    "time_limit": app_settings.SKILLFARM_TASKS_TIME_LIMIT,
+    "max_retries": MAX_RETRIES_DEFAULT,
+}
+
+# Default params for tasks that need run once only.
+TASK_DEFAULTS_ONCE = {**TASK_DEFAULTS, **{"base": QueueOnce}}
+
+_update_skillfarm_params = {
+    **TASK_DEFAULTS_ONCE,
+    **{"once": {"keys": ["character_id"], "graceful": True}},
+}
+
+
+@shared_task(**TASK_DEFAULTS_ONCE)
 @when_esi_is_available
 def update_all_skillfarm(runs: int = 0):
     characters = SkillFarmAudit.objects.select_related("character").all()
@@ -38,38 +50,44 @@ def update_all_skillfarm(runs: int = 0):
     logger.info("Queued %s Skillfarm Updates", runs)
 
 
-@shared_task(bind=True, base=QueueOnce)
+@shared_task(**_update_skillfarm_params)
+@when_esi_is_available
 def update_character_skillfarm(
-    self, character_id, force_refresh=False
+    character_id, force_refresh=False
 ):  # pylint: disable=unused-argument
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    skip_date = timezone.now() - datetime.timedelta(hours=SKILLFARM_STALE_STATUS)
+
+    # Settings for the Task Queue
     que = []
+    skip_date = timezone.now() - datetime.timedelta(
+        hours=app_settings.SKILLFARM_STALE_STATUS
+    )
     mindt = timezone.now() - datetime.timedelta(days=7)
+    priority = 7
+
     logger.debug(
         "Processing Audit Updates for %s", format(character.character.character_name)
     )
     if (character.last_update_skillqueue or mindt) <= skip_date or force_refresh:
-        que.append(update_char_skillqueue.si(character_id, force_refresh=force_refresh))
+        que.append(
+            update_char_skillqueue.si(character_id, force_refresh=force_refresh).set(
+                priority=priority
+            )
+        )
 
     if (character.last_update_skills or mindt) <= skip_date or force_refresh:
-        que.append(update_char_skills.si(character_id, force_refresh=force_refresh))
+        que.append(
+            update_char_skills.si(character_id, force_refresh=force_refresh).set(
+                priority=priority
+            )
+        )
 
-    enqueue_next_task(que)
-
+    chain(que).apply_async()
     logger.debug("Queued %s Tasks for %s", len(que), character.character.character_name)
 
 
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
-    name="tasks.update_char_skillqueue",
-)
-@no_fail_chain
-def update_char_skillqueue(
-    self, character_id, force_refresh=False, chain=[]
-):  # pylint: disable=unused-argument, dangerous-default-value
+@shared_task(**_update_skillfarm_params)
+def update_char_skillqueue(character_id, force_refresh=False):
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     CharacterSkillqueueEntry.objects.update_or_create_esi(
         character, force_refresh=force_refresh
@@ -78,16 +96,8 @@ def update_char_skillqueue(
     character.save()
 
 
-@shared_task(
-    bind=True,
-    base=QueueOnce,
-    once={"graceful": False, "keys": ["character_id"]},
-    name="tasks.update_char_skills",
-)
-@no_fail_chain
-def update_char_skills(
-    self, character_id, force_refresh=False, chain=[]
-):  # pylint: disable=unused-argument, dangerous-default-value
+@shared_task(**_update_skillfarm_params)
+def update_char_skills(character_id, force_refresh=False):
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     CharacterSkill.objects.update_or_create_esi(character, force_refresh=force_refresh)
     character.last_update_skills = timezone.now()
@@ -95,10 +105,9 @@ def update_char_skills(
 
 
 # pylint: disable=unused-argument, too-many-locals
-@shared_task(bind=True, base=QueueOnce)
-def check_skillfarm_notifications(self, runs: int = 0):
+@shared_task(**TASK_DEFAULTS_ONCE)
+def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.select_related("character").all()
-    warnings = {}
     notified_characters = []
 
     # Create a dictionary to map main characters to their alts
@@ -114,40 +123,45 @@ def check_skillfarm_notifications(self, runs: int = 0):
     for main_character, alts in main_to_alts.items():
         msg_items = []
         for alt in alts:
-            if alt.notification and not alt.is_cooldown:
+            if alt.notification:
                 skill_names = alt.get_finished_skills()
                 if skill_names:
                     # Create and Add Notification Message
                     msg = alt._generate_notification(skill_names)
                     msg_items.append(msg)
                     notified_characters.append(alt)
+            else:
+                # Reset Settings for Alts that have no notification enabled
+                alt.notification_sent = False
+                alt.last_notification = None
+                alt.save()
+
         if msg_items:
             # Add each message to Main Character
-            warnings[main_character] = "\n".join(msg_items)
-
-    if warnings:
-        for main_character, msg in warnings.items():
+            notifiy_message = "\n".join(msg_items)
             logger.debug(
                 "Skilltraining has been finished for %s Skills: %s",
                 main_character.character_name,
-                msg,
+                main_character,
             )
             title = _("Skillfarm Notifications")
             full_message = format_html(
-                "Following Skills have finished training: \n{}", msg
+                "Following Skills have finished training: \n{}", notifiy_message
             )
+
             notify(
                 title=title,
                 message=full_message,
                 user=main_character.character_ownership.user,
                 level="warning",
             )
-
-            # Set notification_sent to True for all characters that were notified
-            for character in notified_characters:
-                character.notification_sent = True
-                character.last_notification = timezone.now()
-                character.save()
-
             runs = runs + 1
+
+    if notified_characters:
+        # Set notification_sent to True for all characters that were notified
+        for character in notified_characters:
+            character.notification_sent = True
+            character.last_notification = timezone.now()
+            character.save()
+
     logger.info("Queued %s Skillfarm Notifications", runs)

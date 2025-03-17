@@ -46,3 +46,6 @@ SKILLFARM_STALE_STATUS = clean_setting("SKILLFARM_STALE_STATUS", 3)
 
 # Set Notification Cooldown in Days
 SKILLFARM_NOTIFICATION_COOLDOWN = clean_setting("SKILLFARM_NOTIFICATION_COOLDOWN", 3)
+
+# Global timeout for tasks in seconds to reduce task accumulation during outages.
+SKILLFARM_TASKS_TIME_LIMIT = clean_setting("SKILLFARM_TASKS_TIME_LIMIT", 7200)
