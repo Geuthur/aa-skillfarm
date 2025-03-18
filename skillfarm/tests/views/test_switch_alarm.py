@@ -49,7 +49,7 @@ class TestViews(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTrue(response_data["success"])
-        self.assertEqual(response_data["message"], "Alarm/s successfully updated")
+        self.assertEqual(response_data["message"], "Alarm successfully updated")
 
     def test_switch_alarm_no_audit(self):
         form_data = {
