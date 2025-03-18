@@ -217,9 +217,9 @@ def skillfarm_calc(request, character_id=None):
     skillfarm_dict = {}
     error = False
     try:
-        plex = EveTypePrice.objects.get(eve_type_id=44992)
-        injector = EveTypePrice.objects.get(eve_type_id=40520)
-        extractor = EveTypePrice.objects.get(eve_type_id=40519)
+        plex = EveTypePrice.objects.get(eve_type__id=44992)
+        injector = EveTypePrice.objects.get(eve_type__id=40520)
+        extractor = EveTypePrice.objects.get(eve_type__id=40519)
 
         plex_price = float(plex.sell)
         injector_price = float(injector.sell)
