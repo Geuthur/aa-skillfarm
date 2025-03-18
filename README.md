@@ -24,6 +24,7 @@ ______________________________________________________________________
     - [Step 2 - Configure Alliance Auth](#step2)
     - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
     - [Step 4 - Migration to AA](#step4)
+    - [Step 4.1 - Create/Load Skillfarm Prices](#step41)
     - [Step 5 - Setting up Permissions](#step5)
     - [Step 6 - (Optional) Setting up Compatibilies](#step6)
   - [Highlights](#highlights)
@@ -91,6 +92,12 @@ CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
 ```shell
 python manage.py collectstatic
 python manage.py migrate
+```
+
+### Step 4.1 - Create/Load Skillfarm Prices<a name="step41">
+
+```shell
+python manage.py skillfarm_load_prices
 ```
 
 ### Step 5 - Setting up Permissions<a name="step5"></a>

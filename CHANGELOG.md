@@ -2,6 +2,9 @@
 
 ## [0.5.x] - IN Development
 
+> [!NOTE]
+> Market Price System changed please visit the `README.md`
+
 ### Added
 
 - EveTypePrice Model
