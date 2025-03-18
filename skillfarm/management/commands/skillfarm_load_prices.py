@@ -1,7 +1,7 @@
 import requests
 
 from django.core.management.base import BaseCommand
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from eveuniverse.models import EveType
 
@@ -57,21 +57,26 @@ class Command(BaseCommand):
 
                 objs.append(item)
             except EveType.DoesNotExist:
-                print(
+                self.stdout.write(
                     f"EveType {key} not found. Skipping... Ensure you have loaded the data from eveuniverse."
                 )
                 continue
 
         try:
-            EveTypePrice.objects.bulk_create(objs)
+            with transaction.atomic():
+                EveTypePrice.objects.bulk_create(objs)
         except IntegrityError:
-            print("Error: Prices already loaded into database.")
-            delete_arg = input("Would you like to replace all prices? (y/n): ")
+            self.stdout.write("Error: Prices already loaded into database.")
+            delete_arg = input("Would you like to update all prices? (y/n): ")
 
             if delete_arg == "y":
-                EveTypePrice.objects.all().delete()
-                EveTypePrice.objects.bulk_create(objs)
-                self.stdout.write(f"Successfully replaced {len(objs)} prices.")
+                with transaction.atomic():
+                    EveTypePrice.objects.bulk_create(
+                        objs,
+                        update_conflicts=True,
+                        update_fields=["buy", "sell", "updated_at"],
+                    )
+                self.stdout.write(f"Successfully update {len(objs)} prices.")
             else:
                 self.stdout.write("No changes made.")
             return
