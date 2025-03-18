@@ -4,7 +4,7 @@ Skillfarm Helper
 
 import time
 
-from bravado.exception import HTTPNotModified
+from bravado.exception import HTTPGatewayTimeout, HTTPNotModified
 
 from django.core.cache import cache
 
@@ -16,6 +16,10 @@ MAX_ETAG_LIFE = 60 * 60 * 24 * 7  # 7 Days
 
 
 class NotModifiedError(Exception):
+    pass
+
+
+class HTTPGatewayTimeoutError(Exception):
     pass
 
 
@@ -92,10 +96,11 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
         and not force_refresh
         and not etags_incomplete
     ):
-        logger.debug("Etag: No modified Data for %s", operation.operation.operation_id)
+        # Etag Match Cache Check
         raise NotModifiedError()
 
     if force_refresh:
+        # Remove Etag if force_refresh
         logger.debug(
             "ETag: Removing Etag %s F:%s - %s",
             operation.operation.operation_id,
@@ -104,6 +109,7 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
         )
         del_etag_header(operation)
     else:
+        # Save Etag
         logger.debug(
             "ETag: Saving Etag %s F:%s - %s",
             operation.operation.operation_id,
@@ -118,25 +124,55 @@ def handle_page_results(
 ):
     """Handle multiple page results and use Cache if possible"""
     results = []
+
     while current_page <= total_pages:
         operation.future.request.params["page"] = current_page
         try:
             if not etags_incomplete and not force_refresh:
                 inject_etag_header(operation)
             else:
+                logger.debug()
                 rem_etag_header(operation)
 
             result, headers = operation.result()
             total_pages = int(headers.headers["X-Pages"])
+
+            # Get ETag Informations
+            logger.info(get_etag_header(operation))
+            logger.info(headers.headers.get("ETag"))
+
+            # Handle ETag headers
             handle_etag_headers(operation, headers, force_refresh, etags_incomplete)
+
+            # Store results
             results += result
             current_page += 1
 
+            if not etags_incomplete and not force_refresh:
+                logger.debug(
+                    "ETag: No Etag %s - %s",
+                    operation.operation.operation_id,
+                    stringify_params(operation),
+                )
+                current_page = 1
+                results = []
+                etags_incomplete = True
+
         except (HTTPNotModified, NotModifiedError) as e:
-            logger.debug(e)
             if isinstance(e, NotModifiedError):
+                logger.debug(
+                    "ETag: Match Cache - Etag:%s, %s",
+                    operation.operation.operation_id,
+                    stringify_params(operation),
+                )
                 total_pages = int(headers.headers["X-Pages"])
             else:
+                logger.debug(
+                    "ETag: Match ESI - Etag: %s - %s ETag-Incomplete: %s",
+                    operation.operation.operation_id,
+                    stringify_params(operation),
+                    etags_incomplete,
+                )
                 total_pages = int(e.response.headers["X-Pages"])
 
             if not etags_incomplete:
@@ -145,6 +181,10 @@ def handle_page_results(
                 current_page = 1
                 results = []
                 etags_incomplete = False
+
+    if not etags_incomplete and not force_refresh:
+        raise NotModifiedError()
+
     return results, current_page, total_pages
 
 
@@ -152,6 +192,7 @@ def etag_results(operation, token, force_refresh=False):
     """Handle ETag results"""
     _start_tm = time.perf_counter()
     operation.request_config.also_return_response = True
+
     if token:
         operation.future.request.headers["Authorization"] = (
             "Bearer " + token.valid_access_token()
@@ -160,6 +201,7 @@ def etag_results(operation, token, force_refresh=False):
         current_page = 1
         total_pages = 1
         etags_incomplete = False
+
         results, current_page, total_pages = handle_page_results(
             operation, current_page, total_pages, etags_incomplete, force_refresh
         )
@@ -172,6 +214,9 @@ def etag_results(operation, token, force_refresh=False):
             logger.debug("ETag: Not Modified %s", operation.operation.operation_id)
             set_etag_header(operation, e.response)
             raise NotModifiedError() from e
+        except HTTPGatewayTimeout as e:
+            logger.debug("ETag: Gateway Timeout %s", operation.operation.operation_id)
+            raise HTTPGatewayTimeoutError() from e
         handle_etag_headers(operation, headers, force_refresh, etags_incomplete=False)
     logger.debug(
         "ESI_TIME: OVERALL %s %s %s",

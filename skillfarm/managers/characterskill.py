@@ -5,7 +5,11 @@ from eveuniverse.models import EveType
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.hooks import get_extension_logger
 from skillfarm.providers import esi
-from skillfarm.task_helper import NotModifiedError, etag_results
+from skillfarm.task_helper import (
+    HTTPGatewayTimeoutError,
+    NotModifiedError,
+    etag_results,
+)
 
 logger = get_extension_logger(__name__)
 
@@ -52,6 +56,8 @@ class CharacterSkillManager(models.Manager):
             logger.debug(
                 "No New Skillque data for: %s", character.character.character_name
             )
+        except HTTPGatewayTimeoutError:
+            logger.error("ESI Timeout for: %s", character.character.character_name)
 
         return skills_info
 
