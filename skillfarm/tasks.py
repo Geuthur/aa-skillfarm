@@ -2,9 +2,12 @@
 
 import datetime
 
+import requests
+
 # Third Party
 from celery import chain, shared_task
 
+from django.db.utils import Error
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +18,7 @@ from allianceauth.services.tasks import QueueOnce
 from skillfarm import app_settings
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.hooks import get_extension_logger
+from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import (
     CharacterSkill,
     CharacterSkillqueueEntry,
@@ -104,7 +108,6 @@ def update_char_skills(character_id, force_refresh=False):
     character.save()
 
 
-# pylint: disable=unused-argument, too-many-locals
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.all()
@@ -165,3 +168,37 @@ def check_skillfarm_notifications(runs: int = 0):
             character.save()
 
     logger.info("Queued %s Skillfarm Notifications", runs)
+
+
+@shared_task(**TASK_DEFAULTS_ONCE)
+def update_all_prices():
+    prices = EveTypePrice.objects.all()
+    market_data = {}
+
+    if len(prices) == 0:
+        logger.info("No Prices to update")
+        return
+
+    request = requests.get(
+        "https://market.fuzzwork.co.uk/aggregates/",
+        params={
+            "types": ",".join([str(x) for x in prices]),
+            "station": app_settings.SKILLFARM_PRICE_SOURCE_ID,
+        },
+    ).json()
+
+    market_data.update(request)
+
+    for price in prices:
+        if price.eve_type.id in market_data:
+            price.buy = float(market_data[price.eve_type.id]["buy"]["percentile"])
+            price.sell = float(market_data[price.eve_type.id]["sell"]["percentile"])
+            price.updated_at = timezone.now()
+
+    try:
+        EveTypePrice.objects.bulk_update(prices, ["buy", "sell", "updated_at"])
+    except Error as e:
+        logger.error("Error updating prices: %s", e)
+        return
+
+    logger.info("Skillfarm Prices updated")

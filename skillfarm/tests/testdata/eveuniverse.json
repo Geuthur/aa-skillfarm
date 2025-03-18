@@ -4,6 +4,11 @@
             "id": 1,
             "name": "Skill",
             "published": true
+        },
+        {
+            "id": 2,
+            "name": "Test Category",
+            "published": true
         }
     ],
     "EveGroup": [
@@ -11,6 +16,12 @@
             "eve_category_id": 1,
             "id": 1,
             "name": "Spaceship Command",
+            "published": false
+        },
+        {
+            "eve_category_id": 2,
+            "id": 2,
+            "name": "Test Group",
             "published": false
         }
     ],
@@ -43,6 +54,74 @@
             "id": 2,
             "mass": 0,
             "name": "skill2",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "Test PLEX",
+            "enabled_sections": 0,
+            "eve_graphic_id": null,
+            "eve_group_id": 2,
+            "eve_market_group_id": null,
+            "icon_id": 1,
+            "id": 3,
+            "mass": 0,
+            "name": "PLEX",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test PLEX",
+            "enabled_sections": 0,
+            "eve_graphic_id": null,
+            "eve_group_id": 2,
+            "eve_market_group_id": null,
+            "icon_id": 1,
+            "id": 44992,
+            "mass": 0,
+            "name": "Test PLEX",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test Extractor",
+            "enabled_sections": 0,
+            "eve_graphic_id": null,
+            "eve_group_id": 2,
+            "eve_market_group_id": null,
+            "icon_id": 1,
+            "id": 40519,
+            "mass": 0,
+            "name": "Test Skill Extractor",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test Injector",
+            "enabled_sections": 0,
+            "eve_graphic_id": null,
+            "eve_group_id": 2,
+            "eve_market_group_id": null,
+            "icon_id": 1,
+            "id": 40520,
+            "mass": 0,
+            "name": "Test Skill Injector",
             "packaged_volume": 1.0,
             "portion_size": 1,
             "published": true,

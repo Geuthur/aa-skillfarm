@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-21 17:01+0100\n"
+"POT-Creation-Date: 2025-03-18 10:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,49 +18,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: api/character/helpers/skilldetails.py:177
+#: api/character/helpers/skilldetails.py:103
 msgid "Toggle Alarm"
 msgstr "Alarm umschalten"
 
-#: api/character/helpers/skilldetails.py:183
+#: api/character/helpers/skilldetails.py:109
 msgid "Are you sure you want to toggle the alarm for {}?"
 msgstr "Bist du sicher das du den Alarm für {} umschalten möchtest?"
 
-#: api/character/helpers/skilldetails.py:191
+#: api/character/helpers/skilldetails.py:117
 msgid "Edit Skillset"
 msgstr "Skillset bearbeiten"
 
-#: api/character/helpers/skilldetails.py:207
+#: api/character/helpers/skilldetails.py:133
 msgid "Skillinfo"
 msgstr "Skillinfo"
 
-#: api/character/helpers/skilldetails.py:232
+#: api/character/helpers/skilldetails.py:157
 msgid "Skill Extraction Ready"
 msgstr "Skill Extraktion bereit"
 
-#: api/character/helpers/skilldetails.py:238
+#: api/character/helpers/skilldetails.py:162
 msgid "Please check your Character a Skill should be ready for extraction"
 msgstr ""
 "Bitte überprüfen Sie Ihren Charakter, ein Skill sollte zur Extraktion bereit "
 "sein"
 
-#: api/character/helpers/skilldetails.py:260
+#: api/character/helpers/skilldetails.py:184
 msgid "Notification Activated"
 msgstr "Benachrichtigung aktiviert"
 
-#: api/character/helpers/skilldetails.py:266
+#: api/character/helpers/skilldetails.py:190
 msgid "Notification Deactivated"
 msgstr "Benachrichtigung deaktiviert"
 
-#: api/character/skillfarm.py:62
+#: api/character/skillfarm.py:65
 msgid "Show Skillfarm"
 msgstr "Zeige Skillfarm"
 
-#: api/character/skillfarm.py:156
+#: api/character/skillfarm.py:161
 msgid "No Active Training"
 msgstr "Kein aktives Training"
 
-#: api/character/skillfarm.py:214
+#: api/character/skillfarm.py:219
 #: templates/skillfarm/bundles/settings-bundle.html:20
 #: templates/skillfarm/partials/table/inactive.html:9
 #: templates/skillfarm/partials/table/skillfarm.html:9
@@ -75,12 +75,12 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: models/skillfarm.py:107
+#: models/skillfarm.py:99
 #, python-format
 msgid "%(charname)s: %(skillname)s"
 msgstr ""
 
-#: tasks.py:131
+#: tasks.py:149
 msgid "Skillfarm Notifications"
 msgstr "Skillfarm Benachrichtigung"
 
@@ -92,7 +92,8 @@ msgid "Character"
 msgstr "Charakter"
 
 #: templates/skillfarm/bundles/settings-bundle.html:19
-#: templates/skillfarm/partials/modals/view_skillqueue.html:20
+#: templates/skillfarm/partials/modals/view_skillqueue.html:21
+#: templates/skillfarm/partials/modals/view_skillqueue.html:59
 #: templates/skillfarm/partials/table/inactive.html:8
 #: templates/skillfarm/partials/table/skillfarm.html:8
 msgid "Progress"
@@ -119,7 +120,7 @@ msgstr "Aktionen"
 
 #: templates/skillfarm/bundles/settings-bundle.html:24
 msgid "Error loading data:"
-msgstr ""
+msgstr "Fehler beim Laden von Daten:"
 
 #: templates/skillfarm/calculator.html:17
 msgid "Single Price"
@@ -190,15 +191,6 @@ msgstr ""
 msgid "Result:"
 msgstr "Ergebnis:"
 
-#: templates/skillfarm/calculator.html:104
-msgid ""
-"An error occurred while fetching the market data. Please ensure that "
-"EveMarketPrice is updated. Please inform an admin."
-msgstr ""
-"Ein Fehler ist beim Abrufen der Marktdaten aufgetreten. Bitte stellen Sie "
-"sicher, dass EveMarketPrice aktualisiert ist. Bitte informieren Sie einen "
-"Administrator."
-
 #: templates/skillfarm/overview.html:9
 msgid "Character Overview"
 msgstr "Charakter Übersicht"
@@ -245,36 +237,43 @@ msgstr "Wenn keine Skills ausgewählt sind, wird der Filter deaktiviert."
 msgid "Search skills..."
 msgstr "Suche skills..."
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:13
+#: templates/skillfarm/partials/modals/view_skillqueue.html:14
 msgid "Skillqueue"
 msgstr "Skillwarteschlange"
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:19
-#: templates/skillfarm/partials/modals/view_skillqueue.html:56
+#: templates/skillfarm/partials/modals/view_skillqueue.html:20
+#: templates/skillfarm/partials/modals/view_skillqueue.html:58
+#: templates/skillfarm/partials/modals/view_skillqueue.html:96
 msgid "Skill"
 msgstr "Skill"
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:21
-msgid "Start Date"
-msgstr ""
-
 #: templates/skillfarm/partials/modals/view_skillqueue.html:22
-msgid "Finish Date"
-msgstr ""
+#: templates/skillfarm/partials/modals/view_skillqueue.html:60
+msgid "Start Date"
+msgstr "Start Datum"
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:50
+#: templates/skillfarm/partials/modals/view_skillqueue.html:23
+#: templates/skillfarm/partials/modals/view_skillqueue.html:61
+msgid "Finish Date"
+msgstr "End Datum"
+
+#: templates/skillfarm/partials/modals/view_skillqueue.html:52
+msgid "Skillqueue Filtered"
+msgstr "Skillwarteschlange Gefiltert"
+
+#: templates/skillfarm/partials/modals/view_skillqueue.html:90
 msgid "Skills"
 msgstr "Skills"
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:57
+#: templates/skillfarm/partials/modals/view_skillqueue.html:97
 msgid "Level"
 msgstr ""
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:58
+#: templates/skillfarm/partials/modals/view_skillqueue.html:98
 msgid "Skillpoints"
-msgstr ""
+msgstr "Skillpunkte"
 
-#: templates/skillfarm/partials/modals/view_skillqueue.html:93
+#: templates/skillfarm/partials/modals/view_skillqueue.html:133
 msgid "No character found."
 msgstr "Kein Character gefunden."
 
@@ -294,3 +293,35 @@ msgstr "ESI Skillqueue wird nur geupdated bei Charakter Login"
 #: templates/skillfarm/skillfarm.html:28
 msgid "Inactive Characters"
 msgstr "Inaktive Charaktäre"
+
+#: views.py:99
+msgid "{character_name} successfully added or updated to Skillfarm System"
+msgstr ""
+"{character_name} erfolgreich hinzugefügt oder geupdated in das Skillfarm "
+"System"
+
+#: views.py:119 views.py:149 views.py:183
+msgid "Permission Denied"
+msgstr "Zugriff verweigert"
+
+#: views.py:127 views.py:196
+msgid "Character not found"
+msgstr "Kein Character gefunden."
+
+#: views.py:131
+msgid "{character_name} successfully Deleted"
+msgstr "{character_name} erfolgreich gelöscht"
+
+#: views.py:160
+msgid "Alarm successfully updated"
+msgstr "Alarm erfolgreich geupdated"
+
+#: views.py:201
+msgid "{character_name} Skillset successfully updated"
+msgstr "{character_name} Skillset erfolgreich geupdated"
+
+#: views.py:248
+msgid ""
+"An error occurred while fetching the market data. Please inform an admin to "
+"fetch Market Data."
+msgstr "Beim Abrufen der Marktdaten ist ein Fehler aufgetreten. Bitte informieren Sie einen Administrator, um die Marktdaten abzurufen."

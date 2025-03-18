@@ -15,7 +15,7 @@ from skillfarm.views import add_info_to_context
 MODULE_PATH = "skillfarm.views."
 
 
-class TestViews(TestCase):
+class TestAddInfoContext(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

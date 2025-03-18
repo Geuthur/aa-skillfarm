@@ -19,7 +19,7 @@ MODULE_PATH = "skillfarm.views"
 @patch(MODULE_PATH + ".messages")
 @patch(MODULE_PATH + ".tasks")
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
-class TestViews(TestCase):
+class TestAddCharView(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

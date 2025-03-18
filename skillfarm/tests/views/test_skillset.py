@@ -19,7 +19,7 @@ from skillfarm.views import skillset
 MODULE_PATH = "skillfarm.views"
 
 
-class TestViews(TestCase):
+class TestSkillSetView(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

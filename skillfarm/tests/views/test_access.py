@@ -1,9 +1,7 @@
 """TestView class."""
 
 from http import HTTPStatus
-from unittest.mock import Mock, patch
 
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -12,12 +10,12 @@ from app_utils.testdata_factories import UserMainFactory
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_user_from_evecharacter_with_access
-from skillfarm.views import add_char, character_overview, index, skillfarm
+from skillfarm.views import character_overview, index, skillfarm, skillfarm_calc
 
 MODULE_PATH = "skillfarm.views."
 
 
-class TestViews(TestCase):
+class TestViewAccess(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -112,3 +110,15 @@ class TestViews(TestCase):
         # then
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "Overview")
+
+    def test_skill_calculator(self):
+        # given
+        request = self.factory.get(reverse("skillfarm:calc"))
+        request.user = self.user
+        # when
+        response = skillfarm_calc(request)
+        # then
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(
+            response, "An error occurred while fetching the market data."
+        )
