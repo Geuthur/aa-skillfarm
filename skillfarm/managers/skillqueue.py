@@ -60,11 +60,15 @@ class SkillqueueManager(models.Manager):
                 skillqueue_data, token, force_refresh=force_refresh
             )
         except NotModifiedError:
-            logger.info(
-                "No New Skillque data for: %s", character.character.character_name
+            logger.debug(
+                "No New Skillqueue data for: %s", character.character.character_name
             )
         except HTTPGatewayTimeoutError:
-            logger.error("ESI Timeout for: %s", character.character.character_name)
+            # TODO Add retry logic?
+            logger.debug(
+                "Skillqueue data ESI Timeout for: %s",
+                character.character.character_name,
+            )
 
         return skillqueue
 

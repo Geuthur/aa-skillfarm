@@ -54,10 +54,13 @@ class CharacterSkillManager(models.Manager):
             )
         except NotModifiedError:
             logger.debug(
-                "No New Skillque data for: %s", character.character.character_name
+                "No New Skill data for: %s", character.character.character_name
             )
         except HTTPGatewayTimeoutError:
-            logger.error("ESI Timeout for: %s", character.character.character_name)
+            # TODO Add retry logic?
+            logger.debug(
+                "Skill data ESI Timeout for: %s", character.character.character_name
+            )
 
         return skills_info
 
