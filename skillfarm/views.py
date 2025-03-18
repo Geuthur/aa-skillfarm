@@ -107,41 +107,9 @@ def add_char(request, token):
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
-def remove_char(request, character_id: list):
-    """Remove Character from Skillfarm"""
-    # Retrieve character_id from GET parameters
-    character_id = int(request.POST.get("character_id", 0))
-
-    # Check Permission
-    perm, _ = get_character(request, character_id)
-
-    if not perm:
-        msg = _("Permission Denied")
-        messages.error(request, msg)
-        return redirect("skillfarm:skillfarm", character_id=character_id)
-
-    try:
-        character = SkillFarmAudit.objects.get(character__character_id=character_id)
-        character.delete()
-    except SkillFarmAudit.DoesNotExist:
-        msg = _("Character/s not found")
-        messages.error(request, msg)
-        return redirect("skillfarm:skillfarm", character_id=character_id)
-
-    msg = _("{character_name} successfully Deleted").format(
-        character_name=character.character.character_name,
-    )
-    messages.success(request, msg)
-
-    return redirect("skillfarm:skillfarm", character_id=character_id)
-
-
-@login_required
-@permission_required("skillfarm.basic_access")
-@require_POST
 def switch_alarm(request, character_id: int):
     """Switch Character Notification Alarm"""
-    # Check Permission
+    # Check Permission & If Character Exists
     perm, __ = get_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
@@ -153,16 +121,10 @@ def switch_alarm(request, character_id: int):
 
         character_id = form.cleaned_data["character_id"]
 
-        try:
-            character = SkillFarmAudit.objects.get(character__character_id=character_id)
-            character.notification = not character.notification
-            character.save()
-            msg = _("Alarm/s successfully updated")
-        except SkillFarmAudit.DoesNotExist:
-            msg = "Character/s not found"
-            return JsonResponse(
-                {"success": False, "message": msg}, status=404, safe=False
-            )
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        character.notification = not character.notification
+        character.save()
+        msg = _("Alarm successfully updated")
     else:
         msg = "Invalid Form"
         return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
@@ -174,7 +136,7 @@ def switch_alarm(request, character_id: int):
 @require_POST
 def skillset(request, character_id: list):
     """Edit Character SkillSet"""
-    # Check Permission
+    # Check Permission & If Character Exists
     perm, __ = get_character(request, character_id)
     form = forms.SkillSetForm(request.POST)
 
@@ -186,17 +148,12 @@ def skillset(request, character_id: list):
             )
         character_id = form.cleaned_data["character_id"]
         selected_skills = form.cleaned_data["selected_skills"]
-        try:
-            skillset_list = selected_skills.split(",") if selected_skills else None
-            character = SkillFarmAudit.objects.get(character__character_id=character_id)
-            SkillFarmSetup.objects.update_or_create(
-                character=character, defaults={"skillset": skillset_list}
-            )
-        except SkillFarmAudit.DoesNotExist:
-            msg = _("Character not found")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=404, safe=False
-            )
+
+        skillset_list = selected_skills.split(",") if selected_skills else None
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        SkillFarmSetup.objects.update_or_create(
+            character=character, defaults={"skillset": skillset_list}
+        )
 
         msg = _("{character_name} Skillset successfully updated").format(
             character_name=character.character.character_name,
