@@ -7,6 +7,7 @@ from allianceauth.eveonline.models import EveCharacter
 from allianceauth.tests.auth_utils import AuthUtils
 from app_utils.testing import add_character_to_user
 
+from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit, SkillFarmSetup
 
 
@@ -60,6 +61,16 @@ def create_skillsetup_character(character_id: int, skillset: list) -> CharacterS
     )
 
     return skillset
+
+
+def create_evetypeprice(evetype_id: int, **kwargs) -> EveType:
+    params = {
+        "eve_type": EveType.objects.get(id=evetype_id),
+    }
+    params.update(kwargs)
+    price = EveTypePrice(**params)
+    price.save()
+    return price
 
 
 def create_skill_character(

@@ -12,7 +12,7 @@
             <div class="card-body">
                 <div id="container">
                     <div id="fieldcontents">
-                        {% if not error %}
+                        {% if not error.status %}
                             <h5 class="border-bottom pb-2">
                                 {% translate "Single Price" %}
                                 <span class="text-muted float-end small">{% translate "last update" %}: {{ skillfarm.plex.updated_at }}</span>
@@ -20,15 +20,15 @@
                             <ul class="price-list">
                                 <li>
                                     <span class="item-name">{{ skillfarm.injektor.eve_type.name }}:</span>
-                                    <span id="injektor" class="editable-click" data-original="{{ skillfarm.injektor.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.injektor.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="injektor" class="editable-click" data-original="{{ skillfarm.injektor.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.injektor.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
                                 </li>
                                 <li>
                                     <span class="item-name">{{ skillfarm.extratkor.eve_type.name }}:</span>
-                                    <span id="extratkor" class="editable-click" data-original="{{ skillfarm.extratkor.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.extratkor.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="extratkor" class="editable-click" data-original="{{ skillfarm.extratkor.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.extratkor.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
                                 </li>
                                 <li>
                                     <span class="item-name">{{ skillfarm.plex.eve_type.name }}:</span>
-                                    <span id="plex" class="editable-click" data-original="{{ skillfarm.plex.average_price|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.plex.average_price|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="plex" class="editable-click" data-original="{{ skillfarm.plex.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.plex.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
                                 </li>
                             </ul>
                             <h5 class="border-bottom pb-2">{% translate "Monthly Profit" %}
@@ -101,7 +101,7 @@
                             </span>
                         {% else %}
                             <span>
-                                {% translate "An error occurred while fetching the market data. Please ensure that EveMarketPrice is updated. Please inform an admin." %}
+                                {{ error.message }}
                             </span>
                         {% endif %}
                     </div>
