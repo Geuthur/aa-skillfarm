@@ -80,7 +80,7 @@ CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
     "schedule": crontab(minute=0, hour="*/24"),
 }
 
-CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
+CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
     "task": "skillfarm.tasks.update_all_prices",
     "schedule": crontab(minute=0, hour="0"),
 }
@@ -107,11 +107,12 @@ With the Following IDs you can set up the permissions for the Skillfarm
 
 The Following Settings can be setting up in the `local.py`
 
-| Setting Name             | Descriptioon                                          | Default       |
-| ------------------------ | ----------------------------------------------------- | ------------- |
-| `SKILLFARM_APP_NAME`     | Set the name of the APP                               | `"Skillfarm"` |
-| `SKILLFARM_LOGGER_USE`   | Set to use own Logger File `True/False`               | `False`       |
-| `SKILLFARM_STALE_STATUS` | Set the Stale Status for Skillfarm Character in hours | `3`           |
+| Setting Name                | Descriptioon                                             | Default       |
+| --------------------------- | -------------------------------------------------------- | ------------- |
+| `SKILLFARM_APP_NAME`        | Set the name of the APP                                  | `"Skillfarm"` |
+| `SKILLFARM_LOGGER_USE`      | Set to use own Logger File `True/False`                  | `False`       |
+| `SKILLFARM_STALE_STATUS`    | Set the Stale Status for Skillfarm Character in hours    | `3`           |
+| `SKILLFARM_PRICE_SOURCE_ID` | Set Station ID for fetching base prices. Default is Jita | `60003760`    |
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 
