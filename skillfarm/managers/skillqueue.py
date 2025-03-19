@@ -3,7 +3,11 @@ from eveuniverse.models import EveType
 
 from skillfarm.hooks import get_extension_logger
 from skillfarm.providers import esi
-from skillfarm.task_helper import NotModifiedError, etag_results
+from skillfarm.task_helper import (
+    HTTPGatewayTimeoutError,
+    NotModifiedError,
+    etag_results,
+)
 
 logger = get_extension_logger(__name__)
 
@@ -56,8 +60,14 @@ class SkillqueueManager(models.Manager):
                 skillqueue_data, token, force_refresh=force_refresh
             )
         except NotModifiedError:
-            logger.info(
-                "No New Skillque data for: %s", character.character.character_name
+            logger.debug(
+                "No New Skillqueue data for: %s", character.character.character_name
+            )
+        except HTTPGatewayTimeoutError:
+            # TODO Add retry logic?
+            logger.debug(
+                "Skillqueue data ESI Timeout for: %s",
+                character.character.character_name,
             )
 
         return skillqueue

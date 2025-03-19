@@ -49,3 +49,6 @@ SKILLFARM_NOTIFICATION_COOLDOWN = clean_setting("SKILLFARM_NOTIFICATION_COOLDOWN
 
 # Global timeout for tasks in seconds to reduce task accumulation during outages.
 SKILLFARM_TASKS_TIME_LIMIT = clean_setting("SKILLFARM_TASKS_TIME_LIMIT", 7200)
+
+# Price Source default is Jita
+SKILLFARM_PRICE_SOURCE_ID = clean_setting("SKILLFARM_PRICE_SOURCE_ID", 60003760)

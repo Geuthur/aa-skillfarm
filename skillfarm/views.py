@@ -5,10 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.utils.translation import gettext_lazy as trans
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from esi.decorators import token_required
-from eveuniverse.models import EveMarketPrice
 
 from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
@@ -16,6 +15,7 @@ from allianceauth.eveonline.models import EveCharacter
 from skillfarm import forms, tasks
 from skillfarm.api.helpers import get_character
 from skillfarm.hooks import get_extension_logger
+from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
 
 logger = get_extension_logger(__name__)
@@ -88,14 +88,14 @@ def character_overview(request, character_id=None):
 def add_char(request, token):
     """Add Character to Skillfarm"""
     character = EveCharacter.objects.get_character_by_id(token.character_id)
-    char, _ = SkillFarmAudit.objects.update_or_create(
+    char = SkillFarmAudit.objects.update_or_create(
         character=character, defaults={"name": token.character_name}
-    )
+    )[0]
     tasks.update_character_skillfarm.apply_async(
         args=[char.character.character_id], kwargs={"force_refresh": True}
     )
 
-    msg = trans(
+    msg = _(
         "{character_name} successfully added or updated to Skillfarm System"
     ).format(
         character_name=char.character.character_name,
@@ -107,62 +107,24 @@ def add_char(request, token):
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
-def remove_char(request, character_id: list):
-    """Remove Character from Skillfarm"""
-    # Retrieve character_id from GET parameters
-    character_id = int(request.POST.get("character_id", 0))
-
-    # Check Permission
-    perm, _ = get_character(request, character_id)
-
-    if not perm:
-        msg = trans("Permission Denied")
-        messages.error(request, msg)
-        return redirect("skillfarm:skillfarm", character_id=character_id)
-
-    try:
-        character = SkillFarmAudit.objects.get(character__character_id=character_id)
-        character.delete()
-    except SkillFarmAudit.DoesNotExist:
-        msg = trans("Character/s not found")
-        messages.error(request, msg)
-        return redirect("skillfarm:skillfarm", character_id=character_id)
-
-    msg = trans("{character_name} successfully Deleted").format(
-        character_name=character.character.character_name,
-    )
-    messages.success(request, msg)
-
-    return redirect("skillfarm:skillfarm", character_id=character_id)
-
-
-@login_required
-@permission_required("skillfarm.basic_access")
-@require_POST
 def switch_alarm(request, character_id: int):
     """Switch Character Notification Alarm"""
-    # Check Permission
+    # Check Permission & If Character Exists
     perm, __ = get_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
         if not perm:
-            msg = trans("Permission Denied")
+            msg = _("Permission Denied")
             return JsonResponse(
                 {"success": False, "message": msg}, status=403, safe=False
             )
 
         character_id = form.cleaned_data["character_id"]
 
-        try:
-            character = SkillFarmAudit.objects.get(character__character_id=character_id)
-            character.notification = not character.notification
-            character.save()
-            msg = trans("Alarm/s successfully updated")
-        except SkillFarmAudit.DoesNotExist:
-            msg = "Character/s not found"
-            return JsonResponse(
-                {"success": False, "message": msg}, status=404, safe=False
-            )
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        character.notification = not character.notification
+        character.save()
+        msg = _("Alarm successfully updated")
     else:
         msg = "Invalid Form"
         return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
@@ -174,31 +136,26 @@ def switch_alarm(request, character_id: int):
 @require_POST
 def skillset(request, character_id: list):
     """Edit Character SkillSet"""
-    # Check Permission
+    # Check Permission & If Character Exists
     perm, __ = get_character(request, character_id)
     form = forms.SkillSetForm(request.POST)
 
     if form.is_valid():
         if not perm:
-            msg = trans("Permission Denied")
+            msg = _("Permission Denied")
             return JsonResponse(
                 {"success": False, "message": msg}, status=403, safe=False
             )
         character_id = form.cleaned_data["character_id"]
         selected_skills = form.cleaned_data["selected_skills"]
-        try:
-            skillset_list = selected_skills.split(",") if selected_skills else None
-            character = SkillFarmAudit.objects.get(character__character_id=character_id)
-            SkillFarmSetup.objects.update_or_create(
-                character=character, defaults={"skillset": skillset_list}
-            )
-        except SkillFarmAudit.DoesNotExist:
-            msg = trans("Character not found")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=404, safe=False
-            )
 
-        msg = trans("{character_name} Skillset successfully updated").format(
+        skillset_list = selected_skills.split(",") if selected_skills else None
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        SkillFarmSetup.objects.update_or_create(
+            character=character, defaults={"skillset": skillset_list}
+        )
+
+        msg = _("{character_name} Skillset successfully updated").format(
             character_name=character.character.character_name,
         )
     else:
@@ -217,22 +174,22 @@ def skillfarm_calc(request, character_id=None):
     skillfarm_dict = {}
     error = False
     try:
-        plex = EveMarketPrice.objects.get(eve_type_id=44992)
-        injector = EveMarketPrice.objects.get(eve_type_id=40520)
-        extractor = EveMarketPrice.objects.get(eve_type_id=40519)
+        plex = EveTypePrice.objects.get(eve_type__id=44992)
+        injector = EveTypePrice.objects.get(eve_type__id=40520)
+        extractor = EveTypePrice.objects.get(eve_type__id=40519)
 
-        month = plex.average_price * 500
-        month12 = plex.average_price * 300
-        month24 = plex.average_price * 275
+        plex_price = float(plex.sell)
+        injector_price = float(injector.sell)
+        extractor_price = float(extractor.sell)
 
-        monthcalc = (injector.average_price * 3.5) - (
-            month + (extractor.average_price * 3.5)
+        monthcalc = (injector_price * 3.5) - (
+            (plex_price * 500) + (extractor_price * 3.5)
         )
-        month12calc = (injector.average_price * 3.5) - (
-            month12 + (extractor.average_price * 3.5)
+        month12calc = (injector_price * 3.5) - (
+            (plex_price * 300) + (extractor_price * 3.5)
         )
-        month24calc = (injector.average_price * 3.5) - (
-            month24 + (extractor.average_price * 3.5)
+        month24calc = (injector_price * 3.5) - (
+            (plex_price * 275) + (extractor_price * 3.5)
         )
 
         skillfarm_dict["plex"] = plex
@@ -244,12 +201,16 @@ def skillfarm_calc(request, character_id=None):
             "month12": month12calc,
             "month24": month24calc,
         }
-    except EveMarketPrice.DoesNotExist:
-        EveMarketPrice.objects.update_from_esi()
+    except EveTypePrice.DoesNotExist:
         error = True
 
     context = {
-        "error": error,
+        "error": {
+            "status": error,
+            "message": _(
+                "An error occurred while fetching the market data. Please inform an admin to fetch Market Data."
+            ),
+        },
         "character_id": character_id,
         "page_title": "Skillfarm Calc",
         "skillfarm": skillfarm_dict,

@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from django.db.utils import Error
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -8,6 +9,7 @@ from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
     add_skillfarmaudit_character_to_user,
+    create_evetypeprice,
     create_skill_character,
     create_skillfarm_character,
     create_skillsetup_character,
@@ -263,3 +265,88 @@ class TestCheckSkillfarmNotification(TestCase):
         for audit in audits:
             self.assertTrue(audit.notification_sent)
             self.assertIsNotNone(audit.last_notification)
+
+
+@patch(TASK_PATH + ".requests.get", spec=True)
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+class TestSkillfarmPrices(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+        load_eveuniverse()
+
+        cls.price = create_evetypeprice(3, buy=100, sell=200, updated_at=timezone.now())
+        cls.price2 = create_evetypeprice(
+            2, buy=300, sell=400, updated_at=timezone.now()
+        )
+
+        cls.json = {
+            3: {
+                "buy": {"percentile": 100},
+                "sell": {"percentile": 200},
+            }
+        }
+
+    @patch(TASK_PATH + ".EveTypePrice.objects.all", spec=True)
+    @patch(TASK_PATH + ".logger", spec=True)
+    def test_update_prices_should_update_nothing(
+        self, mock_logger, mock_prices, mock_requests
+    ):
+        mock_prices.return_value = []
+        mock_response = mock_requests.return_value
+        mock_response.json.return_value = self.json
+
+        # when
+        tasks.update_all_prices()
+        # then
+        mock_logger.info.assert_called_once_with("No Prices to update")
+
+    def test_should_update_prices(self, mock_requests):
+        mock_response = mock_requests.return_value
+        mock_response.json.return_value = self.json
+        # when
+        tasks.update_all_prices()
+        # then
+        self.assertAlmostEqual(self.price.buy, 100)
+        self.assertAlmostEqual(self.price.sell, 200)
+        self.assertIsNotNone(self.price.updated_at)
+
+    def test_update_prices_should_only_update_existing(self, mock_requests):
+        mock_response = mock_requests.return_value
+        changed_json = self.json.copy()
+        changed_json.update(
+            {
+                4: {
+                    "buy": {"percentile": 300},
+                    "sell": {"percentile": 400},
+                }
+            }
+        )
+        mock_response.json.return_value = changed_json
+        # when
+        tasks.update_all_prices()
+        # then
+        self.assertAlmostEqual(self.price.buy, 100)
+        self.assertAlmostEqual(self.price.sell, 200)
+        self.assertIsNotNone(self.price.updated_at)
+
+    @patch(TASK_PATH + ".EveTypePrice.objects.bulk_update", spec=True)
+    @patch(TASK_PATH + ".logger", spec=True)
+    def test_update_prices_should_raise_exception(
+        self, mock_logger, mock_bulk_update, mock_requests
+    ):
+        mock_response = mock_requests.return_value
+        mock_response.json.return_value = self.json
+        error_instance = Error("Error")
+        mock_bulk_update.side_effect = error_instance
+        # when
+        tasks.update_all_prices()
+        # then
+        mock_logger.error.assert_called_once_with(
+            "Error updating prices: %s", error_instance
+        )

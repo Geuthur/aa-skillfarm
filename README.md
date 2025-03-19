@@ -24,6 +24,7 @@ ______________________________________________________________________
     - [Step 2 - Configure Alliance Auth](#step2)
     - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
     - [Step 4 - Migration to AA](#step4)
+    - [Step 4.1 - Create/Load Skillfarm Prices](#step41)
     - [Step 5 - Setting up Permissions](#step5)
     - [Step 6 - (Optional) Setting up Compatibilies](#step6)
   - [Highlights](#highlights)
@@ -79,6 +80,11 @@ CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
     "task": "skillfarm.tasks.check_skillfarm_notifications",
     "schedule": crontab(minute=0, hour="*/24"),
 }
+
+CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
+    "task": "skillfarm.tasks.update_all_prices",
+    "schedule": crontab(minute=0, hour="0"),
+}
 ```
 
 ### Step 4 - Migration to AA<a name="step4"></a>
@@ -86,6 +92,12 @@ CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
 ```shell
 python manage.py collectstatic
 python manage.py migrate
+```
+
+### Step 4.1 - Create/Load Skillfarm Prices<a name="step41">
+
+```shell
+python manage.py skillfarm_load_prices
 ```
 
 ### Step 5 - Setting up Permissions<a name="step5"></a>
@@ -102,11 +114,12 @@ With the Following IDs you can set up the permissions for the Skillfarm
 
 The Following Settings can be setting up in the `local.py`
 
-| Setting Name             | Descriptioon                                          | Default       |
-| ------------------------ | ----------------------------------------------------- | ------------- |
-| `SKILLFARM_APP_NAME`     | Set the name of the APP                               | `"Skillfarm"` |
-| `SKILLFARM_LOGGER_USE`   | Set to use own Logger File `True/False`               | `False`       |
-| `SKILLFARM_STALE_STATUS` | Set the Stale Status for Skillfarm Character in hours | `3`           |
+| Setting Name                | Descriptioon                                             | Default       |
+| --------------------------- | -------------------------------------------------------- | ------------- |
+| `SKILLFARM_APP_NAME`        | Set the name of the APP                                  | `"Skillfarm"` |
+| `SKILLFARM_LOGGER_USE`      | Set to use own Logger File `True/False`                  | `False`       |
+| `SKILLFARM_STALE_STATUS`    | Set the Stale Status for Skillfarm Character in hours    | `3`           |
+| `SKILLFARM_PRICE_SOURCE_ID` | Set Station ID for fetching base prices. Default is Jita | `60003760`    |
 
 If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
 

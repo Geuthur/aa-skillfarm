@@ -23,11 +23,6 @@ urlpatterns = [
     # -- Administration
     path("char/add/", views.add_char, name="add_char"),
     path(
-        "char/delete/<int:character_id>/",
-        views.remove_char,
-        name="remove_char",
-    ),
-    path(
         "switch_alarm/<int:character_id>/",
         views.switch_alarm,
         name="switch_alarm",

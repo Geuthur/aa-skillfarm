@@ -1,10 +1,48 @@
 # Changelog
 
+## [0.5.x] - IN Development
+
 ## [0.5.1] - 2025-02-24
+
+> [!WARNING]
+> Market Price System changed please visit the `README.md`
+
+### Added
+
+- EveTypePrice Model
+- `skillfarm_load_prices` command
+- `SKILLFARM_PRICE_SOURCE_ID` Settings
+- Tests
+  - Commands
+
+### Changed
+
+- Tests
+  - Tasks
+- Skillfarm Calculator Prices now used from EveTypePrice
+- Update German Translation
+- Update README
 
 ## Fixed
 
 - All finished Skills are notificated instead of only filtered [#15](https://github.com/Geuthur/aa-skillfarm/issues/15)
+
+______________________________________________________________________
+
+##### Command
+
+To use the new command you can execute:
+
+```shell
+python manage.py skillfarm_load_prices
+```
+
+This will load all necessary prices
+
+##### Price Updates
+
+- Prices are based on Jita 4-4 Station and can be changed with the `SKILLFARM_PRICE_SOURCE_ID` config
+  Visit [Fuzzwork API](https://market.fuzzwork.co.uk/api/) to see supported IDs
 
 ## [0.5.0] - 2025-02-22
 
