@@ -2,7 +2,9 @@
 
 ## [0.5.x] - IN Development
 
-> [!NOTE]
+## [0.5.1] - 2025-02-24
+
+> [!WARNING]
 > Market Price System changed please visit the `README.md`
 
 ### Added
@@ -21,6 +23,10 @@
 - Update German Translation
 - Update README
 
+## Fixed
+
+- All finished Skills are notificated instead of only filtered [#15](https://github.com/Geuthur/aa-skillfarm/issues/15)
+
 ______________________________________________________________________
 
 ##### Command
@@ -37,12 +43,6 @@ This will load all necessary prices
 
 - Prices are based on Jita 4-4 Station and can be changed with the `SKILLFARM_PRICE_SOURCE_ID` config
   Visit [Fuzzwork API](https://market.fuzzwork.co.uk/api/) to see supported IDs
-
-## [0.5.1] - 2025-02-24
-
-## Fixed
-
-- All finished Skills are notificated instead of only filtered [#15](https://github.com/Geuthur/aa-skillfarm/issues/15)
 
 ## [0.5.0] - 2025-02-22
 
