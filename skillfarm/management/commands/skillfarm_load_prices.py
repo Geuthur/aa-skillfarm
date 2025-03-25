@@ -22,10 +22,21 @@ class Command(BaseCommand):
         type_ids = []
         market_data = {}
 
+        # Ensure that the required types are loaded into the database
+        EveType.objects.get_or_create_esi(id=44992)
+        EveType.objects.get_or_create_esi(id=40520)
+        EveType.objects.get_or_create_esi(id=40519)
+
         # Get all skillfarm relevant ids
         typeids = EveType.objects.filter(id__in=[44992, 40520, 40519]).values_list(
             "id", flat=True
         )
+
+        if len(typeids) != 3:
+            self.stdout.write(
+                "Error: Not all required types are loaded into the database."
+            )
+            return
 
         for item in typeids:
             type_ids.append(item)
@@ -65,6 +76,9 @@ class Command(BaseCommand):
         try:
             with transaction.atomic():
                 EveTypePrice.objects.bulk_create(objs)
+                self.stdout.write(f"Successfully created {len(objs)} prices.")
+                logger.debug("Created all skillfarm prices.")
+                return
         except IntegrityError:
             self.stdout.write("Error: Prices already loaded into database.")
             delete_arg = input("Would you like to update all prices? (y/n): ")
@@ -77,9 +91,7 @@ class Command(BaseCommand):
                         update_fields=["buy", "sell", "updated_at"],
                     )
                 self.stdout.write(f"Successfully update {len(objs)} prices.")
+                logger.debug("Updated all skillfarm prices.")
             else:
                 self.stdout.write("No changes made.")
             return
-
-        logger.debug("Updated all skillfarm prices.")
-        self.stdout.write(f"Successfully created {len(objs)} prices.")

@@ -34,7 +34,7 @@ class TestLoadPrices(NoSocketsTestCase):
         # when
         call_command("skillfarm_load_prices")
         # then
-        mock_logger.debug.assert_called_once_with("Updated all skillfarm prices.")
+        mock_logger.debug.assert_called_once_with("Created all skillfarm prices.")
 
     @patch("builtins.input")
     def test_load_prices_should_get_integrityerror(self, mock_input, mock_requests_get):
