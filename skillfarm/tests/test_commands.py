@@ -96,3 +96,23 @@ class TestLoadPrices(NoSocketsTestCase):
         self.assertIn("Ensure you have loaded the data from eveuniverse.", output)
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
+
+    @patch(COMMAND_PATH + ".EveType.objects")
+    def test_load_prices_should_get_error(self, mock_evetype, mock_requests_get):
+        # given
+        mock_requests_get.return_value.json.return_value = {
+            666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
+        }
+        mock_evetype.get.return_value = EveType.objects.get(id=44992)
+        mock_evetype.filter.return_value.values_list.return_value = []
+
+        # when
+        out = StringIO()
+        call_command("skillfarm_load_prices", stdout=out)
+        output = out.getvalue()
+
+        self.assertIn(
+            "Error: Not all required types are loaded into the database.", output
+        )
+        excepted_count = EveTypePrice.objects.count()
+        self.assertEqual(excepted_count, 0)

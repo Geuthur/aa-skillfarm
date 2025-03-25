@@ -7,6 +7,7 @@ node_modules/
 # Ignore all files in the root of the directory
 .coverage
 .env
+.vscode/
 .pypirc
 .venv/
 /build/
