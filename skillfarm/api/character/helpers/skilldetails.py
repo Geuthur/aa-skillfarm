@@ -131,7 +131,7 @@ def _skillfarm_actions(character: SkillFarmAudit, perms, request):
                 modal="skillfarm-confirm",
                 viewname="skillfarm:delete_character",
                 request=request,
-                text=_("Are you sure you want to delete character {}?").format(
+                text=_("Are you sure you want to delete {}?").format(
                     character.character.character_name
                 ),
             )
