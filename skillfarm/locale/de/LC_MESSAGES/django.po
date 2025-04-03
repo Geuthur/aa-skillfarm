@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-18 10:19+0100\n"
+"POT-Creation-Date: 2025-04-03 12:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,25 +30,33 @@ msgstr "Bist du sicher das du den Alarm für {} umschalten möchtest?"
 msgid "Edit Skillset"
 msgstr "Skillset bearbeiten"
 
-#: api/character/helpers/skilldetails.py:133
+#: api/character/helpers/skilldetails.py:128
+msgid "Delete Character"
+msgstr "Lösche Charakter"
+
+#: api/character/helpers/skilldetails.py:134
+msgid "Are you sure you want to delete character {}?"
+msgstr "Bist du sicher das du {} löschen möchtest?"
+
+#: api/character/helpers/skilldetails.py:147
 msgid "Skillinfo"
 msgstr "Skillinfo"
 
-#: api/character/helpers/skilldetails.py:157
+#: api/character/helpers/skilldetails.py:171
 msgid "Skill Extraction Ready"
 msgstr "Skill Extraktion bereit"
 
-#: api/character/helpers/skilldetails.py:162
+#: api/character/helpers/skilldetails.py:176
 msgid "Please check your Character a Skill should be ready for extraction"
 msgstr ""
 "Bitte überprüfen Sie Ihren Charakter, ein Skill sollte zur Extraktion bereit "
 "sein"
 
-#: api/character/helpers/skilldetails.py:184
+#: api/character/helpers/skilldetails.py:198
 msgid "Notification Activated"
 msgstr "Benachrichtigung aktiviert"
 
-#: api/character/helpers/skilldetails.py:190
+#: api/character/helpers/skilldetails.py:204
 msgid "Notification Deactivated"
 msgstr "Benachrichtigung deaktiviert"
 
@@ -75,12 +83,12 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: models/skillfarm.py:99
+#: models/skillfarm.py:111
 #, python-format
 msgid "%(charname)s: %(skillname)s"
 msgstr ""
 
-#: tasks.py:149
+#: tasks.py:150
 msgid "Skillfarm Notifications"
 msgstr "Skillfarm Benachrichtigung"
 
@@ -295,33 +303,37 @@ msgid "Inactive Characters"
 msgstr "Inaktive Charaktäre"
 
 #: views.py:99
+#, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 "{character_name} erfolgreich hinzugefügt oder geupdated in das Skillfarm "
 "System"
 
-#: views.py:119 views.py:149 views.py:183
+#: views.py:117 views.py:144 views.py:173
 msgid "Permission Denied"
 msgstr "Zugriff verweigert"
 
-#: views.py:127 views.py:196
-msgid "Character not found"
-msgstr "Kein Character gefunden."
-
-#: views.py:131
-msgid "{character_name} successfully Deleted"
-msgstr "{character_name} erfolgreich gelöscht"
-
-#: views.py:160
+#: views.py:127
 msgid "Alarm successfully updated"
 msgstr "Alarm erfolgreich geupdated"
 
-#: views.py:201
+#: views.py:153
+#, python-brace-format
+msgid "{character_name} successfully deleted"
+msgstr "{character_name} erfolgreich gelöscht"
+
+#: views.py:186
+#, python-brace-format
 msgid "{character_name} Skillset successfully updated"
 msgstr "{character_name} Skillset erfolgreich geupdated"
 
-#: views.py:248
+#: views.py:239
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
 "fetch Market Data."
-msgstr "Beim Abrufen der Marktdaten ist ein Fehler aufgetreten. Bitte informieren Sie einen Administrator, um die Marktdaten abzurufen."
+msgstr ""
+"Beim Abrufen der Marktdaten ist ein Fehler aufgetreten. Bitte informieren "
+"Sie einen Administrator, um die Marktdaten abzurufen."
+
+#~ msgid "Character not found"
+#~ msgstr "Kein Character gefunden."
