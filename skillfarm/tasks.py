@@ -7,6 +7,7 @@ import requests
 # Third Party
 from celery import chain, shared_task
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import Error
 from django.utils import timezone
 from django.utils.html import format_html
@@ -110,9 +111,7 @@ def update_char_skills(character_id, force_refresh=False):
 
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
-    characters = SkillFarmAudit.objects.filter(active=True).select_related(
-        "character__character_ownership__user__profile"
-    )
+    characters = SkillFarmAudit.objects.filter(active=True)
     notified_characters = []
 
     # Create a dictionary to map main characters to their alts
@@ -122,14 +121,11 @@ def check_skillfarm_notifications(runs: int = 0):
             main_character = (
                 character.character.character_ownership.user.profile.main_character
             )
-        # pylint: disable=broad-exception-caught
-        except Exception:
-            logger.info(
-                "Error getting main character from: %s - Deactivate Character",
-                character,
+        except ObjectDoesNotExist:
+            logger.warning(
+                "Main Character not found for %s, skipping notification",
+                character.character.character_name,
             )
-            character.active = False
-            character.save()
             continue
 
         if main_character not in main_to_alts:
