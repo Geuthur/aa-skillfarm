@@ -110,15 +110,28 @@ def update_char_skills(character_id, force_refresh=False):
 
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
-    characters = SkillFarmAudit.objects.all()
+    characters = SkillFarmAudit.objects.filter(active=True).select_related(
+        "character__character_ownership__user__profile"
+    )
     notified_characters = []
 
     # Create a dictionary to map main characters to their alts
     main_to_alts = {}
     for character in characters:
-        main_character = (
-            character.character.character_ownership.user.profile.main_character
-        )
+        try:
+            main_character = (
+                character.character.character_ownership.user.profile.main_character
+            )
+        # pylint: disable=broad-exception-caught
+        except Exception:
+            logger.info(
+                "Error getting main character from: %s - Deactivate Character",
+                character,
+            )
+            character.active = False
+            character.save()
+            continue
+
         if main_character not in main_to_alts:
             main_to_alts[main_character] = []
         main_to_alts[main_character].append(character)
