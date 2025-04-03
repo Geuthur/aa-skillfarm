@@ -134,6 +134,34 @@ def switch_alarm(request, character_id: int):
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
+def delete_character(request, character_id: int):
+    """Delete Character"""
+    # Check Permission & If Character Exists
+    perm, __ = get_character(request, character_id)
+    form = forms.ConfirmForm(request.POST)
+    if form.is_valid():
+        if not perm:
+            msg = _("Permission Denied")
+            return JsonResponse(
+                {"success": False, "message": msg}, status=403, safe=False
+            )
+
+        character_id = form.cleaned_data["character_id"]
+
+        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+        character.delete()
+        msg = _("{character_name} successfully deleted").format(
+            character_name=character.character.character_name,
+        )
+    else:
+        msg = "Invalid Form"
+        return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
+    return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
+
+
+@login_required
+@permission_required("skillfarm.basic_access")
+@require_POST
 def skillset(request, character_id: list):
     """Edit Character SkillSet"""
     # Check Permission & If Character Exists

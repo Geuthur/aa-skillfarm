@@ -122,6 +122,20 @@ def _skillfarm_actions(character: SkillFarmAudit, perms, request):
                 request=request,
             )
         )
+        actions.append(
+            generate_action_settings(
+                character=character,
+                title=_("Delete Character"),
+                icon="fas fa-trash",
+                color="danger",
+                modal="skillfarm-confirm",
+                viewname="skillfarm:delete_character",
+                request=request,
+                text=_("Are you sure you want to delete {}?").format(
+                    character.character.character_name
+                ),
+            )
+        )
 
     actions_html = format_html("".join(actions))
     return format_html('<div class="d-flex justify-content-end">{}</div>', actions_html)

@@ -28,6 +28,11 @@ urlpatterns = [
         name="switch_alarm",
     ),
     path(
+        "delete/<int:character_id>/",
+        views.delete_character,
+        name="delete_character",
+    ),
+    path(
         "skillset/<int:character_id>/",
         views.skillset,
         name="skillset",

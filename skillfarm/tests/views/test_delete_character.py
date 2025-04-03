@@ -2,9 +2,7 @@
 
 import json
 from http import HTTPStatus
-from unittest.mock import Mock, patch
 
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -14,12 +12,12 @@ from skillfarm.tests.testdata.skillfarm import (
     create_skillfarm_character,
     create_user_from_evecharacter_with_access,
 )
-from skillfarm.views import switch_alarm
+from skillfarm.views import delete_character
 
 MODULE_PATH = "skillfarm.views"
 
 
-class TestSwitchalarmView(TestCase):
+class TestDeleteCharacterView(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -31,7 +29,7 @@ class TestSwitchalarmView(TestCase):
         cls.user = cls.audit.character.character_ownership.user
         cls.no_audit_user, _ = create_user_from_evecharacter_with_access(1002)
 
-    def test_switch_alarm(self):
+    def test_delete_character(self):
         character_id = self.audit.character.character_id
         form_data = {
             "character_id": character_id,
@@ -39,30 +37,30 @@ class TestSwitchalarmView(TestCase):
         }
 
         request = self.factory.post(
-            reverse("skillfarm:switch_alarm", args=[character_id]), data=form_data
+            reverse("skillfarm:delete_character", args=[character_id]), data=form_data
         )
         request.user = self.user
 
-        response = switch_alarm(request, character_id=character_id)
+        response = delete_character(request, character_id=character_id)
 
         response_data = json.loads(response.content)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTrue(response_data["success"])
-        self.assertEqual(response_data["message"], "Alarm successfully updated")
+        self.assertEqual(response_data["message"], "Gneuten successfully deleted")
 
-    def test_switch_alarm_no_audit(self):
+    def test_delete_character_no_audit(self):
         form_data = {
             "character_id": 1001,
             "confirm": "yes",
         }
 
         request = self.factory.post(
-            reverse("skillfarm:switch_alarm", args=[1001]), data=form_data
+            reverse("skillfarm:delete_character", args=[1001]), data=form_data
         )
         request.user = self.no_audit_user
 
-        response = switch_alarm(request, character_id=1001)
+        response = delete_character(request, character_id=1001)
 
         response_data = json.loads(response.content)
 
@@ -70,13 +68,13 @@ class TestSwitchalarmView(TestCase):
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["message"], "Permission Denied")
 
-    def test_switch_alarm_invalid(self):
+    def test_delete_character_invalid(self):
         request = self.factory.post(
-            reverse("skillfarm:switch_alarm", args=[1001]), data=None
+            reverse("skillfarm:delete_character", args=[1001]), data=None
         )
         request.user = self.no_audit_user
 
-        response = switch_alarm(request, character_id=1001)
+        response = delete_character(request, character_id=1001)
 
         response_data = json.loads(response.content)
 

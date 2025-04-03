@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-18 10:19+0100\n"
+"POT-Creation-Date: 2025-04-03 12:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,23 +29,31 @@ msgstr ""
 msgid "Edit Skillset"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:133
+#: api/character/helpers/skilldetails.py:128
+msgid "Delete Character"
+msgstr ""
+
+#: api/character/helpers/skilldetails.py:134
+msgid "Are you sure you want to delete character {}?"
+msgstr ""
+
+#: api/character/helpers/skilldetails.py:147
 msgid "Skillinfo"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:157
+#: api/character/helpers/skilldetails.py:171
 msgid "Skill Extraction Ready"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:162
+#: api/character/helpers/skilldetails.py:176
 msgid "Please check your Character a Skill should be ready for extraction"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:184
+#: api/character/helpers/skilldetails.py:198
 msgid "Notification Activated"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:190
+#: api/character/helpers/skilldetails.py:204
 msgid "Notification Deactivated"
 msgstr ""
 
@@ -72,12 +80,12 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
-#: models/skillfarm.py:99
+#: models/skillfarm.py:111
 #, python-format
 msgid "%(charname)s: %(skillname)s"
 msgstr ""
 
-#: tasks.py:149
+#: tasks.py:150
 msgid "Skillfarm Notifications"
 msgstr ""
 
@@ -295,29 +303,25 @@ msgstr ""
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 
-#: views.py:119 views.py:149 views.py:183
+#: views.py:117 views.py:144 views.py:173
 msgid "Permission Denied"
 msgstr ""
 
-#: views.py:127 views.py:196
-msgid "Character not found"
+#: views.py:127
+msgid "Alarm successfully updated"
 msgstr ""
 
-#: views.py:131
+#: views.py:153
 #, python-brace-format
-msgid "{character_name} successfully Deleted"
+msgid "{character_name} successfully deleted"
 msgstr ""
 
-#: views.py:160
-msgid "Alarm/s successfully updated"
-msgstr ""
-
-#: views.py:201
+#: views.py:186
 #, python-brace-format
 msgid "{character_name} Skillset successfully updated"
 msgstr ""
 
-#: views.py:248
+#: views.py:239
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
 "fetch Market Data."
