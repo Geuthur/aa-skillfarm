@@ -4,6 +4,8 @@ from django.db.utils import Error
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
+from allianceauth.authentication.models import CharacterOwnership, UserProfile
+
 from skillfarm import tasks
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
@@ -182,7 +184,7 @@ class TestUpdateCharSkill(TestCase):
         self.assertIsNotNone(self.audit.last_update_skills)
 
 
-@patch(TASK_PATH + ".SkillFarmAudit.objects.all", spec=True)
+@patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
 @override_settings(
     CELERY_ALWAYS_EAGER=True,
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
@@ -210,10 +212,10 @@ class TestCheckSkillfarmNotification(TestCase):
             audit.notification = status
             audit.save()
 
-    def test_no_notification_should_return_false(self, mock_audit_all):
+    def test_no_notification_should_return_false(self, mock_audit_filter):
         audits = [self.audit, self.audit2]
         self._set_notifiaction_status(audits, False)
-        mock_audit_all.return_value = audits
+        mock_audit_filter.return_value = audits
         # when
         tasks.check_skillfarm_notifications()
         # then
@@ -221,10 +223,12 @@ class TestCheckSkillfarmNotification(TestCase):
             self.assertFalse(audit.notification_sent)
             self.assertIsNone(audit.last_notification)
 
-    def test_notifiaction_with_no_skillsetup_should_return_false(self, mock_audit_all):
+    def test_notifiaction_with_no_skillsetup_should_return_false(
+        self, mock_audit_filter
+    ):
         audits = [self.audit, self.audit2, self.audit3]
         self._set_notifiaction_status(audits, True)
-        mock_audit_all.return_value = audits
+        mock_audit_filter.return_value = audits
         # when
         tasks.check_skillfarm_notifications()
         # then
@@ -232,7 +236,7 @@ class TestCheckSkillfarmNotification(TestCase):
             self.assertFalse(audit.notification_sent)
             self.assertIsNone(audit.last_notification)
 
-    def test_notifiaction_with_skillsetup_should_return_true(self, mock_audit_all):
+    def test_notifiaction_with_skillsetup_should_return_true(self, mock_audit_filter):
         audits = [self.audit, self.audit2]
         self._set_notifiaction_status(audits, True)
 
@@ -258,13 +262,62 @@ class TestCheckSkillfarmNotification(TestCase):
             character_id=1002, skillset=["skill2"]
         )
 
-        mock_audit_all.return_value = audits
+        mock_audit_filter.return_value = audits
         # when
         tasks.check_skillfarm_notifications()
         # then
         for audit in audits:
             self.assertTrue(audit.notification_sent)
             self.assertIsNotNone(audit.last_notification)
+
+
+@patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+class TestCheckSkillfarmNotificationError(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+        load_eveuniverse()
+
+        cls.user, cls.character_ownership = create_user_from_evecharacter_with_access(
+            1001
+        )
+        cls.audit = add_skillfarmaudit_character_to_user(cls.user, 1001)
+
+    def _set_notifiaction_status(self, audits, status):
+        for audit in audits:
+            audit.notification = status
+            audit.save()
+
+    @patch(TASK_PATH + ".logger", spec=True)
+    def test_notifiaction_no_main_should_return_false(
+        self, mock_logger, mock_audit_filter
+    ):
+        audits = [self.audit]
+        self._set_notifiaction_status(audits, True)
+
+        userprofile = UserProfile.objects.get(user=self.user)
+        userprofile.main_character = None
+        userprofile.save()
+        self.character_ownership.delete()
+        self.audit.refresh_from_db()
+
+        mock_audit_filter.return_value = audits
+        # when
+        tasks.check_skillfarm_notifications()
+        # then
+        for audit in audits:
+            self.assertFalse(audit.notification_sent)
+            self.assertIsNone(audit.last_notification)
+            mock_logger.warning.assert_called_once_with(
+                "Main Character not found for %s, skipping notification",
+                self.audit.character.character_name,
+            )
 
 
 @patch(TASK_PATH + ".requests.get", spec=True)
