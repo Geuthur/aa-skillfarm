@@ -2,6 +2,22 @@
 
 ## [0.5.x] - IN Development
 
+## [0.5.2] - 2025-04-03
+
+### Added
+
+- Delete Character Button
+
+### Fixed
+
+- No Notification Issue
+
+## [0.5.1.2] - 2025-03-24
+
+### Fixed
+
+- skillfarm_load_prices Command
+
 ## [0.5.1] - 2025-02-24
 
 > [!WARNING]
