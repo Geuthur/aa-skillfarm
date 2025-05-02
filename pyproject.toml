@@ -34,12 +34,15 @@ dynamic = [
 ]
 dependencies = [
     "allianceauth>=4.6,<5",
-    "allianceauth-app-utils>=1.19",
+    "allianceauth-app-utils>=1.26",
     "django-eveuniverse>=1.3",
     "django-ninja",
 ]
 optional-dependencies.tests-allianceauth-latest = [
+    "aa-discordnotify",
+    "allianceauth-discordbot",
     "coverage",
+    "discordproxy",
     "django-webtest",
 ]
 urls.Changelog = "https://github.com/Geuthur/aa-skillfarm/blob/master/CHANGELOG.md"
