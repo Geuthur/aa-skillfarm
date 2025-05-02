@@ -53,8 +53,6 @@ DATABASES["default"] = {
 
 # Add any additional apps to this list.
 INSTALLED_APPS += [
-    #'allianceauth.theme.bootstrap',
-    "allianceauth.corputils",
     PACKAGE,
     "eveuniverse",
 ]
@@ -112,7 +110,5 @@ DEFAULT_FROM_EMAIL = ""
 # Add any custom settings below here. #
 #######################################
 
-# workarounds to suppress warnings
-LOGGING = None
-STATICFILES_DIRS = []
-ANALYTICS_DISABLED = True
+# Discord
+DISCORD_GUILD_ID = "1234567890123456789"
