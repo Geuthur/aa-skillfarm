@@ -54,6 +54,7 @@ DATABASES["default"] = {
 
 # Add any additional apps to this list.
 INSTALLED_APPS += [
+    "allianceauth.services.modules.discord",
     PACKAGE,
     "eveuniverse",
 ]
