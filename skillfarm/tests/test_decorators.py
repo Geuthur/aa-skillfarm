@@ -1,9 +1,13 @@
+# Standard Library
 from unittest.mock import patch
 
+# Django
 from django.test import TestCase
 
+# Alliance Auth (External Libs)
 from app_utils.esi import EsiDailyDowntime
 
+# AA Skillfarm
 from skillfarm.decorators import log_timing, when_esi_is_available
 from skillfarm.hooks import get_extension_logger
 

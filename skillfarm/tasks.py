@@ -1,23 +1,26 @@
 """App Tasks"""
 
+# Standard Library
 import datetime
 
-import requests
-
 # Third Party
+import requests
 from celery import chain, shared_task
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import Error
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from allianceauth.notifications import notify
+# Alliance Auth
 from allianceauth.services.tasks import QueueOnce
 
+# AA Skillfarm
 from skillfarm import app_settings
 from skillfarm.decorators import when_esi_is_available
+from skillfarm.helpers.discord import send_user_notification
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import (
@@ -161,10 +164,11 @@ def check_skillfarm_notifications(runs: int = 0):
                 "Following Skills have finished training: \n{}", notifiy_message
             )
 
-            notify(
+            send_user_notification.delay(
+                user_id=main_character.character_ownership.user.id,
                 title=title,
                 message=full_message,
-                user=main_character.character_ownership.user,
+                embed_message=True,
                 level="warning",
             )
             runs = runs + 1

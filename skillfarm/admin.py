@@ -1,8 +1,11 @@
+# Django
 from django.contrib import admin
 from django.utils.html import format_html
 
+# Alliance Auth
 from allianceauth.eveonline.evelinks import eveimageserver
 
+# AA Skillfarm
 from skillfarm.models.skillfarm import SkillFarmAudit
 
 

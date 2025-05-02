@@ -1,12 +1,15 @@
 """TestView class."""
 
+# Standard Library
 from http import HTTPStatus
 from unittest.mock import Mock, patch
 
+# Django
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
+# AA Skillfarm
 from skillfarm.models.skillfarm import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse

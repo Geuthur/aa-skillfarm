@@ -1,7 +1,9 @@
 """Model for Permission."""
 
+# Django
 from django.db import models
 
+# AA Skillfarm
 from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)

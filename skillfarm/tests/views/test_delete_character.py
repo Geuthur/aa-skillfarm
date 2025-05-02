@@ -1,11 +1,14 @@
 """TestView class."""
 
+# Standard Library
 import json
 from http import HTTPStatus
 
+# Django
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
+# AA Skillfarm
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (

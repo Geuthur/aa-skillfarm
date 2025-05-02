@@ -7,11 +7,13 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
-from esi.decorators import token_required
 
+# Alliance Auth
 from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
+from esi.decorators import token_required
 
+# AA Skillfarm
 from skillfarm import forms, tasks
 from skillfarm.api.helpers import get_character
 from skillfarm.hooks import get_extension_logger

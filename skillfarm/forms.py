@@ -1,6 +1,9 @@
 """Forms for app."""
 
+# Django
 from django import forms
+
+# Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
 

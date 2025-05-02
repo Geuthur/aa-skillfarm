@@ -1,7 +1,11 @@
+# Django
 from django.test import TestCase
 from django.utils import timezone
+
+# Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
+# AA Skillfarm
 from skillfarm.api.character.helpers.skilldetails import (
     _calculate_single_progress_bar,
     _calculate_sum_progress_bar,

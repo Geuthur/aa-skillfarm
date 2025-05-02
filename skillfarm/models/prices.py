@@ -1,8 +1,12 @@
 """Model for Prices."""
 
+# Django
 from django.db import models
+
+# Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
+# AA Skillfarm
 from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)

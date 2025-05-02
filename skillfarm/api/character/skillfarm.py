@@ -1,12 +1,16 @@
+# Third Party
 from ninja import NinjaAPI
 
+# Django
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+# Alliance Auth
 from allianceauth.authentication.models import UserProfile
 
+# AA Skillfarm
 from skillfarm.api.character.helpers.skilldetails import (
     _calculate_sum_progress_bar,
     _get_extraction_icon,
@@ -19,11 +23,7 @@ from skillfarm.api.character.helpers.skillqueue import (
     _get_character_skillqueue_single,
 )
 from skillfarm.api.character.helpers.skills import _get_character_skills
-from skillfarm.api.helpers import (
-    get_alts_queryset,
-    get_character,
-    get_main_character,
-)
+from skillfarm.api.helpers import get_alts_queryset, get_character, get_main_character
 from skillfarm.helpers import lazy
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup

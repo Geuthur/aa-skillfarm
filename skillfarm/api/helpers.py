@@ -1,10 +1,13 @@
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 
+# AA Skillfarm
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
 

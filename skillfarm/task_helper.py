@@ -2,12 +2,16 @@
 Skillfarm Helper
 """
 
+# Standard Library
 import time
 
+# Third Party
 from bravado.exception import HTTPGatewayTimeout, HTTPNotModified
 
+# Django
 from django.core.cache import cache
 
+# AA Skillfarm
 from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)
