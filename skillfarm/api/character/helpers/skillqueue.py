@@ -1,6 +1,5 @@
-from skillfarm.api.character.helpers.skilldetails import (
-    _calculate_single_progress_bar,
-)
+# AA Skillfarm
+from skillfarm.api.character.helpers.skilldetails import _calculate_single_progress_bar
 from skillfarm.api.helpers import (
     arabic_number_to_roman,
     generate_progressbar,

@@ -1,9 +1,12 @@
+# Django
 from django.test import TestCase
 from django.utils import timezone
+
+# Alliance Auth (External Libs)
+from app_utils.testing import create_user_from_evecharacter
 from eveuniverse.models import EveType
 
-from app_utils.testing import create_user_from_evecharacter
-
+# AA Skillfarm
 from skillfarm.models.skillfarm import (
     CharacterSkill,
     CharacterSkillqueueEntry,

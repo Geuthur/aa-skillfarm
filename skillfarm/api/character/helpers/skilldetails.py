@@ -1,8 +1,10 @@
+# Django
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+# AA Skillfarm
 from skillfarm.api.helpers import (
     generate_button,
     generate_progressbar,

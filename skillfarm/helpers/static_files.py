@@ -15,6 +15,7 @@ from allianceauth.services.hooks import get_extension_logger
 # Alliance Auth (External Libs)
 from app_utils.logging import LoggerAddTag
 
+# AA Skillfarm
 # AA Fleet Pings
 from skillfarm import __title__
 from skillfarm.constants import AA_SKILLFARM_STATIC_DIR

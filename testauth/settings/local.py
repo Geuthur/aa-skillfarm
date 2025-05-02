@@ -36,6 +36,7 @@ SITE_NAME = "testauth"
 # Change this to enable/disable debug mode, which displays
 # useful error messages but can leak sensitive data.
 DEBUG = False
+LOGGING = None
 
 NOTIFICATIONS_REFRESH_TIME = 30
 NOTIFICATIONS_MAX_PER_USER = 50
@@ -53,8 +54,7 @@ DATABASES["default"] = {
 
 # Add any additional apps to this list.
 INSTALLED_APPS += [
-    #'allianceauth.theme.bootstrap',
-    "allianceauth.corputils",
+    "allianceauth.services.modules.discord",
     PACKAGE,
     "eveuniverse",
 ]
@@ -112,7 +112,5 @@ DEFAULT_FROM_EMAIL = ""
 # Add any custom settings below here. #
 #######################################
 
-# workarounds to suppress warnings
-LOGGING = None
-STATICFILES_DIRS = []
-ANALYTICS_DISABLED = True
+# Discord
+DISCORD_GUILD_ID = "1234567890123456789"

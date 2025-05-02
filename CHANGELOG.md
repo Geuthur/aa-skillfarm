@@ -2,6 +2,23 @@
 
 ## [0.5.x] - IN Development
 
+## [0.5.3] - 2025-05-02
+
+### Added
+
+- Discord Notification System
+- Isort
+- Dependbot
+
+### Changed
+
+- Update PyProject
+- Updates deps
+
+### Fixed
+
+- Testing Issues in github
+
 ## [0.5.2] - 2025-04-03
 
 ### Added

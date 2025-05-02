@@ -1,8 +1,10 @@
 # Django
 from django.db import models
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
 
+# AA Skillfarm
 from skillfarm.hooks import get_extension_logger
 
 logger = get_extension_logger(__name__)

@@ -1,11 +1,15 @@
+# Standard Library
 from unittest.mock import patch
 
+# Django
 from django.db.utils import Error
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.authentication.models import CharacterOwnership, UserProfile
 
+# AA Skillfarm
 from skillfarm import tasks
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse

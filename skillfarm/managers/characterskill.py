@@ -1,7 +1,10 @@
 # Django
 from django.db import models, transaction
+
+# Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
+# AA Skillfarm
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.hooks import get_extension_logger
 from skillfarm.providers import esi
