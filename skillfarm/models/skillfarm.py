@@ -1,15 +1,21 @@
 """Models for Skillfarm."""
 
+# Standard Library
 import datetime
 
+# Django
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from eveuniverse.models import EveType
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter, Token
 
+# Alliance Auth (External Libs)
+from eveuniverse.models import EveType
+
+# AA Skillfarm
 from skillfarm import app_settings
 from skillfarm.hooks import get_extension_logger
 from skillfarm.managers.characterskill import CharacterSkillManager

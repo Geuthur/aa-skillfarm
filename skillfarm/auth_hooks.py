@@ -1,9 +1,9 @@
 """Hook into Alliance Auth"""
 
 # Django
-# Alliance Auth
 from django.utils.translation import gettext_lazy as _
 
+# Alliance Auth
 from allianceauth import hooks
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 

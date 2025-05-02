@@ -1,13 +1,16 @@
+# Third Party
 import requests
 
+# Django
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+
+# Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
-from skillfarm.app_settings import (
-    SKILLFARM_PRICE_SOURCE_ID,
-)
+# AA Skillfarm
+from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
 from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 

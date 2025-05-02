@@ -1,13 +1,17 @@
 """Discord helper functions"""
 
+# Third Party
 from celery import shared_task
 
+# Django
 from django.apps import apps
 from django.utils import timezone
 
+# Alliance Auth
 from allianceauth.authentication.models import User
 from allianceauth.notifications import notify
 
+# AA Skillfarm
 from skillfarm import __title__
 from skillfarm.constants import DISCORD_EMBED_COLOR_MAP
 from skillfarm.hooks import get_extension_logger
@@ -26,6 +30,7 @@ def discordnotify_installed() -> bool:
 # pylint: disable=import-outside-toplevel, unused-import
 def discordproxy_installed() -> bool:
     try:
+        # Third Party
         from discordproxy.client import DiscordClient
     except ModuleNotFoundError:
         return False
@@ -42,6 +47,7 @@ def _discordbot_send_direct_message(
 ) -> None:
     """Send a private message to a user via discordbot"""
 
+    # Third Party
     from aadiscordbot.tasks import send_message
     from discord import Embed
 
@@ -66,10 +72,12 @@ def _discordproxy_send_direct_message(
     level: str = "info",
 ):
     """Send a direct message to a user via discordproxy"""
+    # Third Party
     from discordproxy.client import DiscordClient
 
     client = DiscordClient()
     if embed_message is True:
+        # Third Party
         from discordproxy.discord_api_pb2 import Embed
 
         footer = Embed.Footer(text=str(__title__))

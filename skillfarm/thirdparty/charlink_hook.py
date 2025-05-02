@@ -1,11 +1,17 @@
+# Third Party
 from charlink.app_imports.utils import AppImport, LoginImport
 
+# Django
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef
 
+# Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
+
+# Alliance Auth (External Libs)
 from app_utils.allianceauth import users_with_permission
 
+# AA Skillfarm
 from skillfarm.app_settings import SKILLFARM_APP_NAME
 from skillfarm.models.skillfarm import SkillFarmAudit
 from skillfarm.tasks import update_character_skillfarm

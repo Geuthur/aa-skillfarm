@@ -3,6 +3,7 @@
 # Django
 from django.apps import AppConfig
 
+# AA Skillfarm
 # AA Example App
 from skillfarm import __version__
 

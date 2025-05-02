@@ -1,5 +1,6 @@
 """Initialize the app"""
 
+# AA Skillfarm
 from skillfarm.app_settings import SKILLFARM_APP_NAME
 
 __version__ = "0.5.3"

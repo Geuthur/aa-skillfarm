@@ -1,6 +1,8 @@
+# Django
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 
+# AA Skillfarm
 from skillfarm.admin import SkillFarmAuditAdmin
 from skillfarm.models.skillfarm import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth

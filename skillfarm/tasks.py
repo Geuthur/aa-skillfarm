@@ -1,20 +1,23 @@
 """App Tasks"""
 
+# Standard Library
 import datetime
 
-import requests
-
 # Third Party
+import requests
 from celery import chain, shared_task
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.utils import Error
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+# Alliance Auth
 from allianceauth.services.tasks import QueueOnce
 
+# AA Skillfarm
 from skillfarm import app_settings
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.helpers.discord import send_user_notification

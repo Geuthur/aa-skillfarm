@@ -1,12 +1,16 @@
 """TestView class."""
 
+# Standard Library
 from http import HTTPStatus
 
+# Django
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
+# Alliance Auth (External Libs)
 from app_utils.testdata_factories import UserMainFactory
 
+# AA Skillfarm
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_user_from_evecharacter_with_access

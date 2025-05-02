@@ -1,12 +1,16 @@
 """TestView class."""
 
+# Standard Library
 from unittest.mock import Mock, patch
 
+# Django
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
+# Alliance Auth
 from allianceauth.authentication.models import UserProfile
 
+# AA Skillfarm
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_user_from_evecharacter_with_access

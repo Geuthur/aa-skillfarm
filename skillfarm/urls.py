@@ -1,7 +1,9 @@
 """App URLs"""
 
+# Django
 from django.urls import path, re_path
 
+# AA Skillfarm
 from skillfarm import views
 from skillfarm.api import api
 

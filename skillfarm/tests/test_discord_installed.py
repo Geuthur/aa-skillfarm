@@ -1,5 +1,7 @@
+# Django
 from django.test import TestCase, modify_settings
 
+# AA Skillfarm
 from skillfarm.helpers.discord import (
     allianceauth_discordbot_installed,
     discordproxy_installed,
