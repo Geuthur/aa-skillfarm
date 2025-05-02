@@ -2,6 +2,12 @@
 
 ## [0.5.x] - IN Development
 
+## [0.5.3] - 2025-05-02
+
+### Added
+
+- Discord Notification System
+
 ## [0.5.2] - 2025-04-03
 
 ### Added
