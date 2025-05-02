@@ -1,8 +1,20 @@
 {
     "extends": "stylelint-config-standard",
-    "ignoreFiles": [],
     "rules": {
         "color-no-hex": true,
-        "no-descending-specificity": null
+        "at-rule-empty-line-before": [
+            "always",
+            {
+                "except": ["blockless-after-same-name-blockless", "first-nested"],
+                "ignore": ["after-comment"]
+            }
+        ],
+        "no-descending-specificity": null,
+        "selector-type-case": [
+            "lower",
+            {
+                "ignoreTypes": ["custom-elements"]
+            }
+        ]
     }
 }
