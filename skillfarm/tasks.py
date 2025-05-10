@@ -150,6 +150,7 @@ def _update_character_section(character_pk: int, section: str, force_refresh: bo
     character.update_section_log(section, is_success=True, is_updated=result.is_updated)
 
 
+# pylint: disable=too-many-locals
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.filter(active=True)
@@ -176,9 +177,21 @@ def check_skillfarm_notifications(runs: int = 0):
     for main_character, alts in main_to_alts.items():
         msg_items = []
         for alt in alts:
+            alt: SkillFarmAudit
+
             if alt.notification:
-                skill_names = alt.get_finished_skills()
-                if skill_names:
+                skill_names = []
+                skillqueue_extractions = alt.skillfarm_skillqueue.extractions(
+                    alt
+                ).values_list("eve_type__name", flat=True)
+                skill_names.extend(skillqueue_extractions)
+
+                skills_extractions = alt.skillfarm_skills.extractions(alt).values_list(
+                    "eve_type__name", flat=True
+                )
+                skill_names.extend(skills_extractions)
+
+                if len(skill_names) > 0:
                     # Create and Add Notification Message
                     msg = alt._generate_notification(skill_names)
                     msg_items.append(msg)

@@ -25,6 +25,7 @@
   - Characterskill Manager
   - Skillfarmaudit Manager
   - Skillqueue Manager
+- Optimized Skillfarm API
 
 ### Removed
 

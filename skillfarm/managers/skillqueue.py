@@ -2,7 +2,9 @@
 from typing import TYPE_CHECKING
 
 # Django
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
+from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
@@ -13,6 +15,7 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm import __title__
+from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
 from skillfarm.providers import esi
 from skillfarm.task_helper import (
@@ -29,7 +32,74 @@ if TYPE_CHECKING:
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
-class SkillqueueManager(models.Manager):
+class SkillqueueQuerySet(models.QuerySet):
+    def finished_skills(self):
+        """Return finished skills from a training queue."""
+        return self.filter(
+            finish_date__isnull=False,
+            start_date__isnull=True,
+            finish_date__gt=models.F("start_date"),
+            finish_date__lt=timezone.now(),
+            finished_level=5,
+        )
+
+    def extractions(self, character: "SkillFarmAudit") -> bool:
+        """Return extraction ready skills from a training queue."""
+        try:
+            skillsetup = character.skillfarm_setup
+            if not skillsetup or not skillsetup.skillset:
+                skillset = []
+            else:
+                skillset = skillsetup.skillset
+        except ObjectDoesNotExist:
+            skillset = []
+
+        extraction = self.filter(
+            finish_date__gt=models.F("start_date"),
+            finish_date__lt=timezone.now(),
+            finished_level=5,
+            eve_type__name__in=skillset,
+        )
+
+        return extraction
+
+    def active_skills(self):
+        """Return skills from an active training queue.
+        Returns empty queryset when training is not active.
+        """
+        return self.filter(
+            finish_date__isnull=False,
+            start_date__isnull=False,
+        )
+
+    def skill_in_training(self):
+        """Return current skill in training.
+        Returns empty queryset when training is not active.
+        """
+        now_ = timezone.now()
+        return self.active_skills().filter(
+            start_date__lt=now_,
+            finish_date__gt=now_,
+        )
+
+    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+        """Return filtered skills from a training queue."""
+        try:
+            skillsetup = character.skillfarm_setup
+            if not skillsetup or not skillsetup.skillset:
+                skillset = []
+            else:
+                skillset = skillsetup.skillset
+        except ObjectDoesNotExist:
+            skillset = []
+
+        skillqueue = self.filter(
+            eve_type__name__in=skillset,
+        )
+        return skillqueue
+
+
+class SkillqueueManagerBase(models.Manager):
     @log_timing(logger)
     def update_or_create_esi(
         self, character: "SkillFarmAudit", force_refresh: bool = False
@@ -81,4 +151,7 @@ class SkillqueueManager(models.Manager):
         self.filter(character=character).delete()
 
         if len(entries) > 0:
-            self.bulk_create(entries)
+            self.bulk_create(entries, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)
+
+
+SkillqueueManager = SkillqueueManagerBase.from_queryset(SkillqueueQuerySet)

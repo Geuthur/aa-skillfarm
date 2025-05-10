@@ -26,7 +26,7 @@ from eveuniverse.models import EveType
 # AA Skillfarm
 from skillfarm import __title__, app_settings
 from skillfarm.errors import HTTPGatewayTimeoutError, NotModifiedError
-from skillfarm.managers.characterskill import CharacterSkillManager
+from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
 from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
@@ -280,47 +280,6 @@ class SkillFarmAudit(models.Model):
             raise exc
         return result
 
-    def skill_extraction(self) -> list[str]:
-        """Check if a character has a skill extraction ready and return skill names."""
-        skill_names = []
-        try:
-            character = SkillFarmSetup.objects.get(character=self)
-        except SkillFarmSetup.DoesNotExist:
-            character = None
-
-        if character and character.skillset is not None:
-            skills = CharacterSkill.objects.filter(
-                character=self,
-                eve_type__name__in=character.skillset,
-            )
-
-            for skill in skills:
-                if (
-                    skill.trained_skill_level == 5
-                    and skill.eve_type.name in character.skillset
-                ):
-                    skill_names.append(skill.eve_type.name)
-        return skill_names
-
-    def skillqueue_extraction(self) -> list[str]:
-        """Check if a character has a skillqueue Extraction ready and return skill names."""
-        skill_names = []
-        try:
-            character = SkillFarmSetup.objects.get(character=self)
-        except SkillFarmSetup.DoesNotExist:
-            character = None
-
-        if character and character.skillset is not None:
-            skillqueue = CharacterSkillqueueEntry.objects.filter(character=self)
-
-            for skill in skillqueue:
-                if (
-                    skill.is_skillqueue_ready
-                    and skill.eve_type.name in character.skillset
-                ):
-                    skill_names.append(skill.eve_type.name)
-        return skill_names
-
     def _generate_notification(self, skill_names: list[str]) -> str:
         """Generate notification for the user."""
         msg = _("%(charname)s: %(skillname)s") % {
@@ -328,19 +287,6 @@ class SkillFarmAudit(models.Model):
             "skillname": ", ".join(skill_names),
         }
         return msg
-
-    def get_finished_skills(self) -> list[str]:
-        """Return a list of finished skills."""
-        skill_names = set()
-        skills = self.skill_extraction()
-        skillqueue = self.skillqueue_extraction()
-
-        if skillqueue:
-            skill_names.update(skillqueue)
-        if skills:
-            skill_names.update(skills)
-
-        return list(skill_names)
 
     @property
     def is_cooldown(self) -> bool:
@@ -397,7 +343,7 @@ class CharacterSkill(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
 
-    objects = CharacterSkillManager()
+    objects = SkillManager()
 
     class Meta:
         default_permissions = ()

@@ -114,9 +114,11 @@ class SkillFarmApiEndpoints:
 
             characters = get_alts_queryset(main)
 
-            audit_chars = SkillFarmAudit.objects.filter(
-                character__in=characters
-            ).select_related("character")
+            audit_chars = (
+                SkillFarmAudit.objects.filter(character__in=characters)
+                .select_related("character")
+                .prefetch_related("skillfarm_skills", "skillfarm_skillqueue")
+            )
 
             details_dict = []
             inactive_dict = []
@@ -131,20 +133,26 @@ class SkillFarmApiEndpoints:
 
                 char = f"{char_portrait} {character.character.character_name} {notification}"
 
-                skills = _get_character_skills(character)
-                skillqueue = _get_character_skillqueue(character)
-
-                skillextraction = _get_extraction_icon(
-                    skills=skills["is_extraction_ready"],
-                    skillqueue=skillqueue["skillqueue_ready"],
+                # Create the action button
+                extraction_ready_html = _get_extraction_icon(
+                    skills=character.skillfarm_skills.extractions(character).exists(),
+                    skillqueue=character.skillfarm_skillqueue.extractions(
+                        character
+                    ).exists(),
+                )
+                skill_info_html = _get_skillinfo_actions(
+                    character=character, request=request
+                )
+                actions_button_html = _skillfarm_actions(
+                    character=character, perms=perm, request=request
                 )
 
-                skillinfo = _get_skillinfo_actions(character=character, request=request)
-
-                skillinfo_html = f"{skillinfo} {skillextraction}"
-
-                actions = _skillfarm_actions(
-                    character=character, perms=perm, request=request
+                is_filter = (
+                    character.skillfarm_skillqueue.skill_filtered(character).exists()
+                    or SkillFarmSetup.objects.filter(
+                        character=character,
+                        skillset__isnull=False,
+                    ).exists()
                 )
 
                 # Filter update status
@@ -169,19 +177,19 @@ class SkillFarmApiEndpoints:
                         "active": character.active,
                         "notification": character.notification,
                         "last_update": naturaltime(last_update),
-                        "is_extraction_ready": skillinfo_html,
-                        "is_filter": skillqueue.get("is_filter", ""),
+                        "is_extraction_ready": f"{skill_info_html} {extraction_ready_html}",
+                        "is_filter": lazy.get_status_icon(is_filter),
                     },
-                    "actions": actions,
+                    "actions": actions_button_html,
                 }
 
                 # Generate the progress bar for the skill queue
-                if skillqueue["is_training"] is False:
+                if character.skillfarm_skillqueue.skill_in_training().exists() is False:
                     details["details"]["progress"] = _("No Active Training")
                     inactive_dict.append(details)
                 else:
                     details["details"]["progress"] = _calculate_sum_progress_bar(
-                        skillqueue=skillqueue["skillqueue"]
+                        skillqueue=_get_character_skillqueue(character)
                     )
                     details_dict.append(details)
 
@@ -231,7 +239,6 @@ class SkillFarmApiEndpoints:
             if perm is False:
                 return 403, "Permission Denied"
 
-            skills = _get_character_skills(character)
             skillqueue = _get_character_skillqueue_single(character)
 
             context = {
@@ -240,7 +247,7 @@ class SkillFarmApiEndpoints:
                 "character_name": character.character.character_name,
                 "skillqueue": skillqueue["skillqueue"],
                 "skillqueue_filtered": skillqueue["skillqueue_filtered"],
-                "skills": skills["skills"],
+                "skills": _get_character_skills(character),
             }
 
             return render(

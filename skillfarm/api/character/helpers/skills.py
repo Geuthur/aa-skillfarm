@@ -1,13 +1,20 @@
 # AA Skillfarm
-from skillfarm.api.helpers import arabic_number_to_roman, get_skillset
-from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit
+from skillfarm.api.helpers import arabic_number_to_roman
+from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit, SkillFarmSetup
 
 
 def _get_character_skills(character: SkillFarmAudit) -> dict:
     """Get all Skills for the current character"""
-    skillset = get_skillset(character)
+    try:
+        skillsetup = SkillFarmSetup.objects.get(
+            character=character,
+            skillset__isnull=False,
+        )
+        skillset = skillsetup.skillset or []
+    except SkillFarmSetup.DoesNotExist:
+        skillset = []
+
     skills_dict = []
-    extraction_ready = False
 
     if skillset is not None:
         skills = CharacterSkill.objects.filter(
@@ -25,14 +32,5 @@ def _get_character_skills(character: SkillFarmAudit) -> dict:
                 "skillpoints": skill.skillpoints_in_skill,
             }
 
-            if skill.is_exc_ready:
-                extraction_ready = True
-
             skills_dict.append(dict_data)
-
-    output = {
-        "skills": skills_dict,
-        "is_extraction_ready": extraction_ready,
-    }
-
-    return output
+    return skills_dict

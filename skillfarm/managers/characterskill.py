@@ -2,6 +2,7 @@
 from typing import TYPE_CHECKING
 
 # Django
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 
 # Alliance Auth
@@ -30,7 +31,45 @@ if TYPE_CHECKING:
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
-class CharacterSkillManager(models.Manager):
+class SkillManagerQuerySet(models.QuerySet):
+    # pylint: disable=duplicate-code
+    def extractions(self, character: "SkillFarmAudit") -> bool:
+        """Return extraction ready skills from a training queue."""
+        try:
+            skillsetup = character.skillfarm_setup
+            if not skillsetup or not skillsetup.skillset:
+                skillset = []
+            else:
+                skillset = skillsetup.skillset
+        except ObjectDoesNotExist:
+            skillset = []
+
+        extraction = self.filter(
+            trained_skill_level=5,
+            eve_type__name__in=skillset,
+        )
+
+        return extraction
+
+    # pylint: disable=duplicate-code
+    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+        """Return filtered skills from a training queue."""
+        try:
+            skillsetup = character.skillfarm_setup
+            if not skillsetup or not skillsetup.skillset:
+                skillset = []
+            else:
+                skillset = skillsetup.skillset
+        except ObjectDoesNotExist:
+            skillset = []
+
+        skills = self.filter(
+            eve_type__name__in=skillset,
+        )
+        return skills
+
+
+class SkillManagerBase(models.Manager):
     @log_timing(logger)
     def update_or_create_esi(
         self, character: "SkillFarmAudit", force_refresh: bool = False
@@ -142,3 +181,6 @@ class CharacterSkillManager(models.Manager):
             ],
             batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE,
         )
+
+
+SkillManager = SkillManagerBase.from_queryset(SkillManagerQuerySet)
