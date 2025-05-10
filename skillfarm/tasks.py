@@ -53,7 +53,8 @@ _update_skillfarm_params = {
 @shared_task(**TASK_DEFAULTS_ONCE)
 @when_esi_is_available
 def update_all_skillfarm(runs: int = 0):
-    characters = SkillFarmAudit.objects.select_related("character").all()
+    SkillFarmAudit.objects.disable_characters_with_no_owner()
+    characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
     for character in characters:
         update_character.apply_async(args=[character.pk])
         runs = runs + 1

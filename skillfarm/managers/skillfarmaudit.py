@@ -148,7 +148,7 @@ class SkillfarmQuerySet(models.QuerySet):
         return 0
 
 
-class SkillFarmManager(models.Manager):
+class SkillFarmManagerBase(models.Manager):
     def get_queryset(self):
         return SkillfarmQuerySet(self.model, using=self._db)
 
@@ -185,3 +185,6 @@ class SkillFarmManager(models.Manager):
 
     def visible_to(self, user):
         return self.get_queryset().visible_to(user)
+
+
+SkillFarmManager = SkillFarmManagerBase.from_queryset(SkillfarmQuerySet)
