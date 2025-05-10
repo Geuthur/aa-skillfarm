@@ -52,6 +52,6 @@ SKILLFARM_TASKS_TIME_LIMIT = clean_setting("SKILLFARM_TASKS_TIME_LIMIT", 7200)
 SKILLFARM_PRICE_SOURCE_ID = clean_setting("SKILLFARM_PRICE_SOURCE_ID", 60003760)
 
 SKILLFARM_STALE_TYPES = {
-    "skills": 60,
-    "skillqueue": 60,
+    "skills": 30,
+    "skillqueue": 30,
 }
