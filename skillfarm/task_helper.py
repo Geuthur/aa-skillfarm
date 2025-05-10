@@ -1,9 +1,6 @@
 """
-Skillfarm Helper
+Etag Helpers
 """
-
-# Standard Library
-import time
 
 # Third Party
 from bravado.exception import HTTPGatewayTimeout, HTTPNotModified
@@ -11,20 +8,20 @@ from bravado.exception import HTTPGatewayTimeout, HTTPNotModified
 # Django
 from django.core.cache import cache
 
-# AA Skillfarm
-from skillfarm.hooks import get_extension_logger
+# Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
 
-logger = get_extension_logger(__name__)
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
+
+# AA Skillfarm
+from skillfarm import __title__
+from skillfarm.decorators import log_timing
+from skillfarm.errors import HTTPGatewayTimeoutError, NotModifiedError
+
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 MAX_ETAG_LIFE = 60 * 60 * 24 * 7  # 7 Days
-
-
-class NotModifiedError(Exception):
-    pass
-
-
-class HTTPGatewayTimeoutError(Exception):
-    pass
 
 
 def get_etag_key(operation):
@@ -94,7 +91,6 @@ def stringify_params(operation):
 
 
 def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
-    """Handle ETag headers"""
     if (
         get_etag_header(operation) == headers.headers.get("ETag")
         and not force_refresh
@@ -126,9 +122,7 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
 def handle_page_results(
     operation, current_page, total_pages, etags_incomplete, force_refresh
 ):
-    """Handle multiple page results and use Cache if possible"""
     results = []
-
     while current_page <= total_pages:
         operation.future.request.params["page"] = current_page
         try:
@@ -139,12 +133,6 @@ def handle_page_results(
 
             result, headers = operation.result()
             total_pages = int(headers.headers["X-Pages"])
-
-            # Get ETag Informations
-            logger.debug(get_etag_header(operation))
-            logger.debug(headers.headers.get("ETag"))
-
-            # Handle ETag headers
             handle_etag_headers(operation, headers, force_refresh, etags_incomplete)
 
             # Store results
@@ -153,7 +141,7 @@ def handle_page_results(
 
             if not etags_incomplete and not force_refresh:
                 logger.debug(
-                    "ETag: No Etag %s - %s",
+                    "ETag: No Etag: %s - %s",
                     operation.operation.operation_id,
                     stringify_params(operation),
                 )
@@ -162,17 +150,22 @@ def handle_page_results(
                 etags_incomplete = True
 
         except (HTTPNotModified, NotModifiedError) as e:
+            try:
+                etag = e.response.headers["ETag"]
+            except AttributeError:
+                etag = None
+
             if isinstance(e, NotModifiedError):
                 logger.debug(
-                    "ETag: Match Cache - Etag:%s, %s",
-                    operation.operation.operation_id,
+                    "ETag: Match Cache - Etag: %s, %s",
+                    etag,
                     stringify_params(operation),
                 )
                 total_pages = int(headers.headers["X-Pages"])
             else:
                 logger.debug(
                     "ETag: Match ESI - Etag: %s - %s ETag-Incomplete: %s",
-                    operation.operation.operation_id,
+                    etag,
                     stringify_params(operation),
                     etags_incomplete,
                 )
@@ -191,11 +184,15 @@ def handle_page_results(
     return results, current_page, total_pages
 
 
+@log_timing(logger)
 def etag_results(operation, token, force_refresh=False):
     """Handle ETag results"""
-    _start_tm = time.perf_counter()
+    logger.debug(
+        "ETag: etag_results %s - %s",
+        operation.operation.operation_id,
+        force_refresh,
+    )
     operation.request_config.also_return_response = True
-
     if token:
         operation.future.request.headers["Authorization"] = (
             "Bearer " + token.valid_access_token()
@@ -221,10 +218,4 @@ def etag_results(operation, token, force_refresh=False):
             logger.debug("ETag: Gateway Timeout %s", operation.operation.operation_id)
             raise HTTPGatewayTimeoutError() from e
         handle_etag_headers(operation, headers, force_refresh, etags_incomplete=False)
-    logger.debug(
-        "ESI_TIME: OVERALL %s %s %s",
-        time.perf_counter() - _start_tm,
-        operation.operation.operation_id,
-        stringify_params(operation),
-    )
     return results

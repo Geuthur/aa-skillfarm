@@ -11,16 +11,19 @@ from django.views.decorators.http import require_POST
 # Alliance Auth
 from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
 
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
+
 # AA Skillfarm
-from skillfarm import forms, tasks
+from skillfarm import __title__, forms, tasks
 from skillfarm.api.helpers import get_character
-from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 # pylint: disable=unused-argument
@@ -93,9 +96,7 @@ def add_char(request, token):
     char = SkillFarmAudit.objects.update_or_create(
         character=character, defaults={"name": token.character_name}
     )[0]
-    tasks.update_character_skillfarm.apply_async(
-        args=[char.character.character_id], kwargs={"force_refresh": True}
-    )
+    tasks.update_character.apply_async(args=[char.pk], kwargs={"force_refresh": True})
 
     msg = _(
         "{character_name} successfully added or updated to Skillfarm System"

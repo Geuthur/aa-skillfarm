@@ -2,6 +2,7 @@
 from ninja import NinjaAPI
 
 # Django
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -9,8 +10,13 @@ from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.authentication.models import UserProfile
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
+from skillfarm import __title__
 from skillfarm.api.character.helpers.skilldetails import (
     _calculate_sum_progress_bar,
     _get_extraction_icon,
@@ -25,10 +31,13 @@ from skillfarm.api.character.helpers.skillqueue import (
 from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import get_alts_queryset, get_character, get_main_character
 from skillfarm.helpers import lazy
-from skillfarm.hooks import get_extension_logger
-from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarm import (
+    CharacterUpdateStatus,
+    SkillFarmAudit,
+    SkillFarmSetup,
+)
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 class SkillFarmApiEndpoints:
@@ -138,6 +147,18 @@ class SkillFarmApiEndpoints:
                     character=character, perms=perm, request=request
                 )
 
+                # Filter update status
+                update_status = CharacterUpdateStatus.objects.filter(
+                    character=character,
+                ).order_by("last_update_finished_at")
+
+                # Get the last update status
+                last_update = (
+                    update_status.first().last_update_finished_at
+                    if update_status.exists()
+                    else ""
+                )
+
                 details = {
                     "character": {
                         "character_html": char,
@@ -147,9 +168,7 @@ class SkillFarmApiEndpoints:
                     "details": {
                         "active": character.active,
                         "notification": character.notification,
-                        "last_update": character.last_update_skillqueue.strftime(
-                            "%Y-%m-%d %H:%M"
-                        ),
+                        "last_update": naturaltime(last_update),
                         "is_extraction_ready": skillinfo_html,
                         "is_filter": skillqueue.get("is_filter", ""),
                     },

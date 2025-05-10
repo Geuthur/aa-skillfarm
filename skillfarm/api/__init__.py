@@ -7,9 +7,6 @@ from django.conf import settings
 
 # AA Skillfarm
 from skillfarm.api import character
-from skillfarm.hooks import get_extension_logger
-
-logger = get_extension_logger(__name__)
 
 api = NinjaAPI(
     title="Geuthur API",

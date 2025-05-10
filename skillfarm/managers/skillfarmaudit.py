@@ -1,13 +1,18 @@
 # Django
 from django.db import models
+from django.db.models import Case, Count, Q, Value, When
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
-from skillfarm.hooks import get_extension_logger
+from skillfarm import __title__
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 class SkillfarmQuerySet(models.QuerySet):
@@ -40,6 +45,107 @@ class SkillfarmQuerySet(models.QuerySet):
         except AssertionError:
             logger.debug("User %s has no main character. Nothing visible.", user)
             return self.none()
+
+    def annotate_total_update_status_user(self, user):
+        """Get the total update status for the given user."""
+        char = user.profile.main_character
+        assert char
+
+        query = models.Q(character__character_ownership__user=user)
+
+        return self.filter(query).annotate_total_update_status()
+
+    def annotate_total_update_status(self):
+        """Get the total update status."""
+        # pylint: disable=import-outside-toplevel, cyclic-import
+        # AA Skillfarm
+        from skillfarm.models.skillfarm import SkillFarmAudit
+
+        sections = SkillFarmAudit.UpdateSection.get_sections()
+        num_sections_total = len(sections)
+        qs = (
+            self.annotate(
+                num_sections_total=Count(
+                    "skillfarm_update_status",
+                    filter=Q(skillfarm_update_status__section__in=sections),
+                )
+            )
+            .annotate(
+                num_sections_ok=Count(
+                    "skillfarm_update_status",
+                    filter=Q(
+                        skillfarm_update_status__section__in=sections,
+                        skillfarm_update_status__is_success=True,
+                    ),
+                )
+            )
+            .annotate(
+                num_sections_failed=Count(
+                    "skillfarm_update_status",
+                    filter=Q(
+                        skillfarm_update_status__section__in=sections,
+                        skillfarm_update_status__is_success=False,
+                    ),
+                )
+            )
+            .annotate(
+                num_sections_token_error=Count(
+                    "skillfarm_update_status",
+                    filter=Q(
+                        skillfarm_update_status__section__in=sections,
+                        skillfarm_update_status__has_token_error=True,
+                    ),
+                )
+            )
+            # pylint: disable=no-member
+            .annotate(
+                total_update_status=Case(
+                    When(
+                        active=False,
+                        then=Value(SkillFarmAudit.UpdateStatus.DISABLED),
+                    ),
+                    When(
+                        num_sections_token_error=1,
+                        then=Value(SkillFarmAudit.UpdateStatus.TOKEN_ERROR),
+                    ),
+                    When(
+                        num_sections_failed__gt=0,
+                        then=Value(SkillFarmAudit.UpdateStatus.ERROR),
+                    ),
+                    When(
+                        num_sections_ok=num_sections_total,
+                        then=Value(SkillFarmAudit.UpdateStatus.OK),
+                    ),
+                    When(
+                        num_sections_total__lt=num_sections_total,
+                        then=Value(SkillFarmAudit.UpdateStatus.INCOMPLETE),
+                    ),
+                    default=Value(SkillFarmAudit.UpdateStatus.IN_PROGRESS),
+                )
+            )
+        )
+
+        return qs
+
+    def disable_characters_with_no_owner(self) -> int:
+        """Disable characters which have no owner. Return count of disabled characters."""
+        orphaned_characters = self.filter(
+            character__character_ownership__isnull=True, active=True
+        )
+        if orphaned_characters.exists():
+            orphans = list(
+                orphaned_characters.values_list(
+                    "character__character_name", flat=True
+                ).order_by("character__character_name")
+            )
+            orphaned_characters.update(active=False)
+            logger.info(
+                "Disabled %d characters which do not belong to a user: %s",
+                len(orphans),
+                ", ".join(orphans),
+            )
+            return len(orphans)
+        return 0
 
 
 class SkillFarmManager(models.Manager):

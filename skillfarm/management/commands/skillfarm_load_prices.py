@@ -6,15 +6,19 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
+# Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
+
 # Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 from eveuniverse.models import EveType
 
 # AA Skillfarm
+from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
-from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 class Command(BaseCommand):

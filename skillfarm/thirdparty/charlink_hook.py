@@ -14,17 +14,18 @@ from app_utils.allianceauth import users_with_permission
 # AA Skillfarm
 from skillfarm.app_settings import SKILLFARM_APP_NAME
 from skillfarm.models.skillfarm import SkillFarmAudit
-from skillfarm.tasks import update_character_skillfarm
+from skillfarm.tasks import update_character
 
 
 # pylint: disable=unused-argument, duplicate-code
 def _add_character_charaudit(request, token):
-    SkillFarmAudit.objects.update_or_create(
+    skillfarm = SkillFarmAudit.objects.update_or_create(
         character=EveCharacter.objects.get_character_by_id(token.character_id),
         defaults={"name": token.character_name},
-    )
-    update_character_skillfarm.apply_async(
-        args=[token.character_id], kwargs={"force_refresh": True}, priority=6
+    )[0]
+
+    update_character.apply_async(
+        args=[skillfarm.pk], kwargs={"force_refresh": True}, priority=6
     )
 
 
