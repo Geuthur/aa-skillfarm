@@ -13,7 +13,12 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarm import (
+    CharacterSkill,
+    CharacterUpdateStatus,
+    SkillFarmAudit,
+    SkillFarmSetup,
+)
 
 
 def create_character(eve_character: EveCharacter, **kwargs) -> SkillFarmAudit:
@@ -23,6 +28,19 @@ def create_character(eve_character: EveCharacter, **kwargs) -> SkillFarmAudit:
     character = SkillFarmAudit(**params)
     character.save()
     return character
+
+
+def create_update_status(
+    character_audit: SkillFarmAudit, **kwargs
+) -> CharacterUpdateStatus:
+    """Create a Update Status for a Character Audit"""
+    params = {
+        "character": character_audit,
+    }
+    params.update(kwargs)
+    update_status = CharacterUpdateStatus(**params)
+    update_status.save()
+    return update_status
 
 
 def create_user_from_evecharacter_with_access(
@@ -54,18 +72,19 @@ def create_skillfarm_character(character_id: int, **kwargs) -> SkillFarmAudit:
     return create_character(character_ownership.character, **kwargs)
 
 
-def create_skillsetup_character(character_id: int, skillset: list) -> CharacterSkill:
+def create_skillsetup_character(character_id: int, skillset: list) -> SkillFarmSetup:
     """Create a SkillSet for Skillfarm Audit Character"""
     audit = SkillFarmAudit.objects.get(
         character__character_id=character_id,
     )
 
-    skillset = SkillFarmSetup.objects.create(
+    skillsetup = SkillFarmSetup(
         character=audit,
         skillset=skillset,
     )
+    skillsetup.save()
 
-    return skillset
+    return skillsetup
 
 
 def create_evetypeprice(evetype_id: int, **kwargs) -> EveType:
@@ -90,13 +109,14 @@ def create_skill_character(
         character__character_id=character_id,
     )
 
-    skill = CharacterSkill.objects.create(
+    skill = CharacterSkill(
         character=audit,
         eve_type=EveType.objects.get(id=evetype_id),
         skillpoints_in_skill=skillpoints,
         active_skill_level=active_level,
         trained_skill_level=trained_level,
     )
+    skill.save()
 
     return skill
 
@@ -116,7 +136,7 @@ def add_auth_character_to_user(
 
 def add_skillfarmaudit_character_to_user(
     user: User, character_id: int, disconnect_signals: bool = True, **kwargs
-) -> CharacterOwnership:
+) -> SkillFarmAudit:
     character_ownership = add_auth_character_to_user(
         user,
         character_id,

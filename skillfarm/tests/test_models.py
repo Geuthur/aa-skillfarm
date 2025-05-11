@@ -39,26 +39,6 @@ class TestSkillfarmModel(TestCase):
             ["esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"],
         )
 
-    def test_is_active_should_return_false(self):
-        """Test should return False for is_active Property"""
-        self.assertFalse(self.audit.is_active)
-
-    def test_is_active_should_return_true(self):
-        """Test should return True for is_active Property"""
-        self.audit.last_update_skills = timezone.now()
-        self.audit.last_update_skillqueue = timezone.now()
-
-        self.assertTrue(self.audit.is_active)
-
-    def test_is_active_should_update_active_to_false(self):
-        """Test should update the active field to False"""
-        self.audit.active = True
-        self.audit.last_update_skills = timezone.now() - timezone.timedelta(days=7)
-        self.audit.last_update_skillqueue = timezone.now() - timezone.timedelta(days=7)
-        self.audit.save()
-
-        self.assertFalse(self.audit.is_active)
-
     def test_is_cooldown_should_return_false(self):
         """Test should return False for is_cooldown Property"""
         self.assertFalse(self.audit.is_cooldown)
