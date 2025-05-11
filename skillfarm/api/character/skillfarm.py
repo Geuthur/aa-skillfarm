@@ -129,7 +129,7 @@ class SkillFarmApiEndpoints:
                 )
                 notification = _get_notification_icon(character.notification)
 
-                char = f"{char_portrait} {character.character.character_name} {notification}"
+                char = f"{char_portrait} {character.character.character_name} {character.get_status.bootstrap_icon()} - {notification}"
 
                 # Create the action button
                 extraction_ready_html = _get_extraction_icon(
@@ -160,7 +160,7 @@ class SkillFarmApiEndpoints:
                         "character_name": character.character.character_name,
                     },
                     "details": {
-                        "active": character.active,
+                        "update_status": character.get_status,
                         "notification": character.notification,
                         "last_update": character.last_update,
                         "is_extraction_ready": f"{skill_info_html} {extraction_ready_html}",

@@ -161,7 +161,7 @@ class SkillfarmQuerySet(models.QuerySet):
         if update_status:
             last_update_display = naturaltime(update_status.last_update_finished_at)
         else:
-            last_update_display = _("Not Updated yet")
+            last_update_display = character.get_status.description()
         return last_update_display
 
 

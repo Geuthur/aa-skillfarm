@@ -12,6 +12,7 @@
   - Update Information
   - Update Issues Badge
 - Disable Characters with no Owner
+- Add Update Status to Skillfarm View
 
 ### Changed
 
