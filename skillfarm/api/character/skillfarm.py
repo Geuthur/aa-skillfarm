@@ -2,7 +2,6 @@
 from ninja import NinjaAPI
 
 # Django
-from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -32,7 +31,6 @@ from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import get_alts_queryset, get_character, get_main_character
 from skillfarm.helpers import lazy
 from skillfarm.models.skillfarm import (
-    CharacterUpdateStatus,
     SkillFarmAudit,
     SkillFarmSetup,
 )
@@ -155,18 +153,6 @@ class SkillFarmApiEndpoints:
                     ).exists()
                 )
 
-                # Filter update status
-                update_status = CharacterUpdateStatus.objects.filter(
-                    character=character,
-                ).order_by("last_update_finished_at")
-
-                # Get the last update status
-                last_update = (
-                    update_status.first().last_update_finished_at
-                    if update_status.exists()
-                    else ""
-                )
-
                 details = {
                     "character": {
                         "character_html": char,
@@ -176,7 +162,7 @@ class SkillFarmApiEndpoints:
                     "details": {
                         "active": character.active,
                         "notification": character.notification,
-                        "last_update": naturaltime(last_update),
+                        "last_update": character.last_update,
                         "is_extraction_ready": f"{skill_info_html} {extraction_ready_html}",
                         "is_filter": lazy.get_status_icon(is_filter),
                     },

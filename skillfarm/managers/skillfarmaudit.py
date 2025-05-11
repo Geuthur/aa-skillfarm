@@ -1,6 +1,8 @@
 # Django
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
 from django.db.models import Case, Count, Q, Value, When
+from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
@@ -146,6 +148,21 @@ class SkillfarmQuerySet(models.QuerySet):
             )
             return len(orphans)
         return 0
+
+    def last_update_status(self, character):
+        """Return the last update status for the given character."""
+        # Filter update status
+        update_status = (
+            character.skillfarm_update_status.order_by("last_update_finished_at")
+            .exclude(last_update_finished_at__isnull=True)
+            .first()
+        )
+
+        if update_status:
+            last_update_display = naturaltime(update_status.last_update_finished_at)
+        else:
+            last_update_display = _("Not Updated yet")
+        return last_update_display
 
 
 class SkillFarmManagerBase(models.Manager):

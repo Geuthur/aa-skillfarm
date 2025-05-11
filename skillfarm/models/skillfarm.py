@@ -150,6 +150,11 @@ class SkillFarmAudit(models.Model):
         total_update_status = list(qs.values_list("total_update_status", flat=True))[0]
         return self.UpdateStatus(total_update_status)
 
+    @property
+    def last_update(self):
+        """Get the last update status of this character."""
+        return SkillFarmAudit.objects.last_update_status(self)
+
     def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
         """Update skills for this character."""
         return self.skillfarm_skills.update_or_create_esi(
