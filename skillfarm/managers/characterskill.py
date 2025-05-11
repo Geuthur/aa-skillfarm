@@ -95,13 +95,8 @@ class SkillManagerBase(models.Manager):
 
     @transaction.atomic()
     def _update_or_create_objs(self, character: "SkillFarmAudit", objs: list):
-        skills_list = {
-            skill["skill_id"]: skill
-            for skill in objs.get("skills", [])
-            if "skill_id" in skill
-        }
-        skills_list = self._preload_types(skills_list)
-
+        """Update or Create skill entries from objs data."""
+        skills_list = self._preload_types(objs)
         if skills_list is not None:
             incoming_ids = set(skills_list.keys())
             exiting_ids = set(
