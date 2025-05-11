@@ -22,6 +22,7 @@ from skillfarm import __title__, forms, tasks
 from skillfarm.api.helpers import get_character
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm.tasks import clear_all_etags, update_all_skillfarm
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
@@ -50,6 +51,36 @@ def index(request):
     return redirect(
         "skillfarm:skillfarm", request.user.profile.main_character.character_id
     )
+
+
+@login_required
+@permission_required("skillfarm.basic_access")
+def admin(request):
+    """Admin View"""
+    character_id = request.user.profile.main_character.character_id
+
+    context = {
+        "page_title": "Admin",
+        "character_id": character_id,
+    }
+
+    if not request.user.is_superuser:
+        messages.error(request, _("You do not have permission to access this page."))
+        return redirect("skillfarm:index")
+
+    if request.method == "POST":
+        force_refresh = False
+        if request.POST.get("force_refresh", False):
+            force_refresh = True
+        if request.POST.get("run_clear_etag"):
+            messages.info(request, _("Queued Clear All ETags"))
+            clear_all_etags.apply_async(priority=1)
+        if request.POST.get("run_char_updates"):
+            messages.info(request, _("Queued Update All Characters"))
+            update_all_skillfarm.apply_async(
+                kwargs={"force_refresh": force_refresh}, priority=7
+            )
+    return render(request, "skillfarm/admin.html", context=context)
 
 
 @login_required

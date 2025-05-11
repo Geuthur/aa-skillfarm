@@ -13,6 +13,7 @@
   - Update Issues Badge
 - Disable Characters with no Owner
 - Add Update Status to Skillfarm View
+- Admin Menu (superuser only)
 
 ### Changed
 
