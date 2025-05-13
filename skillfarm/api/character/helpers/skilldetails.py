@@ -4,16 +4,22 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+# Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
+
 # AA Skillfarm
+from skillfarm import __title__
 from skillfarm.api.helpers import (
     generate_button,
     generate_progressbar,
     generate_settings,
 )
-from skillfarm.hooks import get_extension_logger
 from skillfarm.models.skillfarm import CharacterSkillqueueEntry, SkillFarmAudit
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 def _calculate_single_progress_bar(skill: CharacterSkillqueueEntry):

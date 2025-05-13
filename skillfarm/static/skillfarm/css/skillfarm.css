@@ -68,6 +68,10 @@
         background-color: rgb(0 255 42 / 10%) !important; /* Modern notation */
     }
 
+    .table-stripe-info {
+        background-color: rgb(0 162 255 / 10%) !important; /* Modern notation */
+    }
+
     .table-stripe-warning {
         background-color: rgb(255 238 0 / 10%) !important; /* Modern notation */
     }

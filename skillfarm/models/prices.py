@@ -3,13 +3,17 @@
 # Django
 from django.db import models
 
+# Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
+
 # Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 from eveuniverse.models import EveType
 
 # AA Skillfarm
-from skillfarm.hooks import get_extension_logger
+from skillfarm import __title__
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 class EveTypePrice(models.Model):

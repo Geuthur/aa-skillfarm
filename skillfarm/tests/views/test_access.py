@@ -14,7 +14,7 @@ from app_utils.testdata_factories import UserMainFactory
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_user_from_evecharacter_with_access
-from skillfarm.views import character_overview, index, skillfarm, skillfarm_calc
+from skillfarm.views import admin, character_overview, index, skillfarm, skillfarm_calc
 
 MODULE_PATH = "skillfarm.views."
 
@@ -126,3 +126,16 @@ class TestViewAccess(TestCase):
         self.assertContains(
             response, "An error occurred while fetching the market data."
         )
+
+    def test_admin(self):
+        # given
+        self.user.is_superuser = True
+        self.user.save()
+
+        request = self.factory.get(reverse("skillfarm:admin"))
+        request.user = self.user
+        # when
+        response = admin(request)
+        # then
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "Administration")

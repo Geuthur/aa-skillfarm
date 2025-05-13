@@ -9,8 +9,13 @@ from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.authentication.models import UserProfile
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
+from skillfarm import __title__
 from skillfarm.api.character.helpers.skilldetails import (
     _calculate_sum_progress_bar,
     _get_extraction_icon,
@@ -25,10 +30,12 @@ from skillfarm.api.character.helpers.skillqueue import (
 from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import get_alts_queryset, get_character, get_main_character
 from skillfarm.helpers import lazy
-from skillfarm.hooks import get_extension_logger
-from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarm import (
+    SkillFarmAudit,
+    SkillFarmSetup,
+)
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 class SkillFarmApiEndpoints:
@@ -105,9 +112,11 @@ class SkillFarmApiEndpoints:
 
             characters = get_alts_queryset(main)
 
-            audit_chars = SkillFarmAudit.objects.filter(
-                character__in=characters
-            ).select_related("character")
+            audit_chars = (
+                SkillFarmAudit.objects.filter(character__in=characters)
+                .select_related("character")
+                .prefetch_related("skillfarm_skills", "skillfarm_skillqueue")
+            )
 
             details_dict = []
             inactive_dict = []
@@ -120,22 +129,28 @@ class SkillFarmApiEndpoints:
                 )
                 notification = _get_notification_icon(character.notification)
 
-                char = f"{char_portrait} {character.character.character_name} {notification}"
+                char = f"{char_portrait} {character.character.character_name} {character.get_status.bootstrap_icon()} - {notification}"
 
-                skills = _get_character_skills(character)
-                skillqueue = _get_character_skillqueue(character)
-
-                skillextraction = _get_extraction_icon(
-                    skills=skills["is_extraction_ready"],
-                    skillqueue=skillqueue["skillqueue_ready"],
+                # Create the action button
+                extraction_ready_html = _get_extraction_icon(
+                    skills=character.skillfarm_skills.extractions(character).exists(),
+                    skillqueue=character.skillfarm_skillqueue.extractions(
+                        character
+                    ).exists(),
+                )
+                skill_info_html = _get_skillinfo_actions(
+                    character=character, request=request
+                )
+                actions_button_html = _skillfarm_actions(
+                    character=character, perms=perm, request=request
                 )
 
-                skillinfo = _get_skillinfo_actions(character=character, request=request)
-
-                skillinfo_html = f"{skillinfo} {skillextraction}"
-
-                actions = _skillfarm_actions(
-                    character=character, perms=perm, request=request
+                is_filter = (
+                    character.skillfarm_skillqueue.skill_filtered(character).exists()
+                    or SkillFarmSetup.objects.filter(
+                        character=character,
+                        skillset__isnull=False,
+                    ).exists()
                 )
 
                 details = {
@@ -145,24 +160,22 @@ class SkillFarmApiEndpoints:
                         "character_name": character.character.character_name,
                     },
                     "details": {
-                        "active": character.active,
+                        "update_status": character.get_status,
                         "notification": character.notification,
-                        "last_update": character.last_update_skillqueue.strftime(
-                            "%Y-%m-%d %H:%M"
-                        ),
-                        "is_extraction_ready": skillinfo_html,
-                        "is_filter": skillqueue.get("is_filter", ""),
+                        "last_update": character.last_update,
+                        "is_extraction_ready": f"{skill_info_html} {extraction_ready_html}",
+                        "is_filter": lazy.get_status_icon(is_filter),
                     },
-                    "actions": actions,
+                    "actions": actions_button_html,
                 }
 
                 # Generate the progress bar for the skill queue
-                if skillqueue["is_training"] is False:
+                if character.skillfarm_skillqueue.skill_in_training().exists() is False:
                     details["details"]["progress"] = _("No Active Training")
                     inactive_dict.append(details)
                 else:
                     details["details"]["progress"] = _calculate_sum_progress_bar(
-                        skillqueue=skillqueue["skillqueue"]
+                        skillqueue=_get_character_skillqueue(character)
                     )
                     details_dict.append(details)
 
@@ -212,7 +225,6 @@ class SkillFarmApiEndpoints:
             if perm is False:
                 return 403, "Permission Denied"
 
-            skills = _get_character_skills(character)
             skillqueue = _get_character_skillqueue_single(character)
 
             context = {
@@ -221,7 +233,7 @@ class SkillFarmApiEndpoints:
                 "character_name": character.character.character_name,
                 "skillqueue": skillqueue["skillqueue"],
                 "skillqueue_filtered": skillqueue["skillqueue_filtered"],
-                "skills": skills["skills"],
+                "skills": _get_character_skills(character),
             }
 
             return render(

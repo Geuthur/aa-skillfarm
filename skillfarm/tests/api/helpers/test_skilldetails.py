@@ -124,9 +124,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
         excepted_progressbar = generate_progressbar(0.0)
 
-        self.assertEqual(
-            _calculate_sum_progress_bar(skillqueue["skillqueue"]), excepted_progressbar
-        )
+        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
 
     def test_calc_sum_progress_bar_partial_progress(self):
         """Test should return 50.0%"""
@@ -147,9 +145,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
         excepted_progressbar = generate_progressbar(50.0)
 
-        self.assertEqual(
-            _calculate_sum_progress_bar(skillqueue["skillqueue"]), excepted_progressbar
-        )
+        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
 
     def test_calc_sum_progress_bar_multiple_skills(self):
         """Test should return 75.0%"""
@@ -183,9 +179,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
         excepted_progressbar = generate_progressbar(75.0)
 
-        self.assertEqual(
-            _calculate_sum_progress_bar(skillqueue["skillqueue"]), excepted_progressbar
-        )
+        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
 
     def test_calc_sum_progress_bar_multiple_skills_below_zero(self):
         """Test should return 0.0%"""
@@ -219,9 +213,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
         excepted_progressbar = generate_progressbar(0.0)
 
-        self.assertEqual(
-            _calculate_sum_progress_bar(skillqueue["skillqueue"]), excepted_progressbar
-        )
+        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
 
     def test_calc_sum_progress_bar_with_nodate(self):
         """Test should return 50.0%"""
@@ -255,6 +247,4 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
         excepted_progressbar = generate_progressbar(50.0)
 
-        self.assertEqual(
-            _calculate_sum_progress_bar(skillqueue["skillqueue"]), excepted_progressbar
-        )
+        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)

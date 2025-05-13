@@ -29,6 +29,13 @@ const SkillFarmAjax = (() => {
                     });
                 },
                 rowCallback: function (row, data, index) {
+                    if (data.details.update_status === 'error') {
+                        $(row).addClass('table-stripe-red');
+                    } else if (data.details.update_status === 'in_progress') {
+                        $(row).addClass('table-stripe-info');
+                    } else if (data.details.update_status === 'incomplete' || data.details.update_status === 'token_error') {
+                        $(row).addClass('table-stripe-warning');
+                    }
                     if (data.details.is_extraction_ready.includes('skillfarm-skill-extractor-maybe')) {
                         $(row).addClass('table-stripe-warning');
                     } else if (data.details.is_extraction_ready.includes('skillfarm-skill-extractor')) {

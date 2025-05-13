@@ -1,6 +1,37 @@
 # Changelog
 
-## [0.5.x] - IN Development
+## [0.5.4] - 2025-05-12
+
+### Added
+
+- Update Section System - Inspired by @\[[Eric Kalkoken](https://gitlab.com/ErikKalkoken/)\]
+  - TokenError Handler
+  - HTTPInternalServerError, HTTPGatewayTimeoutError Handler
+  - Update Section retrieves information between Etag System (Not Updating if NotModified)
+  - Disable Update on Token Error
+  - Update Information
+  - Update Issues Badge
+- Disable Characters with no Owner
+- Add Update Status to Skillfarm View
+- Admin Menu (superuser only)
+
+### Changed
+
+- Make `README` logger settings optional
+- Use app_utils `LoggerAddTag` Logger System
+- Task System
+  - Refactor Tasks
+- Update Interval to 15 Minutes
+- Stale to 30 Minutes
+- Refactor Managers
+  - Characterskill Manager
+  - Skillfarmaudit Manager
+  - Skillqueue Manager
+- Optimized Skillfarm API
+
+### Removed
+
+- own `get_extension_logger`
 
 ## [0.5.3] - 2025-05-02
 
