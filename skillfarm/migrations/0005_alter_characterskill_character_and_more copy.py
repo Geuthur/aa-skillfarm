@@ -30,6 +30,14 @@ class Migration(migrations.Migration):
                 to="skillfarm.skillfarmaudit",
             ),
         ),
+        migrations.RemoveField(
+            model_name="skillfarmaudit",
+            name="last_update_skillqueue",
+        ),
+        migrations.RemoveField(
+            model_name="skillfarmaudit",
+            name="last_update_skills",
+        ),
         migrations.CreateModel(
             name="CharacterUpdateStatus",
             fields=[
