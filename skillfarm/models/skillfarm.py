@@ -141,7 +141,7 @@ class SkillFarmAudit(models.Model):
         return False
 
     @property
-    def get_status(self) -> UpdateStatus:
+    def get_status(self) -> UpdateStatus.description:
         """Get the total update status of this character."""
         if self.active is False:
             return self.UpdateStatus.DISABLED
@@ -151,7 +151,7 @@ class SkillFarmAudit(models.Model):
         return self.UpdateStatus(total_update_status)
 
     @property
-    def last_update(self):
+    def last_update(self) -> UpdateStatus:
         """Get the last update status of this character."""
         return SkillFarmAudit.objects.last_update_status(self)
 
@@ -187,7 +187,7 @@ class SkillFarmAudit(models.Model):
         update_status_obj.reset()
         return update_status_obj
 
-    def reset_has_token_error(self) -> None:
+    def reset_has_token_error(self) -> bool:
         """Reset the has_token_error flag for this character."""
         update_status = self.get_status
         if update_status == self.UpdateStatus.TOKEN_ERROR:
@@ -356,24 +356,6 @@ class CharacterSkill(models.Model):
     def __str__(self) -> str:
         return f"{self.character}-{self.eve_type.name}"
 
-    @property
-    def is_exc_ready(self) -> bool:
-        """Check if skill extraction is ready."""
-        try:
-            character = SkillFarmSetup.objects.get(character=self.character)
-        except SkillFarmSetup.DoesNotExist:
-            character = None
-
-        if character and character.skillset is not None:
-            skills = CharacterSkill.objects.filter(
-                character=self.character,
-                eve_type__name__in=character.skillset,
-            )
-            for skill in skills:
-                if skill.trained_skill_level == 5:
-                    return True
-        return False
-
 
 class CharacterSkillqueueEntry(models.Model):
     """Skillfarm Skillqueue model for app"""
@@ -408,22 +390,6 @@ class CharacterSkillqueueEntry(models.Model):
 
     def __str__(self) -> str:
         return f"{self.character}-{self.queue_position}"
-
-    @property
-    def is_active(self) -> bool:
-        """Returns true when this skill is currently being trained"""
-        return bool(self.finish_date) and self.finish_date > self.start_date
-
-    @property
-    def is_skillqueue_ready(self) -> bool:
-        """Check if skill finish date is below the actual date."""
-        if (
-            self.is_active
-            and self.finish_date <= timezone.now()
-            and self.finished_level == 5
-        ):
-            return True
-        return False
 
 
 class CharacterUpdateStatus(models.Model):

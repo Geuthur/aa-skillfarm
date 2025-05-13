@@ -15,7 +15,10 @@ from skillfarm.models.skillfarm import (
 )
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
-from skillfarm.tests.testdata.skillfarm import create_skillfarm_character
+from skillfarm.tests.testdata.skillfarm import (
+    create_skillfarm_character,
+    create_update_status,
+)
 
 MODULE_PATH = "skillfarm.models.skillfarm"
 
@@ -47,3 +50,28 @@ class TestSkillfarmModel(TestCase):
         """Test should return True for is_cooldown Property"""
         self.audit.last_notification = timezone.now()
         self.assertTrue(self.audit.is_cooldown)
+
+    def test_last_update_should_return_incomplete(self):
+        """Test should return incomplete description for last_update Property"""
+        self.assertEqual(
+            self.audit.last_update, "One or more sections have not been updated"
+        )
+
+    def test_reset_has_token_error_should_return_false(self):
+        """Test should reset has_token_error"""
+        self.assertFalse(self.audit.reset_has_token_error())
+
+    def test_reset_has_token_error_should_return_true(self):
+        """Test should reset has_token_error"""
+        create_update_status(
+            self.audit,
+            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            is_success=False,
+            error_message="",
+            has_token_error=True,
+            last_run_at=timezone.now(),
+            last_run_finished_at=timezone.now(),
+            last_update_at=timezone.now(),
+            last_update_finished_at=timezone.now(),
+        )
+        self.assertTrue(self.audit.reset_has_token_error())
