@@ -10,13 +10,16 @@ from django.utils import timezone
 # Alliance Auth
 from allianceauth.authentication.models import User
 from allianceauth.notifications import notify
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.constants import DISCORD_EMBED_COLOR_MAP
-from skillfarm.hooks import get_extension_logger
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 def allianceauth_discordbot_installed() -> bool:

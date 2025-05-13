@@ -1,7 +1,8 @@
 """App Tasks"""
 
 # Standard Library
-import datetime
+import inspect
+from collections.abc import Callable
 
 # Third Party
 import requests
@@ -15,21 +16,22 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
+
 # AA Skillfarm
-from skillfarm import app_settings
+from skillfarm import __title__, app_settings
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.helpers.discord import send_user_notification
-from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import (
-    CharacterSkill,
-    CharacterSkillqueueEntry,
     SkillFarmAudit,
 )
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 MAX_RETRIES_DEFAULT = 3
 
@@ -44,74 +46,114 @@ TASK_DEFAULTS_ONCE = {**TASK_DEFAULTS, **{"base": QueueOnce}}
 
 _update_skillfarm_params = {
     **TASK_DEFAULTS_ONCE,
-    **{"once": {"keys": ["character_id"], "graceful": True}},
+    **{"once": {"keys": ["character_pk", "force_refresh"], "graceful": True}},
 }
 
 
 @shared_task(**TASK_DEFAULTS_ONCE)
 @when_esi_is_available
-def update_all_skillfarm(runs: int = 0):
-    characters = SkillFarmAudit.objects.select_related("character").all()
+def update_all_skillfarm(runs: int = 0, force_refresh=False):
+    """Update all skillfarm characters."""
+    SkillFarmAudit.objects.disable_characters_with_no_owner()
+    characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
     for character in characters:
-        update_character_skillfarm.apply_async(args=[character.character.character_id])
+        update_character.apply_async(
+            args=[character.pk], kwargs={"force_refresh": force_refresh}
+        )
         runs = runs + 1
     logger.info("Queued %s Skillfarm Updates", runs)
 
 
-@shared_task(**_update_skillfarm_params)
+@shared_task(**TASK_DEFAULTS_ONCE)
 @when_esi_is_available
-def update_character_skillfarm(
-    character_id, force_refresh=False
-):  # pylint: disable=unused-argument
-    character = SkillFarmAudit.objects.get(character__character_id=character_id)
-
-    # Settings for the Task Queue
-    que = []
-    skip_date = timezone.now() - datetime.timedelta(
-        hours=app_settings.SKILLFARM_STALE_STATUS
+def update_character(character_pk: int, force_refresh=False):
+    character = SkillFarmAudit.objects.prefetch_related("skillfarm_update_status").get(
+        pk=character_pk
     )
-    mindt = timezone.now() - datetime.timedelta(days=7)
+
+    que = []
     priority = 7
 
     logger.debug(
         "Processing Audit Updates for %s", format(character.character.character_name)
     )
-    if (character.last_update_skillqueue or mindt) <= skip_date or force_refresh:
-        que.append(
-            update_char_skillqueue.si(character_id, force_refresh=force_refresh).set(
-                priority=priority
-            )
-        )
 
-    if (character.last_update_skills or mindt) <= skip_date or force_refresh:
-        que.append(
-            update_char_skills.si(character_id, force_refresh=force_refresh).set(
-                priority=priority
+    if force_refresh:
+        # Reset Token Error if we are forcing a refresh
+        character.reset_has_token_error()
+
+    needs_update = character.calc_update_needed()
+
+    if not needs_update and not force_refresh:
+        logger.info("No updates needed for %s", character.character.character_name)
+        return
+
+    sections = character.UpdateSection.get_sections()
+
+    for section in sections:
+        # Skip sections that are not in the needs_update list
+        if not force_refresh and not needs_update.for_section(section):
+            logger.debug(
+                "No updates needed for %s (%s)",
+                character.character.character_name,
+                section,
             )
+            continue
+
+        task_name = f"update_char_{section}"
+        task = globals().get(task_name)
+        que.append(
+            task.si(character.pk, force_refresh=force_refresh).set(priority=priority)
         )
 
     chain(que).apply_async()
-    logger.debug("Queued %s Tasks for %s", len(que), character.character.character_name)
-
-
-@shared_task(**_update_skillfarm_params)
-def update_char_skillqueue(character_id, force_refresh=False):
-    character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    CharacterSkillqueueEntry.objects.update_or_create_esi(
-        character, force_refresh=force_refresh
+    logger.debug(
+        "Queued %s Audit Updates for %s",
+        len(que),
+        character.character.character_name,
     )
-    character.last_update_skillqueue = timezone.now()
-    character.save()
 
 
 @shared_task(**_update_skillfarm_params)
-def update_char_skills(character_id, force_refresh=False):
-    character = SkillFarmAudit.objects.get(character__character_id=character_id)
-    CharacterSkill.objects.update_or_create_esi(character, force_refresh=force_refresh)
-    character.last_update_skills = timezone.now()
-    character.save()
+def update_char_skills(character_pk, force_refresh=False):
+    return _update_character_section(
+        character_pk,
+        section=SkillFarmAudit.UpdateSection.SKILLS,
+        force_refresh=force_refresh,
+    )
 
 
+@shared_task(**_update_skillfarm_params)
+def update_char_skillqueue(character_pk, force_refresh=False):
+    return _update_character_section(
+        character_pk,
+        section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+        force_refresh=force_refresh,
+    )
+
+
+def _update_character_section(character_pk: int, section: str, force_refresh: bool):
+    """Update a specific section of the skillfarm audit."""
+    section = SkillFarmAudit.UpdateSection(section)
+    character = SkillFarmAudit.objects.get(pk=character_pk)
+    logger.debug(
+        "Updating %s for %s", section.label, character.character.character_name
+    )
+
+    character.reset_update_status(section)
+
+    method: Callable = getattr(character, section.method_name)
+    method_signature = inspect.signature(method)
+
+    if "force_refresh" in method_signature.parameters:
+        kwargs = {"force_refresh": force_refresh}
+    else:
+        kwargs = {}
+    result = character.perform_update_status(section, method, **kwargs)
+    character.update_section_log(section, is_success=True, is_updated=result.is_updated)
+
+
+# pylint: disable=too-many-locals
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.filter(active=True)
@@ -138,9 +180,21 @@ def check_skillfarm_notifications(runs: int = 0):
     for main_character, alts in main_to_alts.items():
         msg_items = []
         for alt in alts:
+            alt: SkillFarmAudit
+
             if alt.notification:
-                skill_names = alt.get_finished_skills()
-                if skill_names:
+                skill_names = []
+                skillqueue_extractions = alt.skillfarm_skillqueue.extractions(
+                    alt
+                ).values_list("eve_type__name", flat=True)
+                skill_names.extend(skillqueue_extractions)
+
+                skills_extractions = alt.skillfarm_skills.extractions(alt).values_list(
+                    "eve_type__name", flat=True
+                )
+                skill_names.extend(skills_extractions)
+
+                if len(skill_names) > 0:
                     # Create and Add Notification Message
                     msg = alt._generate_notification(skill_names)
                     msg_items.append(msg)
@@ -215,3 +269,28 @@ def update_all_prices():
         return
 
     logger.info("Skillfarm Prices updated")
+
+
+@shared_task(**TASK_DEFAULTS_ONCE)
+def clear_all_etags():
+    logger.debug("Clearing all etags")
+    try:
+        # Third Party
+        # pylint: disable=import-outside-toplevel
+        from django_redis import get_redis_connection
+
+        _client = get_redis_connection("default")
+    except (NotImplementedError, ModuleNotFoundError):
+        # Django
+        # pylint: disable=import-outside-toplevel
+        from django.core.cache import caches
+
+        default_cache = caches["default"]
+        _client = default_cache.get_master_client()
+    keys = _client.keys(":?:skillfarm-*")
+    logger.info("Deleting %s etag keys", len(keys))
+    if keys:
+        deleted = _client.delete(*keys)
+        logger.info("Deleted %s etag keys", deleted)
+    else:
+        logger.info("No etag keys to delete")

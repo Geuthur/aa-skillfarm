@@ -73,7 +73,7 @@ To set up the Scheduled Tasks add following code to your `local.py`
 ```python
 CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
     "task": "skillfarm.tasks.update_all_skillfarm",
-    "schedule": crontab(minute=0, hour="*/1"),
+    "schedule": crontab(minute="*/15"),
 }
 
 CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
@@ -84,6 +84,26 @@ CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
 CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
     "task": "skillfarm.tasks.update_all_prices",
     "schedule": crontab(minute=0, hour="0"),
+}
+```
+
+### Step 3.1 - (Optional) Add own Logger File
+
+To set up the Logger add following code to your `local.py`
+Ensure that you have writing permission in logs folder.
+
+```python
+LOGGING["handlers"]["skillfarm_file"] = {
+    "level": "INFO",
+    "class": "logging.handlers.RotatingFileHandler",
+    "filename": os.path.join(BASE_DIR, "log/skillfarm.log"),
+    "formatter": "verbose",
+    "maxBytes": 1024 * 1024 * 5,
+    "backupCount": 5,
+}
+LOGGING["loggers"]["extensions.skillfarm"] = {
+    "handlers": ["skillfarm_file"],
+    "level": "DEBUG",
 }
 ```
 
@@ -117,34 +137,11 @@ The Following Settings can be setting up in the `local.py`
 | Setting Name                | Descriptioon                                             | Default       |
 | --------------------------- | -------------------------------------------------------- | ------------- |
 | `SKILLFARM_APP_NAME`        | Set the name of the APP                                  | `"Skillfarm"` |
-| `SKILLFARM_LOGGER_USE`      | Set to use own Logger File `True/False`                  | `False`       |
-| `SKILLFARM_STALE_STATUS`    | Set the Stale Status for Skillfarm Character in hours    | `3`           |
 | `SKILLFARM_PRICE_SOURCE_ID` | Set Station ID for fetching base prices. Default is Jita | `60003760`    |
 
-If you set up SKILLFARM_LOGGER_USE to `True` you need to add the following code below:
+Advanced Settings: Stale Status for Each Section
 
-```python
-LOGGING_SKILLFARM = {
-    "handlers": {
-        "skillfarm_file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(BASE_DIR, "log/skillfarm.log"),
-            "formatter": "verbose",
-            "maxBytes": 1024 * 1024 * 5,
-            "backupCount": 5,
-        },
-    },
-    "loggers": {
-        "skillfarm": {
-            "handlers": ["skillfarm_file", "console"],
-            "level": "INFO",
-        },
-    },
-}
-LOGGING["handlers"].update(LOGGING_SKILLFARM["handlers"])
-LOGGING["loggers"].update(LOGGING_SKILLFARM["loggers"])
-```
+- SKILLFARM_STALE_TYPES = `{     "skills": 30,     "skillqueue": 30, }` - Defines the stale status duration (in minutes) for each section.
 
 ## Highlights<a name="highlights"></a>
 

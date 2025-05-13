@@ -11,16 +11,20 @@ from django.views.decorators.http import require_POST
 # Alliance Auth
 from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
 
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
+
 # AA Skillfarm
-from skillfarm import forms, tasks
+from skillfarm import __title__, forms, tasks
 from skillfarm.api.helpers import get_character
-from skillfarm.hooks import get_extension_logger
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm.tasks import clear_all_etags, update_all_skillfarm
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 # pylint: disable=unused-argument
@@ -47,6 +51,36 @@ def index(request):
     return redirect(
         "skillfarm:skillfarm", request.user.profile.main_character.character_id
     )
+
+
+@login_required
+@permission_required("skillfarm.basic_access")
+def admin(request):
+    """Admin View"""
+    character_id = request.user.profile.main_character.character_id
+
+    context = {
+        "page_title": "Admin",
+        "character_id": character_id,
+    }
+
+    if not request.user.is_superuser:
+        messages.error(request, _("You do not have permission to access this page."))
+        return redirect("skillfarm:index")
+
+    if request.method == "POST":
+        force_refresh = False
+        if request.POST.get("force_refresh", False):
+            force_refresh = True
+        if request.POST.get("run_clear_etag"):
+            messages.info(request, _("Queued Clear All ETags"))
+            clear_all_etags.apply_async(priority=1)
+        if request.POST.get("run_char_updates"):
+            messages.info(request, _("Queued Update All Characters"))
+            update_all_skillfarm.apply_async(
+                kwargs={"force_refresh": force_refresh}, priority=7
+            )
+    return render(request, "skillfarm/admin.html", context=context)
 
 
 @login_required
@@ -93,9 +127,7 @@ def add_char(request, token):
     char = SkillFarmAudit.objects.update_or_create(
         character=character, defaults={"name": token.character_name}
     )[0]
-    tasks.update_character_skillfarm.apply_async(
-        args=[char.character.character_id], kwargs={"force_refresh": True}
-    )
+    tasks.update_character.apply_async(args=[char.pk], kwargs={"force_refresh": True})
 
     msg = _(
         "{character_name} successfully added or updated to Skillfarm System"

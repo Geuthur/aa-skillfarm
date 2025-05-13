@@ -42,9 +42,6 @@ SKILLFARM_BULK_METHODS_BATCH_SIZE = clean_setting(
     "SKILLFARM_BULK_METHODS_BATCH_SIZE", 500
 )
 
-# Update Period for Skillfarm in Hours
-SKILLFARM_STALE_STATUS = clean_setting("SKILLFARM_STALE_STATUS", 3)
-
 # Set Notification Cooldown in Days
 SKILLFARM_NOTIFICATION_COOLDOWN = clean_setting("SKILLFARM_NOTIFICATION_COOLDOWN", 3)
 
@@ -53,3 +50,8 @@ SKILLFARM_TASKS_TIME_LIMIT = clean_setting("SKILLFARM_TASKS_TIME_LIMIT", 7200)
 
 # Price Source default is Jita
 SKILLFARM_PRICE_SOURCE_ID = clean_setting("SKILLFARM_PRICE_SOURCE_ID", 60003760)
+
+SKILLFARM_STALE_TYPES = {
+    "skills": 30,
+    "skillqueue": 30,
+}

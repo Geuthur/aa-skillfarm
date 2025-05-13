@@ -40,14 +40,6 @@ class TestAdminView(TestCase):
             self.adminmodel._character__character_name(self.character), "Gneuten"
         )
 
-    def test_column_last_update_skillqueue(self):
-        """Test if the last update skillqueue column is displayed correctly"""
-        self.assertEqual(self.adminmodel._last_update_skillqueue(self.character), None)
-
-    def test_column_last_update_skills(self):
-        """Test if the last skills column is displayed correctly"""
-        self.assertEqual(self.adminmodel._last_update_skills(self.character), None)
-
     def test_has_add_permission(self):
         """Test if the user has the permission to add should be false"""
         self.assertFalse(self.adminmodel.has_add_permission(RequestFactory()))

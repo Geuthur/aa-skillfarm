@@ -6,12 +6,16 @@ from django.utils.safestring import mark_safe
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
+from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
-from skillfarm.hooks import get_extension_logger
-from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm import __title__
+from skillfarm.models.skillfarm import SkillFarmAudit
 
-logger = get_extension_logger(__name__)
+logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 def arabic_number_to_roman(value) -> str:
@@ -74,15 +78,6 @@ def get_alts_queryset(main_char, corporations=None):
         return EveCharacter.objects.filter(id__in=linked_corporations)
     except ObjectDoesNotExist:
         return EveCharacter.objects.filter(pk=main_char.pk)
-
-
-def get_skillset(character: SkillFarmAudit) -> dict | None:
-    """Get the skillset for the character"""
-    try:
-        skillfilter = SkillFarmSetup.objects.get(character=character)
-        return skillfilter.skillset
-    except SkillFarmSetup.DoesNotExist:
-        return None
 
 
 def generate_button(template, queryset, settings, request) -> mark_safe:
