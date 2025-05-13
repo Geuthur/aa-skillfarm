@@ -57,11 +57,8 @@ def index(request):
 @permission_required("skillfarm.basic_access")
 def admin(request):
     """Admin View"""
-    character_id = request.user.profile.main_character.character_id
-
     context = {
         "page_title": "Admin",
-        "character_id": character_id,
     }
 
     if not request.user.is_superuser:
@@ -104,14 +101,10 @@ def skillfarm(request, character_id=None):
 
 @login_required
 @permission_required("skillfarm.basic_access")
-def character_overview(request, character_id=None):
+def character_overview(request):
     """Character Overview"""
-    if character_id is None:
-        character_id = request.user.profile.main_character.character_id
-
     context = {
-        "page_title": "Character Admin",
-        "character_id": character_id,
+        "page_title": "Character Overview",
     }
     context = add_info_to_context(request, context)
 

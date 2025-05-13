@@ -19,7 +19,7 @@ urlpatterns = [
         name="skillfarm",
     ),
     path(
-        "<int:character_id>/view/overview/",
+        "view/overview/",
         views.character_overview,
         name="character_overview",
     ),

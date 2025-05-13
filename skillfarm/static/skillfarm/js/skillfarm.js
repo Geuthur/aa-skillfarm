@@ -47,8 +47,9 @@ const SkillFarmAjax = (() => {
     };
 
     const fetchDetails = () => {
+        var url = SkillfarmSettings.DetailsUrl.replace('12345', SkillfarmSettings.characterPk);
         return $.ajax({
-            url: SkillfarmSettings.DetailsUrl,
+            url: url,
             type: 'GET',
             success: function (data) {
                 updateDataTable('#skillfarm-details', Object.values(data.details));
