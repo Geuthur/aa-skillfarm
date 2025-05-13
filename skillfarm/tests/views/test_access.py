@@ -88,27 +88,9 @@ class TestViewAccess(TestCase):
         request = self.factory.get(
             reverse(
                 "skillfarm:character_overview",
-                args=[self.user.profile.main_character.character_id],
             )
         )
         request.user = self.user
-        # when
-        response = character_overview(
-            request, character_id=self.user.profile.main_character.character_id
-        )
-        # then
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "Overview")
-
-    def test_character_overview_no_character(self):
-        # given
-        request = self.factory.get(
-            reverse(
-                "skillfarm:character_overview",
-                args=[self.user.profile.main_character.character_id],
-            )
-        )
-        request.user = self.no_evecharacter_user
         # when
         response = character_overview(request)
         # then
