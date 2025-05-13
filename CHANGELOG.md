@@ -28,6 +28,7 @@
   - Skillfarmaudit Manager
   - Skillqueue Manager
 - Optimized Skillfarm API
+- Remove Character ID req. for navigation
 
 ### Removed
 

@@ -9,9 +9,9 @@
         characterPk: '{{ character_id }}',
         updateInterval: '{{ update_interval }}',
         // URLs
-        DetailsUrl: '{% url "skillfarm:api:get_details" character_id=character_id %}',
+        DetailsUrl: '{% url "skillfarm:api:get_details" character_id=12345 %}',
         SkillSetupUrl: '{% url "skillfarm:api:get_skillsetup" character_id=12345 %}',
-        OverviewUrl: '{% url "skillfarm:api:get_character_overview" character_id=character_id %}',
+        OverviewUrl: '{% url "skillfarm:api:get_character_overview" %}',
 
         // Translations
         translations: {

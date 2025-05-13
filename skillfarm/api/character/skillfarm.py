@@ -44,12 +44,12 @@ class SkillFarmApiEndpoints:
     # pylint: disable=too-many-statements, too-many-locals
     def __init__(self, api: NinjaAPI):
         @api.get(
-            "{character_id}/overview/",
+            "/overview/",
             response={200: dict, 403: str},
             tags=self.tags,
         )
         # pylint: disable=unused-argument
-        def get_character_overview(request, character_id: int):
+        def get_character_overview(request):
             """Get Character SkillFarm Overview"""
             chars_visible = SkillFarmAudit.objects.visible_eve_characters(request.user)
 
