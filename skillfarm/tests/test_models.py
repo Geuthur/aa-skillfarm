@@ -30,7 +30,7 @@ class TestSkillfarmModel(TestCase):
 
     def test_should_return_string_audit(self):
         """Test should return the Audit Character Data"""
-        self.assertEqual(str(self.audit), "Gneuten's Character Data")
+        self.assertEqual(str(self.audit), "Gneuten - Active: True - Status: incomplete")
 
     def test_should_return_esi_scopes(self):
         """Test should return the ESI Scopes for Skillfarm"""

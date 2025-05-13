@@ -1,5 +1,9 @@
+# Standard Library
+from typing import List, Optional, Tuple
+
 # Django
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 # Alliance Auth
 from allianceauth.authentication.backends import StateBackend
@@ -61,6 +65,38 @@ def create_user_from_evecharacter_with_access(
         disconnect_signals=disconnect_signals,
     )
     return user, character_ownership
+
+
+def create_user_from_evecharacter(
+    character_id: int,
+    permissions: list[str] | None = None,
+    scopes: list[str] | None = None,
+) -> tuple[User, CharacterOwnership]:
+    """Create new allianceauth user from EveCharacter object.
+
+    Args:
+        character_id: ID of eve character
+        permissions: list of permission names, e.g. `"my_app.my_permission"`
+        scopes: list of scope names
+    """
+    auth_character = EveCharacter.objects.get(character_id=character_id)
+    user = AuthUtils.create_user(auth_character.character_name.replace(" ", "_"))
+    character_ownership = add_character_to_user(
+        user, auth_character, is_main=True, scopes=scopes
+    )
+    if permissions:
+        for permission_name in permissions:
+            user = AuthUtils.add_permission_to_user_by_name(permission_name, user)
+    return user, character_ownership
+
+
+def create_skillfarm_character_from_user(user: User, **kwargs) -> SkillFarmAudit:
+    eve_character = user.profile.main_character
+    if not eve_character:
+        raise ValueError("User needs to have a main character.")
+
+    kwargs.update({"eve_character": eve_character})
+    return create_character(**kwargs)
 
 
 def create_skillfarm_character(character_id: int, **kwargs) -> SkillFarmAudit:

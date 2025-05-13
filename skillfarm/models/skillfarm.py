@@ -115,7 +115,7 @@ class SkillFarmAudit(models.Model):
     objects = SkillFarmManager()
 
     def __str__(self):
-        return f"{self.character.character_name}'s Character Data"
+        return f"{self.character.character_name} - Active: {self.active} - Status: {self.get_status}"
 
     class Meta:
         default_permissions = ()
@@ -142,7 +142,7 @@ class SkillFarmAudit(models.Model):
 
     @property
     def get_status(self) -> UpdateStatus:
-        """Get the status of this character."""
+        """Get the total update status of this character."""
         if self.active is False:
             return self.UpdateStatus.DISABLED
 

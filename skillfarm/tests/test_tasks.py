@@ -11,6 +11,7 @@ from allianceauth.authentication.models import CharacterOwnership, UserProfile
 
 # AA Skillfarm
 from skillfarm import tasks
+from skillfarm.models.skillfarm import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
@@ -19,6 +20,7 @@ from skillfarm.tests.testdata.skillfarm import (
     create_skill_character,
     create_skillfarm_character,
     create_skillsetup_character,
+    create_update_status,
     create_user_from_evecharacter_with_access,
 )
 
@@ -40,6 +42,51 @@ class TestUpdateAllSkillfarm(TestCase):
         tasks.update_all_skillfarm()
         # then
         self.assertTrue(mock_update_all_skillfarm.apply_async.called)
+
+
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+@patch(TASK_PATH + ".chain", spec=True)
+@patch(TASK_PATH + ".logger", spec=True)
+class TestUpdateCharacter(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+        load_eveuniverse()
+
+        cls.audit = create_skillfarm_character(1001)
+
+    def test_update_character_should_no_updated(self, mock_logger, __):
+        # when
+        tasks.update_character(self.audit.pk)
+        # then
+        mock_logger.info.assert_called_once_with(
+            "No updates needed for %s",
+            self.audit.character.character_name,
+        )
+
+    def test_update_character_should_update(self, mock_logger, mock_chain):
+        # given
+        create_update_status(
+            self.audit,
+            section=SkillFarmAudit.UpdateSection.SKILLS,
+            is_success=True,
+            error_message="",
+            has_token_error=False,
+            last_run_at=None,
+            last_run_finished_at=None,
+            last_update_at=None,
+            last_update_finished_at=None,
+        )
+
+        # when
+        tasks.update_character(self.audit.pk)
+        # then
+        mock_chain.assert_called_once()
 
 
 @patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
@@ -64,10 +111,6 @@ class TestCheckSkillfarmNotification(TestCase):
         cls.audit = add_skillfarmaudit_character_to_user(cls.user, 1001)
         cls.audit2 = add_skillfarmaudit_character_to_user(cls.user2, 1002)
         cls.audit3 = add_skillfarmaudit_character_to_user(cls.user2, 1003)
-
-        cls.audit.refresh_from_db()
-        cls.audit2.refresh_from_db()
-        cls.audit3.refresh_from_db()
 
     def _set_notifiaction_status(self, audits, status):
         for audit in audits:
