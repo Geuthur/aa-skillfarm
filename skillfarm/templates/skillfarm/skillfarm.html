@@ -12,13 +12,11 @@
             <h3>{% translate "Skillfarm" %} </h3>
         </div>
         <div class="card-body bg-secondary tab-content rounded-bottom">
-            <div class="tab-content">
+            <i class="fa-solid fa-exclamation-triangle"></i>
+            <span class="text-muted font-weight-bold">{% trans "Skillqueue Data will only update on Change trought the client" %}</span>
+            <div class="tab-content mt-2">
                 {% include 'skillfarm/partials/table/skillfarm.html' %}
             </div>
-            <button class="btn btn-primary btn-sm btn-square">
-                <i class="fa-solid fa-info"></i>
-            </button>
-            <span class="text-muted">{% trans "ESI Skillqueue will only update on Character Login" %}</span>
         </div>
     </div>
     <!-- Inactive Characters -->
