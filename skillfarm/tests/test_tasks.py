@@ -336,3 +336,41 @@ class TestSkillfarmPrices(TestCase):
         mock_logger.error.assert_called_once_with(
             "Error updating prices: %s", error_instance
         )
+
+
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+@patch(TASK_PATH + ".logger", spec=True)
+class TestClearEtag(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+
+    def test_clear_all_etag_return_no_etags(self, mock_logger):
+        # when
+        tasks.clear_all_etags()
+
+        # then
+        mock_logger.info.assert_any_call("Deleting %s etag keys", 0)
+        mock_logger.info.assert_any_call("No etag keys to delete")
+
+    def test_clear_all_etag_return_etags(self, mock_logger):
+        # given
+        # pylint: disable=import-outside-toplevel
+        # Third Party
+        from django_redis import get_redis_connection
+
+        _client = get_redis_connection("default")
+        _client.set("skillfarm-test", "test")
+        _client.set("skillfarm-test2", "test2")
+
+        # when
+        tasks.clear_all_etags()
+
+        # then
+        mock_logger.info.assert_any_call("Deleting %s etag keys", 2)
+        mock_logger.info.assert_any_call("Deleted %s etag keys", 2)
