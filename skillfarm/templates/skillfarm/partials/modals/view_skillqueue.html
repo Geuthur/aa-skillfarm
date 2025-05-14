@@ -9,10 +9,6 @@
         <img src="{{ character_id|character_portrait_url:32 }}" class="rounded-circle">
         {{character_name}}
     </h4>
-    <div class="mb-2">
-        <i class="fa-solid fa-exclamation-triangle"></i>
-        <span class="text-muted font-weight-bold">{% trans "All dates are Eve Servertime" %}</span>
-    </div>
     {% if skillqueue %}
         <header class="card-header bg-primary rounded-top">
             <h3 class="me-3">{% trans "Skillqueue" %}</h3>
@@ -45,7 +41,10 @@
                 const SkillQueueTable = SkillQueue.DataTable({
                     "order": [[ 2, "asc" ]],
                     "columnDefs": [
-                        { "orderable": false, "targets": 1 }
+                        {
+                            "orderable": false,
+                            "targets": 1
+                        }
                     ]
                 });
             });
@@ -86,17 +85,6 @@
                         {
                             "orderable": false,
                             "targets": 1
-                        },
-                        {
-                            "targets": [2, 3], // Start Date und Finish Date
-                            "render": function (data, type, row) {
-                                if (type === 'display' && data !== "-") {
-                                    // Annahme: data ist im Format "YYYY-MM-DD HH:mm"
-                                    const date = new Date(data.replace(" ", "T") + ":00");
-                                    return date.toLocaleString();
-                                }
-                                return data;
-                            }
                         }
                     ]
                 });
