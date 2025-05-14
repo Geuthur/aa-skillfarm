@@ -91,6 +91,7 @@ def stringify_params(operation):
 
 
 def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
+    """Handle ETag headers"""
     if (
         get_etag_header(operation) == headers.headers.get("ETag")
         and not force_refresh
@@ -122,7 +123,9 @@ def handle_etag_headers(operation, headers, force_refresh, etags_incomplete):
 def handle_page_results(
     operation, current_page, total_pages, etags_incomplete, force_refresh
 ):
+    """Handle multiple page results and use Cache if possible"""
     results = []
+
     while current_page <= total_pages:
         operation.future.request.params["page"] = current_page
         try:
