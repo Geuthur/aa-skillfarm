@@ -11,6 +11,7 @@ from allianceauth.authentication.models import CharacterOwnership, UserProfile
 
 # AA Skillfarm
 from skillfarm import tasks
+from skillfarm.models.skillfarm import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
@@ -19,13 +20,14 @@ from skillfarm.tests.testdata.skillfarm import (
     create_skill_character,
     create_skillfarm_character,
     create_skillsetup_character,
+    create_update_status,
     create_user_from_evecharacter_with_access,
 )
 
 TASK_PATH = "skillfarm.tasks"
 
 
-@patch(TASK_PATH + ".update_character_skillfarm", spec=True)
+@patch(TASK_PATH + ".update_character", spec=True)
 class TestUpdateAllSkillfarm(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -42,14 +44,14 @@ class TestUpdateAllSkillfarm(TestCase):
         self.assertTrue(mock_update_all_skillfarm.apply_async.called)
 
 
-@patch(TASK_PATH + ".update_char_skillqueue.si", spec=True)
-@patch(TASK_PATH + ".update_char_skills.si", spec=True)
 @override_settings(
     CELERY_ALWAYS_EAGER=True,
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
     APP_UTILS_OBJECT_CACHE_DISABLED=True,
 )
-class TestUpdateCharacterSkillfarm(TestCase):
+@patch(TASK_PATH + ".chain", spec=True)
+@patch(TASK_PATH + ".logger", spec=True)
+class TestUpdateCharacter(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -58,134 +60,33 @@ class TestUpdateCharacterSkillfarm(TestCase):
 
         cls.audit = create_skillfarm_character(1001)
 
-    def test_should_not_update_character_skillfarm(
-        self, mock_update_char_skillqueue, mock_update_char_skills
-    ):
-        self.audit.last_update_skillqueue = timezone.now()
-        self.audit.last_update_skills = timezone.now()
-        self.audit.save()
+    def test_update_character_should_no_updated(self, mock_logger, __):
         # when
-        tasks.update_character_skillfarm(
-            character_id=self.audit.character.character_id, force_refresh=False
-        )
+        tasks.update_character(self.audit.pk)
         # then
-        mock_update_char_skillqueue.assert_not_called()
-        mock_update_char_skills.assert_not_called()
+        mock_logger.info.assert_called_once_with(
+            "No updates needed for %s",
+            self.audit.character.character_name,
+        )
 
-    def test_should_update_character_skillfarm(
-        self, mock_update_char_skillqueue, mock_update_char_skills
-    ):
-        self.audit.last_update_skillqueue = timezone.now() - timezone.timedelta(days=8)
-        self.audit.last_update_skills = timezone.now() - timezone.timedelta(days=8)
-        self.audit.save()
+    def test_update_character_should_update(self, mock_logger, mock_chain):
+        # given
+        create_update_status(
+            self.audit,
+            section=SkillFarmAudit.UpdateSection.SKILLS,
+            is_success=True,
+            error_message="",
+            has_token_error=False,
+            last_run_at=None,
+            last_run_finished_at=None,
+            last_update_at=None,
+            last_update_finished_at=None,
+        )
+
         # when
-        tasks.update_character_skillfarm(
-            character_id=self.audit.character.character_id, force_refresh=False
-        )
+        tasks.update_character(self.audit.pk)
         # then
-        mock_update_char_skillqueue.assert_called_once_with(
-            self.audit.character.character_id, force_refresh=False
-        )
-        mock_update_char_skills.assert_called_once_with(
-            self.audit.character.character_id, force_refresh=False
-        )
-
-    def test_should_update_character_skillfarm_forced(
-        self, mock_update_char_skillqueue, mock_update_char_skills
-    ):
-        # when
-        tasks.update_character_skillfarm(
-            character_id=self.audit.character.character_id, force_refresh=True
-        )
-        # then
-        mock_update_char_skillqueue.assert_called_once_with(
-            self.audit.character.character_id, force_refresh=True
-        )
-        mock_update_char_skills.assert_called_once_with(
-            self.audit.character.character_id, force_refresh=True
-        )
-
-
-@patch(TASK_PATH + ".SkillFarmAudit.objects.get", spec=True)
-@patch(TASK_PATH + ".CharacterSkillqueueEntry.objects.update_or_create_esi", spec=True)
-@override_settings(
-    CELERY_ALWAYS_EAGER=True,
-    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-    APP_UTILS_OBJECT_CACHE_DISABLED=True,
-)
-class TestUpdateCharSkillQueue(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
-
-        cls.audit = create_skillfarm_character(1001)
-
-    def test_update_char_skillqueue_should_work(
-        self, mock_update_or_create_esi, mock_get_audit
-    ):
-        mock_get_audit.return_value = self.audit
-        mock_update_or_create_esi.return_value = True
-        # when
-        tasks.update_char_skillqueue(
-            character_id=self.audit.character.character_id, force_refresh=False
-        )
-        # then
-        mock_get_audit.assert_called_once_with(
-            character__character_id=self.audit.character.character_id
-        )
-        mock_update_or_create_esi.assert_called_once_with(
-            self.audit, force_refresh=False
-        )
-        self.assertAlmostEqual(
-            self.audit.last_update_skillqueue,
-            timezone.now(),
-            delta=timezone.timedelta(seconds=1),
-        )
-        self.audit.refresh_from_db()
-        self.assertIsNotNone(self.audit.last_update_skillqueue)
-
-
-@patch(TASK_PATH + ".SkillFarmAudit.objects.get", spec=True)
-@patch(TASK_PATH + ".CharacterSkill.objects.update_or_create_esi", spec=True)
-@override_settings(
-    CELERY_ALWAYS_EAGER=True,
-    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-    APP_UTILS_OBJECT_CACHE_DISABLED=True,
-)
-class TestUpdateCharSkill(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
-
-        cls.audit = create_skillfarm_character(1001)
-
-    def test_update_char_skills_should_work(
-        self, mock_update_or_create_esi, mock_get_audit
-    ):
-        mock_get_audit.return_value = self.audit
-        mock_update_or_create_esi.return_value = True
-        # when
-        tasks.update_char_skills(
-            character_id=self.audit.character.character_id, force_refresh=False
-        )
-        # then
-        mock_get_audit.assert_called_once_with(
-            character__character_id=self.audit.character.character_id
-        )
-        mock_update_or_create_esi.assert_called_once_with(
-            self.audit, force_refresh=False
-        )
-        self.assertAlmostEqual(
-            self.audit.last_update_skills,
-            timezone.now(),
-            delta=timezone.timedelta(seconds=1),
-        )
-        self.audit.refresh_from_db()
-        self.assertIsNotNone(self.audit.last_update_skills)
+        mock_chain.assert_called_once()
 
 
 @patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
@@ -240,31 +141,59 @@ class TestCheckSkillfarmNotification(TestCase):
             self.assertFalse(audit.notification_sent)
             self.assertIsNone(audit.last_notification)
 
-    def test_notifiaction_with_skillsetup_should_return_true(self, mock_audit_filter):
-        audits = [self.audit, self.audit2]
-        self._set_notifiaction_status(audits, True)
 
-        self.skill = create_skill_character(
-            character_id=1001,
+@patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+class TestCheckSkillfarmNotificationSuccess(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+        load_eveuniverse()
+
+        cls.user, cls.character_ownership = create_user_from_evecharacter_with_access(
+            1001
+        )
+        cls.audit = add_skillfarmaudit_character_to_user(cls.user, 1001)
+        cls.user2, cls.character_ownership2 = create_user_from_evecharacter_with_access(
+            1002
+        )
+        cls.audit2 = add_skillfarmaudit_character_to_user(cls.user2, 1002)
+
+        cls.skill = create_skill_character(
+            character_id=cls.audit.character.character_id,
             evetype_id=1,
             skillpoints=500000,
             trained_level=5,
             active_level=5,
         )
-        self.skillsetup = create_skillsetup_character(
-            character_id=1001, skillset=["skill1"]
+        cls.skillsetup = create_skillsetup_character(
+            character_id=cls.audit.character.character_id, skillset=["skill1"]
         )
 
-        self.skill2 = create_skill_character(
-            character_id=1002,
+        cls.skill2 = create_skill_character(
+            character_id=cls.audit2.character.character_id,
             evetype_id=2,
             skillpoints=500000,
             trained_level=5,
             active_level=5,
         )
-        self.skillsetup2 = create_skillsetup_character(
-            character_id=1002, skillset=["skill2"]
+        cls.skillsetup2 = create_skillsetup_character(
+            character_id=cls.audit2.character.character_id, skillset=["skill2"]
         )
+
+    def _set_notifiaction_status(self, audits, status):
+        for audit in audits:
+            audit.notification = status
+            audit.save()
+
+    def test_notifiaction_with_skillsetup_should_return_true(self, mock_audit_filter):
+        audits = [self.audit, self.audit2]
+        self._set_notifiaction_status(audits, True)
 
         mock_audit_filter.return_value = audits
         # when
@@ -407,3 +336,41 @@ class TestSkillfarmPrices(TestCase):
         mock_logger.error.assert_called_once_with(
             "Error updating prices: %s", error_instance
         )
+
+
+@override_settings(
+    CELERY_ALWAYS_EAGER=True,
+    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+    APP_UTILS_OBJECT_CACHE_DISABLED=True,
+)
+@patch(TASK_PATH + ".logger", spec=True)
+class TestClearEtag(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        load_allianceauth()
+
+    def test_clear_all_etag_return_no_etags(self, mock_logger):
+        # when
+        tasks.clear_all_etags()
+
+        # then
+        mock_logger.info.assert_any_call("Deleting %s etag keys", 0)
+        mock_logger.info.assert_any_call("No etag keys to delete")
+
+    def test_clear_all_etag_return_etags(self, mock_logger):
+        # given
+        # pylint: disable=import-outside-toplevel
+        # Third Party
+        from django_redis import get_redis_connection
+
+        _client = get_redis_connection("default")
+        _client.set("skillfarm-test", "test")
+        _client.set("skillfarm-test2", "test2")
+
+        # when
+        tasks.clear_all_etags()
+
+        # then
+        mock_logger.info.assert_any_call("Deleting %s etag keys", 2)
+        mock_logger.info.assert_any_call("Deleted %s etag keys", 2)

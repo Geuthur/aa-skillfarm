@@ -1,0 +1,88 @@
+{
+   "Skills": {
+      "get_characters_character_id_skills":{
+         "1001": {
+            "skills": [
+               {
+                  "skill_id":1,
+                  "active_skill_level":5,
+                  "skillpoints_in_skill":128000,
+                  "trained_skill_level":5
+               },
+               {
+                  "skill_id":2,
+                  "active_skill_level":4,
+                  "skillpoints_in_skill":4000,
+                  "trained_skill_level":4
+               }
+            ],
+            "total_sp": 1000000,
+            "unallocated_sp": 0
+         },
+         "1002": {
+            "skills": [
+               {
+                  "skill_id":1,
+                  "active_skill_level":1,
+                  "skillpoints_in_skill":500,
+                  "trained_skill_level":2
+               },
+               {
+                  "skill_id":2,
+                  "active_skill_level":3,
+                  "skillpoints_in_skill":12000,
+                  "trained_skill_level":4
+               }
+            ],
+            "total_sp": 1000000,
+            "unallocated_sp": 0
+         }
+      },
+      "get_characters_character_id_skillqueue":{
+         "1001": [
+            {
+               "finish_date": "2023-10-01T00:00:00Z",
+               "queue_position": 1,
+               "skill_id": 1,
+               "start_date": "2023-09-01T00:00:00Z",
+               "training_start_sp": 312345,
+               "level_start_sp": 128000,
+               "level_end_sp": 512000,
+               "finished_level": 5
+            },
+            {
+               "finish_date": "2023-10-02T00:00:00Z",
+               "queue_position": 2,
+               "skill_id": 2,
+               "start_date": "2023-09-02T00:00:00Z",
+               "training_start_sp": 5000,
+               "level_start_sp": 4000,
+               "level_end_sp": 16000,
+               "finished_level": 4
+            }
+         ],
+         "1002": [
+            {
+               "finish_date": "2023-10-03T00:00:00Z",
+               "queue_position": 1,
+               "skill_id": 1,
+               "start_date": "2023-09-03T00:00:00Z",
+               "training_start_sp": 1200,
+               "level_start_sp": 500,
+               "level_end_sp": 2000,
+               "finished_level": 2
+            },
+            {
+               "finish_date": "2023-10-04T00:00:00Z",
+               "queue_position": 2,
+               "skill_id": 2,
+               "start_date": "2023-09-04T00:00:00Z",
+               "training_start_sp": 8000,
+               "level_start_sp": 12000,
+               "level_end_sp": 48000,
+               "finished_level": 4
+            }
+         ]
+      }
+   }
+}

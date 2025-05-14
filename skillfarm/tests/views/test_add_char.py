@@ -52,7 +52,7 @@ class TestAddCharView(TestCase):
         # then
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(response.url, reverse("skillfarm:index"))
-        self.assertTrue(mock_tasks.update_character_skillfarm.apply_async.called)
+        self.assertTrue(mock_tasks.update_character.apply_async.called)
         self.assertTrue(mock_messages.success.called)
         self.assertTrue(
             SkillFarmAudit.objects.filter(character__character_id=1001).exists()

@@ -4,12 +4,16 @@ from unittest.mock import patch
 # Django
 from django.test import TestCase
 
+# Alliance Auth
+from allianceauth.services.hooks import get_extension_logger
+
 # Alliance Auth (External Libs)
 from app_utils.esi import EsiDailyDowntime
+from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
+from skillfarm import __title__
 from skillfarm.decorators import log_timing, when_esi_is_available
-from skillfarm.hooks import get_extension_logger
 
 
 class TestDecorators(TestCase):
@@ -57,7 +61,7 @@ class TestDecorators(TestCase):
 
     def test_log_timing(self):
         # given
-        logger = get_extension_logger(__name__)
+        logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
         @log_timing(logger)
         def trigger_log_timing():

@@ -12,13 +12,14 @@ app_name: str = "skillfarm"
 urlpatterns = [
     # -- Views
     path("", views.index, name="index"),
+    path("admin/", views.admin, name="admin"),
     path(
         "<int:character_id>/view/skillfarm/",
         views.skillfarm,
         name="skillfarm",
     ),
     path(
-        "<int:character_id>/view/overview/",
+        "view/overview/",
         views.character_overview,
         name="character_overview",
     ),
