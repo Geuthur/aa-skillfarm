@@ -7,9 +7,9 @@ from django.db import migrations, models
 
 def create_update_status(apps, schema_editor):
     CharacterUpdateStatus = apps.get_model("skillfarm", "CharacterUpdateStatus")
-    CharacterAudit = apps.get_model("skillfarm", "SkillFarmAudit")
+    SkillFarmAudit = apps.get_model("skillfarm", "SkillFarmAudit")
 
-    for character in CharacterAudit.objects.all():
+    for character in SkillFarmAudit.objects.all():
         sections = ["skills", "skillqueue"]
         for section in sections:
             update_status = CharacterUpdateStatus.objects.get_or_create(
@@ -27,7 +27,7 @@ def create_update_status(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("skillfarm", "0005_alter_characterskill_character_and_more copy"),
+        ("skillfarm", "0005_alter_characterskill_character_and_more"),
     ]
 
     operations = [
