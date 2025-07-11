@@ -2,9 +2,9 @@ name: Bug Report
 description: File a bug report.
 title: "[BUG]: "
 labels: ["bug", "triage"]
-projects: ["aa-taxsystem"]
+projects: ["aa-skillfarm"]
 assignees:
-  - octocat
+  - geuthur
 body:
   - type: markdown
     attributes:
