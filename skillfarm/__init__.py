@@ -1,9 +1,9 @@
 """Initialize the app"""
 
-# AA Skillfarm
-from skillfarm.app_settings import SKILLFARM_APP_NAME
-
 __version__ = "0.5.4"
 __title__ = "Skillfarm"
 
-USER_AGENT_TEXT = f"{SKILLFARM_APP_NAME} v{__version__}"
+__package_name__ = "aa-skillfarm"
+
+__app_name_useragent__ = "AA-Skillfarm"
+__github_url__ = f"https://github.com/Geuthur/{__package_name__}"
