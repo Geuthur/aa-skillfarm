@@ -9,7 +9,6 @@ from app_utils.testing import NoSocketsTestCase
 from eveuniverse.models import EveType
 
 # AA Skillfarm
-# AA Ledger
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.esi_stub import esi_client_stub
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
