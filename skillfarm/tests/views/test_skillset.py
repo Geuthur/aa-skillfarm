@@ -90,6 +90,27 @@ class TestSkillSetView(TestCase):
             response_data["message"], "Gneuten Skillset successfully updated"
         )
 
+    def test_skillset_exception(self):
+        character_id = self.audit.character.character_id
+        form_data = {
+            "character_id": character_id,
+            "confirm": "yes",
+            "selected_skills": "<invalid_json>",
+        }
+
+        request = self.factory.post(
+            reverse("skillfarm:skillset", args=[character_id]), data=form_data
+        )
+        request.user = self.user
+
+        response = skillset(request, character_id=character_id)
+
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertFalse(response_data["success"])
+        self.assertEqual(response_data["message"], "Invalid JSON format")
+
     def test_skillset_no_audit(self):
         form_data = {
             "character_id": 1001,
