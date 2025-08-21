@@ -39,11 +39,38 @@ class TestSkillSetView(TestCase):
         form_data = {
             "character_id": character_id,
             "confirm": "yes",
-            "skillset": json.dumps(
+            "selected_skills": json.dumps(
                 [
-                    {"skill_id": 1, "level": 5},
-                    {"skill_id": 2, "level": 4},
-                    {"skill_id": 3, "level": 3},
+                    {
+                        "id": "6v8twmoh",
+                        "value": "Abyssal Ore Processing",
+                        "text": "Abyssal Ore Processing",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
+                    {
+                        "id": "4xf648s5",
+                        "value": "Acceleration Control",
+                        "text": "Acceleration Control",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
                 ]
             ),
         }
@@ -67,11 +94,38 @@ class TestSkillSetView(TestCase):
         form_data = {
             "character_id": 1001,
             "confirm": "yes",
-            "skillset": json.dumps(
+            "selected_skills": json.dumps(
                 [
-                    {"skill_id": 1, "level": 5},
-                    {"skill_id": 2, "level": 4},
-                    {"skill_id": 3, "level": 3},
+                    {
+                        "id": "6v8twmoh",
+                        "value": "Abyssal Ore Processing",
+                        "text": "Abyssal Ore Processing",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
+                    {
+                        "id": "4xf648s5",
+                        "value": "Acceleration Control",
+                        "text": "Acceleration Control",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
                 ]
             ),
         }
