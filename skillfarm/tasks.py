@@ -249,7 +249,7 @@ def update_all_prices():
     request = requests.get(
         "https://market.fuzzwork.co.uk/aggregates/",
         params={
-            "types": ",".join([str(x) for x in prices]),
+            "types": ",".join([str(x.eve_type.id) for x in prices]),
             "station": app_settings.SKILLFARM_PRICE_SOURCE_ID,
         },
     ).json()
@@ -257,9 +257,15 @@ def update_all_prices():
     market_data.update(request)
 
     for price in prices:
-        if price.eve_type.id in market_data:
-            price.buy = float(market_data[price.eve_type.id]["buy"]["percentile"])
-            price.sell = float(market_data[price.eve_type.id]["sell"]["percentile"])
+        key = str(price.eve_type.id)
+        if key in market_data:
+            logger.info(
+                "Updating Price for %s (%s)",
+                price.eve_type.name,
+                price.eve_type.id,
+            )
+            price.buy = float(market_data[key]["buy"]["percentile"])
+            price.sell = float(market_data[key]["sell"]["percentile"])
             price.updated_at = timezone.now()
 
     try:

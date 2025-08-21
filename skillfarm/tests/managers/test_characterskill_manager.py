@@ -3,14 +3,11 @@ from unittest.mock import patch
 
 # Django
 from django.test import override_settings
-from django.utils import timezone
 
 # Alliance Auth (External Libs)
 from app_utils.testing import NoSocketsTestCase
 
 # AA Skillfarm
-# AA Ledger
-from skillfarm.models.skillfarm import CharacterSkill
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.esi_stub import esi_client_stub
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
