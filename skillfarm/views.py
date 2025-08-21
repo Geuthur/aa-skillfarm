@@ -211,16 +211,15 @@ def skillset(request, character_id: list):
 
         try:
             skills_data = json.loads(selected_skills)
-            if isinstance(skills_data, list):
-                filtered = [
-                    entry["value"]
-                    for entry in skills_data
-                    if entry.get("selected") is True and entry.get("value")
-                ]
-                skillset_list = filtered if filtered else None
-                SkillFarmSetup.objects.update_or_create(
-                    character=character, defaults={"skillset": skillset_list}
-                )
+            filtered = [
+                entry["value"]
+                for entry in skills_data
+                if entry.get("selected") is True and entry.get("value")
+            ]
+            skillset_list = filtered if filtered else None
+            SkillFarmSetup.objects.update_or_create(
+                character=character, defaults={"skillset": skillset_list}
+            )
         except Exception:  # pylint: disable=broad-except
             msg = _("Invalid JSON format")
             return JsonResponse(
