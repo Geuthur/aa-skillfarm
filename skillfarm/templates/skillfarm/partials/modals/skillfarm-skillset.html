@@ -25,7 +25,7 @@
                             {% translate "If no skills are selected, the filter will be disabled." %}
                         </h6>
                         <div class="mb-3">
-                            <select id="multiple" multiple="">
+                            <select id="skillset" multiple="">
                                 {% for skill in forms.skillset.fields.skills.queryset %}
                                     <option value="{{ skill.name }}">{{ skill.name }}</option>
                                 {% endfor %}

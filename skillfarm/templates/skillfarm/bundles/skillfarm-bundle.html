@@ -8,12 +8,14 @@
 
 {% sri_static 'skillfarm/libs/slimselect/js/slimselect.min.js' %}
 {% sri_static 'skillfarm/libs/slimselect/css/slimselect.css' %}
+
 <script>
     let skillSelect = new SlimSelect({
-        select: '#multiple',
+        select: '#skillset',
         settings: {
             hideSelected: true,
             closeOnSelect: false,
+            allowDeselect: true,
         }
     })
 </script>
