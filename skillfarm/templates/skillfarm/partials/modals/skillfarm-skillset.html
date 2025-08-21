@@ -3,7 +3,7 @@
 {% load bootstrap %}
 
 <!-- Approve Request Modal -->
-<div class="modal fade" id="skillfarm-skillset" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="skillfarm-skillset" tabindex="-1" role="dialog" aria-hidden="true" data-bs-focus="false">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -25,19 +25,11 @@
                             {% translate "If no skills are selected, the filter will be disabled." %}
                         </h6>
                         <div class="mb-3">
-                            <input type="text" id="skillSearch" class="form-control" placeholder="{% translate 'Search skills...' %}">
-                        </div>
-                        <div class="mb-3">
-                            <select id="skillSetSelect" class="form-select" multiple="">
+                            <select id="skillset" multiple="">
                                 {% for skill in forms.skillset.fields.skills.queryset %}
-                                    <option value="{{ skill.id }}">{{ skill.name }}</option>
+                                    <option value="{{ skill.name }}">{{ skill.name }}</option>
                                 {% endfor %}
                             </select>
-                        </div>
-                        <div class="mb-3">
-                            <ul id="selectedSkills" class="list-group">
-                                <!-- Selected skills will be added here -->
-                            </ul>
                         </div>
                     </fieldset>
                 </form>

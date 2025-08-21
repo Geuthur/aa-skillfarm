@@ -39,11 +39,38 @@ class TestSkillSetView(TestCase):
         form_data = {
             "character_id": character_id,
             "confirm": "yes",
-            "skillset": json.dumps(
+            "selected_skills": json.dumps(
                 [
-                    {"skill_id": 1, "level": 5},
-                    {"skill_id": 2, "level": 4},
-                    {"skill_id": 3, "level": 3},
+                    {
+                        "id": "6v8twmoh",
+                        "value": "Abyssal Ore Processing",
+                        "text": "Abyssal Ore Processing",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
+                    {
+                        "id": "4xf648s5",
+                        "value": "Acceleration Control",
+                        "text": "Acceleration Control",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
                 ]
             ),
         }
@@ -63,15 +90,63 @@ class TestSkillSetView(TestCase):
             response_data["message"], "Gneuten Skillset successfully updated"
         )
 
+    def test_skillset_exception(self):
+        character_id = self.audit.character.character_id
+        form_data = {
+            "character_id": character_id,
+            "confirm": "yes",
+            "selected_skills": "<invalid_json>",
+        }
+
+        request = self.factory.post(
+            reverse("skillfarm:skillset", args=[character_id]), data=form_data
+        )
+        request.user = self.user
+
+        response = skillset(request, character_id=character_id)
+
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertFalse(response_data["success"])
+        self.assertEqual(response_data["message"], "Invalid JSON format")
+
     def test_skillset_no_audit(self):
         form_data = {
             "character_id": 1001,
             "confirm": "yes",
-            "skillset": json.dumps(
+            "selected_skills": json.dumps(
                 [
-                    {"skill_id": 1, "level": 5},
-                    {"skill_id": 2, "level": 4},
-                    {"skill_id": 3, "level": 3},
+                    {
+                        "id": "6v8twmoh",
+                        "value": "Abyssal Ore Processing",
+                        "text": "Abyssal Ore Processing",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
+                    {
+                        "id": "4xf648s5",
+                        "value": "Acceleration Control",
+                        "text": "Acceleration Control",
+                        "html": "",
+                        "defaultSelected": False,
+                        "selected": False,
+                        "display": True,
+                        "disabled": False,
+                        "mandatory": False,
+                        "placeholder": False,
+                        "class": "",
+                        "style": "",
+                        "data": {},
+                    },
                 ]
             ),
         }
