@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.6] - 2025-08-21
+
+### Changed
+
+- Optimized Search System by using SlimSelect Lib
+- Filtered SkillSet now Ordered by ASC
+
+### Removed
+
+- Cache Buster
+
 ## [0.5.5] - 2025-07-11
 
 ### Added
