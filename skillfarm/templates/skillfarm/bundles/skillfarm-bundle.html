@@ -1,7 +1,19 @@
 {% load i18n %}
-{% load skillfarm %}
+{% load sri %}
 
-{% skillfarm_static 'js/skillfarm.js' %}
-{% skillfarm_static 'js/modals/modal-system.js' %}
-{% skillfarm_static 'js/modals/skillfarm-confirm.js' %}
-{% skillfarm_static 'js/modals/skillfarm-skillset.js' %}
+{% sri_static 'skillfarm/js/skillfarm.js' %}
+{% sri_static 'skillfarm/js/modals/modal-system.js' %}
+{% sri_static 'skillfarm/js/modals/skillfarm-confirm.js' %}
+{% sri_static 'skillfarm/js/modals/skillfarm-skillset.js' %}
+
+{% sri_static 'skillfarm/libs/slimselect/js/slimselect.min.js' %}
+{% sri_static 'skillfarm/libs/slimselect/css/slimselect.css' %}
+<script>
+    let skillSelect = new SlimSelect({
+        select: '#multiple',
+        settings: {
+            hideSelected: true,
+            closeOnSelect: false,
+        }
+    })
+</script>

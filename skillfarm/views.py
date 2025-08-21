@@ -1,5 +1,8 @@
 """PvE Views"""
 
+# Standard Library
+import json
+
 # Django
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -204,11 +207,25 @@ def skillset(request, character_id: list):
         character_id = form.cleaned_data["character_id"]
         selected_skills = form.cleaned_data["selected_skills"]
 
-        skillset_list = selected_skills.split(",") if selected_skills else None
         character = SkillFarmAudit.objects.get(character__character_id=character_id)
-        SkillFarmSetup.objects.update_or_create(
-            character=character, defaults={"skillset": skillset_list}
-        )
+
+        try:
+            skills_data = json.loads(selected_skills)
+            if isinstance(skills_data, list):
+                filtered = [
+                    entry["value"]
+                    for entry in skills_data
+                    if entry.get("selected") is True and entry.get("value")
+                ]
+                skillset_list = filtered if filtered else None
+                SkillFarmSetup.objects.update_or_create(
+                    character=character, defaults={"skillset": skillset_list}
+                )
+        except Exception:  # pylint: disable=broad-except
+            msg = _("Invalid JSON format")
+            return JsonResponse(
+                {"success": False, "message": msg}, status=400, safe=False
+            )
 
         msg = _("{character_name} Skillset successfully updated").format(
             character_name=character.character.character_name,
