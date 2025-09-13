@@ -17,18 +17,27 @@ from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
 from skillfarm.providers import esi
-from skillfarm.task_helper import (
-    etag_results,
-)
 
 if TYPE_CHECKING:
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
-    from skillfarm.models.skillfarm import (
+    from skillfarm.models.skillfarmaudit import (
         SkillFarmAudit,
     )
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+
+
+class CharacterSkillContext:
+    class SkillContext:
+        active_skill_level: int
+        skill_id: int
+        skillpoints_in_skill: int
+        trained_skill_level: int
+
+    skills: list[SkillContext]
+    total_sp: int
+    unallocated_sp: int
 
 
 class SkillManagerQuerySet(models.QuerySet):
@@ -86,73 +95,116 @@ class SkillManagerBase(models.Manager):
     ) -> dict:
         token = character.get_token()
 
-        skills_info_data = esi.client.Skills.get_characters_character_id_skills(
+        # Generate kwargs for OpenAPI request
+        openapi_kwargs = character.generate_openapi3_request(
+            section=character.UpdateSection.SKILLS,
+            force_refresh=force_refresh,
             character_id=character.character.character_id,
+            token=token,
         )
 
-        skills_info = etag_results(skills_info_data, token, force_refresh=force_refresh)
-        self._update_or_create_objs(character, skills_info)
+        character_skills = esi.client.Skills.GetCharactersCharacterIdSkills(
+            **openapi_kwargs
+        )
+        character_skills_items, response = character_skills.results(
+            return_response=True
+        )
+        logger.debug(f"character_skills_items: {character_skills_items}")
+        # Set new etag in cache
+        character.set_cache_key(
+            section=character.UpdateSection.SKILLS,
+            etag=response.headers.get("ETag"),
+            character_id=character.character.character_id,
+            token=token,
+        )
+        logger.debug(f"New ETag set for {character}: {response.headers.get('ETag')}")
+
+        self._update_or_create_objs(
+            character=character, character_skills_items=character_skills_items
+        )
 
     @transaction.atomic()
-    def _update_or_create_objs(self, character: "SkillFarmAudit", objs: list):
+    def _update_or_create_objs(
+        self,
+        character: "SkillFarmAudit",
+        character_skills_items: list[CharacterSkillContext],
+    ) -> None:
         """Update or Create skill entries from objs data."""
-        skills_list = self._preload_types(objs)
-        if skills_list is not None:
-            incoming_ids = set(skills_list.keys())
-            exiting_ids = set(
-                self.filter(character=character).values_list("eve_type_id", flat=True)
-            )
-
-            obsolete_ids = exiting_ids.difference(incoming_ids)
-            if obsolete_ids:
-                logger.debug(
-                    "%s: Deleting %s obsolete skill/s", character, len(obsolete_ids)
-                )
-                self.filter(character=character, eve_type_id__in=obsolete_ids).delete()
-
-            create_ids = incoming_ids.difference(exiting_ids)
-            if create_ids:
-                self._create_from_dict(
-                    character=character, skills_list=skills_list, create_ids=create_ids
+        for character_skills in character_skills_items:
+            skills_list = self._preload_types(character_skills)
+            if skills_list is not None:
+                incoming_ids = set(skills_list)
+                existing_ids = set(
+                    self.filter(character=character).values_list(
+                        "eve_type_id", flat=True
+                    )
                 )
 
-            update_ids = incoming_ids.intersection(exiting_ids)
-            if update_ids:
-                self._update_from_dict(
-                    character=character, skills_list=skills_list, update_ids=update_ids
-                )
+                obsolete_ids = existing_ids.difference(incoming_ids)
+                if obsolete_ids:
+                    logger.debug(
+                        "%s: Deleting %s obsolete skill/s", character, len(obsolete_ids)
+                    )
+                    self.filter(
+                        character=character, eve_type_id__in=obsolete_ids
+                    ).delete()
 
-    def _preload_types(self, objs: list):
-        skills_list = {
-            skill["skill_id"]: skill
-            for skill in objs.get("skills", [])
-            if "skill_id" in skill
-        }
+                create_ids = incoming_ids.difference(existing_ids)
+                if create_ids:
+                    self._create_from_list(
+                        character=character,
+                        skills_list=character_skills.skills,
+                        create_ids=create_ids,
+                    )
+
+                update_ids = incoming_ids.intersection(existing_ids)
+                if update_ids:
+                    self._update_from_list(
+                        character=character,
+                        skills_list=character_skills.skills,
+                        update_ids=update_ids,
+                    )
+
+    def _preload_types(
+        self, character_skills_items: CharacterSkillContext
+    ) -> list[int] | None:
+        """Preload EveType objects from a list of skills."""
+        skills_list = [skill.skill_id for skill in character_skills_items.skills]
         if skills_list:
-            incoming_ids = set(skills_list.keys())
+            incoming_ids = set(skills_list)
             existing_ids = set(self.values_list("eve_type_id", flat=True))
             new_ids = incoming_ids.difference(existing_ids)
             EveType.objects.bulk_get_or_create_esi(ids=list(new_ids))
             return skills_list
         return None
 
-    def _create_from_dict(self, character, skills_list: dict, create_ids: set):
+    def _create_from_list(
+        self,
+        character: "SkillFarmAudit",
+        skills_list: list[CharacterSkillContext.SkillContext],
+        create_ids: set,
+    ):
         logger.debug("%s: Storing %s new skills", character, len(create_ids))
         skills = [
             self.model(
                 name=character.name,
                 character=character,
-                eve_type=EveType.objects.get(id=skill_info.get("skill_id")),
-                active_skill_level=skill_info.get("active_skill_level"),
-                skillpoints_in_skill=skill_info.get("skillpoints_in_skill"),
-                trained_skill_level=skill_info.get("trained_skill_level"),
+                eve_type=EveType.objects.get(id=skill.skill_id),
+                active_skill_level=skill.active_skill_level,
+                skillpoints_in_skill=skill.skillpoints_in_skill,
+                trained_skill_level=skill.trained_skill_level,
             )
-            for skill_id, skill_info in skills_list.items()
-            if skill_id in create_ids
+            for skill in skills_list
+            if skill.skill_id in create_ids
         ]
         self.bulk_create(skills, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)
 
-    def _update_from_dict(self, character, skills_list: dict, update_ids: set):
+    def _update_from_list(
+        self,
+        character,
+        skills_list: list[CharacterSkillContext.SkillContext],
+        update_ids: set,
+    ):
         logger.debug("%s: Updating %s skills", character, len(update_ids))
         update_pks = list(
             self.filter(character=character, eve_type_id__in=update_ids).values_list(
@@ -160,12 +212,13 @@ class SkillManagerBase(models.Manager):
             )
         )
         skills = self.in_bulk(update_pks)
+        skills_dict = {s.skill_id: s for s in skills_list}
         for skill in skills.values():
-            skill_info = skills_list.get(skill.eve_type_id)
-            if skill_info:
-                skill.active_skill_level = skill_info.get("active_skill_level")
-                skill.skillpoints_in_skill = skill_info.get("skillpoints_in_skill")
-                skill.trained_skill_level = skill_info.get("trained_skill_level")
+            if skill.eve_type_id in skills_dict:
+                skill_ctx = skills_dict[skill.eve_type_id]
+                skill.active_skill_level = skill_ctx.active_skill_level
+                skill.skillpoints_in_skill = skill_ctx.skillpoints_in_skill
+                skill.trained_skill_level = skill_ctx.trained_skill_level
 
         self.bulk_update(
             skills.values(),

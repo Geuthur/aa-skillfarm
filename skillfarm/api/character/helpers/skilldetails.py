@@ -17,7 +17,7 @@ from skillfarm.api.helpers import (
     generate_progressbar,
     generate_settings,
 )
-from skillfarm.models.skillfarm import CharacterSkillqueueEntry, SkillFarmAudit
+from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry, SkillFarmAudit
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 

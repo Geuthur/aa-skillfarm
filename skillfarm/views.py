@@ -24,7 +24,7 @@ from app_utils.logging import LoggerAddTag
 from skillfarm import __title__, forms, tasks
 from skillfarm.api.helpers import get_character
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarm import SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.tasks import clear_all_etags, update_all_skillfarm
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)

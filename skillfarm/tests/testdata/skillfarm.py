@@ -17,7 +17,7 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarm import (
+from skillfarm.models.skillfarmaudit import (
     CharacterSkill,
     CharacterUpdateStatus,
     SkillFarmAudit,

@@ -27,7 +27,7 @@ from skillfarm import __title__, app_settings
 from skillfarm.decorators import when_esi_is_available
 from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarm import (
+from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
 )
 
@@ -115,7 +115,7 @@ def update_character(character_pk: int, force_refresh=False):
 
 
 @shared_task(**_update_skillfarm_params)
-def update_char_skills(character_pk, force_refresh=False):
+def update_char_skills(character_pk: int, force_refresh: bool):
     return _update_character_section(
         character_pk,
         section=SkillFarmAudit.UpdateSection.SKILLS,
@@ -124,7 +124,7 @@ def update_char_skills(character_pk, force_refresh=False):
 
 
 @shared_task(**_update_skillfarm_params)
-def update_char_skillqueue(character_pk, force_refresh=False):
+def update_char_skillqueue(character_pk: int, force_refresh: bool):
     return _update_character_section(
         character_pk,
         section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
@@ -293,7 +293,7 @@ def clear_all_etags():
 
         default_cache = caches["default"]
         _client = default_cache.get_master_client()
-    keys = _client.keys(":?:skillfarm-*")
+    keys = _client.keys(f":?:{app_settings.SKILLFARM_CACHE_KEY}-*")
     logger.info("Deleting %s etag keys", len(keys))
     if keys:
         deleted = _client.delete(*keys)

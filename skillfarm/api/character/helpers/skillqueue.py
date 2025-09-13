@@ -7,7 +7,7 @@ from skillfarm.api.helpers import (
     arabic_number_to_roman,
     generate_progressbar,
 )
-from skillfarm.models.skillfarm import CharacterSkillqueueEntry, SkillFarmAudit
+from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry, SkillFarmAudit
 
 
 def _get_character_skillqueue(character: SkillFarmAudit) -> dict:

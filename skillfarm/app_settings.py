@@ -55,3 +55,8 @@ SKILLFARM_STALE_TYPES = {
     "skills": 30,
     "skillqueue": 30,
 }
+
+# Skillfarm Cache System
+SKILLFARM_CACHE_STALE = 60 * 60 * 168  # 168 hours
+SKILLFARM_CACHE_KEY = "SKILLFARM"
+SKILLFARM_CACHE_ENABLED = True

@@ -7,11 +7,12 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 # Alliance Auth
-from allianceauth.authentication.models import CharacterOwnership, UserProfile
+from allianceauth.authentication.models import UserProfile
 
 # AA Skillfarm
 from skillfarm import tasks
-from skillfarm.models.skillfarm import SkillFarmAudit
+from skillfarm.app_settings import SKILLFARM_CACHE_KEY
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
@@ -365,12 +366,11 @@ class TestClearEtag(TestCase):
         from django_redis import get_redis_connection
 
         _client = get_redis_connection("default")
-        _client.set("skillfarm-test", "test")
-        _client.set("skillfarm-test2", "test2")
+        keys = _client.keys(f":?:{SKILLFARM_CACHE_KEY}-*")
 
         # when
         tasks.clear_all_etags()
 
         # then
-        mock_logger.info.assert_any_call("Deleting %s etag keys", 2)
-        mock_logger.info.assert_any_call("Deleted %s etag keys", 2)
+        mock_logger.info.assert_any_call("Deleting %s etag keys", len(keys))
+        mock_logger.info.assert_any_call("Deleted %s etag keys", len(keys))

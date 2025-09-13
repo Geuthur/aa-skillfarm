@@ -9,7 +9,7 @@ from app_utils.testing import NoSocketsTestCase
 
 # AA Skillfarm
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.esi_stub import esi_client_stub
+from skillfarm.tests.testdata.esi_stub import esi_client_stub_openapi
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
     create_skillfarm_character,
@@ -20,7 +20,6 @@ MODULE_PATH = "skillfarm.managers.characterskill"
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 @patch(MODULE_PATH + ".esi")
-@patch(MODULE_PATH + ".etag_results")
 @patch(MODULE_PATH + ".EveType.objects.bulk_get_or_create_esi", spec=True)
 class TestCharacterSkillManager(NoSocketsTestCase):
     @classmethod
@@ -31,28 +30,9 @@ class TestCharacterSkillManager(NoSocketsTestCase):
 
         cls.audit = create_skillfarm_character(1001)
 
-    def test_update_skills(self, _, mock_etag, mock_esi):
+    def test_update_skills(self, _, mock_esi):
         # given
-        mock_esi.client = esi_client_stub
-        mock_etag.return_value = {
-            "skills": [
-                {
-                    "active_skill_level": 4,
-                    "skill_id": 1,
-                    "skillpoints_in_skill": 128000,
-                    "trained_skill_level": 5,
-                },
-                {
-                    "active_skill_level": 2,
-                    "skill_id": 2,
-                    "skillpoints_in_skill": 4000,
-                    "trained_skill_level": 4,
-                },
-            ],
-            "total_sp": 1000000,
-            "unallocated_sp": 0,
-        }
-
+        mock_esi.client = esi_client_stub_openapi
         self.audit.update_skills(force_refresh=False)
 
         self.assertSetEqual(

@@ -1,6 +1,10 @@
 # AA Skillfarm
 from skillfarm.api.helpers import arabic_number_to_roman
-from skillfarm.models.skillfarm import CharacterSkill, SkillFarmAudit, SkillFarmSetup
+from skillfarm.models.skillfarmaudit import (
+    CharacterSkill,
+    SkillFarmAudit,
+    SkillFarmSetup,
+)
 
 
 def _get_character_skills(character: SkillFarmAudit) -> dict:
