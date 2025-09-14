@@ -21,6 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
+from esi.exceptions import HTTPNotModified
 
 # Alliance Auth (External Libs)
 from app_utils.logging import LoggerAddTag
@@ -28,7 +29,7 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm import __title__, app_settings
-from skillfarm.errors import HTTPGatewayTimeoutError, NotModifiedError
+from skillfarm.errors import HTTPGatewayTimeoutError
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
@@ -125,11 +126,9 @@ class SkillFarmAudit(models.Model):
 
     def generate_openapi3_request(self, section, force_refresh: bool, **kwargs) -> dict:
         """Generate kwargs for an OpenAPI3 request based on the section."""
-        if force_refresh is False:
-            pass
         etag = cache.get(self.build_cache_key(section, **kwargs))
         logger.debug(f"Old ETag for {self} Section: {section}: {etag}")
-        if etag:
+        if etag and force_refresh is False:
             kwargs["If-None-Match"] = etag
         return kwargs
 
@@ -245,8 +244,8 @@ class SkillFarmAudit(models.Model):
         except HTTPInternalServerError as exc:
             logger.debug("%s: Update has an HTTP internal server error: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
-        except NotModifiedError:
-            logger.debug("%s: Update has not changed, section: %s", self, section.label)
+        except HTTPNotModified as exc:
+            logger.debug("%s: Update has not changed, section: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
         except HTTPGatewayTimeoutError as exc:
             logger.debug(
