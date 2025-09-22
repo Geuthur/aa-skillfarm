@@ -125,29 +125,16 @@ class SkillqueueManagerBase(models.Manager):
         """Fetch Skillqueue entries from ESI data."""
         token = character.get_token()
 
-        # Generate kwargs for OpenAPI request
-        openapi_kwargs = character.generate_openapi3_request(
-            section=character.UpdateSection.SKILLQUEUE,
-            force_refresh=force_refresh,
+        # Make the ESI request
+        skillqueue_data = esi.client.Skills.GetCharactersCharacterIdSkillqueue(
             character_id=character.character.character_id,
             token=token,
-        )
-
-        skillqueue_data = esi.client.Skills.GetCharactersCharacterIdSkillqueue(
-            **openapi_kwargs
         )
         character_skillqueue_items, response = skillqueue_data.results(
-            return_response=True
+            return_response=True,
+            force_refresh=force_refresh,
         )
-        # Set new etag in cache
-        # pylint: disable=duplicate-code
-        character.set_cache_key(
-            section=character.UpdateSection.SKILLQUEUE,
-            etag=response.headers.get("ETag"),
-            character_id=character.character.character_id,
-            token=token,
-        )
-        logger.debug(f"New ETag set for {character}: {response.headers.get('ETag')}")
+        logger.debug("ESI response Status: %s", response.status_code)
 
         self._update_or_create_objs(
             character=character, character_skillqueue_items=character_skillqueue_items

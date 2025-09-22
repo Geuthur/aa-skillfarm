@@ -95,29 +95,15 @@ class SkillManagerBase(models.Manager):
     ) -> dict:
         token = character.get_token()
 
-        # Generate kwargs for OpenAPI request
-        openapi_kwargs = character.generate_openapi3_request(
-            section=character.UpdateSection.SKILLS,
-            force_refresh=force_refresh,
+        # Make the ESI request
+        character_skills = esi.client.Skills.GetCharactersCharacterIdSkills(
             character_id=character.character.character_id,
             token=token,
-        )
-
-        character_skills = esi.client.Skills.GetCharactersCharacterIdSkills(
-            **openapi_kwargs
         )
         character_skills_items, response = character_skills.results(
-            return_response=True
+            return_response=True, force_refresh=force_refresh
         )
-        logger.debug(f"character_skills_items: {character_skills_items}")
-        # Set new etag in cache
-        character.set_cache_key(
-            section=character.UpdateSection.SKILLS,
-            etag=response.headers.get("ETag"),
-            character_id=character.character.character_id,
-            token=token,
-        )
-        logger.debug(f"New ETag set for {character}: {response.headers.get('ETag')}")
+        logger.debug("ESI response Status: %s", response.status_code)
 
         self._update_or_create_objs(
             character=character, character_skills_items=character_skills_items
