@@ -11,7 +11,6 @@ from allianceauth.authentication.models import UserProfile
 
 # AA Skillfarm
 from skillfarm import tasks
-from skillfarm.app_settings import SKILLFARM_CACHE_KEY
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
@@ -337,40 +336,3 @@ class TestSkillfarmPrices(TestCase):
         mock_logger.error.assert_called_once_with(
             "Error updating prices: %s", error_instance
         )
-
-
-@override_settings(
-    CELERY_ALWAYS_EAGER=True,
-    CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-    APP_UTILS_OBJECT_CACHE_DISABLED=True,
-)
-@patch(TASK_PATH + ".logger", spec=True)
-class TestClearEtag(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        load_allianceauth()
-
-    def test_clear_all_etag_return_no_etags(self, mock_logger):
-        # when
-        tasks.clear_all_etags()
-
-        # then
-        mock_logger.info.assert_any_call("Deleting %s etag keys", 0)
-        mock_logger.info.assert_any_call("No etag keys to delete")
-
-    def test_clear_all_etag_return_etags(self, mock_logger):
-        # given
-        # pylint: disable=import-outside-toplevel
-        # Third Party
-        from django_redis import get_redis_connection
-
-        _client = get_redis_connection("default")
-        keys = _client.keys(f":?:{SKILLFARM_CACHE_KEY}-*")
-
-        # when
-        tasks.clear_all_etags()
-
-        # then
-        mock_logger.info.assert_any_call("Deleting %s etag keys", len(keys))
-        mock_logger.info.assert_any_call("Deleted %s etag keys", len(keys))

@@ -275,28 +275,3 @@ def update_all_prices():
         return
 
     logger.info("Skillfarm Prices updated")
-
-
-@shared_task(**TASK_DEFAULTS_ONCE)
-def clear_all_etags():
-    logger.debug("Clearing all etags")
-    try:
-        # Third Party
-        # pylint: disable=import-outside-toplevel
-        from django_redis import get_redis_connection
-
-        _client = get_redis_connection("default")
-    except (NotImplementedError, ModuleNotFoundError):
-        # Django
-        # pylint: disable=import-outside-toplevel
-        from django.core.cache import caches
-
-        default_cache = caches["default"]
-        _client = default_cache.get_master_client()
-    keys = _client.keys(f":?:{app_settings.SKILLFARM_CACHE_KEY}-*")
-    logger.info("Deleting %s etag keys", len(keys))
-    if keys:
-        deleted = _client.delete(*keys)
-        logger.info("Deleted %s etag keys", deleted)
-    else:
-        logger.info("No etag keys to delete")
