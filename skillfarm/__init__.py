@@ -1,6 +1,6 @@
 """Initialize the app"""
 
-__version__ = "0.5.6"
+__version__ = "0.5.7"
 __title__ = "Skillfarm"
 
 __package_name__ = "aa-skillfarm"

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.7] - 2025-10-07
+
+### Changed
+
+- [Enhance ESI availability check with locking mechanism to avoid hammering Endpoint](https://github.com/Geuthur/aa-skillfarm/commit/7f7b28945a49ebedba1c933a4bcf68c73ef5f162)
+- Updated `npm`
+
 ## [0.5.6] - 2025-08-21
 
 ### Changed
