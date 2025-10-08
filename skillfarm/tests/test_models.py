@@ -2,12 +2,8 @@
 from django.test import TestCase
 from django.utils import timezone
 
-# Alliance Auth (External Libs)
-from app_utils.testing import create_user_from_evecharacter
-from eveuniverse.models import EveType
-
 # AA Skillfarm
-from skillfarm.models.skillfarm import (
+from skillfarm.models.skillfarmaudit import (
     CharacterSkill,
     CharacterSkillqueueEntry,
     SkillFarmAudit,
@@ -20,7 +16,7 @@ from skillfarm.tests.testdata.skillfarm import (
     create_update_status,
 )
 
-MODULE_PATH = "skillfarm.models.skillfarm"
+MODULE_PATH = "skillfarm.models.skillfarmaudit"
 
 
 class TestSkillfarmModel(TestCase):

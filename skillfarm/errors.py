@@ -16,9 +16,5 @@ class CustomError(Exception):
     pass
 
 
-class NotModifiedError(Exception):
-    pass
-
-
 class HTTPGatewayTimeoutError(Exception):
     pass

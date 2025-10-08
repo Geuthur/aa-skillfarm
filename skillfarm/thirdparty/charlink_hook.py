@@ -13,7 +13,7 @@ from app_utils.allianceauth import users_with_permission
 
 # AA Skillfarm
 from skillfarm.app_settings import SKILLFARM_APP_NAME
-from skillfarm.models.skillfarm import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tasks import update_character
 
 

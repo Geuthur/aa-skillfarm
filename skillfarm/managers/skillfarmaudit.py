@@ -61,7 +61,7 @@ class SkillfarmQuerySet(models.QuerySet):
         """Get the total update status."""
         # pylint: disable=import-outside-toplevel, cyclic-import
         # AA Skillfarm
-        from skillfarm.models.skillfarm import SkillFarmAudit
+        from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
         sections = SkillFarmAudit.UpdateSection.get_sections()
         num_sections_total = len(sections)

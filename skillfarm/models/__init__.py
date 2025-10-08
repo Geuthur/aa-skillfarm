@@ -1,5 +1,5 @@
 from .general import General
-from .skillfarm import (
+from .skillfarmaudit import (
     CharacterSkill,
     CharacterSkillqueueEntry,
     SkillFarmAudit,

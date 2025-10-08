@@ -30,7 +30,7 @@ from skillfarm.api.character.helpers.skillqueue import (
 from skillfarm.api.character.helpers.skills import _get_character_skills
 from skillfarm.api.helpers import get_alts_queryset, get_character, get_main_character
 from skillfarm.helpers import lazy
-from skillfarm.models.skillfarm import (
+from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
 )

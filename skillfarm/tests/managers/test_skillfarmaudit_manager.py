@@ -6,7 +6,7 @@ from django.utils import timezone
 from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
-from skillfarm.models.skillfarm import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.skillfarm import (
     add_skillfarmaudit_character_to_user,

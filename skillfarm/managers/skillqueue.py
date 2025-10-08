@@ -18,18 +18,26 @@ from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
 from skillfarm.providers import esi
-from skillfarm.task_helper import (
-    etag_results,
-)
 
 if TYPE_CHECKING:
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
-    from skillfarm.models.skillfarm import (
+    from skillfarm.models.skillfarmaudit import (
         SkillFarmAudit,
     )
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+
+
+class CharacterSkillQueueContext:
+    finish_date: timezone.datetime
+    finished_level: int
+    level_end_sp: int
+    level_start_sp: int
+    queue_position: int
+    skill_id: int
+    start_date: timezone.datetime
+    training_start_sp: int
 
 
 class SkillqueueQuerySet(models.QuerySet):
@@ -117,34 +125,44 @@ class SkillqueueManagerBase(models.Manager):
         """Fetch Skillqueue entries from ESI data."""
         token = character.get_token()
 
-        skillqueue_data = esi.client.Skills.get_characters_character_id_skillqueue(
+        # Make the ESI request
+        skillqueue_data = esi.client.Skills.GetCharactersCharacterIdSkillqueue(
             character_id=character.character.character_id,
+            token=token,
+        )
+        character_skillqueue_items, response = skillqueue_data.results(
+            return_response=True,
+            force_refresh=force_refresh,
+        )
+        logger.debug("ESI response Status: %s", response.status_code)
+
+        self._update_or_create_objs(
+            character=character, character_skillqueue_items=character_skillqueue_items
         )
 
-        skillqueue = etag_results(skillqueue_data, token, force_refresh=force_refresh)
-        self._update_or_create_objs(character, skillqueue)
-
     @transaction.atomic()
-    def _update_or_create_objs(self, character: "SkillFarmAudit", objs: list):
+    def _update_or_create_objs(
+        self,
+        character: "SkillFarmAudit",
+        character_skillqueue_items: list[CharacterSkillQueueContext],
+    ) -> None:
         """Update or Create skill queue entries from objs data."""
         entries = []
 
-        for entry in objs:
-            eve_type_instance, _ = EveType.objects.get_or_create_esi(
-                id=entry.get("skill_id")
-            )
+        for entry in character_skillqueue_items:
+            eve_type_instance, _ = EveType.objects.get_or_create_esi(id=entry.skill_id)
             entries.append(
                 self.model(
                     name=character.name,
                     character=character,
                     eve_type=eve_type_instance,
-                    finish_date=entry.get("finish_date"),
-                    finished_level=entry.get("finished_level"),
-                    level_end_sp=entry.get("level_end_sp"),
-                    level_start_sp=entry.get("level_start_sp"),
-                    queue_position=entry.get("queue_position"),
-                    start_date=entry.get("start_date"),
-                    training_start_sp=entry.get("training_start_sp"),
+                    finish_date=entry.finish_date,
+                    finished_level=entry.finished_level,
+                    level_end_sp=entry.level_end_sp,
+                    level_start_sp=entry.level_start_sp,
+                    queue_position=entry.queue_position,
+                    start_date=entry.start_date,
+                    training_start_sp=entry.training_start_sp,
                 )
             )
 
