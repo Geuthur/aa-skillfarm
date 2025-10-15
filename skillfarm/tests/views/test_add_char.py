@@ -10,7 +10,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 # AA Skillfarm
-from skillfarm.models.skillfarm import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_user_from_evecharacter_with_access

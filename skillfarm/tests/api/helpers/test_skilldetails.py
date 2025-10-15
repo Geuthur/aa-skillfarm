@@ -12,7 +12,7 @@ from skillfarm.api.character.helpers.skilldetails import (
 )
 from skillfarm.api.character.helpers.skillqueue import _get_character_skillqueue
 from skillfarm.api.helpers import generate_progressbar
-from skillfarm.models.skillfarm import CharacterSkillqueueEntry
+from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_skillfarm_character

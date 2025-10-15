@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.evelinks import eveimageserver
 
 # AA Skillfarm
-from skillfarm.models.skillfarm import CharacterUpdateStatus, SkillFarmAudit
+from skillfarm.models.skillfarmaudit import CharacterUpdateStatus, SkillFarmAudit
 
 
 class CharacterUpdateStatusAdminInline(admin.TabularInline):

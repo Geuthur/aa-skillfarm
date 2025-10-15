@@ -19,6 +19,7 @@ COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
+@patch(COMMAND_PATH + ".EveType.objects.get_or_create_esi")
 class TestLoadPrices(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
@@ -31,7 +32,7 @@ class TestLoadPrices(NoSocketsTestCase):
         }
 
     @patch(COMMAND_PATH + ".logger")
-    def test_should_load_prices(self, mock_logger, mock_requests_get):
+    def test_should_load_prices(self, mock_logger, _, mock_requests_get):
         # given
         mock_requests_get.return_value.json.return_value = self.json
 
@@ -41,7 +42,9 @@ class TestLoadPrices(NoSocketsTestCase):
         mock_logger.debug.assert_called_once_with("Created all skillfarm prices.")
 
     @patch("builtins.input")
-    def test_load_prices_should_get_integrityerror(self, mock_input, mock_requests_get):
+    def test_load_prices_should_get_integrityerror(
+        self, mock_input, _, mock_requests_get
+    ):
         # given
         EveTypePrice.objects.create(
             eve_type_id=1, buy=100, sell=200, updated_at=timezone.now()
@@ -63,7 +66,7 @@ class TestLoadPrices(NoSocketsTestCase):
 
     @patch("builtins.input")
     def test_load_prices_should_get_integrityerror_and_replace(
-        self, mock_input, mock_requests_get
+        self, mock_input, _, mock_requests_get
     ):
         # given
         EveTypePrice.objects.create(
@@ -84,7 +87,7 @@ class TestLoadPrices(NoSocketsTestCase):
 
     @patch(COMMAND_PATH + ".EveType.objects.get")
     def test_load_prices_should_evetype_not_exist(
-        self, mock_evetype, mock_requests_get
+        self, mock_evetype, _, mock_requests_get
     ):
         # given
         mock_requests_get.return_value.json.return_value = {
@@ -102,7 +105,7 @@ class TestLoadPrices(NoSocketsTestCase):
         self.assertEqual(excepted_count, 0)
 
     @patch(COMMAND_PATH + ".EveType.objects")
-    def test_load_prices_should_get_error(self, mock_evetype, mock_requests_get):
+    def test_load_prices_should_get_error(self, mock_evetype, _, mock_requests_get):
         # given
         mock_requests_get.return_value.json.return_value = {
             666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
