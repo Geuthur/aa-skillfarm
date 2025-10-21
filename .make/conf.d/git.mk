@@ -6,13 +6,13 @@ git-prune:
 
 # Git Reset Soft to HEAD~1
 .PHONY: git-reset-soft
-git-reset-soft: confirm-action
+git-reset-soft:
 	@echo "Resetting HEAD to the previous commit …"
 	@git reset --soft HEAD~1
 
 # Git force push
 .PHONY: git-force-push
-git-force-push: confirm-action
+git-force-push:
 	@echo "Forcing push to the remote repository …"
 	@git push --force
 
