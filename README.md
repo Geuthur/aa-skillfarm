@@ -8,6 +8,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Tests](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml/badge.svg)](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml)
 [![codecov](https://codecov.io/gh/Geuthur/aa-skillfarm/graph/badge.svg?token=oFZPpgIXz4)](https://codecov.io/gh/Geuthur/aa-skillfarm)
+[![Translation status](https://weblate.voices-of-war.de/widget/allianceauth/aa-skillfarm/svg-badge.svg)](https://weblate.voices-of-war.de/engage/allianceauth/)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/W7W810Q5J4)
 
@@ -28,6 +29,8 @@ ______________________________________________________________________
     - [Step 5 - Setting up Permissions](#step5)
     - [Step 6 - (Optional) Setting up Compatibilies](#step6)
   - [Highlights](#highlights)
+  - [Translations](#translations)
+  - [Contributing](#contributing)
 
 ## Features<a name="features"></a>
 
@@ -148,8 +151,13 @@ Advanced Settings: Stale Status for Each Section
 ![skillfarm1](https://github.com/user-attachments/assets/b7a99b75-39c0-4349-84ae-89c5c48262c2)
 ![Screenshot 2024-09-21 012008](https://github.com/user-attachments/assets/567197cc-c55f-4b0e-b470-d4ceeadcfb15)
 
-> [!NOTE]
-> Contributing
-> You want to improve the project?
-> Just Make a [Pull Request](https://github.com/Geuthur/aa-skillfarm/pulls) with the Guidelines.
-> We Using pre-commit
+## Translations<a name="translations"></a>
+
+[![Translations](https://weblate.voices-of-war.de/widget/allianceauth/aa-skillfarm/multi-auto.svg)](https://weblate.voices-of-war.de/engage/allianceauth/)
+
+Help us translate this app into your language or improve existing translations. Join our team!"
+
+## Contributing <a name="contributing"></a>
+
+You want to improve the project?
+Please ensure you read the [contribution guidelines](https://github.com/Geuthur/aa-skillfarm/blob/master/CONTRIBUTING.md)

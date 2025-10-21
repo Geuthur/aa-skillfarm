@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-03 12:48+0200\n"
+"Project-Id-Version: AA Skillfarm 0.5.8\n"
+"Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
+"POT-Creation-Date: 2025-10-21 11:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,311 +17,401 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: api/character/helpers/skilldetails.py:103
+#: skillfarm/admin.py:141
+msgid "last update run"
+msgstr ""
+
+#: skillfarm/api/character/helpers/skilldetails.py:111
 msgid "Toggle Alarm"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:109
+#: skillfarm/api/character/helpers/skilldetails.py:117
 msgid "Are you sure you want to toggle the alarm for {}?"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:117
+#: skillfarm/api/character/helpers/skilldetails.py:125
 msgid "Edit Skillset"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:128
+#: skillfarm/api/character/helpers/skilldetails.py:136
 msgid "Delete Character"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:134
-msgid "Are you sure you want to delete character {}?"
+#: skillfarm/api/character/helpers/skilldetails.py:142
+msgid "Are you sure you want to delete {}?"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:147
+#: skillfarm/api/character/helpers/skilldetails.py:155
 msgid "Skillinfo"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:171
+#: skillfarm/api/character/helpers/skilldetails.py:179
 msgid "Skill Extraction Ready"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:176
+#: skillfarm/api/character/helpers/skilldetails.py:184
 msgid "Please check your Character a Skill should be ready for extraction"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:198
+#: skillfarm/api/character/helpers/skilldetails.py:206
 msgid "Notification Activated"
 msgstr ""
 
-#: api/character/helpers/skilldetails.py:204
+#: skillfarm/api/character/helpers/skilldetails.py:212
 msgid "Notification Deactivated"
 msgstr ""
 
-#: api/character/skillfarm.py:65
+#: skillfarm/api/character/skillfarm.py:72
 msgid "Show Skillfarm"
 msgstr ""
 
-#: api/character/skillfarm.py:161
+#: skillfarm/api/character/skillfarm.py:174
 msgid "No Active Training"
 msgstr ""
 
-#: api/character/skillfarm.py:219
-#: templates/skillfarm/bundles/settings-bundle.html:20
-#: templates/skillfarm/partials/table/inactive.html:9
-#: templates/skillfarm/partials/table/skillfarm.html:9
+#: skillfarm/api/character/skillfarm.py:231
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:20
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:9
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:9
 msgid "Skill Info"
 msgstr ""
 
-#: helpers/lazy.py:59
+#: skillfarm/helpers/lazy.py:61
 msgid "Active"
 msgstr ""
 
-#: helpers/lazy.py:62
+#: skillfarm/helpers/lazy.py:64
 msgid "Inactive"
 msgstr ""
 
-#: models/skillfarm.py:111
+#: skillfarm/models/skillfarm.py:41
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:96
+msgid "Skills"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:42
+msgid "Skill Queue"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:55
+msgid "disabled"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:56
+msgid "token error"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:57
+msgid "error"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:58
+msgid "ok"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:59
+msgid "incomplete"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:60
+msgid "in progress"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:94
+msgid "Update is disabled"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:95
+msgid "One section has a token error during update"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:96
+msgid "One or more sections have not been updated"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:97
+msgid "Update is in progress"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:98
+msgid "An error occurred during update"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:99
+msgid "Updates completed successfully"
+msgstr ""
+
+#: skillfarm/models/skillfarm.py:290
 #, python-format
 msgid "%(charname)s: %(skillname)s"
 msgstr ""
 
-#: tasks.py:150
+#: skillfarm/tasks.py:216
 msgid "Skillfarm Notifications"
 msgstr ""
 
-#: templates/skillfarm/bundles/settings-bundle.html:18
-#: templates/skillfarm/overview.html:16
-#: templates/skillfarm/partials/table/inactive.html:7
-#: templates/skillfarm/partials/table/skillfarm.html:7
-msgid "Character"
-msgstr ""
-
-#: templates/skillfarm/bundles/settings-bundle.html:19
-#: templates/skillfarm/partials/modals/view_skillqueue.html:21
-#: templates/skillfarm/partials/modals/view_skillqueue.html:59
-#: templates/skillfarm/partials/table/inactive.html:8
-#: templates/skillfarm/partials/table/skillfarm.html:8
-msgid "Progress"
-msgstr ""
-
-#: templates/skillfarm/bundles/settings-bundle.html:21
-#: templates/skillfarm/partials/table/inactive.html:10
-#: templates/skillfarm/partials/table/skillfarm.html:10
-msgid "Last Updated"
-msgstr ""
-
-#: templates/skillfarm/bundles/settings-bundle.html:22
-#: templates/skillfarm/partials/table/inactive.html:11
-#: templates/skillfarm/partials/table/skillfarm.html:11
-msgid "Filter"
-msgstr ""
-
-#: templates/skillfarm/bundles/settings-bundle.html:23
-#: templates/skillfarm/overview.html:18
-#: templates/skillfarm/partials/table/inactive.html:12
-#: templates/skillfarm/partials/table/skillfarm.html:12
-msgid "Actions"
-msgstr ""
-
-#: templates/skillfarm/bundles/settings-bundle.html:24
-msgid "Error loading data:"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:17
-msgid "Single Price"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:18
-msgid "last update"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:34
-msgid "Monthly Profit"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:41
-msgid "Profit Month Abo"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:47
-msgid "Profit 12 Month Abo"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:53
-msgid "Profit 24 Month Abo"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:60
-msgid "Calculation"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:64
-msgid "Monthly"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:65
-msgid "12 Months"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:66
-msgid "24 Months"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:73
-msgid "Skill Injector Amount"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:77
-msgid "Skill Exctractor Amount"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:84
-msgid "Use custom PLEX amount"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:88
-msgid "Custom PLEX Amount"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:91
-msgid "Calculate"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:94
-msgid "Please fill out at least one field: Skill Injector or Extractor"
-msgstr ""
-
-#: templates/skillfarm/calculator.html:97
-msgid "Result:"
-msgstr ""
-
-#: templates/skillfarm/overview.html:9
-msgid "Character Overview"
-msgstr ""
-
-#: templates/skillfarm/overview.html:17
-msgid "Corporation"
-msgstr ""
-
-#: templates/skillfarm/partials/administration.html:6
-msgid "Overview"
-msgstr ""
-
-#: templates/skillfarm/partials/administration.html:12
-msgid "Add Character"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/modal.html:29
-msgid "Close"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-confirm.html:29
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:47
-msgid "Cancel"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-confirm.html:33
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:51
-msgid "Confirm"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:23
-msgid "Select the skills you want to filter for this character."
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:24
-msgid "You can add multiple skills to the filter."
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:25
-msgid "If no skills are selected, the filter will be disabled."
-msgstr ""
-
-#: templates/skillfarm/partials/modals/skillfarm-skillset.html:28
-msgid "Search skills..."
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:14
-msgid "Skillqueue"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:20
-#: templates/skillfarm/partials/modals/view_skillqueue.html:58
-#: templates/skillfarm/partials/modals/view_skillqueue.html:96
-msgid "Skill"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:22
-#: templates/skillfarm/partials/modals/view_skillqueue.html:60
-msgid "Start Date"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:23
-#: templates/skillfarm/partials/modals/view_skillqueue.html:61
-msgid "Finish Date"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:52
-msgid "Skillqueue Filtered"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:90
-msgid "Skills"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:97
-msgid "Level"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:98
-msgid "Skillpoints"
-msgstr ""
-
-#: templates/skillfarm/partials/modals/view_skillqueue.html:133
-msgid "No character found."
-msgstr ""
-
-#: templates/skillfarm/partials/navigation.html:5
-#: templates/skillfarm/skillfarm.html:12
+#: skillfarm/templates/skillfarm/admin.html:5
+#: skillfarm/templates/skillfarm/partials/navigation.html:5
+#: skillfarm/templates/skillfarm/skillfarm.html:12
 msgid "Skillfarm"
 msgstr ""
 
-#: templates/skillfarm/partials/navigation.html:9
+#: skillfarm/templates/skillfarm/admin.html:29
+msgid "Administration"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/admin.html:35
+msgid "Mark all tasks as Force Refresh"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/admin.html:40
+msgid "Clear all cached ETags"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/admin.html:44
+msgid "Update Character Updates"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/admin.html:46
+msgid "Submit"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:18
+#: skillfarm/templates/skillfarm/overview.html:16
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:7
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:7
+msgid "Character"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:19
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:21
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:62
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:8
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:8
+msgid "Progress"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:21
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:10
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:10
+msgid "Last Updated"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:22
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:11
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:11
+msgid "Filter"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:23
+#: skillfarm/templates/skillfarm/overview.html:18
+#: skillfarm/templates/skillfarm/partials/table/inactive.html:12
+#: skillfarm/templates/skillfarm/partials/table/skillfarm.html:12
+msgid "Actions"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/bundles/settings-bundle.html:24
+msgid "Error loading data:"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:17
+msgid "Single Price"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:18
+msgid "last update"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:34
+msgid "Monthly Profit"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:41
+msgid "Profit Month Abo"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:47
+msgid "Profit 12 Month Abo"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:53
+msgid "Profit 24 Month Abo"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:60
+msgid "Calculation"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:64
+msgid "Monthly"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:65
+msgid "12 Months"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:66
+msgid "24 Months"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:73
+msgid "Skill Injector Amount"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:77
+msgid "Skill Exctractor Amount"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:84
+msgid "Use custom PLEX amount"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:88
+msgid "Custom PLEX Amount"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:91
+msgid "Calculate"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:94
+msgid "Please fill out at least one field: Skill Injector or Extractor"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/calculator.html:97
+msgid "Result:"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/overview.html:9
+msgid "Character Overview"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/overview.html:17
+msgid "Corporation"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/administration.html:6
+msgid "Overview"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/administration.html:12
+msgid "Add Character"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/modal.html:29
+msgid "Close"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-confirm.html:29
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-skillset.html:39
+msgid "Cancel"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-confirm.html:33
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-skillset.html:43
+msgid "Confirm"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-skillset.html:23
+msgid "Select the skills you want to filter for this character."
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-skillset.html:24
+msgid "You can add multiple skills to the filter."
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/skillfarm-skillset.html:25
+msgid "If no skills are selected, the filter will be disabled."
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:14
+msgid "Skillqueue"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:20
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:61
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:102
+msgid "Skill"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:22
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:63
+msgid "Start Date"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:23
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:64
+msgid "Finish Date"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:55
+msgid "Skillqueue Filtered"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:103
+msgid "Level"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:104
+msgid "Skillpoints"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:139
+msgid "No character found."
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/navigation.html:9
 msgid "Skillfarm Calculator"
 msgstr ""
 
-#: templates/skillfarm/skillfarm.html:21
-msgid "ESI Skillqueue will only update on Character Login"
+#: skillfarm/templates/skillfarm/skillfarm.html:16
+msgid "Data will only update on change trought the client"
 msgstr ""
 
-#: templates/skillfarm/skillfarm.html:28
+#: skillfarm/templates/skillfarm/skillfarm.html:26
 msgid "Inactive Characters"
 msgstr ""
 
-#: views.py:99
+#: skillfarm/views.py:68
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: skillfarm/views.py:76
+msgid "Queued Clear All ETags"
+msgstr ""
+
+#: skillfarm/views.py:79
+msgid "Queued Update All Characters"
+msgstr ""
+
+#: skillfarm/views.py:129
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 
-#: views.py:117 views.py:144 views.py:173
+#: skillfarm/views.py:147 skillfarm/views.py:174 skillfarm/views.py:203
 msgid "Permission Denied"
 msgstr ""
 
-#: views.py:127
+#: skillfarm/views.py:157
 msgid "Alarm successfully updated"
 msgstr ""
 
-#: views.py:153
+#: skillfarm/views.py:183
 #, python-brace-format
 msgid "{character_name} successfully deleted"
 msgstr ""
 
-#: views.py:186
+#: skillfarm/views.py:224
+msgid "Invalid JSON format"
+msgstr ""
+
+#: skillfarm/views.py:229
 #, python-brace-format
 msgid "{character_name} Skillset successfully updated"
 msgstr ""
 
-#: views.py:239
+#: skillfarm/views.py:282
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
 "fetch Market Data."
