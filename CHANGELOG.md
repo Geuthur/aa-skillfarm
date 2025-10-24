@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.8] - 2025-10-21
+
+### Added
+
+- Release Workflow
+
+### Changed
+
+- Updated Makefile System
+- Updated Translations
+- Updated Contributing
+- Updated README
+- Optimized ESI Status Check
+
 ## [0.5.7] - 2025-10-07
 
 ### Changed
