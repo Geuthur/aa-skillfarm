@@ -88,16 +88,22 @@ class Command(BaseCommand):
                 return
         except IntegrityError:
             self.stdout.write("Error: Prices already loaded into database.")
-            delete_arg = input("Would you like to update all prices? (y/n): ")
+            update_arg = input("Would you like to update all prices? (y/n): ")
 
-            if delete_arg == "y":
-                with transaction.atomic():
-                    EveTypePrice.objects.bulk_create(
-                        objs,
-                        update_conflicts=True,
-                        update_fields=["buy", "sell", "updated_at"],
-                    )
-                self.stdout.write(f"Successfully update {len(objs)} prices.")
+            if update_arg == "y":
+                count = 0
+                for obj in objs:
+                    with transaction.atomic():
+                        EveTypePrice.objects.update_or_create(
+                            eve_type_id=obj.eve_type_id,
+                            defaults={
+                                "buy": obj.buy,
+                                "sell": obj.sell,
+                                "updated_at": obj.updated_at,
+                            },
+                        )
+                    count += 1
+                self.stdout.write(f"Successfully updated {count} prices.")
                 logger.debug("Updated all skillfarm prices.")
             else:
                 self.stdout.write("No changes made.")

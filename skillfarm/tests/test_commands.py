@@ -78,7 +78,7 @@ class TestLoadPrices(NoSocketsTestCase):
         output = out.getvalue()
 
         # then
-        self.assertIn("Successfully update 2 prices.", output)
+        self.assertIn("Successfully updated 2 prices.", output)
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 2)
 
