@@ -3,11 +3,11 @@
 {% load humanize %}
 {% load evelinks %}
 
-{% if character_id %}
+{% if character.character_id %}
     <h4 class="d-none" id="modal-title">
         {{ title }}:
-        <img src="{{ character_id|character_portrait_url:32 }}" class="rounded-circle">
-        {{character_name}}
+        <img src="{{ character.character_id|character_portrait_url:32 }}" class="rounded-circle">
+        {{ character.character_name }}
     </h4>
     {% if skillqueue %}
         <header class="card-header bg-primary rounded-top">

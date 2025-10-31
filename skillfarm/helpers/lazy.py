@@ -1,6 +1,7 @@
 """This module provides lazy loading of some common functions and objects that are not needed for every request."""
 
 # Django
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -55,14 +56,15 @@ def str_normalize_time(evetime, hours: bool = False) -> str:
 
 def get_status_icon(boolean: bool, size: int = 32) -> str:
     """Get the status icon for a status."""
-    html = "<button class='btn bg-gradient rounded-circle "
     if boolean:
-        html += "btn-success' "
+        color = "btn-success"
         title = _("Active")
     else:
-        html += "btn-danger' "
+        color = "btn-danger"
         title = _("Inactive")
-    html += f"style='height: {size}px; width: {size}px;' "
-    html += "data-tooltip-toggle='skillfarm-tooltip' "
-    html += f" title='{title}'></button>"
-    return format_html(html)
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/icons/status.html",
+            {"color": color, "size": size, "title": title},
+        )
+    )

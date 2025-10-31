@@ -80,55 +80,61 @@ def get_alts_queryset(main_char, corporations=None):
         return EveCharacter.objects.filter(pk=main_char.pk)
 
 
-def generate_button(template, queryset, settings, request) -> mark_safe:
-    """Generate a html button for the tax system"""
+def generate_toggle_notification_button(character: SkillFarmAudit) -> mark_safe:
+    """Generate a toggle notification button for the skillfarm"""
     return format_html(
         render_to_string(
-            template,
+            "skillfarm/partials/buttons/toggle-notification.html",
             {
-                "queryset": queryset,
-                "settings": settings,
+                "character": character,
             },
-            request=request,
         )
     )
 
 
-# pylint: disable=too-many-positional-arguments
-def generate_settings(
-    title: str, icon: str, color: str, text: str, modal: str, action: str, ajax: str
-) -> dict:
-    """Generate a settings dict for the tax system"""
-    return {
-        "title": title,
-        "icon": icon,
-        "color": color,
-        "text": text,
-        "modal": modal,
-        "action": action,
-        "ajax": ajax,
-    }
-
-
-def generate_progressbar(progress) -> str:
-    """Generate a progress bar"""
-    value = round(progress, 2)
-    if value > 50:
-        progress_value = format_html('<span class="text-white)">{}%</span>', value)
-    else:
-        progress_value = format_html('<span class="text-dark">{}%</span>', value)
-
-    progressbar = format_html(
-        """
-        <div class="progress-outer flex-grow-1 me-2">
-            <div class="progress" style="position: relative;">
-                <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: {}%; box-shadow: -1px 3px 5px rgba(0, 180, 231, 0.9);"></div>
-                <div class="fw-bold fs-6 text-center position-absolute top-50 start-50 translate-middle">{}</div>
-            </div>
-        </div>
-        """,
-        value,
-        progress_value,
+def generate_edit_skillsetup_button(character: SkillFarmAudit) -> mark_safe:
+    """Generate an edit skillsetup button for the skillfarm"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/buttons/edit-skillsetup.html",
+            {
+                "character": character,
+            },
+        )
     )
 
-    return progressbar
+
+def generate_delete_character_button(character: SkillFarmAudit) -> mark_safe:
+    """Generate a delete character button for the skillfarm"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/buttons/delete-character.html",
+            {
+                "character": character,
+            },
+        )
+    )
+
+
+def generate_skillinfo_button(character: SkillFarmAudit) -> mark_safe:
+    """Generate a skillinfo button for the skillfarm"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/buttons/skillinfo.html",
+            {
+                "character": character,
+            },
+        )
+    )
+
+
+def generate_progressbar_html(progress) -> str:
+    """Generate a progress bar HTML"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/progressbar.html",
+            {
+                "progress": round(progress, 2),
+            },
+        )
+    )

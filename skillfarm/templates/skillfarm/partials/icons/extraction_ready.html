@@ -1,0 +1,15 @@
+{% load i18n %}
+{% load static %}
+
+<img src="{% static 'skillfarm/images/skillExtractor.png' %}"
+    class="rounded-circle"
+    style="width: 32px"
+    data-info="skillfarm-skill-extractor"
+>
+<i
+    class="fas fa-exclamation-triangle"
+    style='margin-left: 5px; color: red'
+    data-tooltip-toggle="skillfarm-tooltip"
+    title="{% translate 'Skill is extraction ready' %}"
+>
+</i>

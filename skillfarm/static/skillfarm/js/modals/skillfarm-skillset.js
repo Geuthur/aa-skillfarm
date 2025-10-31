@@ -31,11 +31,13 @@ $(document).ready(() => {
                 return response.json();
             })
             .then(data => {
-                if (data.skillset && Array.isArray(data.skillset)) {
-                    skillSelect.setSelected(data.skillset);
+                if (data.setup && Array.isArray(data.setup.skillset)) {
+                    skillSelect.setSelected(data.setup.skillset);
                 }
             })
-            .catch(error => console.error('Error fetching selected skills:', error));
+            .catch(error => {
+                console.error('Error loading data:', error);
+            });
 
         // Confirm button click event
         $('#modal-button-confirm-skillset-request').on('click', () => {

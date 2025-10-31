@@ -7,10 +7,17 @@ $(document).ready(() => {
             url: SkillfarmSettings.OverviewUrl,
             type: 'GET',
             dataSrc: function (data) {
-                return Object.values(data);
+                return data.characters;
             },
             error: function (xhr, error, thrown) {
-                console.error('Error loading data:', error);
+                let errorMsg = 'Unknown error';
+                try {
+                    const resp = JSON.parse(xhr.responseText);
+                    errorMsg = resp.error || errorMsg;
+                } catch (e) {
+                    errorMsg = xhr.responseText || errorMsg;
+                }
+                console.error('Error loading data:', errorMsg);
                 OverViewTable.clear().draw();
             }
         },
@@ -22,13 +29,13 @@ $(document).ready(() => {
                 }
             },
             {
-                data: 'character_name',
+                data: 'character.character_name',
                 render: function (data, _, row) {
                     return data;
                 }
             },
             {
-                data: 'corporation_name',
+                data: 'character.corporation_name',
                 render: function (data, _, row) {
                     return data;
                 }
