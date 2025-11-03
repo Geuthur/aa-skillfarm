@@ -10,6 +10,16 @@ class Message(Schema):
     message: str
 
 
+class CharacterSchema(Schema):
+    character_html: str | None = None
+    character_id: int
+    character_name: str
+    corporation_id: int | None = None
+    corporation_name: str | None = None
+    alliance_id: int | None = None
+    alliance_name: str | None = None
+
+
 class SkillFarm(Schema):
     character_id: int
     character_name: str

@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-primary btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-tooltip-toggle="skillfarm-tooltip"
+    data-character-id="{{ character.character.character_id }}"
+    data-title="{% translate 'Skillinfo' %}"
+    data-bs-target="#modalViewSkillContainer"
+    data-ajax_skillview="{% url 'skillfarm:api:get_skillinfo_details' character_id=character.character.character_id %}"
+
+    title="{% translate 'Skillinfo' %}"
+    >
+    <span class="fas fa-info"></span>
+</button>

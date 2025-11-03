@@ -51,18 +51,3 @@ def str_normalize_time(evetime, hours: bool = False) -> str:
     if hours:
         return timezone.localtime(evetime).strftime("%Y-%m-%d %H:%M")
     return timezone.localtime(evetime).strftime("%Y-%m-%d")
-
-
-def get_status_icon(boolean: bool, size: int = 32) -> str:
-    """Get the status icon for a status."""
-    html = "<button class='btn bg-gradient rounded-circle "
-    if boolean:
-        html += "btn-success' "
-        title = _("Active")
-    else:
-        html += "btn-danger' "
-        title = _("Inactive")
-    html += f"style='height: {size}px; width: {size}px;' "
-    html += "data-tooltip-toggle='skillfarm-tooltip' "
-    html += f" title='{title}'></button>"
-    return format_html(html)

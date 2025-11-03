@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load static %}
+
+<i class='fa-solid fa-bullhorn'
+    style='margin-left: 5px; color: {% if status %}green{% else %}gray{% endif %};'
+    data-tooltip-toggle="skillfarm-tooltip"
+    title="{% if status %}
+        {% translate 'Notification Activated' %}
+    {% else %}
+        {% translate 'Notification Deactivated' %}
+    {% endif %}"
+>
+</i>

@@ -10,7 +10,9 @@ from bravado.exception import HTTPInternalServerError
 # Django
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -34,6 +36,7 @@ from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
+# pylint: disable=too-many-public-methods
 class SkillFarmAudit(models.Model):
     """Skillfarm Character Audit model"""
 
@@ -151,9 +154,84 @@ class SkillFarmAudit(models.Model):
         return self.UpdateStatus(total_update_status)
 
     @property
+    def notification_icon(self) -> str:
+        """Get the notification icon for this character."""
+        return format_html(
+            render_to_string(
+                "skillfarm/partials/icons/notification.html",
+                {"status": self.notification},
+            )
+        )
+
+    @property
     def last_update(self) -> UpdateStatus:
         """Get the last update status of this character."""
         return SkillFarmAudit.objects.last_update_status(self)
+
+    @property
+    def is_filtered(self) -> bool:
+        """Check if the character has Skill Queue filter active."""
+        return (
+            self.skillfarm_skillqueue.skill_filtered(self).exists()
+            or SkillFarmSetup.objects.filter(
+                character=self,
+                skillset__isnull=False,
+            ).exists()
+        )
+
+    @property
+    def is_skill_ready(self) -> bool:
+        """Check if a character has skills for extraction."""
+        return self.skillfarm_skills.extractions(self).exists()
+
+    @property
+    def is_skillqueue_ready(self) -> bool:
+        """Check if a character has skillqueue ready for extraction."""
+        return self.skillfarm_skillqueue.extractions(self).exists()
+
+    @property
+    def is_cooldown(self) -> bool:
+        """Check if a character has a notification cooldown."""
+        if (
+            self.last_notification is not None
+            and self.last_notification
+            < timezone.now()
+            - datetime.timedelta(days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN)
+        ):
+            return False
+        if self.last_notification is None:
+            return False
+        return True
+
+    @property
+    def get_skillqueue(self) -> models.QuerySet["CharacterSkillqueueEntry"]:
+        """Get the skillqueue for this character."""
+        return self.skillfarm_skillqueue.all().select_related("eve_type")
+
+    @property
+    def get_skills(self) -> models.QuerySet["CharacterSkill"]:
+        """Get the skills for this character."""
+        return self.skillfarm_skills.all().select_related("eve_type")
+
+    @property
+    def get_skillsetup(self) -> models.QuerySet["SkillFarmSetup"] | None:
+        """Get the skill setup for this character."""
+        try:
+            return self.skillfarm_setup
+        except SkillFarmSetup.DoesNotExist:
+            return None
+
+    @property
+    def extraction_icon(self) -> str:
+        if self.is_skill_ready is True:
+            return format_html(
+                render_to_string("skillfarm/partials/icons/extraction_ready.html")
+            )
+        if self.is_skillqueue_ready is True:
+            return format_html(
+                render_to_string("skillfarm/partials/icons/extraction_sb_ready.html")
+            )
+        return ""
 
     def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
         """Update skills for this character."""
@@ -292,20 +370,6 @@ class SkillFarmAudit(models.Model):
             "skillname": ", ".join(skill_names),
         }
         return msg
-
-    @property
-    def is_cooldown(self) -> bool:
-        """Check if a character has a notification cooldown."""
-        if (
-            self.last_notification is not None
-            and self.last_notification
-            < timezone.now()
-            - datetime.timedelta(days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN)
-        ):
-            return False
-        if self.last_notification is None:
-            return False
-        return True
 
 
 class SkillFarmSetup(models.Model):

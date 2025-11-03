@@ -1,0 +1,7 @@
+{% load i18n %}
+{% load static %}
+
+<button class="btn bg-gradient rounded-circle {% if character.is_filtered %}btn-success{% else %}btn-danger{% endif %}" style="height: {{ size }}px; width: {{ size }}px;"
+    data-tooltip-toggle="skillfarm-tooltip"
+    title="{% if character.is_filtered %} {% translate 'Active' %} {% else %} {% translate 'Inactive' %} {% endif %}">
+</button>

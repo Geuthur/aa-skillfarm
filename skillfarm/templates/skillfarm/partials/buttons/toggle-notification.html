@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-primary btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-tooltip-toggle="skillfarm-tooltip"
+    data-character-id="{{ character.character.character_id }}"
+    data-title="{% translate 'Toggle Alarm' %}"
+    data-text="{% translate 'Are you sure you want to toggle the alarm for' %} {{ character.character.character_name }}?"
+    data-bs-target="#skillfarm-confirm"
+    data-action="{% url 'skillfarm:switch_alarm' character_id=character.character.character_id %}"
+
+    title="{% translate 'Toggle Alarm' %}"
+    >
+    <span class="fas fa-bullhorn"></span>
+</button>

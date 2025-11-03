@@ -1,0 +1,10 @@
+<div class="progress-outer flex-grow-1 me-2">
+    <div class="progress" style="position: relative;">
+        <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" style="width: {{ progress }}%; box-shadow: -1px 3px 5px rgba(0, 180, 231, 0.9);"></div>
+        <div class="fw-bold fs-6 text-center position-absolute top-50 start-50 translate-middle">
+            <span class="{% if progress > 50 %}text-white{% else %}text-dark{% endif %}">
+                {{ progress }}%
+            </span>
+        </div>
+    </div>
+</div>

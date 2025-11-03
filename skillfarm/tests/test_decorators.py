@@ -9,6 +9,7 @@ from allianceauth.services.hooks import get_extension_logger
 
 # Alliance Auth (External Libs)
 from app_utils.logging import LoggerAddTag
+from app_utils.testing import NoSocketsTestCase
 
 # AA Skillfarm
 from skillfarm import __title__
@@ -21,7 +22,7 @@ DECORATOR_PATH = "skillfarm.decorators."
 
 
 @patch(DECORATOR_PATH + "ESI_STATUS_ROUTE_RATE_LIMIT", new=1)
-class TestDecorators(TestCase):
+class TestDecorators(NoSocketsTestCase):
     @patch(DECORATOR_PATH + "fetch_esi_status")
     @patch(DECORATOR_PATH + "IS_TESTING", new=True)
     def test_when_esi_is_available_is_test(self, mock_fetch_esi_status):
