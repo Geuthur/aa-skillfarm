@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-warning btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-title="{% translate 'Edit Skillset' %}"
+    data-tooltip-toggle="skillfarm-tooltip"
+    data-character-id="{{ character.character.character_id }}"
+    data-bs-target="#skillfarm-skillset"
+    data-action="{% url 'skillfarm:skillset' character_id=character.character.character_id %}"
+
+    title="{% translate 'Edit Skillset' %}"
+    >
+    <span class="fas fa-pencil"></span>
+</button>

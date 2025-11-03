@@ -1,0 +1,15 @@
+{% load i18n %}
+{% load static %}
+
+<img src="{% static 'skillfarm/images/skillExtractor.png' %}"
+    class="rounded-circle"
+    style="width: 32px"
+    data-info="skillfarm-skill-extractor-maybe"
+>
+<i
+    class="fas fa-question"
+    style='margin-left: 5px; color: orange'
+    data-tooltip-toggle="skillfarm-tooltip"
+    title="{% translate 'Please check your Character a Skill should be ready for extraction' %}"
+>
+</i>

@@ -22,7 +22,7 @@ from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
 from skillfarm import __title__, forms, tasks
-from skillfarm.api.helpers import get_character
+from skillfarm.api.helpers.core import get_character
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.tasks import update_all_skillfarm

@@ -1,5 +1,34 @@
 # Changelog
 
+## [In Development] - Unreleased
+
+<!--
+Section Order:
+
+### Added
+### Fixed
+### Changed
+### Removed
+-->
+
+### Changed
+
+- Refactored API
+- loading spinner image
+- optimized Python HTML functions
+
+### Added
+
+- SkillfarmAudit Model
+  - `get_skillqueue` property
+  - `get_skills` property
+  - `get_skillsetup` property
+  - `is_filtered` property
+  - `is_skill_ready` property
+  - `is_skillqueue_ready` property
+  - `notification_icon` property
+  - `extraction_icon` property
+
 ## [0.5.8] - 2025-10-21
 
 ### Added
@@ -359,3 +388,5 @@ This will load all necessary prices
 ### Added
 
 - Initial public release
+
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...HEAD "In Development"

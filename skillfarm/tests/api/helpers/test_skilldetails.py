@@ -3,24 +3,25 @@ from django.test import TestCase
 from django.utils import timezone
 
 # Alliance Auth (External Libs)
+from app_utils.testing import NoSocketsTestCase
 from eveuniverse.models import EveType
 
 # AA Skillfarm
-from skillfarm.api.character.helpers.skilldetails import (
-    _calculate_single_progress_bar,
+from skillfarm.api.helpers.core import generate_progressbar_html
+from skillfarm.api.helpers.skilldetails import (
     _calculate_sum_progress_bar,
+    calculate_single_progress_bar,
 )
-from skillfarm.api.character.helpers.skillqueue import _get_character_skillqueue
-from skillfarm.api.helpers import generate_progressbar
+from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_skillfarm_character
 
-MODULE_PATH = "skillfarm.api.character.helpers."
+MODULE_PATH = "skillfarm.api.helpers."
 
 
-class Test_Calculate_Single_Progress_Bar(TestCase):
+class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -43,7 +44,7 @@ class Test_Calculate_Single_Progress_Bar(TestCase):
             level_end_sp=0,
         )
 
-        self.assertEqual(_calculate_single_progress_bar(characterskillqueue), 0)
+        self.assertEqual(calculate_single_progress_bar(characterskillqueue), 0)
 
     def test_calc_single_progress_bar_100_percent(self):
         """Test should return 100 if the skill is already finished"""
@@ -57,7 +58,7 @@ class Test_Calculate_Single_Progress_Bar(TestCase):
             level_end_sp=1000,
         )
 
-        self.assertEqual(_calculate_single_progress_bar(characterskillqueue), 100)
+        self.assertEqual(calculate_single_progress_bar(characterskillqueue), 100)
 
     def test_calc_single_progress_bar_below_zero(self):
         """Test should return 100 if the skill is already finished"""
@@ -71,7 +72,7 @@ class Test_Calculate_Single_Progress_Bar(TestCase):
             level_end_sp=1000,
         )
 
-        self.assertEqual(_calculate_single_progress_bar(characterskillqueue), 0)
+        self.assertEqual(calculate_single_progress_bar(characterskillqueue), 0)
 
     def test_calc_single_progress_bar(self):
         """Test should return 25 if the skill is 25% finished"""
@@ -85,7 +86,7 @@ class Test_Calculate_Single_Progress_Bar(TestCase):
             level_end_sp=1000,
         )
 
-        self.assertEqual(_calculate_single_progress_bar(characterskillqueue), 25.0)
+        self.assertEqual(calculate_single_progress_bar(characterskillqueue), 25.0)
 
 
 class Test_Calculate_Sum_Progress_bar(TestCase):
@@ -101,7 +102,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
 
     def test_calc_sum_progress_bar_no_skills(self):
         """Test should return 0 if there are no skills"""
-        excepted_progressbar = generate_progressbar(0)
+        excepted_progressbar = generate_progressbar_html(0)
         self.assertEqual(_calculate_sum_progress_bar({}), excepted_progressbar)
 
     def test_calc_sum_progress_bar_no_end_sp(self):
@@ -120,11 +121,19 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
         characterskillqueue.save()
 
-        skillqueue = _get_character_skillqueue(self.audit)
+        skillqueue_response: list[SkillFarmQueueSchema] = []
+        skillqueue = self.audit.skillfarm_skillqueue.filter(
+            character=self.audit
+        ).select_related("eve_type")
 
-        excepted_progressbar = generate_progressbar(0.0)
+        for entry in skillqueue:
+            skillqueue_response.append(get_skillqueue_data(entry))
 
-        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
+        excepted_progressbar = generate_progressbar_html(0.0)
+
+        self.assertEqual(
+            _calculate_sum_progress_bar(skillqueue_response), excepted_progressbar
+        )
 
     def test_calc_sum_progress_bar_partial_progress(self):
         """Test should return 50.0%"""
@@ -141,11 +150,19 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
         characterskillqueue.save()
 
-        skillqueue = _get_character_skillqueue(self.audit)
+        skillqueue_response: list[SkillFarmQueueSchema] = []
+        skillqueue = self.audit.skillfarm_skillqueue.filter(
+            character=self.audit
+        ).select_related("eve_type")
 
-        excepted_progressbar = generate_progressbar(50.0)
+        for entry in skillqueue:
+            skillqueue_response.append(get_skillqueue_data(entry))
 
-        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
+        excepted_progressbar = generate_progressbar_html(50.0)
+
+        self.assertEqual(
+            _calculate_sum_progress_bar(skillqueue_response), excepted_progressbar
+        )
 
     def test_calc_sum_progress_bar_multiple_skills(self):
         """Test should return 75.0%"""
@@ -175,11 +192,19 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
         characterskillqueue2.save()
 
-        skillqueue = _get_character_skillqueue(self.audit)
+        skillqueue_response: list[SkillFarmQueueSchema] = []
+        skillqueue = self.audit.skillfarm_skillqueue.filter(
+            character=self.audit
+        ).select_related("eve_type")
 
-        excepted_progressbar = generate_progressbar(75.0)
+        for entry in skillqueue:
+            skillqueue_response.append(get_skillqueue_data(entry))
 
-        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
+        excepted_progressbar = generate_progressbar_html(75.0)
+
+        self.assertEqual(
+            _calculate_sum_progress_bar(skillqueue_response), excepted_progressbar
+        )
 
     def test_calc_sum_progress_bar_multiple_skills_below_zero(self):
         """Test should return 0.0%"""
@@ -209,11 +234,19 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
         characterskillqueue2.save()
 
-        skillqueue = _get_character_skillqueue(self.audit)
+        skillqueue_response: list[SkillFarmQueueSchema] = []
+        skillqueue = self.audit.skillfarm_skillqueue.filter(
+            character=self.audit
+        ).select_related("eve_type")
 
-        excepted_progressbar = generate_progressbar(0.0)
+        for entry in skillqueue:
+            skillqueue_response.append(get_skillqueue_data(entry))
 
-        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
+        excepted_progressbar = generate_progressbar_html(0.0)
+
+        self.assertEqual(
+            _calculate_sum_progress_bar(skillqueue_response), excepted_progressbar
+        )
 
     def test_calc_sum_progress_bar_with_nodate(self):
         """Test should return 50.0%"""
@@ -243,8 +276,16 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
         characterskillqueue2.save()
 
-        skillqueue = _get_character_skillqueue(self.audit)
+        skillqueue_response: list[SkillFarmQueueSchema] = []
+        skillqueue = self.audit.skillfarm_skillqueue.filter(
+            character=self.audit
+        ).select_related("eve_type")
 
-        excepted_progressbar = generate_progressbar(50.0)
+        for entry in skillqueue:
+            skillqueue_response.append(get_skillqueue_data(entry))
 
-        self.assertEqual(_calculate_sum_progress_bar(skillqueue), excepted_progressbar)
+        excepted_progressbar = generate_progressbar_html(50.0)
+
+        self.assertEqual(
+            _calculate_sum_progress_bar(skillqueue_response), excepted_progressbar
+        )

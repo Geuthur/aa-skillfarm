@@ -1,12 +1,13 @@
 /* global SkillfarmSettings */
 
 const SkillFarmAjax = (() => {
-    const updateDataTable = (tableId, data) => {
-        const table = $(tableId);
-        if ($.fn.DataTable.isDataTable(table)) {
-            table.DataTable().clear().rows.add(data).draw();
+
+    const updateDataTable = (tableName, data) => {
+        const SkillFarmTable = $(tableName);
+        if ($.fn.DataTable.isDataTable(SkillFarmTable)) {
+            SkillFarmTable.DataTable().clear().rows.add(data).draw();
         } else {
-            table.DataTable({
+            SkillFarmTable.DataTable({
                 data: data,
                 columns: [
                     { data: 'character.character_html' },
@@ -52,11 +53,21 @@ const SkillFarmAjax = (() => {
             url: url,
             type: 'GET',
             success: function (data) {
-                updateDataTable('#skillfarm-details', Object.values(data.details));
-                updateDataTable('#skillfarm-inactive', Object.values(data.inactive));
+                updateDataTable('#skillfarm-details', data.active_characters);
+                updateDataTable('#skillfarm-inactive', data.inactive_characters);
             },
             error: function (xhr, error, thrown) {
-                console.error('Error loading data:', error);
+                let errorMsg = 'Unknown error';
+                try {
+                    const resp = JSON.parse(xhr.responseText);
+                    errorMsg = resp.error || errorMsg;
+                } catch (e) {
+                    errorMsg = xhr.responseText || errorMsg;
+                }
+                console.error('Error loading data:', errorMsg);
+                // Empty Datatable
+                updateDataTable('#skillfarm-details', []);
+                updateDataTable('#skillfarm-inactive', []);
             }
         });
     };
