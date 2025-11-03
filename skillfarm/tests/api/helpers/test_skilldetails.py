@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 # Alliance Auth (External Libs)
+from app_utils.testing import NoSocketsTestCase
 from eveuniverse.models import EveType
 
 # AA Skillfarm
@@ -17,10 +18,10 @@ from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_skillfarm_character
 
-MODULE_PATH = "skillfarm.api.character.helpers."
+MODULE_PATH = "skillfarm.api.helpers."
 
 
-class Test_Calculate_Single_Progress_Bar(TestCase):
+class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
