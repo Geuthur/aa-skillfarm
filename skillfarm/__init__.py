@@ -9,3 +9,8 @@ __esi_compatibility_date__ = "2025-08-26"
 __app_name_useragent__ = "AA-Skillfarm"
 
 __github_url__ = f"https://github.com/Geuthur/{__package_name__}"
+
+__characters_operations__ = [
+    "GetCharactersCharacterIdSkills",
+    "GetCharactersCharacterIdSkillqueue",
+]
