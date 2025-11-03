@@ -11,8 +11,18 @@ Section Order:
 ### Removed
 -->
 
+## [1.0.0-beta.1] - 2025-11-03
+
+> [!CAUTION]
+>
+> This is a BETA version, not intended for production use!
+> Please test it in a test environment first and [report any issues].
+
 ### Changed
 
+- Switch to OPENAPI3 ESI Client
+- Updated dependencies
+- Updated README url for translations
 - Refactored API
 - loading spinner image
 - optimized Python HTML functions
@@ -389,4 +399,6 @@ This will load all necessary prices
 
 - Initial public release
 
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...HEAD "In Development"
+[1.0.0-beta.1]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...v1.0.0-beta.1 "1.0.0-beta.1"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.0-beta.1...HEAD "In Development"
+[report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
