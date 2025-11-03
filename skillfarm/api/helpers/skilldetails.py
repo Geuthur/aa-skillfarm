@@ -16,7 +16,7 @@ from skillfarm import __title__
 from skillfarm.api.helpers.core import (
     generate_progressbar_html,
 )
-from skillfarm.models.skillfarm import CharacterSkillqueueEntry
+from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 
 if TYPE_CHECKING:
     # AA Skillfarm
