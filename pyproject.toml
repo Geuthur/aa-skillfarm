@@ -33,10 +33,10 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "allianceauth>=4.6,<5",
-    "allianceauth-app-utils>=1.26",
-    "django-esi>=7.0.1",
-    "django-eveuniverse>=1.5.7",
+    "allianceauth>=4.10,<5",
+    "allianceauth-app-utils @ git+https://gitlab.com/Geuthur/allianceauth-app-utils.git@openapi",
+    "django-esi>=8a4",
+    "django-eveuniverse>=1.6",
     "django-ninja",
 ]
 optional-dependencies.tests-allianceauth-latest = [
@@ -58,3 +58,6 @@ include = [
 
 [tool.hatch.version]
 path = "skillfarm/__init__.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true

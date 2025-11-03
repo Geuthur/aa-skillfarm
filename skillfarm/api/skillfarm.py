@@ -39,7 +39,7 @@ from skillfarm.api.helpers.skilldetails import (
 )
 from skillfarm.api.schema import CharacterSchema
 from skillfarm.helpers import lazy
-from skillfarm.models.skillfarm import (
+from skillfarm.models.skillfarmaudit import (
     CharacterSkill,
     CharacterSkillqueueEntry,
     SkillFarmAudit,
@@ -386,11 +386,8 @@ class SkillFarmApiEndpoints:
 
             response_skillqueue: list[SkillFarmQueueSchema] = []
             response_skillqueue_filtered: list[SkillFarmQueueSchema] = []
-            for (
-                skill
-            ) in (
-                character.get_skillqueue
-            ):  # retrieve all skillqueue entries from character
+            # retrieve all skillqueue entries from character
+            for skill in character.get_skillqueue:
                 # Get skillqueue data for each skill
                 skillqueue_response = get_skillqueue_data(skill)
                 # Check if skill is filtered
@@ -401,9 +398,8 @@ class SkillFarmApiEndpoints:
 
             response_skills: list[SkillFarmSkillSchema] = []
             if character.is_filtered and character.get_skillsetup is not None:
-                for (
-                    skill
-                ) in character.get_skills:  # retrieve all skill entries from character
+                # retrieve all skill entries from character
+                for skill in character.get_skills:
                     if skill.eve_type.name in character.get_skillsetup.skillset:
                         # Get skill data for each skill
                         skill_data = get_filtered_skills_data(skill)

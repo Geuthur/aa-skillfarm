@@ -13,7 +13,7 @@ from skillfarm.api.helpers.skilldetails import (
     calculate_single_progress_bar,
 )
 from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
-from skillfarm.models.skillfarm import CharacterSkillqueueEntry
+from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import create_skillfarm_character

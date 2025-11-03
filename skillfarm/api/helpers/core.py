@@ -13,7 +13,7 @@ from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
 from skillfarm import __title__
-from skillfarm.models.skillfarm import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 

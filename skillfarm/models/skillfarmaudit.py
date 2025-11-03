@@ -5,6 +5,7 @@ import datetime
 from collections.abc import Callable
 
 # Third Party
+from aiopenapi3.errors import ContentTypeError
 from bravado.exception import HTTPInternalServerError
 
 # Django
@@ -20,6 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
+from esi.exceptions import HTTPNotModified
 
 # Alliance Auth (External Libs)
 from app_utils.logging import LoggerAddTag
@@ -27,7 +29,7 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm import __title__, app_settings
-from skillfarm.errors import HTTPGatewayTimeoutError, NotModifiedError
+from skillfarm.errors import HTTPGatewayTimeoutError
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
@@ -291,13 +293,22 @@ class SkillFarmAudit(models.Model):
         except HTTPInternalServerError as exc:
             logger.debug("%s: Update has an HTTP internal server error: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
-        except NotModifiedError:
-            logger.debug("%s: Update has not changed, section: %s", self, section.label)
+        except HTTPNotModified as exc:
+            logger.debug("%s: Update has not changed, section: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
         except HTTPGatewayTimeoutError as exc:
             logger.debug(
                 "%s: Update has a gateway timeout error, section: %s: %s",
                 self,
+                section.label,
+                exc,
+            )
+            return UpdateSectionResult(is_changed=False, is_updated=False)
+        except (OSError, ContentTypeError) as exc:
+            logger.info(
+                "%s Update has a %s error, section: %s: %s",
+                self,
+                type(exc).__name__,
                 section.label,
                 exc,
             )

@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 # Alliance Auth (External Libs)
-from app_utils.esi_testing import EsiClientStub, EsiEndpoint
+from app_utils.esi_testing import EsiClientStub, EsiClientStubOpenApi, EsiEndpoint
 
 
 def load_test_data():
@@ -17,17 +17,20 @@ _esi_data = load_test_data()
 _endpoints = [
     EsiEndpoint(
         "Skills",
-        "get_characters_character_id_skillqueue",
+        "GetCharactersCharacterIdSkillqueue",
         "character_id",
         needs_token=False,
+        return_response=True,
     ),
     EsiEndpoint(
         "Skills",
-        "get_characters_character_id_skills",
+        "GetCharactersCharacterIdSkills",
         "character_id",
         needs_token=False,
+        return_response=True,
     ),
 ]
 
 esi_client_stub = EsiClientStub(_esi_data, endpoints=_endpoints)
+esi_client_stub_openapi = EsiClientStubOpenApi(_esi_data, endpoints=_endpoints)
 esi_client_error_stub = EsiClientStub(_esi_data, endpoints=_endpoints, http_error=502)
