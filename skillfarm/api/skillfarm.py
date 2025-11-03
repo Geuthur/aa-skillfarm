@@ -27,6 +27,7 @@ from skillfarm.api.helpers.core import (
     generate_edit_skillsetup_button,
     generate_progressbar_html,
     generate_skillinfo_button,
+    generate_status_icon_html,
     generate_toggle_notification_button,
     get_alts_queryset,
     get_character,
@@ -295,7 +296,7 @@ class SkillFarmApiEndpoints:
                         notification=character.notification,
                         last_update=str(character.last_update),
                         is_extraction_ready=f"{skill_info_html} {character.extraction_icon}",
-                        is_filter=str(lazy.get_status_icon(character.is_filtered)),
+                        is_filter=generate_status_icon_html(character=character),
                     ),
                     actions=actions_html,
                 )

@@ -27,7 +27,7 @@ def arabic_number_to_roman(value) -> str:
         return "-"
 
 
-def get_main_character(request, character_id):
+def get_main_character(request, character_id) -> tuple[bool, EveCharacter]:
     """Get Character and check permissions"""
     perms = True
     try:
@@ -134,7 +134,17 @@ def generate_progressbar_html(progress) -> str:
         render_to_string(
             "skillfarm/partials/progressbar.html",
             {
-                "progress": round(progress, 2),
+                "progress": f"{progress:.2f}",
             },
+        )
+    )
+
+
+def generate_status_icon_html(character: SkillFarmAudit, size: int = 32) -> str:
+    """Generate a status icon HTML"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/icons/status.html",
+            {"character": character, "size": size},
         )
     )
