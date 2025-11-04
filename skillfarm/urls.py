@@ -7,7 +7,7 @@ from django.urls import path, re_path
 from skillfarm import views
 from skillfarm.api import api
 
-app_name: str = "skillfarm"
+app_name: str = "skillfarm"  # pylint: disable=invalid-name
 
 urlpatterns = [
     # -- Views
