@@ -20,6 +20,9 @@ from skillfarm.decorators import log_timing
 from skillfarm.providers import esi
 
 if TYPE_CHECKING:
+    # Alliance Auth
+    from esi.stubs import CharactersCharacterIdSkillqueueGetItem as SkillQueueItems
+
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
     from skillfarm.models.skillfarmaudit import (
@@ -27,17 +30,6 @@ if TYPE_CHECKING:
     )
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
-
-
-class CharacterSkillQueueContext:
-    finish_date: timezone.datetime
-    finished_level: int
-    level_end_sp: int
-    level_start_sp: int
-    queue_position: int
-    skill_id: int
-    start_date: timezone.datetime
-    training_start_sp: int
 
 
 class SkillqueueQuerySet(models.QuerySet):
@@ -130,11 +122,9 @@ class SkillqueueManagerBase(models.Manager):
             character_id=character.character.character_id,
             token=token,
         )
-        character_skillqueue_items, response = skillqueue_data.results(
-            return_response=True,
+        character_skillqueue_items = skillqueue_data.results(
             force_refresh=force_refresh,
         )
-        logger.debug("ESI response Status: %s", response.status_code)
 
         self._update_or_create_objs(
             character=character, character_skillqueue_items=character_skillqueue_items
@@ -144,7 +134,7 @@ class SkillqueueManagerBase(models.Manager):
     def _update_or_create_objs(
         self,
         character: "SkillFarmAudit",
-        character_skillqueue_items: list[CharacterSkillQueueContext],
+        character_skillqueue_items: list["SkillQueueItems"],
     ) -> None:
         """Update or Create skill queue entries from objs data."""
         entries = []

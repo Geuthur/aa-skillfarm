@@ -19,6 +19,10 @@ from skillfarm.decorators import log_timing
 from skillfarm.providers import esi
 
 if TYPE_CHECKING:
+    # Alliance Auth
+    from esi.stubs import CharactersCharacterIdSkillsGet
+    from esi.stubs import CharactersCharacterIdSkillsGet_SkillsItem as SkillItems
+
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
     from skillfarm.models.skillfarmaudit import (
@@ -26,18 +30,6 @@ if TYPE_CHECKING:
     )
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
-
-
-class CharacterSkillContext:
-    class SkillContext:
-        active_skill_level: int
-        skill_id: int
-        skillpoints_in_skill: int
-        trained_skill_level: int
-
-    skills: list[SkillContext]
-    total_sp: int
-    unallocated_sp: int
 
 
 class SkillManagerQuerySet(models.QuerySet):
@@ -100,10 +92,7 @@ class SkillManagerBase(models.Manager):
             character_id=character.character.character_id,
             token=token,
         )
-        character_skills_items, response = character_skills.results(
-            return_response=True, force_refresh=force_refresh
-        )
-        logger.debug("ESI response Status: %s", response.status_code)
+        character_skills_items = character_skills.results(force_refresh=force_refresh)
 
         self._update_or_create_objs(
             character=character, character_skills_items=character_skills_items
@@ -113,7 +102,7 @@ class SkillManagerBase(models.Manager):
     def _update_or_create_objs(
         self,
         character: "SkillFarmAudit",
-        character_skills_items: list[CharacterSkillContext],
+        character_skills_items: list["CharactersCharacterIdSkillsGet"],
     ) -> None:
         """Update or Create skill entries from objs data."""
         for character_skills in character_skills_items:
@@ -152,7 +141,7 @@ class SkillManagerBase(models.Manager):
                     )
 
     def _preload_types(
-        self, character_skills_items: CharacterSkillContext
+        self, character_skills_items: "CharactersCharacterIdSkillsGet"
     ) -> list[int] | None:
         """Preload EveType objects from a list of skills."""
         skills_list = [skill.skill_id for skill in character_skills_items.skills]
@@ -167,7 +156,7 @@ class SkillManagerBase(models.Manager):
     def _create_from_list(
         self,
         character: "SkillFarmAudit",
-        skills_list: list[CharacterSkillContext.SkillContext],
+        skills_list: list["SkillItems"],
         create_ids: set,
     ):
         logger.debug("%s: Storing %s new skills", character, len(create_ids))
@@ -188,7 +177,7 @@ class SkillManagerBase(models.Manager):
     def _update_from_list(
         self,
         character,
-        skills_list: list[CharacterSkillContext.SkillContext],
+        skills_list: list["SkillItems"],
         update_ids: set,
     ):
         logger.debug("%s: Updating %s skills", character, len(update_ids))
