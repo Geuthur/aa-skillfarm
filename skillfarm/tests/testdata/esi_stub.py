@@ -26,14 +26,12 @@ _endpoints = [
         "GetCharactersCharacterIdSkillqueue",
         "character_id",
         needs_token=False,
-        return_response=True,
     ),
     EsiEndpoint(
         "Skills",
         "GetCharactersCharacterIdSkills",
         "character_id",
         needs_token=False,
-        return_response=True,
     ),
 ]
 
