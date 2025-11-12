@@ -5,8 +5,7 @@ import datetime
 from collections.abc import Callable
 
 # Third Party
-from aiopenapi3.errors import ContentTypeError
-from bravado.exception import HTTPInternalServerError
+from aiopenapi3.errors import HTTPClientError, HTTPServerError
 
 # Django
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -29,7 +28,6 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm import __title__, app_settings
-from skillfarm.errors import HTTPGatewayTimeoutError
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
@@ -290,29 +288,28 @@ class SkillFarmAudit(models.Model):
         try:
             data = fetch_func(character=self, force_refresh=force_refresh)
             logger.debug("%s: Update has changed, section: %s", self, section.label)
-        except HTTPInternalServerError as exc:
-            logger.debug("%s: Update has an HTTP internal server error: %s", self, exc)
-            return UpdateSectionResult(is_changed=False, is_updated=False)
         except HTTPNotModified as exc:
             logger.debug("%s: Update has not changed, section: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
-        except HTTPGatewayTimeoutError as exc:
-            logger.debug(
-                "%s: Update has a gateway timeout error, section: %s: %s",
+        except HTTPServerError as exc:
+            logger.debug("%s: Update has an HTTP internal server error: %s", self, exc)
+            return UpdateSectionResult(is_changed=False, is_updated=False)
+        except HTTPClientError as exc:
+            error_message = f"{type(exc).__name__}: {str(exc)}"
+            # TODO ADD DISCORD/AUTH NOTIFICATION?
+            logger.error(
+                "%s: %s: Update has Client Error: %s %s",
                 self,
                 section.label,
-                exc,
+                error_message,
+                exc.status_code,
             )
-            return UpdateSectionResult(is_changed=False, is_updated=False)
-        except (OSError, ContentTypeError) as exc:
-            logger.info(
-                "%s Update has a %s error, section: %s: %s",
-                self,
-                type(exc).__name__,
-                section.label,
-                exc,
+            return UpdateSectionResult(
+                is_changed=False,
+                is_updated=False,
+                has_token_error=True,
+                error_message=error_message,
             )
-            return UpdateSectionResult(is_changed=False, is_updated=False)
         return UpdateSectionResult(
             is_changed=True,
             is_updated=True,
@@ -322,23 +319,22 @@ class SkillFarmAudit(models.Model):
     def update_section_log(
         self,
         section: UpdateSection,
-        is_success: bool,
-        is_updated: bool = False,
-        error_message: str = None,
+        result: UpdateSectionResult,
     ) -> None:
         """Update the status of a specific section."""
-        error_message = error_message if error_message else ""
+        error_message = result.error_message if result.error_message else ""
+        is_success = not result.has_token_error
         defaults = {
             "is_success": is_success,
             "error_message": error_message,
-            "has_token_error": False,
+            "has_token_error": result.has_token_error,
             "last_run_finished_at": timezone.now(),
         }
         obj: CharacterUpdateStatus = self.skillfarm_update_status.update_or_create(
             section=section,
             defaults=defaults,
         )[0]
-        if is_updated:
+        if result.is_updated:
             obj.last_update_at = obj.last_run_at
             obj.last_update_finished_at = timezone.now()
             obj.save()
@@ -352,7 +348,6 @@ class SkillFarmAudit(models.Model):
         try:
             result = method(*args, **kwargs)
         except Exception as exc:
-            # TODO ADD DISCORD NOTIFICATION?
             error_message = f"{type(exc).__name__}: {str(exc)}"
             is_token_error = isinstance(exc, (TokenError))
             logger.error(
