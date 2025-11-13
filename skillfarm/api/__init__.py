@@ -13,7 +13,6 @@ api = NinjaAPI(
     version="0.5.0",
     urls_namespace="skillfarm:api",
     auth=django_auth,
-    csrf=True,
     openapi_url=settings.DEBUG and "/openapi.json" or "",
 )
 
