@@ -35,10 +35,10 @@ dynamic = [
 ]
 dependencies = [
     "allianceauth>=4.10,<5",
-    "allianceauth-app-utils>=2b1",
+    "allianceauth-app-utils>=2b2",
     "django-esi>=8,<9",
     "django-eveuniverse>=1.6",
-    "django-ninja<1.5",
+    "django-ninja",
 ]
 optional-dependencies.tests-allianceauth-latest = [
     "aa-discordnotify",
@@ -59,6 +59,3 @@ include = [
 
 [tool.hatch.version]
 path = "skillfarm/__init__.py"
-
-[tool.hatch.metadata]
-allow-direct-references = true
