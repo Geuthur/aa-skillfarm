@@ -11,6 +11,38 @@ Section Order:
 ### Removed
 -->
 
+## [1.0.0] - 2025-11-03
+
+### Changed
+
+- Switch to OPENAPI3 ESI Client
+  - Dependency `django-esi` set to `>=8,<9`
+  - Dependency `allianceauth-app-utils` set to `2b1`
+- Updated dependencies
+  - Dependency `django-eveuniverse` set to `>=1.6`
+- Updated README url for translations
+- Refactored API
+- Updated loading spinner image
+- Optimized Python HTML functions
+- Updated Application Tests
+
+### Added
+
+- SkillfarmAudit Model
+  - `get_skillqueue` property
+  - `get_skills` property
+  - `get_skillsetup` property
+  - `is_filtered` property
+  - `is_skill_ready` property
+  - `is_skillqueue_ready` property
+  - `notification_icon` property
+  - `extraction_icon` property
+
+### Removed
+
+- Own Context Classes
+- ESI Response Debug Logs
+
 ## [1.0.0-beta.1] - 2025-11-03
 
 > [!CAUTION]
@@ -399,6 +431,7 @@ This will load all necessary prices
 
 - Initial public release
 
+[1.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...v1.0.0 "1.0.0"
 [1.0.0-beta.1]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...v1.0.0-beta.1 "1.0.0-beta.1"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.0-beta.1...HEAD "In Development"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"

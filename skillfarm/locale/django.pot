@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: AA Skillfarm 0.5.8\n"
+"Project-Id-Version: AA Skillfarm 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2025-10-21 11:58+0200\n"
+"POT-Creation-Date: 2025-11-13 08:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,127 +21,75 @@ msgstr ""
 msgid "last update run"
 msgstr ""
 
-#: skillfarm/api/character/helpers/skilldetails.py:111
-msgid "Toggle Alarm"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:117
-msgid "Are you sure you want to toggle the alarm for {}?"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:125
-msgid "Edit Skillset"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:136
-msgid "Delete Character"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:142
-msgid "Are you sure you want to delete {}?"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:155
-msgid "Skillinfo"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:179
-msgid "Skill Extraction Ready"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:184
-msgid "Please check your Character a Skill should be ready for extraction"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:206
-msgid "Notification Activated"
-msgstr ""
-
-#: skillfarm/api/character/helpers/skilldetails.py:212
-msgid "Notification Deactivated"
-msgstr ""
-
-#: skillfarm/api/character/skillfarm.py:72
-msgid "Show Skillfarm"
-msgstr ""
-
-#: skillfarm/api/character/skillfarm.py:174
+#: skillfarm/api/skillfarm.py:306
 msgid "No Active Training"
 msgstr ""
 
-#: skillfarm/api/character/skillfarm.py:231
+#: skillfarm/api/skillfarm.py:410
 #: skillfarm/templates/skillfarm/bundles/settings-bundle.html:20
 #: skillfarm/templates/skillfarm/partials/table/inactive.html:9
 #: skillfarm/templates/skillfarm/partials/table/skillfarm.html:9
 msgid "Skill Info"
 msgstr ""
 
-#: skillfarm/helpers/lazy.py:61
-msgid "Active"
-msgstr ""
-
-#: skillfarm/helpers/lazy.py:64
-msgid "Inactive"
-msgstr ""
-
-#: skillfarm/models/skillfarm.py:41
+#: skillfarm/models/skillfarmaudit.py:44
 #: skillfarm/templates/skillfarm/partials/modals/view_skillqueue.html:96
 msgid "Skills"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:42
+#: skillfarm/models/skillfarmaudit.py:45
 msgid "Skill Queue"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:55
+#: skillfarm/models/skillfarmaudit.py:58
 msgid "disabled"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:56
+#: skillfarm/models/skillfarmaudit.py:59
 msgid "token error"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:57
+#: skillfarm/models/skillfarmaudit.py:60
 msgid "error"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:58
+#: skillfarm/models/skillfarmaudit.py:61
 msgid "ok"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:59
+#: skillfarm/models/skillfarmaudit.py:62
 msgid "incomplete"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:60
+#: skillfarm/models/skillfarmaudit.py:63
 msgid "in progress"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:94
+#: skillfarm/models/skillfarmaudit.py:97
 msgid "Update is disabled"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:95
+#: skillfarm/models/skillfarmaudit.py:98
 msgid "One section has a token error during update"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:96
+#: skillfarm/models/skillfarmaudit.py:99
 msgid "One or more sections have not been updated"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:97
+#: skillfarm/models/skillfarmaudit.py:100
 msgid "Update is in progress"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:98
+#: skillfarm/models/skillfarmaudit.py:101
 msgid "An error occurred during update"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:99
+#: skillfarm/models/skillfarmaudit.py:102
 msgid "Updates completed successfully"
 msgstr ""
 
-#: skillfarm/models/skillfarm.py:290
+#: skillfarm/models/skillfarmaudit.py:374
 #, python-format
 msgid "%(charname)s: %(skillname)s"
 msgstr ""
@@ -298,7 +246,63 @@ msgstr ""
 msgid "Add Character"
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/modal.html:29
+#: skillfarm/templates/skillfarm/partials/buttons/delete-character.html:7
+#: skillfarm/templates/skillfarm/partials/buttons/delete-character.html:12
+msgid "Delete Character"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/delete-character.html:8
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/edit-skillsetup.html:5
+#: skillfarm/templates/skillfarm/partials/buttons/edit-skillsetup.html:11
+msgid "Edit Skillset"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/skillinfo.html:7
+#: skillfarm/templates/skillfarm/partials/buttons/skillinfo.html:11
+msgid "Skillinfo"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/toggle-notification.html:7
+#: skillfarm/templates/skillfarm/partials/buttons/toggle-notification.html:12
+msgid "Toggle Alarm"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/toggle-notification.html:8
+msgid "Are you sure you want to toggle the alarm for"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/buttons/view.html:4
+msgid "Show Skillfarm"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/extraction_ready.html:13
+msgid "Skill is extraction ready"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/extraction_sb_ready.html:13
+msgid "Please check your Character a Skill should be ready for extraction"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/notification.html:8
+msgid "Notification Activated"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/notification.html:10
+msgid "Notification Deactivated"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/status.html:6
+msgid "Active"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/icons/status.html:6
+msgid "Inactive"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/modal.html:25
 msgid "Close"
 msgstr ""
 
@@ -377,41 +381,37 @@ msgid "You do not have permission to access this page."
 msgstr ""
 
 #: skillfarm/views.py:76
-msgid "Queued Clear All ETags"
-msgstr ""
-
-#: skillfarm/views.py:79
 msgid "Queued Update All Characters"
 msgstr ""
 
-#: skillfarm/views.py:129
+#: skillfarm/views.py:126
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 
-#: skillfarm/views.py:147 skillfarm/views.py:174 skillfarm/views.py:203
+#: skillfarm/views.py:144 skillfarm/views.py:171 skillfarm/views.py:200
 msgid "Permission Denied"
 msgstr ""
 
-#: skillfarm/views.py:157
+#: skillfarm/views.py:154
 msgid "Alarm successfully updated"
 msgstr ""
 
-#: skillfarm/views.py:183
+#: skillfarm/views.py:180
 #, python-brace-format
 msgid "{character_name} successfully deleted"
 msgstr ""
 
-#: skillfarm/views.py:224
+#: skillfarm/views.py:221
 msgid "Invalid JSON format"
 msgstr ""
 
-#: skillfarm/views.py:229
+#: skillfarm/views.py:226
 #, python-brace-format
 msgid "{character_name} Skillset successfully updated"
 msgstr ""
 
-#: skillfarm/views.py:282
+#: skillfarm/views.py:279
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
 "fetch Market Data."
