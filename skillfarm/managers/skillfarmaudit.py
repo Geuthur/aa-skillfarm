@@ -1,3 +1,6 @@
+# Standard Library
+from typing import TYPE_CHECKING
+
 # Django
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
@@ -15,6 +18,10 @@ from app_utils.logging import LoggerAddTag
 from skillfarm import __title__
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+
+if TYPE_CHECKING:
+    # AA Skillfarm
+    from skillfarm.models.skillfarmaudit import SkillFarmAudit as SkillFarmAuditType
 
 
 class SkillfarmQuerySet(models.QuerySet):
@@ -47,15 +54,6 @@ class SkillfarmQuerySet(models.QuerySet):
         except AssertionError:
             logger.debug("User %s has no main character. Nothing visible.", user)
             return self.none()
-
-    def annotate_total_update_status_user(self, user):
-        """Get the total update status for the given user."""
-        char = user.profile.main_character
-        assert char
-
-        query = models.Q(character__character_ownership__user=user)
-
-        return self.filter(query).annotate_total_update_status()
 
     def annotate_total_update_status(self):
         """Get the total update status."""
@@ -165,9 +163,25 @@ class SkillfarmQuerySet(models.QuerySet):
         return last_update_display
 
 
-class SkillFarmManagerBase(models.Manager):
+class SkillFarmManager(models.Manager["SkillFarmAuditType"]):
     def get_queryset(self):
         return SkillfarmQuerySet(self.model, using=self._db)
+
+    def visible_to(self, user):
+        """Return characters visible to the given user."""
+        return self.get_queryset().visible_to(user)
+
+    def annotate_total_update_status(self):
+        """Return the total update status."""
+        return self.get_queryset().annotate_total_update_status()
+
+    def disable_characters_with_no_owner(self) -> int:
+        """Disable characters which have no owner. Return count of disabled characters."""
+        return self.get_queryset().disable_characters_with_no_owner()
+
+    def last_update_status(self, character):
+        """Proxy to QuerySet.last_update_status for a given character."""
+        return self.get_queryset().last_update_status(character)
 
     @staticmethod
     def visible_eve_characters(user):
@@ -199,9 +213,3 @@ class SkillFarmManagerBase(models.Manager):
         except AssertionError:
             logger.debug("User %s has no main character. Nothing visible.", user)
             return qs.none()
-
-    def visible_to(self, user):
-        return self.get_queryset().visible_to(user)
-
-
-SkillFarmManager = SkillFarmManagerBase.from_queryset(SkillfarmQuerySet)

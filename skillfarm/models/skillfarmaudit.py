@@ -115,7 +115,7 @@ class SkillFarmAudit(models.Model):
     notification_sent = models.BooleanField(default=False)
     last_notification = models.DateTimeField(null=True, default=None, blank=True)
 
-    objects = SkillFarmManager()
+    objects: SkillFarmManager = SkillFarmManager()
 
     def __str__(self):
         return f"{self.character.character_name} - Active: {self.active} - Status: {self.get_status}"
@@ -394,7 +394,7 @@ class SkillFarmSetup(models.Model):
     def __str__(self):
         return f"{self.skillset}'s Skill Setup"
 
-    objects = SkillFarmManager()
+    objects: SkillFarmManager = SkillFarmManager()
 
     class Meta:
         default_permissions = ()
@@ -418,7 +418,7 @@ class CharacterSkill(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
 
-    objects = SkillManager()
+    objects: SkillManager = SkillManager()
 
     class Meta:
         default_permissions = ()
