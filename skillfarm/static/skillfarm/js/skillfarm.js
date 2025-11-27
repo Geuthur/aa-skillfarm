@@ -55,6 +55,8 @@ const SkillFarmAjax = (() => {
             success: function (data) {
                 updateDataTable('#skillfarm-details', data.active_characters);
                 updateDataTable('#skillfarm-inactive', data.inactive_characters);
+                // Set extraction count from the full response object
+                $('#skillExtractorLabel').text(data.skill_extraction_count || 'N/A');
             },
             error: function (xhr, error, thrown) {
                 let errorMsg = 'Unknown error';

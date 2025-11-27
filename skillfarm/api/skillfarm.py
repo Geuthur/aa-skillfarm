@@ -77,6 +77,7 @@ class SkillFarmDetailsSchema(Schema):
 class SkillFarmDetailsResponse(Schema):
     active_characters: list[SkillFarmDetailsSchema] | None = None
     inactive_characters: list[SkillFarmDetailsSchema] | None = None
+    skill_extraction_count: int | None = None
 
 
 class SkillFarmSetupSchema(Schema):
@@ -263,6 +264,7 @@ class SkillFarmApiEndpoints:
 
             active_characters: list[SkillFarmDetailsSchema] = []
             inactive_characters: list[SkillFarmDetailsSchema] = []
+            skills_ready = 0
 
             for character in skillfarm_characters:
                 char_portrait = lazy.get_character_portrait_url(
@@ -321,12 +323,19 @@ class SkillFarmApiEndpoints:
                     )
                     active_characters.append(skillfarm_details)
 
+                # Count skills ready for extraction
+                if character.is_skill_ready:
+                    skills_ready += 1
+                if character.is_skillqueue_ready:
+                    skills_ready += 1
+
             logger.info(
                 f"User {request.user} successfully retrieved SkillFarm details for character ID {character_id}."
             )
             return SkillFarmDetailsResponse(
                 active_characters=active_characters,
                 inactive_characters=inactive_characters,
+                skill_extraction_count=skills_ready,
             )
 
         @api.get(
