@@ -55,15 +55,6 @@ class SkillfarmQuerySet(models.QuerySet):
             logger.debug("User %s has no main character. Nothing visible.", user)
             return self.none()
 
-    def annotate_total_update_status_user(self, user):
-        """Get the total update status for the given user."""
-        char = user.profile.main_character
-        assert char
-
-        query = models.Q(character__character_ownership__user=user)
-
-        return self.filter(query).annotate_total_update_status()
-
     def annotate_total_update_status(self):
         """Get the total update status."""
         # pylint: disable=import-outside-toplevel, cyclic-import
@@ -179,6 +170,10 @@ class SkillFarmManager(models.Manager["SkillFarmAuditType"]):
     def visible_to(self, user):
         """Return characters visible to the given user."""
         return self.get_queryset().visible_to(user)
+
+    def annotate_total_update_status(self):
+        """Return the total update status."""
+        return self.get_queryset().annotate_total_update_status()
 
     def disable_characters_with_no_owner(self) -> int:
         """Disable characters which have no owner. Return count of disabled characters."""
