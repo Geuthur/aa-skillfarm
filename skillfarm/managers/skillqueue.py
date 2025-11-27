@@ -25,9 +25,7 @@ if TYPE_CHECKING:
 
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
-    from skillfarm.models.skillfarmaudit import (
-        SkillFarmAudit,
-    )
+    from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry, SkillFarmAudit
 
 logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
@@ -99,7 +97,22 @@ class SkillqueueQuerySet(models.QuerySet):
         return skillqueue
 
 
-class SkillqueueManagerBase(models.Manager):
+class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
+    def get_queryset(self):
+        """Get the base QuerySet for Skillqueue entries."""
+        return SkillqueueQuerySet(self.model, using=self._db)
+
+    def extractions(self, character: "SkillFarmAudit") -> bool:
+        """Return extraction ready skills from a training queue."""
+        return self.get_queryset().extractions(character)
+
+    def skill_in_training(self):
+        return self.get_queryset().skill_in_training()
+
+    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+        """Return filtered skills from a training queue."""
+        return self.get_queryset().skill_filtered(character)
+
     @log_timing(logger)
     def update_or_create_esi(
         self, character: "SkillFarmAudit", force_refresh: bool = False
@@ -160,6 +173,3 @@ class SkillqueueManagerBase(models.Manager):
 
         if len(entries) > 0:
             self.bulk_create(entries, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)
-
-
-SkillqueueManager = SkillqueueManagerBase.from_queryset(SkillqueueQuerySet)
