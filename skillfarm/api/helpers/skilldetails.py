@@ -31,7 +31,7 @@ def calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
     start_date = skill.start_date
     finish_date = skill.finish_date
 
-    if totalsp == 0:
+    if totalsp == 0 or start_date is None or finish_date is None:
         return 0
 
     current_date = timezone.now()
