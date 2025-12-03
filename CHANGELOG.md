@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- implement AppLogger and retry_task_on_esi_error for enhanced logging and error handling
+
 ### Changed
 
 - refactor app_settings to use Django settings instead of app_utils
