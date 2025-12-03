@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Changed
+
+- refactor app_settings to use Django settings instead of app_utils
+
 ## [1.0.3] - 2025-11-16
 
 ### Changed
