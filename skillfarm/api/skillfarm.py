@@ -117,21 +117,13 @@ class SkillFarmInfoResponse(Schema):
 def get_skillqueue_data(skill: CharacterSkillqueueEntry):
     """Get skillqueue data for a single skill"""
     level = arabic_number_to_roman(skill.finished_level)
-
-    if skill.start_date is None:
-        progress = 0
-    else:
-        progress = calculate_single_progress_bar(skill)
-
-    if skill.start_date is None:
-        start_date = "-"
-    else:
-        start_date = skill.start_date.strftime("%Y-%m-%d %H:%M")
-
-    if skill.finish_date is None:
-        end_date = "-"
-    else:
-        end_date = skill.finish_date.strftime("%Y-%m-%d %H:%M")
+    progress = calculate_single_progress_bar(skill)
+    start_date = (
+        skill.start_date.strftime("%Y-%m-%d %H:%M") if skill.start_date else "-"
+    )
+    end_date = (
+        skill.finish_date.strftime("%Y-%m-%d %H:%M") if skill.finish_date else "-"
+    )
 
     skillqueue_response = SkillFarmQueueSchema(
         skill=f"{skill.eve_type.name} {level}",
