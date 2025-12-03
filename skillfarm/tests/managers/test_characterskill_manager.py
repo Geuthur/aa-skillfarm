@@ -4,10 +4,8 @@ from unittest.mock import patch
 # Django
 from django.test import override_settings
 
-# Alliance Auth (External Libs)
-from app_utils.testing import NoSocketsTestCase
-
 # AA Skillfarm
+from skillfarm.tests import NoSocketsTestCase
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.esi_stub import esi_client_stub_openapi
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse

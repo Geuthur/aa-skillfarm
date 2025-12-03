@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 # Django
 from django.db.utils import Error
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from django.utils import timezone
 
 # Alliance Auth
@@ -12,6 +12,7 @@ from allianceauth.authentication.models import UserProfile
 # AA Skillfarm
 from skillfarm import tasks
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.tests import NoSocketsTestCase
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
@@ -28,7 +29,7 @@ TASK_PATH = "skillfarm.tasks"
 
 
 @patch(TASK_PATH + ".update_character", spec=True)
-class TestUpdateAllSkillfarm(TestCase):
+class TestUpdateAllSkillfarm(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -51,7 +52,7 @@ class TestUpdateAllSkillfarm(TestCase):
 )
 @patch(TASK_PATH + ".chain", spec=True)
 @patch(TASK_PATH + ".logger", spec=True)
-class TestUpdateCharacter(TestCase):
+class TestUpdateCharacter(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -95,7 +96,7 @@ class TestUpdateCharacter(TestCase):
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
     APP_UTILS_OBJECT_CACHE_DISABLED=True,
 )
-class TestCheckSkillfarmNotification(TestCase):
+class TestCheckSkillfarmNotification(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -148,7 +149,7 @@ class TestCheckSkillfarmNotification(TestCase):
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
     APP_UTILS_OBJECT_CACHE_DISABLED=True,
 )
-class TestCheckSkillfarmNotificationSuccess(TestCase):
+class TestCheckSkillfarmNotificationSuccess(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -210,7 +211,7 @@ class TestCheckSkillfarmNotificationSuccess(TestCase):
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
     APP_UTILS_OBJECT_CACHE_DISABLED=True,
 )
-class TestCheckSkillfarmNotificationError(TestCase):
+class TestCheckSkillfarmNotificationError(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -259,7 +260,7 @@ class TestCheckSkillfarmNotificationError(TestCase):
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
     APP_UTILS_OBJECT_CACHE_DISABLED=True,
 )
-class TestSkillfarmPrices(TestCase):
+class TestSkillfarmPrices(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

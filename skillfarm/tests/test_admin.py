@@ -5,13 +5,14 @@ from django.test import RequestFactory, TestCase
 # AA Skillfarm
 from skillfarm.admin import SkillFarmAuditAdmin
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.tests import NoSocketsTestCase
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.skillfarm import create_skillfarm_character
 
 MODULE_PATH = "skillfarm.admin."
 
 
-class TestAdminView(TestCase):
+class TestAdminView(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

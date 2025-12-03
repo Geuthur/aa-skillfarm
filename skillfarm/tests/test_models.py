@@ -4,13 +4,10 @@ from django.utils import timezone
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import (
-    CharacterSkill,
-    CharacterSkillqueueEntry,
     SkillFarmAudit,
-    SkillFarmSetup,
 )
+from skillfarm.tests import NoSocketsTestCase
 from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.skillfarm import (
     create_skillfarm_character,
     create_update_status,
@@ -19,7 +16,7 @@ from skillfarm.tests.testdata.skillfarm import (
 MODULE_PATH = "skillfarm.models.skillfarmaudit"
 
 
-class TestSkillfarmModel(TestCase):
+class TestSkillfarmModel(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

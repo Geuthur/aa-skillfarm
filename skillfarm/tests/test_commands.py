@@ -4,15 +4,15 @@ from unittest.mock import patch
 
 # Django
 from django.core.management import call_command
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.utils import timezone
 
 # Alliance Auth (External Libs)
-from app_utils.testing import NoSocketsTestCase
 from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
+from skillfarm.tests import NoSocketsTestCase
 from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
