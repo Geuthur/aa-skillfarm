@@ -17,17 +17,15 @@ from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__, forms, tasks
 from skillfarm.api.helpers.core import get_character
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.providers import AppLogger
 from skillfarm.tasks import update_all_skillfarm
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 # pylint: disable=unused-argument

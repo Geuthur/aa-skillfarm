@@ -23,7 +23,6 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPNotModified
 
 # Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
 from eveuniverse.models import EveType
 
 # AA Skillfarm
@@ -32,8 +31,9 @@ from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
 from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
+from skillfarm.providers import AppLogger
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 # pylint: disable=too-many-public-methods
@@ -283,7 +283,13 @@ class SkillFarmAudit(models.Model):
         fetch_func: Callable,
         force_refresh: bool = False,
     ):
-        """Update the status of a specific section if it has changed."""
+        """Update character section if changed from ESI or is forced.
+
+        :param section: The section to update.
+        :param fetch_func: The function to fetch data from ESI.
+        :param force_refresh: Whether to force refresh the data.
+        :return: UpdateSectionResult indicating the result of the update.
+        """
         section = self.UpdateSection(section)
         try:
             data = fetch_func(character=self, force_refresh=force_refresh)

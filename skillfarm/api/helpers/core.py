@@ -6,16 +6,10 @@ from django.utils.safestring import mark_safe
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
-from allianceauth.services.hooks import get_extension_logger
-
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
 
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
 
 
 def arabic_number_to_roman(value) -> str:

@@ -9,14 +9,13 @@ from django.db import models, transaction
 from allianceauth.services.hooks import get_extension_logger
 
 # Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
 from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
-from skillfarm.providers import esi
+from skillfarm.providers import AppLogger, esi
 
 if TYPE_CHECKING:
     # Alliance Auth
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
     from skillfarm.models.general import UpdateSectionResult
     from skillfarm.models.skillfarmaudit import CharacterSkill, SkillFarmAudit
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 class SkillManagerQuerySet(models.QuerySet):

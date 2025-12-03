@@ -16,9 +16,6 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.authentication.models import UserProfile
 from allianceauth.services.hooks import get_extension_logger
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.api.helpers.core import (
@@ -45,8 +42,9 @@ from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
 )
+from skillfarm.providers import AppLogger
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 class OverviewSchema(Schema):

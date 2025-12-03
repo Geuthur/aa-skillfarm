@@ -21,6 +21,7 @@ Section Order:
 
 ### Removed
 
+- `allianceauth-app-utils` dependency
 - unused ESI-related functions and imports from decorators.py
 - unused EVE Online and Fuzzwork API settings from app_settings
 

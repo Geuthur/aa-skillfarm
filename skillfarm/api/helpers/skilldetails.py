@@ -8,21 +8,19 @@ from django.utils.translation import gettext_lazy as _
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.api.helpers.core import (
     generate_progressbar_html,
 )
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
+from skillfarm.providers import AppLogger
 
 if TYPE_CHECKING:
     # AA Skillfarm
     from skillfarm.api.skillfarm import SkillFarmQueueSchema
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 def calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
