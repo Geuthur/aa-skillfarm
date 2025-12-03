@@ -5,24 +5,6 @@ App Settings
 # Django
 from django.conf import settings
 
-# EVE Online Swagger
-EVE_BASE_URL = "https://esi.evetech.net/"
-EVE_API_URL = "https://esi.evetech.net/latest/"
-EVE_BASE_URL_REGEX = r"^http[s]?:\/\/esi.evetech\.net\/"
-
-# Fuzzwork
-FUZZ_BASE_URL = "https://www.fuzzwork.co.uk/"
-FUZZ_API_URL = "https://www.fuzzwork.co.uk/api/"
-FUZZ_BASE_URL_REGEX = r"^http[s]?:\/\/(www\.)?fuzzwork\.co\.uk\/"
-
-# ZKillboard
-ZKILLBOARD_BASE_URL = "https://zkillboard.com/"
-ZKILLBOARD_API_URL = "https://zkillboard.com/api/"
-ZKILLBOARD_BASE_URL_REGEX = r"^http[s]?:\/\/zkillboard\.com\/"
-ZKILLBOARD_KILLMAIL_URL_REGEX = r"^http[s]?:\/\/zkillboard\.com\/kill\/\d+\/"
-
-# Set Test Mode True or False
-
 # Set Naming on Auth Hook
 SKILLFARM_APP_NAME = getattr(settings, "SKILLFARM_APP_NAME", "Skillfarm")
 
