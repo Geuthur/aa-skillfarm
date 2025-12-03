@@ -15,6 +15,11 @@ Section Order:
 
 - refactor app_settings to use Django settings instead of app_utils
 
+### Removed
+
+- unused ESI-related functions and imports from decorators.py
+- unused EVE Online and Fuzzwork API settings from app_settings
+
 ## [1.0.3] - 2025-11-16
 
 ### Changed
