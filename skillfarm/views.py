@@ -12,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 # Alliance Auth
-from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
@@ -28,28 +27,11 @@ from skillfarm.tasks import update_all_skillfarm
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
-# pylint: disable=unused-argument
-def add_info_to_context(request, context: dict) -> dict:
-    """Add additional information to the context for the view."""
-    theme = None
-    try:
-        user = UserProfile.objects.get(id=request.user.id)
-        theme = user.theme
-    except UserProfile.DoesNotExist:
-        pass
-
-    new_context = {
-        **{"theme": theme},
-        **context,
-    }
-    return new_context
-
-
 @login_required
 @permission_required("skillfarm.basic_access")
 def index(request, character_id=None):
     """Main Skillfarm View"""
-    if character_id is None:
+    if character_id is None and request.user.profile.main_character is not None:
         character_id = request.user.profile.main_character.character_id
 
     context = {
@@ -60,7 +42,6 @@ def index(request, character_id=None):
             "skillset": forms.SkillSetForm(),
         },
     }
-    context = add_info_to_context(request, context)
     return render(request, "skillfarm/skillfarm.html", context=context)
 
 
@@ -95,8 +76,6 @@ def character_overview(request):
     context = {
         "page_title": "Character Overview",
     }
-    context = add_info_to_context(request, context)
-
     return render(request, "skillfarm/overview.html", context=context)
 
 
