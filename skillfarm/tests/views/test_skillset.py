@@ -3,39 +3,35 @@
 # Standard Library
 import json
 from http import HTTPStatus
-from unittest.mock import Mock, patch
 
 # Django
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 # AA Skillfarm
-from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
-from skillfarm.tests.testdata.skillfarm import (
-    create_skillfarm_character,
-    create_user_from_evecharacter_with_access,
+from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests.testdata.utils import (
+    create_skillfarm_character_from_user,
 )
 from skillfarm.views import skillset
 
 MODULE_PATH = "skillfarm.views"
 
 
-class TestSkillSetView(TestCase):
+class TestSkillSetView(SkillFarmTestCase):
+    """Test Skillset Ajax Response."""
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
 
-        cls.factory = RequestFactory()
-        cls.audit = create_skillfarm_character(1001)
-        cls.user = cls.audit.character.character_ownership.user
-        cls.no_audit_user, _ = create_user_from_evecharacter_with_access(1002)
+        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
 
     def test_skillset(self):
-        character_id = self.audit.character.character_id
+        """
+        Test should update skillset successfully.
+        """
+        character_id = self.skillfarm_audit.character.character_id
+        # SlimSelect Data Types: https://slimselectjs.com/data#types
         form_data = {
             "character_id": character_id,
             "confirm": "yes",
@@ -91,7 +87,10 @@ class TestSkillSetView(TestCase):
         )
 
     def test_skillset_exception(self):
-        character_id = self.audit.character.character_id
+        """
+        Test should handle invalid JSON format in skillset update.
+        """
+        character_id = self.skillfarm_audit.character.character_id
         form_data = {
             "character_id": character_id,
             "confirm": "yes",
@@ -111,9 +110,12 @@ class TestSkillSetView(TestCase):
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["message"], "Invalid JSON format")
 
-    def test_skillset_no_audit(self):
+    def test_skillset_no_permission(self):
+        """
+        Test should prevent skillset update for Character that are not owned by the User.
+        """
         form_data = {
-            "character_id": 1001,
+            "character_id": 1003,
             "confirm": "yes",
             "selected_skills": json.dumps(
                 [
@@ -152,12 +154,11 @@ class TestSkillSetView(TestCase):
         }
 
         request = self.factory.post(
-            reverse("skillfarm:skillset", args=[1001]), data=form_data
+            reverse("skillfarm:skillset", args=[1003]), data=form_data
         )
-        request.user = self.no_audit_user
+        request.user = self.user
 
-        response = skillset(request, character_id=1001)
-
+        response = skillset(request, character_id=1003)
         response_data = json.loads(response.content)
 
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
@@ -165,11 +166,13 @@ class TestSkillSetView(TestCase):
         self.assertEqual(response_data["message"], "Permission Denied")
 
     def test_skillset_invalid(self):
+        """
+        Test should prevent skillset update with invalid form data.
+        """
         request = self.factory.post(
             reverse("skillfarm:skillset", args=[1001]), data=None
         )
-        request.user = self.no_audit_user
-
+        request.user = self.user
         response = skillset(request, character_id=1001)
 
         response_data = json.loads(response.content)

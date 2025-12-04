@@ -13,29 +13,27 @@ from skillfarm.api.helpers.skilldetails import (
 )
 from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
-from skillfarm.tests import NoSocketsTestCase
-from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
-from skillfarm.tests.testdata.skillfarm import create_skillfarm_character
+from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests.testdata.utils import create_skillfarm_character_from_user
 
 MODULE_PATH = "skillfarm.api.helpers."
 
 
-class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
+class Test_Calculate_Single_Progress_Bar(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
 
-        cls.audit = create_skillfarm_character(1001)
+        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
         cls.skill1 = EveType.objects.get(name="skill1")
         cls.skill2 = EveType.objects.get(name="skill2")
 
     def test_calc_single_progress_bar_no_end_sp(self):
-        """Test should return 0 if the skill has no end SP"""
+        """
+        Test should return 0.0% if the skill has no end SP
+        """
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -47,9 +45,11 @@ class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
         self.assertEqual(calculate_single_progress_bar(characterskillqueue), 0)
 
     def test_calc_single_progress_bar_100_percent(self):
-        """Test should return 100 if the skill is already finished"""
+        """
+        Test should return 100 if the skill is already finished
+        """
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -61,9 +61,11 @@ class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
         self.assertEqual(calculate_single_progress_bar(characterskillqueue), 100)
 
     def test_calc_single_progress_bar_below_zero(self):
-        """Test should return 100 if the skill is already finished"""
+        """
+        Test should return 0 if the skill has not yet started
+        """
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -75,9 +77,11 @@ class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
         self.assertEqual(calculate_single_progress_bar(characterskillqueue), 0)
 
     def test_calc_single_progress_bar(self):
-        """Test should return 25 if the skill is 25% finished"""
+        """
+        Test should return 25 if the skill is 25% finished
+        """
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -89,27 +93,29 @@ class Test_Calculate_Single_Progress_Bar(NoSocketsTestCase):
         self.assertEqual(calculate_single_progress_bar(characterskillqueue), 25.0)
 
 
-class Test_Calculate_Sum_Progress_bar(TestCase):
+class Test_Calculate_Sum_Progress_bar(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
 
-        cls.audit = create_skillfarm_character(1001)
+        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
         cls.skill1 = EveType.objects.get(name="skill1")
         cls.skill2 = EveType.objects.get(name="skill2")
 
     def test_calc_sum_progress_bar_no_skills(self):
-        """Test should return 0 if there are no skills"""
+        """
+        Test should return 0% if there are no skills in the queue
+        """
         excepted_progressbar = generate_progressbar_html(0)
         self.assertEqual(_calculate_sum_progress_bar({}), excepted_progressbar)
 
     def test_calc_sum_progress_bar_no_end_sp(self):
-        """Test should return 0.0% if the skill has no end SP"""
+        """
+        Test should return 0.0% if the skill has no end SP
+        """
 
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -122,8 +128,8 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue.save()
 
         skillqueue_response: list[SkillFarmQueueSchema] = []
-        skillqueue = self.audit.skillfarm_skillqueue.filter(
-            character=self.audit
+        skillqueue = self.skillfarm_audit.skillfarm_skillqueue.filter(
+            character=self.skillfarm_audit
         ).select_related("eve_type")
 
         for entry in skillqueue:
@@ -136,9 +142,11 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
 
     def test_calc_sum_progress_bar_partial_progress(self):
-        """Test should return 50.0%"""
+        """
+        Test should return 50.0%
+        """
         characterskillqueue = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -151,8 +159,8 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue.save()
 
         skillqueue_response: list[SkillFarmQueueSchema] = []
-        skillqueue = self.audit.skillfarm_skillqueue.filter(
-            character=self.audit
+        skillqueue = self.skillfarm_audit.skillfarm_skillqueue.filter(
+            character=self.skillfarm_audit
         ).select_related("eve_type")
 
         for entry in skillqueue:
@@ -165,9 +173,11 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
 
     def test_calc_sum_progress_bar_multiple_skills(self):
-        """Test should return 75.0%"""
+        """
+        Test should return 75.0% for two skills at 50% and 100%
+        """
         characterskillqueue1 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -180,7 +190,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue1.save()
 
         characterskillqueue2 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=2,
             eve_type=self.skill2,
             finished_level=5,
@@ -193,8 +203,8 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue2.save()
 
         skillqueue_response: list[SkillFarmQueueSchema] = []
-        skillqueue = self.audit.skillfarm_skillqueue.filter(
-            character=self.audit
+        skillqueue = self.skillfarm_audit.skillfarm_skillqueue.filter(
+            character=self.skillfarm_audit
         ).select_related("eve_type")
 
         for entry in skillqueue:
@@ -207,9 +217,11 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
 
     def test_calc_sum_progress_bar_multiple_skills_below_zero(self):
-        """Test should return 0.0%"""
+        """
+        Test should return 0.0% when both skills are not yet started
+        """
         characterskillqueue1 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -222,7 +234,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue1.save()
 
         characterskillqueue2 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=2,
             eve_type=self.skill2,
             finished_level=5,
@@ -235,8 +247,8 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue2.save()
 
         skillqueue_response: list[SkillFarmQueueSchema] = []
-        skillqueue = self.audit.skillfarm_skillqueue.filter(
-            character=self.audit
+        skillqueue = self.skillfarm_audit.skillfarm_skillqueue.filter(
+            character=self.skillfarm_audit
         ).select_related("eve_type")
 
         for entry in skillqueue:
@@ -249,9 +261,11 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         )
 
     def test_calc_sum_progress_bar_with_nodate(self):
-        """Test should return 50.0%"""
+        """
+        Test should return 50.0% when one skill has no start/finish date
+        """
         characterskillqueue1 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=1,
             eve_type=self.skill1,
             finished_level=5,
@@ -264,7 +278,7 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue1.save()
 
         characterskillqueue2 = CharacterSkillqueueEntry.objects.create(
-            character=self.audit,
+            character=self.skillfarm_audit,
             queue_position=2,
             eve_type=self.skill2,
             finished_level=5,
@@ -277,8 +291,8 @@ class Test_Calculate_Sum_Progress_bar(TestCase):
         characterskillqueue2.save()
 
         skillqueue_response: list[SkillFarmQueueSchema] = []
-        skillqueue = self.audit.skillfarm_skillqueue.filter(
-            character=self.audit
+        skillqueue = self.skillfarm_audit.skillfarm_skillqueue.filter(
+            character=self.skillfarm_audit
         ).select_related("eve_type")
 
         for entry in skillqueue:

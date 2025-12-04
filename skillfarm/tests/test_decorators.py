@@ -18,10 +18,7 @@ DECORATOR_PATH = "skillfarm.decorators."
 class TestDecorators(NoSocketsTestCase):
     def test_log_timing(self):
         """
-        Test log_timing decorator to log function execution time.
-
-        :return:
-        :rtype:
+        Test should log execution time of decorated function.
         """
         # given
         logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)

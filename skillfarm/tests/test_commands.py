@@ -12,20 +12,17 @@ from eveuniverse.models import EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.tests import NoSocketsTestCase
-from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
+from skillfarm.tests import SkillFarmTestCase
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
 @patch(COMMAND_PATH + ".EveType.objects.get_or_create_esi")
-class TestLoadPrices(NoSocketsTestCase):
+class TestLoadPrices(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_eveuniverse()
-
         cls.json = {
             1: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
             2: {"buy": {"percentile": 300}, "sell": {"percentile": 400}},
@@ -33,6 +30,9 @@ class TestLoadPrices(NoSocketsTestCase):
 
     @patch(COMMAND_PATH + ".logger")
     def test_should_load_prices(self, mock_logger, _, mock_requests_get):
+        """
+        Test should load prices into the database.
+        """
         # given
         mock_requests_get.return_value.json.return_value = self.json
 
@@ -40,11 +40,16 @@ class TestLoadPrices(NoSocketsTestCase):
         call_command("skillfarm_load_prices")
         # then
         mock_logger.debug.assert_called_once_with("Created all skillfarm prices.")
+        excepted_count = EveTypePrice.objects.count()
+        self.assertEqual(excepted_count, 2)
 
     @patch("builtins.input")
     def test_load_prices_should_get_integrityerror(
         self, mock_input, _, mock_requests_get
     ):
+        """
+        Test should handle IntegrityError when loading prices and not replace.
+        """
         # given
         EveTypePrice.objects.create(
             eve_type_id=1, buy=100, sell=200, updated_at=timezone.now()
@@ -68,6 +73,9 @@ class TestLoadPrices(NoSocketsTestCase):
     def test_load_prices_should_get_integrityerror_and_replace(
         self, mock_input, _, mock_requests_get
     ):
+        """
+        Test should handle IntegrityError when loading prices and replace.
+        """
         # given
         EveTypePrice.objects.create(
             eve_type_id=1, buy=100, sell=200, updated_at=timezone.now()
@@ -89,6 +97,9 @@ class TestLoadPrices(NoSocketsTestCase):
     def test_load_prices_should_evetype_not_exist(
         self, mock_evetype, _, mock_requests_get
     ):
+        """
+        Test should handle EveType.DoesNotExist when loading prices.
+        """
         # given
         mock_requests_get.return_value.json.return_value = {
             666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
@@ -106,6 +117,9 @@ class TestLoadPrices(NoSocketsTestCase):
 
     @patch(COMMAND_PATH + ".EveType.objects")
     def test_load_prices_should_get_error(self, mock_evetype, _, mock_requests_get):
+        """
+        Test should handle general error when loading prices.
+        """
         # given
         mock_requests_get.return_value.json.return_value = {
             666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
