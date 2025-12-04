@@ -175,6 +175,9 @@ def check_skillfarm_notifications(runs: int = 0):
             main_character = (
                 character.character.character_ownership.user.profile.main_character
             )
+            # Raise Exception if no main character found
+            if main_character is None:
+                raise ObjectDoesNotExist
         except ObjectDoesNotExist:
             logger.warning(
                 "Main Character not found for %s, skipping notification",
