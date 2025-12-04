@@ -21,8 +21,18 @@ def arabic_number_to_roman(value) -> str:
         return "-"
 
 
-def get_main_character(request, character_id) -> tuple[bool, EveCharacter]:
-    """Get Character and check permissions"""
+def get_auth_character_or_main(request, character_id) -> tuple[bool, EveCharacter]:
+    """
+    Get Character and check permissions
+
+    Note:
+        If character not found, main character of the reqesting user is returned.
+    Args:
+        request: Django Request Object
+        character_id: Character ID of the EveCharacter
+    Returns:
+        Tuple of (has_permissions: bool, EveCharacter)
+    """
     perms = True
     try:
         main_char = EveCharacter.objects.get(character_id=character_id)
@@ -40,8 +50,16 @@ def get_main_character(request, character_id) -> tuple[bool, EveCharacter]:
     return perms, main_char
 
 
-def get_character(request, character_id):
-    """Get Character and check permissions"""
+def get_skillfarm_character(request, character_id):
+    """
+    Get SkillFarmAudit Character and check permissions
+
+    Args:
+        request: Django Request Object
+        character_id: Character ID of the SkillFarmAudit Character
+    Returns:
+        Tuple of (has_permissions: bool, SkillFarmAudit | None)
+    """
     perms = True
     try:
         character = SkillFarmAudit.objects.get(character__character_id=character_id)
@@ -56,20 +74,26 @@ def get_character(request, character_id):
 
 
 def get_alts_queryset(main_char, corporations=None):
-    """Get all alts for a main character, optionally filtered by corporations."""
+    """
+    Get a queryset of alt characters linked to the main character's user.
+
+    Args:
+        main_char: EveCharacter object representing the main character.
+        corporations: Optional list of corporation IDs to filter the alts.
+    Returns:
+        QuerySet of EveCharacter objects representing the alt characters.
+    """
     try:
-        linked_corporations = main_char.character_ownership.user.character_ownerships.all().select_related(
+        characters = main_char.character_ownership.user.character_ownerships.all().select_related(
             "character_ownership"
         )
 
         if corporations:
-            linked_corporations = linked_corporations.filter(
-                character__corporation_id__in=corporations
-            )
+            characters = characters.filter(character__corporation_id__in=corporations)
 
-        linked_corporations = linked_corporations.values_list("character_id", flat=True)
+        characters_ids = characters.values_list("character_id", flat=True)
 
-        return EveCharacter.objects.filter(id__in=linked_corporations)
+        return EveCharacter.objects.filter(id__in=characters_ids)
     except ObjectDoesNotExist:
         return EveCharacter.objects.filter(pk=main_char.pk)
 

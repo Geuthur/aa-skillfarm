@@ -27,8 +27,8 @@ from skillfarm.api.helpers.core import (
     generate_status_icon_html,
     generate_toggle_notification_button,
     get_alts_queryset,
-    get_character,
-    get_main_character,
+    get_auth_character_or_main,
+    get_skillfarm_character,
 )
 from skillfarm.api.helpers.skilldetails import (
     _calculate_sum_progress_bar,
@@ -235,7 +235,7 @@ class SkillFarmApiEndpoints:
                 f"User {request.user} requested SkillFarm details for character ID {character_id}."
             )
             # Get Main Character and check permissions
-            perm, main = get_main_character(request, character_id)
+            perm, main = get_auth_character_or_main(request, character_id)
 
             # Check permissions
             if perm is False:
@@ -341,7 +341,7 @@ class SkillFarmApiEndpoints:
                 f"User {request.user} requested SkillFarm skill setup for character ID {character_id}."
             )
             # Get Main Character and check permissions
-            perm, character = get_character(request, character_id)
+            perm, character = get_skillfarm_character(request, character_id)
 
             if perm is False:
                 logger.warning(
@@ -375,7 +375,7 @@ class SkillFarmApiEndpoints:
                 f"User {request.user} requested SkillFarm skill info for character ID {character_id}."
             )
             # Get Main Character and check permissions
-            perm, character = get_character(request, character_id)
+            perm, character = get_skillfarm_character(request, character_id)
 
             if perm is False:
                 logger.warning(

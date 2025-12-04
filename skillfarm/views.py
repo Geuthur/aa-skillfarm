@@ -19,7 +19,7 @@ from esi.decorators import token_required
 
 # AA Skillfarm
 from skillfarm import __title__, forms, tasks
-from skillfarm.api.helpers.core import get_character
+from skillfarm.api.helpers.core import get_skillfarm_character
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.providers import AppLogger
@@ -135,7 +135,7 @@ def add_char(request, token):
 def switch_alarm(request, character_id: int):
     """Switch Character Notification Alarm"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
         if not perm:
@@ -162,7 +162,7 @@ def switch_alarm(request, character_id: int):
 def delete_character(request, character_id: int):
     """Delete Character"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
         if not perm:
@@ -190,7 +190,7 @@ def delete_character(request, character_id: int):
 def skillset(request, character_id: list):
     """Edit Character SkillSet"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.SkillSetForm(request.POST)
 
     if form.is_valid():
