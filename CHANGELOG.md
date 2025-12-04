@@ -21,6 +21,7 @@ Section Order:
 
 ### Removed
 
+- blank and null options from EveTypePrice name field for stricter validation
 - `allianceauth-app-utils` dependency
 - unused ESI-related functions and imports from decorators.py
 - unused EVE Online and Fuzzwork API settings from app_settings

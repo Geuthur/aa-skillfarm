@@ -13,8 +13,6 @@ from skillfarm import __title__
 class EveTypePrice(models.Model):
     name = models.CharField(
         max_length=255,
-        blank=True,
-        null=True,
     )
     eve_type = models.OneToOneField(
         EveType,
