@@ -187,7 +187,7 @@ class SkillFarmApiEndpoints:
                             template_name=template,
                             context={
                                 "url": reverse(
-                                    "skillfarm:skillfarm",
+                                    "skillfarm:index",
                                     kwargs={
                                         "character_id": character.main_character.character_id
                                     },

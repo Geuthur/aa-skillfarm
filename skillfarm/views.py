@@ -47,11 +47,21 @@ def add_info_to_context(request, context: dict) -> dict:
 
 @login_required
 @permission_required("skillfarm.basic_access")
-def index(request):
-    """Index View"""
-    return redirect(
-        "skillfarm:skillfarm", request.user.profile.main_character.character_id
-    )
+def index(request, character_id=None):
+    """Main Skillfarm View"""
+    if character_id is None:
+        character_id = request.user.profile.main_character.character_id
+
+    context = {
+        "page_title": "Skillfarm",
+        "character_id": character_id,
+        "forms": {
+            "confirm": forms.ConfirmForm(),
+            "skillset": forms.SkillSetForm(),
+        },
+    }
+    context = add_info_to_context(request, context)
+    return render(request, "skillfarm/skillfarm.html", context=context)
 
 
 @login_required
@@ -76,25 +86,6 @@ def admin(request):
                 kwargs={"force_refresh": force_refresh}, priority=7
             )
     return render(request, "skillfarm/admin.html", context=context)
-
-
-@login_required
-@permission_required("skillfarm.basic_access")
-def skillfarm(request, character_id=None):
-    """Main Skillfarm View"""
-    if character_id is None:
-        character_id = request.user.profile.main_character.character_id
-
-    context = {
-        "page_title": "Skillfarm",
-        "character_id": character_id,
-        "forms": {
-            "confirm": forms.ConfirmForm(),
-            "skillset": forms.SkillSetForm(),
-        },
-    }
-    context = add_info_to_context(request, context)
-    return render(request, "skillfarm/skillfarm.html", context=context)
 
 
 @login_required
