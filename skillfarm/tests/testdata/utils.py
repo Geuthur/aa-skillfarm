@@ -281,8 +281,8 @@ def create_skillfarm_character_from_user(user: User, **kwargs) -> SkillFarmAudit
     return create_character(**kwargs)
 
 
-def create_skillfarm_character(character_id: int, **kwargs) -> SkillFarmAudit:
-    """Create a Skillfarm Audit Character from a existing EveCharacter.
+def create_skillfarm_character_with_user(character_id: int, **kwargs) -> SkillFarmAudit:
+    """Create a Skillfarm Audit Character along with a new Alliance Auth User.
 
     Args:
         character_id (int): The character ID of the EveCharacter to create the SkillFarmAudit for.
