@@ -7,28 +7,30 @@ from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.skillfarm import (
-    add_skillfarmaudit_character_to_user,
-    create_skillfarm_character,
+from skillfarm.tests import NoSocketsTestCase, SkillFarmTestCase
+from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
+from skillfarm.tests.testdata.utils import (
+    add_alt_character_to_user,
+    create_character,
     create_skillfarm_character_from_user,
     create_update_status,
     create_user_from_evecharacter,
-    create_user_from_evecharacter_with_access,
 )
 
 MODULE_PATH = "skillfarm.managers.skillfarmaudit"
 
 
-class TestCharacterAnnotateTotalUpdateStatus(TestCase):
+class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_allianceauth()
 
     def test_should_be_ok(self):
+        """
+        Test should be OK when all sections are successful.
+        """
         # given
-        character = create_skillfarm_character(1001)
+        character = create_skillfarm_character_from_user(self.user)
         sections = SkillFarmAudit.UpdateSection.get_sections()
         for section in sections:
             create_update_status(
@@ -53,8 +55,11 @@ class TestCharacterAnnotateTotalUpdateStatus(TestCase):
         self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.OK)
 
     def test_should_be_incomplete(self):
+        """
+        Test should be incomplete when no sections have been updated.
+        """
         # given
-        character = create_skillfarm_character(1001)
+        character = create_skillfarm_character_from_user(self.user)
         # when/then
         self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.INCOMPLETE)
 
@@ -67,8 +72,11 @@ class TestCharacterAnnotateTotalUpdateStatus(TestCase):
         )
 
     def test_should_be_token_error(self):
+        """
+        Test should be token error when any section has a token error.
+        """
         # given
-        character = create_skillfarm_character(1001)
+        character = create_skillfarm_character_from_user(self.user)
         create_update_status(
             character,
             section=character.UpdateSection.SKILLS,
@@ -91,7 +99,10 @@ class TestCharacterAnnotateTotalUpdateStatus(TestCase):
         )
 
     def test_should_be_disabled(self):
-        character = create_skillfarm_character(1001, active=False)
+        """
+        Test should be disabled when character is inactive.
+        """
+        character = create_skillfarm_character_from_user(self.user, active=False)
         # given
         sections = SkillFarmAudit.UpdateSection.get_sections()
         for section in sections:
@@ -116,8 +127,11 @@ class TestCharacterAnnotateTotalUpdateStatus(TestCase):
         self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.DISABLED)
 
     def test_should_be_error(self):
+        """
+        Test should be error when any sections have errors.
+        """
         # given
-        character = create_skillfarm_character(1001)
+        character = create_skillfarm_character_from_user(self.user)
         sections = SkillFarmAudit.UpdateSection.get_sections()
         for section in sections:
             create_update_status(
@@ -141,13 +155,13 @@ class TestCharacterAnnotateTotalUpdateStatus(TestCase):
         self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.ERROR)
 
 
-class TestSkillfarmAuditVisibleTo(TestCase):
+class TestSkillfarmAuditVisibleTo(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         load_allianceauth()
-        cls.user, cls.characterownership = create_user_from_evecharacter_with_access(
-            1001
+        cls.user, cls.characterownership = create_user_from_evecharacter(
+            character_id=1001, permissions=["skillfarm.basic_access"]
         )
 
     def test_should_return_audit(self):
@@ -160,7 +174,9 @@ class TestSkillfarmAuditVisibleTo(TestCase):
 
     def test_should_return_empty_for_other_user(self):
         # given
-        other_user, _ = create_user_from_evecharacter_with_access(1002)
+        other_user, _ = create_user_from_evecharacter(
+            character_id=1002, permissions=["skillfarm.basic_access"]
+        )
         create_skillfarm_character_from_user(self.user)
         # when
         qs = SkillFarmAudit.objects.visible_to(other_user)
@@ -170,7 +186,8 @@ class TestSkillfarmAuditVisibleTo(TestCase):
     def test_should_return_multiple_audits_for_user_with_multiple_characters(self):
         # given
         character1 = create_skillfarm_character_from_user(self.user)
-        character2 = add_skillfarmaudit_character_to_user(self.user, 1003)
+        alt_character = add_alt_character_to_user(user=self.user, character_id=1003)
+        character2 = create_character(eve_character=alt_character.character)
         # when
         qs = SkillFarmAudit.objects.visible_to(self.user)
         # then
@@ -179,7 +196,8 @@ class TestSkillfarmAuditVisibleTo(TestCase):
     def test_should_return_all_characters(self):
         # given
         other_user, _ = create_user_from_evecharacter(
-            1002, permissions=["skillfarm.basic_access", "skillfarm.admin_access"]
+            character_id=1002,
+            permissions=["skillfarm.basic_access", "skillfarm.admin_access"],
         )
         character = create_skillfarm_character_from_user(self.user)
         character2 = create_skillfarm_character_from_user(other_user)
@@ -194,8 +212,8 @@ class TestSkillfarmAuditVisibleEveCharacter(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         load_allianceauth()
-        cls.user, cls.characterownership = create_user_from_evecharacter_with_access(
-            1001
+        cls.user, cls.characterownership = create_user_from_evecharacter(
+            character_id=1001, permissions=["skillfarm.basic_access"]
         )
 
     def test_should_return_audit(self):
@@ -210,7 +228,7 @@ class TestSkillfarmAuditVisibleEveCharacter(TestCase):
     def test_should_return_multiple_audits_for_user_with_multiple_characters(self):
         # given
         create_skillfarm_character_from_user(self.user)
-        add_skillfarmaudit_character_to_user(self.user, 1002)
+        add_alt_character_to_user(user=self.user, character_id=1002)
         eve_character = EveCharacter.objects.get(character_id=1001)
         eve_character2 = EveCharacter.objects.get(character_id=1002)
         # when
@@ -221,7 +239,8 @@ class TestSkillfarmAuditVisibleEveCharacter(TestCase):
     def test_should_return_all_characters(self):
         # given
         other_user, _ = create_user_from_evecharacter(
-            1002, permissions=["skillfarm.basic_access", "skillfarm.admin_access"]
+            character_id=1002,
+            permissions=["skillfarm.basic_access", "skillfarm.admin_access"],
         )
 
         eve_characters = EveCharacter.objects.all()
