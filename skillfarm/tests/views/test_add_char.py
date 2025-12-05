@@ -13,7 +13,6 @@ from django.urls import reverse
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import create_user_from_evecharacter
 from skillfarm.views import add_char
 
 MODULE_PATH = "skillfarm.views"

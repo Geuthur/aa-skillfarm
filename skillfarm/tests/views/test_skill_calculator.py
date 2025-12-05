@@ -11,8 +11,6 @@ from django.utils import timezone
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.utils import (
     create_eve_type_price,
-    create_skillfarm_character,
-    create_user_from_evecharacter,
 )
 from skillfarm.views import skillfarm_calc
 

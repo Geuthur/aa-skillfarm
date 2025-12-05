@@ -11,7 +11,6 @@ from django.urls import reverse
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.utils import (
     create_skillfarm_character_from_user,
-    create_user_from_evecharacter,
 )
 from skillfarm.views import switch_alarm
 
