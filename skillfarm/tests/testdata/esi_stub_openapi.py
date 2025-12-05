@@ -8,31 +8,34 @@ in tests to return predefined test data without making actual API calls.
 # Standard Library
 import json
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Any
 
+# Third Party
+from pydantic import BaseModel, create_model
 
-def dict_to_object(data: Any) -> Any:
+
+def _to_pydantic_model_instance(name: str, data: Any) -> Any:
     """
-    Convert dictionaries to objects with attributes (SimpleNamespace).
-
-    This mimics the behavior of OpenAPI 3 clients which return objects
-    instead of dictionaries.
-
-    :param data: Data to convert (dict, list, or primitive)
-    :type data: Any
-    :return: Converted data
-    :rtype: Any
+    Recursively convert dicts/lists to Pydantic model instances.
     """
+    # Lists -> convert each item
+    if isinstance(data, list):
+        return [_to_pydantic_model_instance(name + "Item", v) for v in data]
+
+    # Dicts -> create a transient pydantic model class and instantiate it
     if isinstance(data, dict):
-        # Convert dict to SimpleNamespace recursively
-        return SimpleNamespace(**{k: dict_to_object(v) for k, v in data.items()})
-    elif isinstance(data, list):
-        # Convert each item in list
-        return [dict_to_object(item) for item in data]
-    else:
-        # Return primitive types as-is
-        return data
+        fields: dict[str, tuple[type, Any]] = {}
+        values: dict[str, Any] = {}
+        for k, v in data.items():
+            # Use Any for field type; instantiate nested models recursively
+            fields[k] = (Any, ...)
+            values[k] = _to_pydantic_model_instance(name + k.capitalize(), v)
+
+        Model = create_model(name, **fields, __base__=BaseModel)
+        return Model(**values)
+
+    # Primitives -> return as-is
+    return data
 
 
 class MockResponse:
@@ -159,15 +162,18 @@ class EsiOperationStub:
                         raise effect
                     # If not an exception, return it as data
                     return (
-                        dict_to_object(effect)
+                        _to_pydantic_model_instance("SideEffect", effect)
                         if not return_response
-                        else (dict_to_object(effect), MockResponse())
+                        else (
+                            _to_pydantic_model_instance("SideEffect", effect),
+                            MockResponse(),
+                        )
                     )
             elif isinstance(self._side_effect, Exception):
                 raise self._side_effect
 
-        # Convert dict to object to mimic OpenAPI 3 behavior
-        data = dict_to_object(self._test_data)
+        # Convert dict to Pydantic model instance to mimic OpenAPI 3 behavior
+        data = _to_pydantic_model_instance("Result", self._test_data)
 
         if return_response:
             # Return tuple of (data, response)
@@ -216,7 +222,7 @@ class EsiOperationStub:
                     if isinstance(effect, Exception):
                         raise effect
                     # If not an exception, return it as data
-                    data = dict_to_object(effect)
+                    data = _to_pydantic_model_instance("SideEffect", effect)
                     result_data = data if isinstance(data, list) else [data]
                     return (
                         (result_data, MockResponse())
@@ -226,8 +232,8 @@ class EsiOperationStub:
             elif isinstance(self._side_effect, Exception):
                 raise self._side_effect
 
-        # Convert to objects first
-        data = dict_to_object(self._test_data)
+        # Convert to Pydantic model instances first
+        data = _to_pydantic_model_instance("Results", self._test_data)
 
         # If test data is already a list, use it as is
         if isinstance(data, list):
