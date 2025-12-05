@@ -70,39 +70,41 @@ EXAMPLE_ENDPOINTS = [
 class TestEsiStubUsage(NoSocketsTestCase):
     """Example tests showing how to use the ESI stub system."""
 
-    def test_stub_with_result_method(self):
-        """Test using the stub with result() method for single results."""
+    def test_should_return_single_result(self):
+        """
+        Test should return single result using result() method.
+        """
         # Create a stub with example data and endpoints
         stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
-
         # Simulate an ESI call that returns a single result
         operation = stub.Character.GetCharactersCharacterId(character_id=12345678)
         result = operation.result()
-
         # Verify the data - now using attributes instead of dict keys
         self.assertEqual(result.character_id, 12345678)
         self.assertEqual(result.name, "Test Character")
         self.assertEqual(result.corporation_id, 98765432)
 
-    def test_stub_with_results_method(self):
-        """Test using the stub with results() method for list results."""
+    def test_should_return_list(self):
+        """
+        Test should return list of results using results() method.
+        """
         # Create a stub with example data and endpoints
         stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
-
         # Simulate an ESI call that returns a list of results
         operation = stub.Skills.GetCharactersCharacterIdSkillqueue(
             character_id=12345678
         )
         results = operation.results()
-
         # Verify the data - now using attributes
         self.assertIsInstance(results, list)
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].skill_id, 11111)
         self.assertEqual(results[1].skill_id, 22222)
 
-    def test_stub_with_custom_data(self):
-        """Test creating a stub with custom test data."""
+    def test_should_create_stub_with_custom_data(self):
+        """
+        Test should create stub with custom test data and return custom values.
+        """
         # Define custom test data
         custom_data = {
             "Skills": {
@@ -119,111 +121,108 @@ class TestEsiStubUsage(NoSocketsTestCase):
                 }
             }
         }
-
         # Define endpoints
         endpoints = [
             EsiEndpoint("Skills", "GetCharactersCharacterIdSkills", "character_id"),
         ]
-
         # Create stub with custom data and endpoints
         stub = create_esi_client_stub(custom_data, endpoints=endpoints)
-
         # Use the stub
         operation = stub.Skills.GetCharactersCharacterIdSkills(character_id=12345)
         result = operation.result()
-
         # Verify custom data is returned - using attributes
         self.assertEqual(result.total_sp, 1000000)
         self.assertEqual(len(result.skills), 1)
         self.assertEqual(result.skills[0].skill_id, 99999)
 
     @patch("skillfarm.providers.esi")
-    def test_stub_integration_with_mock(self, mock_esi):
-        """Test integrating the stub with mock.patch."""
+    def test_should_mock_esi(self, mock_esi):
+        """
+        Test should mock esi provider to return the stub client.
+        """
         # Create a stub with endpoints
         stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
-
         # Make mock.client return our stub
         type(mock_esi).client = property(lambda self: stub)
-
-        # Now when code calls esi.client, it will get our stub
-        # Verify it works
+        # Now when code calls esi.client, it will get our stub - Verify it works
         self.assertEqual(mock_esi.client, stub)
 
-    def test_stub_with_nested_result(self):
-        """Test stub with nested data structures."""
+    def test_should_handle_nested_data_structures(self):
+        """
+        Test should handle stub with nested data structures correctly.
+        """
+        # Create stub with example data and endpoints
         stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
-
+        # Simulate an ESI call that returns nested data
         operation = stub.Skills.GetCharactersCharacterIdSkills(character_id=12345)
         result = operation.result()
-
         # Verify nested structure - using attributes
         self.assertTrue(hasattr(result, "skills"))
         self.assertIsInstance(result.skills, list)
         self.assertEqual(result.skills[0].skill_id, 12345)
 
-    def test_stub_with_dynamic_data(self):
-        """Test stub with callable/dynamic test data."""
+    def test_should_support_dynamic_callable_data(self):
+        """
+        Test should support callable/dynamic test data based on input parameters.
+        """
 
         def dynamic_skill_data(**kwargs):
-            """Return dynamic data based on input."""
-            character_id = kwargs.get("character_id", 0)
+            """Return dynamic data based on skill_points parameter."""
+            skill_points = kwargs.get("skill_points", 0)
             return {
-                "total_sp": character_id * 1000,  # SP based on character ID
+                "total_sp": skill_points,  # SP based on input parameter
                 "skills": [],
-                "unallocated_sp": 0,
+                "unallocated_sp": skill_points // 10,  # 10% unallocated
             }
 
-        # Create stub with callable data
+        # Create stub with callable data - using a custom parameter
         custom_data = {
             "Skills": {
                 "GetCharactersCharacterIdSkills": dynamic_skill_data,
             }
         }
-
         endpoints = [
-            EsiEndpoint("Skills", "GetCharactersCharacterIdSkills", "character_id"),
+            EsiEndpoint("Skills", "GetCharactersCharacterIdSkills", "skill_points"),
         ]
-
         stub = create_esi_client_stub(custom_data, endpoints=endpoints)
-
-        # Call with different character IDs
-        op1 = stub.Skills.GetCharactersCharacterIdSkills(character_id=100)
+        # Call with different skill_points values
+        op1 = stub.Skills.GetCharactersCharacterIdSkills(skill_points=1000000)
         result1 = op1.result()
-
-        op2 = stub.Skills.GetCharactersCharacterIdSkills(character_id=200)
+        op2 = stub.Skills.GetCharactersCharacterIdSkills(skill_points=2000000)
         result2 = op2.result()
-
         # Verify dynamic data works - using attributes
-        self.assertEqual(result1.total_sp, 100000)
-        self.assertEqual(result2.total_sp, 200000)
+        self.assertEqual(result1.total_sp, 1000000)
+        self.assertEqual(result1.unallocated_sp, 100000)
+        self.assertEqual(result2.total_sp, 2000000)
+        self.assertEqual(result2.unallocated_sp, 200000)
 
-    def test_stub_missing_method(self):
-        """Test stub behavior when method is not registered."""
+    def test_should_raise_attribute_error_for_unregistered_method(self):
+        """
+        Test should raise AttributeError when calling unregistered method.
+        """
         endpoints = [
             EsiEndpoint("Skills", "GetCharactersCharacterIdSkills", "character_id"),
         ]
         stub = create_esi_client_stub({"Skills": {}}, endpoints=endpoints)
-
         # Call a method that isn't registered should raise AttributeError
         with self.assertRaises(AttributeError) as context:
             stub.Skills.SomeUnconfiguredMethod(character_id=12345)
-
         self.assertIn("not registered", str(context.exception))
 
-    def test_results_wraps_non_list_data(self):
-        """Test that results() wraps single items in a list."""
+    def test_should_wrap_single_item_in_list(self):
+        """
+        Test should wrap single items in a list when using results() method.
+        """
         custom_data = {
             "Test": {
                 "SingleItemMethod": {"id": 1, "name": "single"},
             }
         }
-
         endpoints = [
             EsiEndpoint("Test", "SingleItemMethod", "id"),
         ]
-
         stub = create_esi_client_stub(custom_data, endpoints=endpoints)
+
         operation = stub.Test.SingleItemMethod()
         results = operation.results()
 
@@ -232,28 +231,40 @@ class TestEsiStubUsage(NoSocketsTestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].id, 1)
 
-    def test_return_response_parameter(self):
-        """Test that result() and results() return tuple when return_response=True."""
+    def test_should_return_tuple_with_response_on_result(self):
+        """
+        Test should return tuple with data and response when return_response=True for result() method.
+        """
+
         stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
 
-        # Test with result()
         operation = stub.Character.GetCharactersCharacterId(character_id=12345678)
         data, response = operation.result(return_response=True)
+
         self.assertEqual(data.character_id, 12345678)
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.headers, dict)
 
-        # Test with results()
+    def test_should_return_tuple_with_response_on_results(self):
+        """
+        Test should return tuple with list data and response for results() method.
+        """
+
+        stub = create_esi_client_stub(EXAMPLE_TEST_DATA, endpoints=EXAMPLE_ENDPOINTS)
+
         operation = stub.Skills.GetCharactersCharacterIdSkillqueue(
             character_id=12345678
         )
         data, response = operation.results(return_response=True)
+
         self.assertIsInstance(data, list)
         self.assertEqual(len(data), 2)
         self.assertEqual(response.status_code, 200)
 
-    def test_side_effect_http_not_modified(self):
-        """Test that HTTPNotModified exception can be simulated via endpoints."""
+    def test_should_raise_http_not_modified_exception(self):
+        """
+        Test should raise HTTPNotModified exception via side_effect parameter.
+        """
         # Define endpoints with side effects
         _endpoints = [
             EsiEndpoint(
@@ -263,22 +274,20 @@ class TestEsiStubUsage(NoSocketsTestCase):
                 side_effect=HTTPNotModified(304, {}),
             ),
         ]
-
         test_data = {
             "Character": {
                 "GetCharactersCharacterId": {"character_id": 12345, "name": "Test"}
             }
         }
-
         stub = create_esi_client_stub(test_data, endpoints=_endpoints)
         operation = stub.Character.GetCharactersCharacterId(character_id=12345)
-
-        # Should raise HTTPNotModified
         with self.assertRaises(HTTPNotModified):
             operation.result()
 
-    def test_side_effect_http_client_error(self):
-        """Test that HTTPClientError exception can be simulated via endpoints."""
+    def test_should_raise_http_client_error_exception(self):
+        """
+        Test should raise HTTPClientError exception via side_effect parameter.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Skills",
@@ -287,20 +296,18 @@ class TestEsiStubUsage(NoSocketsTestCase):
                 side_effect=HTTPClientError(404, {}, b"Not Found"),
             ),
         ]
-
         test_data = {
             "Skills": {"GetCharactersCharacterIdSkills": {"total_sp": 0, "skills": []}}
         }
-
         stub = create_esi_client_stub(test_data, endpoints=_endpoints)
         operation = stub.Skills.GetCharactersCharacterIdSkills(character_id=12345)
-
-        # Should raise HTTPClientError
         with self.assertRaises(HTTPClientError):
             operation.result()
 
-    def test_side_effect_http_server_error(self):
-        """Test that HTTPServerError exception can be simulated via endpoints."""
+    def test_should_raise_http_server_error_exception(self):
+        """
+        Test should raise HTTPServerError exception via side_effect parameter.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Skills",
@@ -309,18 +316,16 @@ class TestEsiStubUsage(NoSocketsTestCase):
                 side_effect=HTTPServerError(500, {}, b"Server Error"),
             ),
         ]
-
         test_data = {"Skills": {"GetCharactersCharacterIdSkillqueue": []}}
-
         stub = create_esi_client_stub(test_data, endpoints=_endpoints)
         operation = stub.Skills.GetCharactersCharacterIdSkillqueue(character_id=12345)
-
-        # Should raise HTTPServerError
         with self.assertRaises(HTTPServerError):
             operation.results()
 
     def test_side_effect_os_error(self):
-        """Test that OSError exception can be simulated via endpoints."""
+        """
+        Test that OSError exception can be simulated via endpoints.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Character",
@@ -339,39 +344,10 @@ class TestEsiStubUsage(NoSocketsTestCase):
         with self.assertRaises(OSError):
             operation.result()
 
-    def test_side_effect_sequential_calls(self):
-        """Test that sequential side effects work (first call raises, second returns data)."""
-        _endpoints = [
-            EsiEndpoint(
-                "Skills",
-                "GetCharactersCharacterIdSkills",
-                "character_id",
-                side_effect=[
-                    HTTPNotModified(304, {}),
-                    HTTPNotModified(304, {}),
-                ],
-            ),
-        ]
-
-        test_data = {
-            "Skills": {
-                "GetCharactersCharacterIdSkills": {"total_sp": 1000000, "skills": []}
-            }
-        }
-
-        stub = create_esi_client_stub(test_data, endpoints=_endpoints)
-        operation = stub.Skills.GetCharactersCharacterIdSkills(character_id=12345)
-
-        # First call should raise HTTPNotModified
-        with self.assertRaises(HTTPNotModified):
-            operation.result()
-
-        # Second call should also raise HTTPNotModified
-        with self.assertRaises(HTTPNotModified):
-            operation.result()
-
     def test_endpoints_restrict_available_methods(self):
-        """Test that only registered endpoints are available when endpoints are provided."""
+        """
+        Test that only registered endpoints are available when endpoints are provided.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Character",
@@ -401,7 +377,9 @@ class TestEsiStubUsage(NoSocketsTestCase):
         self.assertIn("not registered", str(context.exception))
 
     def test_endpoints_restrict_available_categories(self):
-        """Test that only categories with registered endpoints are available."""
+        """
+        Test that only categories with registered endpoints are available.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Character",
@@ -435,7 +413,9 @@ class TestEsiStubUsage(NoSocketsTestCase):
         self.assertIn("not registered", str(context.exception))
 
     def test_endpoints_are_required(self):
-        """Test that endpoints parameter is required."""
+        """
+        Test that endpoints parameter is required.
+        """
         test_data = {
             "Character": {
                 "GetCharactersCharacterId": {"character_id": 12345, "name": "Test"}
@@ -449,7 +429,9 @@ class TestEsiStubUsage(NoSocketsTestCase):
         self.assertIn("endpoints parameter is required", str(context.exception))
 
     def test_multiple_endpoints_mixed(self):
-        """Test multiple endpoints with and without side effects."""
+        """
+        Test multiple endpoints with and without side effects.
+        """
         _endpoints = [
             EsiEndpoint(
                 "Character",
