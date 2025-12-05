@@ -11,7 +11,11 @@ from celery import Task
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
-from esi.exceptions import ESIBucketLimitException, ESIErrorLimitException, HTTPError
+from esi.exceptions import (
+    ESIBucketLimitException,
+    ESIErrorLimitException,
+    HTTPServerError,
+)
 from esi.openapi_clients import ESIClientProvider
 
 # AA Skillfarm
@@ -95,7 +99,7 @@ def retry_task_on_esi_error(task: Task):
         logger.warning(
             "ESI Error encountered: %s. Retrying after %.2f seconds. Issue: %s",
             str(exc),
-            retry_after,
+            countdown,
             issue,
         )
         raise task.retry(countdown=countdown, exc=exc)
@@ -106,7 +110,7 @@ def retry_task_on_esi_error(task: Task):
         retry(exc, exc.reset, "ESI Error Limit Reached")
     except ESIBucketLimitException as exc:
         retry(exc, exc.reset, f"ESI Bucket Limit Reached for {exc.bucket}")
-    except HTTPError as exc:
+    except HTTPServerError as exc:
         if exc.status_code in [
             HTTPStatus.BAD_GATEWAY,
             HTTPStatus.SERVICE_UNAVAILABLE,
