@@ -11,13 +11,13 @@ app_name: str = "skillfarm"  # pylint: disable=invalid-name
 
 urlpatterns = [
     # -- Views
-    path("", views.index, name="index"),
-    path("admin/", views.admin, name="admin"),
+    path("view/skillfarm/", views.index, name="index"),
     path(
         "<int:character_id>/view/skillfarm/",
-        views.skillfarm,
-        name="skillfarm",
+        views.index,
+        name="index",
     ),
+    path("admin/", views.admin, name="admin"),
     path(
         "view/overview/",
         views.character_overview,

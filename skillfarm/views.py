@@ -12,48 +12,37 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 # Alliance Auth
-from allianceauth.authentication.models import UserProfile
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__, forms, tasks
-from skillfarm.api.helpers.core import get_character
+from skillfarm.api.helpers.core import get_skillfarm_character
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
+from skillfarm.providers import AppLogger
 from skillfarm.tasks import update_all_skillfarm
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
-
-
-# pylint: disable=unused-argument
-def add_info_to_context(request, context: dict) -> dict:
-    """Add additional information to the context for the view."""
-    theme = None
-    try:
-        user = UserProfile.objects.get(id=request.user.id)
-        theme = user.theme
-    except UserProfile.DoesNotExist:
-        pass
-
-    new_context = {
-        **{"theme": theme},
-        **context,
-    }
-    return new_context
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 @login_required
 @permission_required("skillfarm.basic_access")
-def index(request):
-    """Index View"""
-    return redirect(
-        "skillfarm:skillfarm", request.user.profile.main_character.character_id
-    )
+def index(request, character_id=None):
+    """Main Skillfarm View"""
+    if character_id is None and request.user.profile.main_character is not None:
+        character_id = request.user.profile.main_character.character_id
+
+    context = {
+        "page_title": "Skillfarm",
+        "character_id": character_id,
+        "forms": {
+            "confirm": forms.ConfirmForm(),
+            "skillset": forms.SkillSetForm(),
+        },
+    }
+    return render(request, "skillfarm/skillfarm.html", context=context)
 
 
 @login_required
@@ -82,32 +71,11 @@ def admin(request):
 
 @login_required
 @permission_required("skillfarm.basic_access")
-def skillfarm(request, character_id=None):
-    """Main Skillfarm View"""
-    if character_id is None:
-        character_id = request.user.profile.main_character.character_id
-
-    context = {
-        "page_title": "Skillfarm",
-        "character_id": character_id,
-        "forms": {
-            "confirm": forms.ConfirmForm(),
-            "skillset": forms.SkillSetForm(),
-        },
-    }
-    context = add_info_to_context(request, context)
-    return render(request, "skillfarm/skillfarm.html", context=context)
-
-
-@login_required
-@permission_required("skillfarm.basic_access")
 def character_overview(request):
     """Character Overview"""
     context = {
         "page_title": "Character Overview",
     }
-    context = add_info_to_context(request, context)
-
     return render(request, "skillfarm/overview.html", context=context)
 
 
@@ -137,7 +105,7 @@ def add_char(request, token):
 def switch_alarm(request, character_id: int):
     """Switch Character Notification Alarm"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
         if not perm:
@@ -164,7 +132,7 @@ def switch_alarm(request, character_id: int):
 def delete_character(request, character_id: int):
     """Delete Character"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.ConfirmForm(request.POST)
     if form.is_valid():
         if not perm:
@@ -192,7 +160,7 @@ def delete_character(request, character_id: int):
 def skillset(request, character_id: list):
     """Edit Character SkillSet"""
     # Check Permission & If Character Exists
-    perm, __ = get_character(request, character_id)
+    perm, __ = get_skillfarm_character(request, character_id)
     form = forms.SkillSetForm(request.POST)
 
     if form.is_valid():

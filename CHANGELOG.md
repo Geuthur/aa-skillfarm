@@ -11,6 +11,32 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- OpenAPI ESIStub Class
+- exception handling for missing main character in skillfarm notifications
+- SkillFarmTestCase with preloaded test data and request factory setup
+- implement AppLogger and retry_task_on_esi_error for enhanced logging and error handling
+
+### Changed
+
+- Overhaul Test Enviroment
+  - SkillFarm TestCase Class
+  - Doc String optimization
+- moved `skillfarm` view to `index`
+- simplify character_id retrieval in index view
+- rename and update character retrieval functions for clarity and improved documentation
+- refactor app_settings to use Django settings instead of app_utils
+
+### Removed
+
+- blank and null options from EveTypePrice name field for stricter validation
+- `allianceauth-app-utils` dependency
+- unused ESI-related functions and imports from decorators.py
+- unused EVE Online and Fuzzwork API settings from app_settings
+- unused add_info_to_context function
+- unused custom exception classes from errors.py
+
 ## [1.0.3] - 2025-11-16
 
 ### Changed

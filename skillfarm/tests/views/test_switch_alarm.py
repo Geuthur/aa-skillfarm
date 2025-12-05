@@ -3,39 +3,35 @@
 # Standard Library
 import json
 from http import HTTPStatus
-from unittest.mock import Mock, patch
 
 # Django
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 # AA Skillfarm
-from skillfarm.tests.testdata.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.eveuniverse import load_eveuniverse
-from skillfarm.tests.testdata.skillfarm import (
-    create_skillfarm_character,
-    create_user_from_evecharacter_with_access,
+from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests.testdata.utils import (
+    create_skillfarm_character_from_user,
 )
 from skillfarm.views import switch_alarm
 
 MODULE_PATH = "skillfarm.views"
 
 
-class TestSwitchalarmView(TestCase):
+class TestSwitchalarmView(SkillFarmTestCase):
+    """Test Switchalarm Ajax Response."""
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        load_allianceauth()
-        load_eveuniverse()
 
-        cls.factory = RequestFactory()
-        cls.audit = create_skillfarm_character(1001)
-        cls.user = cls.audit.character.character_ownership.user
-        cls.no_audit_user, _ = create_user_from_evecharacter_with_access(1002)
+        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit_2 = create_skillfarm_character_from_user(cls.superuser)
 
     def test_switch_alarm(self):
-        character_id = self.audit.character.character_id
+        """
+        Test should switch alarm status for character.
+        """
+        character_id = self.skillfarm_audit.character.character_id
         form_data = {
             "character_id": character_id,
             "confirm": "yes",
@@ -54,18 +50,21 @@ class TestSwitchalarmView(TestCase):
         self.assertTrue(response_data["success"])
         self.assertEqual(response_data["message"], "Alarm successfully updated")
 
-    def test_switch_alarm_no_audit(self):
+    def test_switch_alarm_no_permission(self):
+        """
+        Test should return permission denied when switching alarm for character without permission.
+        """
         form_data = {
-            "character_id": 1001,
+            "character_id": 1003,
             "confirm": "yes",
         }
 
         request = self.factory.post(
-            reverse("skillfarm:switch_alarm", args=[1001]), data=form_data
+            reverse("skillfarm:switch_alarm", args=[1003]), data=form_data
         )
-        request.user = self.no_audit_user
+        request.user = self.user
 
-        response = switch_alarm(request, character_id=1001)
+        response = switch_alarm(request, character_id=1003)
 
         response_data = json.loads(response.content)
 
@@ -74,10 +73,13 @@ class TestSwitchalarmView(TestCase):
         self.assertEqual(response_data["message"], "Permission Denied")
 
     def test_switch_alarm_invalid(self):
+        """
+        Test should return bad request when form is invalid.
+        """
         request = self.factory.post(
             reverse("skillfarm:switch_alarm", args=[1001]), data=None
         )
-        request.user = self.no_audit_user
+        request.user = self.user
 
         response = switch_alarm(request, character_id=1001)
 

@@ -1,0 +1,92 @@
+{
+  "Skills": {
+    "GetCharactersCharacterIdSkills": {
+      "skills": [
+        {
+          "skill_id": 1,
+          "trained_skill_level": 5,
+          "active_skill_level": 4,
+          "skillpoints_in_skill": 128000
+        },
+        {
+          "skill_id": 2,
+          "trained_skill_level": 4,
+          "active_skill_level": 2,
+          "skillpoints_in_skill": 4000
+        }
+      ],
+      "total_sp": 75000000,
+      "unallocated_sp": 250000
+    },
+    "GetCharactersCharacterIdSkillqueue": [
+      {
+        "skill_id": 1,
+        "finished_level": 5,
+        "queue_position": 1,
+        "finish_date": "2023-10-01T00:00:00Z",
+        "start_date": "2023-09-01T00:00:00Z",
+        "training_start_sp": 312345,
+        "level_start_sp": 128000,
+        "level_end_sp": 512000
+      },
+      {
+        "skill_id": 2,
+        "finished_level": 4,
+        "queue_position": 2,
+        "finish_date": "2023-10-02T00:00:00Z",
+        "start_date": "2023-09-02T00:00:00Z",
+        "training_start_sp": 5000,
+        "level_start_sp": 4000,
+        "level_end_sp": 16000
+      }
+    ]
+  },
+  "Character": {
+    "GetCharactersCharacterId": {
+      "character_id": 93330670,
+      "name": "Test Pilot",
+      "corporation_id": 98765432,
+      "alliance_id": 99000001,
+      "birthday": "2015-03-24T11:37:00Z",
+      "gender": "male",
+      "race_id": 1,
+      "bloodline_id": 3,
+      "ancestry_id": 12,
+      "security_status": 0.5
+    },
+    "GetCharactersCharacterIdRoles": {
+      "roles": ["Director", "Station_Manager"]
+    }
+  },
+  "Corporation": {
+    "GetCorporationsCorporationId": {
+      "corporation_id": 98765432,
+      "name": "Test Corporation",
+      "ticker": "TEST",
+      "member_count": 150,
+      "ceo_id": 12345678,
+      "alliance_id": 99000001,
+      "date_founded": "2010-01-01T00:00:00Z",
+      "tax_rate": 0.1
+    }
+  },
+  "Universe": {
+    "PostUniverseNames": [
+      {
+        "id": 3431,
+        "name": "Spaceship Command",
+        "category": "inventory_type"
+      },
+      {
+        "id": 3413,
+        "name": "Gunnery",
+        "category": "inventory_type"
+      },
+      {
+        "id": 24311,
+        "name": "Amarr Frigate",
+        "category": "inventory_type"
+      }
+    ]
+  }
+}

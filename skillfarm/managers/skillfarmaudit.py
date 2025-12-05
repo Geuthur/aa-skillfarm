@@ -11,13 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__
+from skillfarm.providers import AppLogger
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 if TYPE_CHECKING:
     # AA Skillfarm

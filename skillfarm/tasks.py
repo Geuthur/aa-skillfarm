@@ -6,7 +6,7 @@ from collections.abc import Callable
 
 # Third Party
 import requests
-from celery import chain, shared_task
+from celery import Task, chain, shared_task
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,19 +19,16 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
-# Alliance Auth (External Libs)
-from app_utils.logging import LoggerAddTag
-
 # AA Skillfarm
 from skillfarm import __title__, app_settings
-from skillfarm.decorators import when_esi_is_available
 from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
 )
+from skillfarm.providers import AppLogger, retry_task_on_esi_error
 
-logger = LoggerAddTag(get_extension_logger(__name__), __title__)
+logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 MAX_RETRIES_DEFAULT = 3
 
@@ -44,14 +41,17 @@ TASK_DEFAULTS = {
 # Default params for tasks that need run once only.
 TASK_DEFAULTS_ONCE = {**TASK_DEFAULTS, **{"base": QueueOnce}}
 
-_update_skillfarm_params = {
-    **TASK_DEFAULTS_ONCE,
-    **{"once": {"keys": ["character_pk", "force_refresh"], "graceful": True}},
+# Default params for tasks that need run once only and are bound to the task instance.
+TASK_DEFAULTS_BIND_ONCE = {**TASK_DEFAULTS, **{"bind": True, "base": QueueOnce}}
+
+# Default params for tasks that need run once only per character and are bound to the task instance.
+TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
+    **TASK_DEFAULTS_BIND_ONCE,
+    **{"once": {"keys": ["character_pk"], "graceful": True}},
 }
 
 
 @shared_task(**TASK_DEFAULTS_ONCE)
-@when_esi_is_available
 def update_all_skillfarm(runs: int = 0, force_refresh=False):
     """Update all skillfarm characters."""
     SkillFarmAudit.objects.disable_characters_with_no_owner()
@@ -65,7 +65,6 @@ def update_all_skillfarm(runs: int = 0, force_refresh=False):
 
 
 @shared_task(**TASK_DEFAULTS_ONCE)
-@when_esi_is_available
 def update_character(character_pk: int, force_refresh=False):
     character = SkillFarmAudit.objects.prefetch_related("skillfarm_update_status").get(
         pk=character_pk
@@ -114,42 +113,52 @@ def update_character(character_pk: int, force_refresh=False):
     )
 
 
-@shared_task(**_update_skillfarm_params)
-def update_char_skills(character_pk: int, force_refresh: bool):
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+def update_char_skills(self: Task, character_pk: int, force_refresh: bool):
     return _update_character_section(
-        character_pk,
+        task=self,
+        character_pk=character_pk,
         section=SkillFarmAudit.UpdateSection.SKILLS,
         force_refresh=force_refresh,
     )
 
 
-@shared_task(**_update_skillfarm_params)
-def update_char_skillqueue(character_pk: int, force_refresh: bool):
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+def update_char_skillqueue(self: Task, character_pk: int, force_refresh: bool):
     return _update_character_section(
-        character_pk,
+        task=self,
+        character_pk=character_pk,
         section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
         force_refresh=force_refresh,
     )
 
 
-def _update_character_section(character_pk: int, section: str, force_refresh: bool):
+def _update_character_section(
+    task: Task, character_pk: int, section: str, force_refresh: bool
+):
     """Update a specific section of the skillfarm audit."""
     section = SkillFarmAudit.UpdateSection(section)
     character = SkillFarmAudit.objects.get(pk=character_pk)
+    # Reset update status for the section
+    character.reset_update_status(section)
+
     logger.debug(
         "Updating %s for %s", section.label, character.character.character_name
     )
 
-    character.reset_update_status(section)
-
+    # Get the method to call for the section
     method: Callable = getattr(character, section.method_name)
     method_signature = inspect.signature(method)
 
+    # Prepare kwargs based on whether force_refresh is accepted
     if "force_refresh" in method_signature.parameters:
         kwargs = {"force_refresh": force_refresh}
     else:
         kwargs = {}
-    result = character.perform_update_status(section, method, **kwargs)
+
+    # Perform the update within the retry context manager
+    with retry_task_on_esi_error(task):
+        result = character.perform_update_status(section, method, **kwargs)
     character.update_section_log(section, result)
 
 
@@ -166,6 +175,9 @@ def check_skillfarm_notifications(runs: int = 0):
             main_character = (
                 character.character.character_ownership.user.profile.main_character
             )
+            # Raise Exception if no main character found
+            if main_character is None:
+                raise ObjectDoesNotExist
         except ObjectDoesNotExist:
             logger.warning(
                 "Main Character not found for %s, skipping notification",
