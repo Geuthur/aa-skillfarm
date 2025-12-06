@@ -104,8 +104,8 @@ class EsiOperationStub:
     This class simulates the result() and results() methods that are called on
     ESI operations in the actual implementation.
 
-    Can also simulate exceptions/side effects by passing an exception instance
-    or class as test_data.
+    If a side_effect is configured, calling result() or results() will raise that exception
+    instead of returning test data.
     """
 
     def __init__(self, test_data: Any, side_effect: Exception | None = None):
@@ -119,7 +119,6 @@ class EsiOperationStub:
         """
         self._test_data = test_data
         self._side_effect = side_effect
-        self._call_count = 0
 
     def result(
         self,
@@ -149,8 +148,6 @@ class EsiOperationStub:
         :rtype: Any
         :raises: Exception if side_effect was configured
         """
-        self._call_count += 1
-
         # If side_effect is configured, raise it
         if self._side_effect is not None:
             # Support both exception instances and lists of exceptions/values
@@ -210,8 +207,6 @@ class EsiOperationStub:
         :rtype: list[Any]
         :raises: Exception if side_effect was configured
         """
-        self._call_count += 1
-
         # If side_effect is configured, raise it
         if self._side_effect is not None:
             # Support both exception instances and lists of exceptions/values
