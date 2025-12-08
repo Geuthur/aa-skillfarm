@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<header class="card-header bg-primary rounded-top">
+    <h3 class="me-3">{% trans "Skillqueue Filtered" %}</h3>
+</header>
+<div class="card-body rounded-bottom mb-3">
+    <table class="table table-striped w-100" id="skillfarm-skillqueue-filtered">
+        <thead>
+            <tr>
+                <th scope="col">{% translate "Skill" %}</th>
+                <th scope="col">{% translate "Progress" %}</th>
+                <th scope="col">{% translate "Start Date" %}</th>
+                <th scope="col">{% translate "Finish Date" %}</th>
+            </tr>
+        </thead>
+        <tbody class="modal-payments-table-body">
+        </tbody>
+    </table>
+</div>

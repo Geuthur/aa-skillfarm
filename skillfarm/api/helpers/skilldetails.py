@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
-def calculate_single_progress_bar(skill: CharacterSkillqueueEntry):
+def calculate_single_progress_bar(skill: CharacterSkillqueueEntry) -> float:
     """Calculate the progress bar for a single skill"""
     totalsp = skill.level_end_sp
     start_date = skill.start_date

@@ -102,7 +102,7 @@ def generate_toggle_notification_button(character: SkillFarmAudit) -> mark_safe:
     """Generate a toggle notification button for the skillfarm"""
     return format_html(
         render_to_string(
-            "skillfarm/partials/buttons/toggle-notification.html",
+            "skillfarm/partials/buttons/accept-switch-notification.html",
             {
                 "character": character,
             },
@@ -126,7 +126,7 @@ def generate_delete_character_button(character: SkillFarmAudit) -> mark_safe:
     """Generate a delete character button for the skillfarm"""
     return format_html(
         render_to_string(
-            "skillfarm/partials/buttons/delete-character.html",
+            "skillfarm/partials/buttons/accept-delete-character.html",
             {
                 "character": character,
             },
@@ -138,7 +138,7 @@ def generate_skillinfo_button(character: SkillFarmAudit) -> mark_safe:
     """Generate a skillinfo button for the skillfarm"""
     return format_html(
         render_to_string(
-            "skillfarm/partials/buttons/skillinfo.html",
+            "skillfarm/partials/buttons/view-skillqueue.html",
             {
                 "character": character,
             },

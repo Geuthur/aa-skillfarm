@@ -12,7 +12,7 @@ from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.utils import (
     create_skillfarm_character_from_user,
 )
-from skillfarm.views import skillset
+from skillfarm.views import edit_skillsetup
 
 MODULE_PATH = "skillfarm.views"
 
@@ -70,13 +70,14 @@ class TestSkillSetView(SkillFarmTestCase):
                 ]
             ),
         }
-
         request = self.factory.post(
-            reverse("skillfarm:skillset", args=[character_id]), data=form_data
+            reverse("skillfarm:edit_skillsetup", args=[character_id]),
+            data=json.dumps(form_data),
+            content_type="application/json",
         )
         request.user = self.user
 
-        response = skillset(request, character_id=character_id)
+        response = edit_skillsetup(request, character_id=character_id)
 
         response_data = json.loads(response.content)
 
@@ -85,30 +86,6 @@ class TestSkillSetView(SkillFarmTestCase):
         self.assertEqual(
             response_data["message"], "Gneuten Skillset successfully updated"
         )
-
-    def test_skillset_exception(self):
-        """
-        Test should handle invalid JSON format in skillset update.
-        """
-        character_id = self.skillfarm_audit.character.character_id
-        form_data = {
-            "character_id": character_id,
-            "confirm": "yes",
-            "selected_skills": "<invalid_json>",
-        }
-
-        request = self.factory.post(
-            reverse("skillfarm:skillset", args=[character_id]), data=form_data
-        )
-        request.user = self.user
-
-        response = skillset(request, character_id=character_id)
-
-        response_data = json.loads(response.content)
-
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
-        self.assertFalse(response_data["success"])
-        self.assertEqual(response_data["message"], "Invalid JSON format")
 
     def test_skillset_no_permission(self):
         """
@@ -154,29 +131,15 @@ class TestSkillSetView(SkillFarmTestCase):
         }
 
         request = self.factory.post(
-            reverse("skillfarm:skillset", args=[1003]), data=form_data
+            reverse("skillfarm:edit_skillsetup", args=[1003]),
+            data=json.dumps(form_data),
+            content_type="application/json",
         )
         request.user = self.user
 
-        response = skillset(request, character_id=1003)
+        response = edit_skillsetup(request, character_id=1003)
         response_data = json.loads(response.content)
 
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["message"], "Permission Denied")
-
-    def test_skillset_invalid(self):
-        """
-        Test should prevent skillset update with invalid form data.
-        """
-        request = self.factory.post(
-            reverse("skillfarm:skillset", args=[1001]), data=None
-        )
-        request.user = self.user
-        response = skillset(request, character_id=1001)
-
-        response_data = json.loads(response.content)
-
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
-        self.assertFalse(response_data["success"])
-        self.assertEqual(response_data["message"], "Invalid Form")

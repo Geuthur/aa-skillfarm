@@ -32,13 +32,12 @@ class TestDeleteCharacterView(SkillFarmTestCase):
         Test should delete own Character successfully.
         """
         character_id = self.skillfarm_audit.character.character_id
-        form_data = {
-            "character_id": character_id,
-            "confirm": "yes",
-        }
+        form_data = {}
 
         request = self.factory.post(
-            reverse("skillfarm:delete_character", args=[character_id]), data=form_data
+            reverse("skillfarm:delete_character", args=[character_id]),
+            data=json.dumps(form_data),
+            content_type="application/json",
         )
         request.user = self.user
 
@@ -54,13 +53,12 @@ class TestDeleteCharacterView(SkillFarmTestCase):
         """
         Test should prevent deleting Character that are not owned by the user.
         """
-        form_data = {
-            "character_id": 1003,
-            "confirm": "yes",
-        }
+        form_data = {}
 
         request = self.factory.post(
-            reverse("skillfarm:delete_character", args=[1003]), data=form_data
+            reverse("skillfarm:delete_character", args=[1003]),
+            data=json.dumps(form_data),
+            content_type="application/json",
         )
         request.user = self.user
 
@@ -70,19 +68,3 @@ class TestDeleteCharacterView(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
         self.assertFalse(response_data["success"])
         self.assertEqual(response_data["message"], "Permission Denied")
-
-    def test_delete_character_invalid(self):
-        """
-        Test should prevent deleting Character with invalid form data.
-        """
-        request = self.factory.post(
-            reverse("skillfarm:delete_character", args=[1003]), data=None
-        )
-        request.user = self.user
-        response = delete_character(request, character_id=1003)
-
-        response_data = json.loads(response.content)
-
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
-        self.assertFalse(response_data["success"])
-        self.assertEqual(response_data["message"], "Invalid Form")

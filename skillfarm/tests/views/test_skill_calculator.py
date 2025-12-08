@@ -47,7 +47,7 @@ class TestSkillFarmCalculator(SkillFarmTestCase):
         Test should render skill calculator view.
         """
         # given
-        request = self.factory.get(reverse("skillfarm:calc"))
+        request = self.factory.get(reverse("skillfarm:calculator"))
         request.user = self.user
         # when
         response = skillfarm_calc(request)
@@ -62,7 +62,7 @@ class TestSkillFarmCalculator(SkillFarmTestCase):
         Test should render skill calculator view with character id.
         """
         # given
-        request = self.factory.get(reverse("skillfarm:calc"))
+        request = self.factory.get(reverse("skillfarm:calculator"))
         request.user = self.user
         # when
         response = skillfarm_calc(request, character_id=1001)

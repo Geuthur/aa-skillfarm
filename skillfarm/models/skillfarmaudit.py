@@ -66,7 +66,7 @@ class SkillFarmAudit(models.Model):
             """Return bootstrap corresponding icon class."""
             update_map = {
                 status: mark_safe(
-                    f"<span class='{self.bootstrap_text_style_class()}' data-tooltip-toggle='skillfarm-tooltip' title='{self.description()}'>⬤</span>"
+                    f"<span class='{self.bootstrap_text_style_class()}' data-bs-tooltip='aa-skillfarm' title='{self.description()}'>⬤</span>"
                 )
                 for status in [
                     self.DISABLED,

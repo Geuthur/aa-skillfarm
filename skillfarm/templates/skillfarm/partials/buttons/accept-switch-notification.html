@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<button type="button"
+    class="btn btn-primary btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-bs-target="#skillfarm-accept-switch-notification"
+    data-bs-tooltip="aa-skillfarm"
+    data-action="{% url 'skillfarm:switch_notification' character_id=character.character.character_id %}"
+    title="{% translate 'Switch Notification' %}"
+    >
+    <span class="fas fa-bell"></span>
+</button>

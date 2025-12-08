@@ -20,19 +20,19 @@
                             <ul class="price-list">
                                 <li>
                                     <span class="item-name">{{ skillfarm.injektor.eve_type.name }}:</span>
-                                    <span id="injektor" class="editable-click" data-original="{{ skillfarm.injektor.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.injektor.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="injektor" class="aa-skillfarm-editable" data-original="{{ skillfarm.injektor.sell|floatformat:0|intcomma }}" data-type="number" data-title="Enter value">{{ skillfarm.injektor.sell|floatformat:0|intcomma }} ISK</span>
                                 </li>
                                 <li>
                                     <span class="item-name">{{ skillfarm.extratkor.eve_type.name }}:</span>
-                                    <span id="extratkor" class="editable-click" data-original="{{ skillfarm.extratkor.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.extratkor.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="extratkor" class="aa-skillfarm-editable" data-original="{{ skillfarm.extratkor.sell|floatformat:0|intcomma }}" data-type="number" data-title="Enter value">{{ skillfarm.extratkor.sell|floatformat:0|intcomma }} ISK</span>
                                 </li>
                                 <li>
                                     <span class="item-name">{{ skillfarm.plex.eve_type.name }}:</span>
-                                    <span id="plex" class="editable-click" data-original="{{ skillfarm.plex.sell|floatformat:0 }}" data-type="number" data-title="Enter value">{{ skillfarm.plex.sell|floatformat:0 }}</span><span class="px-2"> ISK</span>
+                                    <span id="plex" class="aa-skillfarm-editable" data-original="{{ skillfarm.plex.sell|floatformat:0|intcomma }}" data-type="number" data-title="Enter value">{{ skillfarm.plex.sell|floatformat:0|intcomma }} ISK</span>
                                 </li>
                             </ul>
                             <h5 class="border-bottom pb-2">{% translate "Monthly Profit" %}
-                                <button class="btn btn-sm btn-primary btn-square" title="Calculated with 3.5 Skill Injektors" data-tooltip-toggle="skillfarm-tooltip" data-bs-placement="top">
+                                <button class="btn btn-sm btn-primary btn-square" title="Calculated with 3.5 Skill Injektors" data-bs-tooltip="aa-skillfarm" data-bs-placement="top">
                                     <span class="fas fa-info"></span>
                                 </button>
                             </h5>
@@ -111,8 +111,13 @@
     </div>
 {% endblock %}
 
+{% block extra_css %}
+    {% include 'bundles/datatables-css-bs5.html' %}
+    {% include 'skillfarm/bundles/aa-skillfarm-css.html' %}
+{% endblock %}
+
 {% block extra_javascript %}
     {% include 'skillfarm/bundles/x-editable.html' %}
-    {% include 'skillfarm/bundles/settings-bundle.html' %}
-    {% include 'skillfarm/bundles/calculator-bundle.html' %}
+    {% include 'skillfarm/bundles/aa-skillfarm-js.html' %}
+    {% include 'skillfarm/bundles/view-calculator-js.html' %}
 {% endblock %}

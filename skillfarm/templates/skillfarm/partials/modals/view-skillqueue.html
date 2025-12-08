@@ -1,0 +1,33 @@
+
+{% load i18n %}
+
+<!-- view skillqueue modal -->
+<div class="modal fade" id="skillfarm-view-skillqueue" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title fs-5">
+                    {% translate "Skillqueue" %} </span id="custom-title"></span>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
+            </div>
+            <div class="card border-0 modal-body" id="modal-ajax-content">
+                <div id="table-skillqueue-content">
+                    {% include 'skillfarm/partials/table/skillqueue.html' %}
+                </div>
+                <div id="table-skillqueue-filtered-content">
+                    {% include 'skillfarm/partials/table/skillqueue-filtered.html' %}
+                </div>
+                <div id="table-skills-content">
+                    {% include 'skillfarm/partials/table/skills.html' %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-button-cancel-accept-request" type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                    {% translate "Close" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
