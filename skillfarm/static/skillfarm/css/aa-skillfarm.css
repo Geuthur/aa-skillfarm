@@ -80,16 +80,6 @@
         background-color: rgb(255 0 0 / 10%) !important; /* Modern notation */
     }
 
-    /* Fix X-Editable Cancel Button */
-
-    .editable-cancel {
-        background-color: rgb(231 76 60); /* Modern notation */
-    }
-
-    .editable-cancel:hover {
-        background-color: rgb(231 76 60 / 70%); /* Modern notation */
-    }
-
     /* Calculator */
     .price-list {
         list-style-type: none;
@@ -109,5 +99,32 @@
         flex: 1;
         text-align: right;
         font-weight: bold;
+    }
+}
+
+/* Editable
+------------------------------------------------------------------------------------- */
+@media all {
+    /* Fix X-Editable Cancel Button */
+
+    .editable-cancel {
+        background-color: rgb(231 76 60);
+    }
+
+    .editable-cancel:hover {
+        background-color: rgb(231 76 60 / 70%);
+    }
+
+    /* Entferne die Pfeile (Spinner) bei Number-Inputs innerhalb des `.editable-input` Containers */
+    .editable-input input[type="number"] {
+        appearance: none;
+        margin: 0;
+    }
+
+    /* WebKit: verstecke die inneren/äußeren Spin-Buttons */
+    .editable-input input[type="number"]::-webkit-outer-spin-button,
+    .editable-input input[type="number"]::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
     }
 }

@@ -13,6 +13,7 @@ Section Order:
 
 ### Added
 
+- Translation for DataTable
 - OpenAPI ESIStub Class
 - exception handling for missing main character in skillfarm notifications
 - SkillFarmTestCase with preloaded test data and request factory setup
@@ -20,6 +21,23 @@ Section Order:
 
 ### Changed
 
+- Moved SkillInfo Modal to Actions
+- Added DataTable v2 [Version 2.3.5](https://cdn.datatables.net/2.3.5/)
+  - `ColumnControl` Extensions [Docs](https://datatables.net/extensions/columncontrol/)
+  - `FixedHeader` Extensions [Docs](https://datatables.net/extensions/fixedheader/)
+- Refactored JS Structure
+  - Optimized Modal System
+  - Optimized DataTable Structure
+  - Unified Modal Structure
+  - Unified Settings Structure
+  - Unified DataTable Structure
+- Optimized Settings System
+  - Added Locale
+  - Added DataTable Settings
+- Refactored Template Structure
+- Refactored Ajax Views
+  - Optimized Structure
+- use AA `numberFomatter` for Currency
 - Overhaul Test Enviroment
   - SkillFarm TestCase Class
   - Doc String optimization

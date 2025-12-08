@@ -38,7 +38,8 @@ def index(request, character_id=None):
         "page_title": "Skillfarm",
         "character_id": character_id,
         "forms": {
-            "confirm": forms.ConfirmForm(),
+            "switch_notification": forms.SwitchNotification(),
+            "delete": forms.Delete(),
             "skillset": forms.SkillSetForm(),
         },
     }
@@ -102,27 +103,17 @@ def add_char(request, token):
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
-def switch_alarm(request, character_id: int):
+def switch_notification(request, character_id: int):
     """Switch Character Notification Alarm"""
     # Check Permission & If Character Exists
     perm, __ = get_skillfarm_character(request, character_id)
-    form = forms.ConfirmForm(request.POST)
-    if form.is_valid():
-        if not perm:
-            msg = _("Permission Denied")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=403, safe=False
-            )
-
-        character_id = form.cleaned_data["character_id"]
-
-        character = SkillFarmAudit.objects.get(character__character_id=character_id)
-        character.notification = not character.notification
-        character.save()
-        msg = _("Alarm successfully updated")
-    else:
-        msg = "Invalid Form"
-        return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
+    if not perm:
+        msg = _("Permission Denied")
+        return JsonResponse({"success": False, "message": msg}, status=403, safe=False)
+    character = SkillFarmAudit.objects.get(character__character_id=character_id)
+    character.notification = not character.notification
+    character.save()
+    msg = _("Notification successfully updated")
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
 
 
@@ -133,70 +124,40 @@ def delete_character(request, character_id: int):
     """Delete Character"""
     # Check Permission & If Character Exists
     perm, __ = get_skillfarm_character(request, character_id)
-    form = forms.ConfirmForm(request.POST)
-    if form.is_valid():
-        if not perm:
-            msg = _("Permission Denied")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=403, safe=False
-            )
+    if not perm:
+        msg = _("Permission Denied")
+        return JsonResponse({"success": False, "message": msg}, status=403, safe=False)
 
-        character_id = form.cleaned_data["character_id"]
-
-        character = SkillFarmAudit.objects.get(character__character_id=character_id)
-        character.delete()
-        msg = _("{character_name} successfully deleted").format(
-            character_name=character.character.character_name,
-        )
-    else:
-        msg = "Invalid Form"
-        return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
+    character = SkillFarmAudit.objects.get(character__character_id=character_id)
+    character.delete()
+    msg = _("{character_name} successfully deleted").format(
+        character_name=character.character.character_name,
+    )
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
 
 
 @login_required
 @permission_required("skillfarm.basic_access")
 @require_POST
-def skillset(request, character_id: list):
+def edit_skillsetup(request, character_id: int):
     """Edit Character SkillSet"""
     # Check Permission & If Character Exists
-    perm, __ = get_skillfarm_character(request, character_id)
-    form = forms.SkillSetForm(request.POST)
+    perm, character = get_skillfarm_character(request, character_id)
 
-    if form.is_valid():
-        if not perm:
-            msg = _("Permission Denied")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=403, safe=False
-            )
-        character_id = form.cleaned_data["character_id"]
-        selected_skills = form.cleaned_data["selected_skills"]
+    if not perm:
+        msg = _("Permission Denied")
+        return JsonResponse({"success": False, "message": msg}, status=403, safe=False)
+    data = json.loads(request.body)
+    skillset_list = data.get("selected_skills") or None
 
-        character = SkillFarmAudit.objects.get(character__character_id=character_id)
+    # Update or create skillset
+    SkillFarmSetup.objects.update_or_create(
+        character=character, defaults={"skillset": skillset_list}
+    )
 
-        try:
-            skills_data = json.loads(selected_skills)
-            filtered = [
-                entry["value"]
-                for entry in skills_data
-                if entry.get("selected") is True and entry.get("value")
-            ]
-            skillset_list = filtered if filtered else None
-            SkillFarmSetup.objects.update_or_create(
-                character=character, defaults={"skillset": skillset_list}
-            )
-        except Exception:  # pylint: disable=broad-except
-            msg = _("Invalid JSON format")
-            return JsonResponse(
-                {"success": False, "message": msg}, status=400, safe=False
-            )
-
-        msg = _("{character_name} Skillset successfully updated").format(
-            character_name=character.character.character_name,
-        )
-    else:
-        msg = "Invalid Form"
-        return JsonResponse({"success": False, "message": msg}, status=400, safe=False)
+    msg = _("{character_name} Skillset successfully updated").format(
+        character_name=character.character.character_name,
+    )
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
 
 

@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<button type="button"
+    class="btn btn-danger btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-bs-target="#skillfarm-accept-delete-character"
+    data-bs-tooltip="aa-skillfarm"
+    data-action="{% url 'skillfarm:delete_character' character_id=character.character.character_id %}"
+    title="{% translate 'Delete Character' %}"
+    >
+    <span class="fas fa-trash"></span>
+</button>

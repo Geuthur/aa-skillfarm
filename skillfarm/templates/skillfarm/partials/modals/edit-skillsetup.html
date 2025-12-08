@@ -1,0 +1,50 @@
+{% load bootstrap %}
+{% load i18n %}
+
+<!-- accept edit skillsetup modal -->
+<!-- data-bs-focus is need to be false to allow select2 to work -->
+<div class="modal fade" id="skillfarm-edit-skillsetup" tabindex="-1" role="dialog" aria-hidden="true" data-bs-focus="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title fs-5">
+                    {% translate "Edit SkillSetup request" %}
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
+            </div>
+
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <h6 class="text-muted">
+                        {% translate "Select the skills you want to filter for this character." %}
+                        {% translate "You can add multiple skills to the filter." %}
+                        {% translate "If no skills are selected, the filter will be disabled." %}
+                    </h6>
+                    <div class="mb-3">
+                        <select id="skillset" name="skillset" multiple="">
+                            {% for skill in forms.skillset.Meta.querysets.skills %}
+                                <option value="{{ skill.name }}">{{ skill.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="character_id" value="">
+                        <input type="hidden" name="selected_skills" value="">
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modal-button-cancel-accept-request" type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-hand"></i>
+                    {% translate "Cancel" %}
+                </button>
+
+                <button id="modal-button-confirm-accept-request" type="button" class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-check"></i>
+                    {% translate "Accept Edit request" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

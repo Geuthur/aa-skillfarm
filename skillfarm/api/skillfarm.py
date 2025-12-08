@@ -6,7 +6,7 @@ from ninja import NinjaAPI, Schema
 
 # Django
 from django.core.handlers.wsgi import WSGIRequest
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.html import format_html
@@ -130,7 +130,11 @@ def get_skillqueue_data(skill: CharacterSkillqueueEntry):
         trained_sp=skill.training_start_sp,
         start_date=start_date,
         finish_date=end_date,
-        progress={"html": generate_progressbar_html(progress), "value": progress},
+        progress={
+            "display": generate_progressbar_html(progress),
+            "sort": progress,
+            "value": progress,
+        },
     )
     return skillqueue_response
 
@@ -265,11 +269,9 @@ class SkillFarmApiEndpoints:
 
                 char = f"{char_portrait} {character.character.character_name} {character.get_status.bootstrap_icon()} - {character.notification_icon}"
 
-                # Create the skillinfo button
-                skill_info_html = generate_skillinfo_button(character=character)
-
                 # Create the skillfarm action buttons
                 actions = []
+                actions.append(generate_skillinfo_button(character=character))
                 actions.append(generate_toggle_notification_button(character=character))
                 actions.append(generate_edit_skillsetup_button(character=character))
                 actions.append(generate_delete_character_button(character=character))
@@ -287,7 +289,7 @@ class SkillFarmApiEndpoints:
                         update_status=character.get_status,
                         notification=character.notification,
                         last_update=str(character.last_update),
-                        is_extraction_ready=f"{skill_info_html} {character.extraction_icon}",
+                        is_extraction_ready=character.extraction_icon,
                         is_filter=generate_status_icon_html(character=character),
                     ),
                     actions=actions_html,
@@ -365,11 +367,11 @@ class SkillFarmApiEndpoints:
             return SkillFarmSetupResponse(setup=skillfarm_setup)
 
         @api.get(
-            "{character_id}/skillinfo/",
-            response={200: dict, 403: str},
+            "{character_id}/skillqueue/",
+            response={200: SkillFarmInfoResponse, 403: dict},
             tags=self.tags,
         )
-        def get_skillinfo_details(request, character_id: int):
+        def get_skillqueue(request, character_id: int):
             """Get Character Skills and SkillQueue"""
             logger.info(
                 f"User {request.user} requested SkillFarm skill info for character ID {character_id}."
@@ -381,7 +383,7 @@ class SkillFarmApiEndpoints:
                 logger.warning(
                     f"User {request.user} tried to access SkillFarm skill info for character ID {character_id} without permissions."
                 )
-                return 403, "Permission Denied"
+                return 403, {"error": "Permission Denied"}
 
             response_skillqueue: list[SkillFarmQueueSchema] = []
             response_skillqueue_filtered: list[SkillFarmQueueSchema] = []
@@ -404,8 +406,10 @@ class SkillFarmApiEndpoints:
                         skill_data = get_filtered_skills_data(skill)
                         if skill_data is not None:
                             response_skills.append(skill_data)
-
-            skillinfo_response = SkillFarmInfoResponse(
+            logger.info(
+                f"User {request.user} successfully retrieved SkillFarm skill info for character ID {character_id}."
+            )
+            return SkillFarmInfoResponse(
                 title=str(_("Skill Info")),
                 character=CharacterSchema(
                     character_id=character.character.character_id,
@@ -414,12 +418,4 @@ class SkillFarmApiEndpoints:
                 skillqueue=response_skillqueue,
                 skillqueue_filtered=response_skillqueue_filtered,
                 skills=response_skills,
-            )
-            logger.info(
-                f"User {request.user} successfully retrieved SkillFarm skill info for character ID {character_id}."
-            )
-            return render(
-                request,
-                "skillfarm/partials/modals/view_skillqueue.html",
-                context=skillinfo_response.__dict__,
             )

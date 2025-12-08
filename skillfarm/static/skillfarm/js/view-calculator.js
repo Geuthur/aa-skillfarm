@@ -1,41 +1,39 @@
-/* global skillfarm */
+/* global skillfarm, aaSkillfarmSettings, aaSkillfarmSettingsOverride, numberFormatter, _bootstrapTooltip */
 
 $(document).ready(() => {
-    $('.editable-click').editable({
+
+    $('.aa-skillfarm-editable').editable({
+        container: 'body',
         type: 'number',
         title: 'Enter value',
         placement: 'top',
-        display: function(value) {
-            // Display the value with thousands separators
-            if (!value) {
-                // Display the original value if the new value is empty
-                value = $(this).data('original');
-            } else {
-                // Store the new value
-                $(this).text(parseFloat(value).toLocaleString());
-            }
+        /**
+         * Disable display of the editable field value after editing
+         */
+        display: () => {
+            return false;
         },
         success: function(response, newValue) {
-            // Check if the new value is empty
-            if (!newValue) {
-                console.log('Empty value');
-                // Revert to the original value
-                const originalValue = $(this).data('original');
-                $(this).text(parseFloat(originalValue).toLocaleString());
-            } else {
-                // Display the value with thousands separators after saving
-                $(this).text(parseFloat(newValue).toLocaleString());
-            }
+            newValue = parseInt(newValue);
+
+            const newValueFormatted = numberFormatter({
+                value: newValue,
+                locales: aaSkillfarmSettings.locale,
+                options: {
+                    style: 'currency',
+                    currency: 'ISK'
+                }
+            });
+            $(this).attr('data-value', newValue).html(newValueFormatted);
             calculate();
         },
-        inputclass: 'editable-input',
-        onblur: 'submit'
-    });
-
-    // Remove thousands separators when the input field is shown
-    $('.editable-click').on('shown', function(e, editable) {
-        var value = $(this).text().replace(/[,.]/g, '');
-        editable.input.$input.val(value);
+        validate: (value) => {
+            if (value === '') {
+                return 'This field is required';
+            } else if (isNaN(value) || parseFloat(value) < 0) {
+                return 'Please enter a valid non-negative number';
+            }
+        }
     });
 
     const elements = ['duration', 'injector-amount', 'extractor-amount', 'custom-plex-amount'];
@@ -115,8 +113,5 @@ $(document).ready(() => {
         document.getElementById('error').classList.add('d-none');
         document.getElementById('result-text').classList.remove('d-none');
     }
-
-    $('[data-tooltip-toggle="skillfarm-tooltip"]').tooltip({
-        trigger: 'hover',
-    });
+    _bootstrapTooltip();
 });

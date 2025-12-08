@@ -6,36 +6,51 @@ from django import forms
 # Alliance Auth (External Libs)
 from eveuniverse.models import EveType
 
-
-class ConfirmForm(forms.Form):
-    """Form Confirms."""
-
-    character_id = forms.CharField(
-        widget=forms.HiddenInput(),
-    )
+# AA Skillfarm
+from skillfarm.models.skillfarmaudit import SkillFarmSetup
 
 
-class SkillSetForm(forms.Form):
-    """Form SkillSet."""
+class Delete(forms.Form):
+    """
+    Form to confirm character deletion.
+    """
 
-    character_id = forms.CharField(
-        widget=forms.HiddenInput(),
-    )
+    class Meta:
+        fields = ["character_id"]
 
-    selected_skills = forms.CharField(
-        required=False,
-        widget=forms.HiddenInput(),
-    )
 
-    skills = forms.ModelMultipleChoiceField(
-        queryset=EveType.objects.filter(eve_group__eve_category__id=16)
-        .select_related("eve_group", "eve_group__eve_category")
-        .order_by("name"),
-        required=False,
-        widget=forms.SelectMultiple(
-            attrs={
-                "class": "form-select",
-                "id": "skillSetSelect",
-            }
-        ),
-    )
+class SwitchNotification(forms.Form):
+    """
+    Form to confirm switching notification for a character.
+    """
+
+    class Meta:
+        fields = ["character_id"]
+
+
+class SkillSetForm(forms.ModelForm):
+    """
+    Form to edit Skillset for a character.
+    """
+
+    class Meta:
+        model = SkillFarmSetup
+        fields = ["skillset"]
+        labels = {
+            "skillset": "Skills",
+        }
+        querysets = {
+            "skills": EveType.objects.filter(eve_group__eve_category__id=16)
+            .select_related("eve_group", "eve_group__eve_category")
+            .order_by("name"),
+        }
+
+        widgets = {
+            "skillset": forms.CharField(),
+            "skills": forms.SelectMultiple(
+                attrs={
+                    "class": "form-select",
+                    "id": "skillSetSelect",
+                }
+            ),
+        }

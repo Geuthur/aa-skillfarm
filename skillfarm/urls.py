@@ -26,22 +26,22 @@ urlpatterns = [
     # -- Administration
     path("char/add/", views.add_char, name="add_char"),
     path(
-        "switch_alarm/<int:character_id>/",
-        views.switch_alarm,
-        name="switch_alarm",
+        "switch_notification/<int:character_id>/",
+        views.switch_notification,
+        name="switch_notification",
     ),
     path(
-        "delete/<int:character_id>/",
+        "delete_character/<int:character_id>/",
         views.delete_character,
         name="delete_character",
     ),
     path(
-        "skillset/<int:character_id>/",
-        views.skillset,
-        name="skillset",
+        "edit_skillsetup/<int:character_id>/",
+        views.edit_skillsetup,
+        name="edit_skillsetup",
     ),
     # -- Tools
-    path("calc/", views.skillfarm_calc, name="calc"),
+    path("view/calculator/", views.skillfarm_calc, name="calculator"),
     # -- API System
     re_path(r"^api/", api.urls),
 ]

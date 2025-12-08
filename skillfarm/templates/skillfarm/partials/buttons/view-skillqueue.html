@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-primary btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-bs-tooltip="aa-skillfarm"
+    data-bs-target="#skillfarm-view-skillqueue"
+    data-action="{% url 'skillfarm:api:get_skillqueue' character_id=character.character.character_id %}"
+    title="{% translate 'Skillinfo' %}"
+    >
+    <span class="fas fa-info"></span>
+</button>
