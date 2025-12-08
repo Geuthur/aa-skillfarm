@@ -66,7 +66,7 @@ $(document).ready(() => {
                             width: 45
                         },
                         {
-                            targets: [5],
+                            targets: [2, 5],
                             width: 115
                         },
                     ],
