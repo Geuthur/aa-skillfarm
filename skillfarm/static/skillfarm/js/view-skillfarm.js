@@ -63,10 +63,10 @@ $(document).ready(() => {
                         },
                         {
                             targets: [4],
-                            width: 10
+                            width: 45
                         },
                         {
-                            targets: [5],
+                            targets: [2, 5],
                             width: 115
                         },
                     ],
