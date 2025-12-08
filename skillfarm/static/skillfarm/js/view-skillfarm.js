@@ -63,7 +63,7 @@ $(document).ready(() => {
                         },
                         {
                             targets: [4],
-                            width: 10
+                            width: 45
                         },
                         {
                             targets: [5],
