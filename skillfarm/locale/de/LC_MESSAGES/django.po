@@ -8,16 +8,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-03 12:48+0200\n"
-"PO-Revision-Date: 2025-10-17 06:28+0000\n"
-"Last-Translator: Peter Pfeufer <info@ppfeufer.de>\n"
-"Language-Team: German <https://weblate.voices-of-war.de/projects/"
-"allianceauth/aa-skillfarm/de/>\n"
+"PO-Revision-Date: 2025-12-22 10:25+0000\n"
+"Last-Translator: Weblate Admin <geuthur@users.noreply.weblate.voices-of-"
+"war.de>\n"
+"Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
+"skillfarm/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.1\n"
 
 msgid "Toggle Alarm"
 msgstr "Alarm umschalten"
@@ -26,7 +27,7 @@ msgid "Are you sure you want to toggle the alarm for {}?"
 msgstr "Bist Du sicher das Du den Alarm für {} umschalten möchtest?"
 
 msgid "Edit Skillset"
-msgstr "Skillset bearbeiten"
+msgstr "Skillsatz bearbeiten"
 
 msgid "Delete Character"
 msgstr "Lösche Charakter"
@@ -35,7 +36,7 @@ msgid "Are you sure you want to delete character {}?"
 msgstr "Bist du sicher das du {} löschen möchtest?"
 
 msgid "Skillinfo"
-msgstr ""
+msgstr "Skillinfo"
 
 msgid "Skill Extraction Ready"
 msgstr "Skill Extraktion bereit"
@@ -52,7 +53,7 @@ msgid "Notification Deactivated"
 msgstr "Benachrichtigung deaktiviert"
 
 msgid "Show Skillfarm"
-msgstr "Zeige Skillfarm"
+msgstr "Skillfarm anzeigen"
 
 msgid "No Active Training"
 msgstr "Kein aktives Training"
@@ -89,13 +90,13 @@ msgid "Actions"
 msgstr "Aktionen"
 
 msgid "Error loading data:"
-msgstr "Fehler beim Laden von Daten:"
+msgstr "Fehler beim Laden der Daten:"
 
 msgid "Single Price"
-msgstr "Einzel Preis"
+msgstr "Einheitspreis"
 
 msgid "last update"
-msgstr "letzte update"
+msgstr "letzte Aktualisierung"
 
 msgid "Monthly Profit"
 msgstr "Monatlicher Profit"
@@ -110,7 +111,7 @@ msgid "Profit 24 Month Abo"
 msgstr "Profit 24-Monatsabo"
 
 msgid "Calculation"
-msgstr "Kalkulation"
+msgstr "Berechnung"
 
 msgid "Monthly"
 msgstr "Monatlich"
@@ -125,7 +126,7 @@ msgid "Skill Injector Amount"
 msgstr "Skill Injector Menge"
 
 msgid "Skill Exctractor Amount"
-msgstr "Skill Extractor Menge"
+msgstr "Skill Extraktor Menge"
 
 msgid "Use custom PLEX amount"
 msgstr "Benutzerdefinierte PLEX-Menge verwenden"
@@ -137,8 +138,7 @@ msgid "Calculate"
 msgstr "Berechnen"
 
 msgid "Please fill out at least one field: Skill Injector or Extractor"
-msgstr ""
-"Bitte füllen Sie mindestens ein Feld aus: Skill Injektor oder Extraktor"
+msgstr "Bitte füllen Sie mindestens ein Feld aus: Skill Injektor oder Extraktor"
 
 msgid "Result:"
 msgstr "Ergebnis:"
@@ -147,7 +147,7 @@ msgid "Character Overview"
 msgstr "Charakter Übersicht"
 
 msgid "Corporation"
-msgstr ""
+msgstr "Corporation"
 
 msgid "Overview"
 msgstr "Übersicht"
@@ -180,22 +180,22 @@ msgid "Skillqueue"
 msgstr "Skillwarteschlange"
 
 msgid "Skill"
-msgstr ""
+msgstr "Skill"
 
 msgid "Start Date"
 msgstr "Start Datum"
 
 msgid "Finish Date"
-msgstr "End Datum"
+msgstr "Enddatum"
 
 msgid "Skillqueue Filtered"
-msgstr "Skillwarteschlange Gefiltert"
+msgstr "Skillwarteschlange gefiltert"
 
 msgid "Skills"
-msgstr ""
+msgstr "Skills"
 
 msgid "Level"
-msgstr ""
+msgstr "Level"
 
 msgid "Skillpoints"
 msgstr "Skillpunkte"
@@ -207,25 +207,25 @@ msgid "Skillfarm"
 msgstr "Skillfarm"
 
 msgid "Skillfarm Calculator"
-msgstr "Skillfarm Kalkulator"
+msgstr "Skillfarm Berechnung"
 
 msgid "ESI Skillqueue will only update on Character Login"
 msgstr "ESI Skillqueue wird nur geupdated bei Charakter Login"
 
 msgid "Inactive Characters"
-msgstr "Inaktive Charaktäre"
+msgstr "Inaktive Charaktere"
 
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
-"{character_name} erfolgreich hinzugefügt oder geupdated in das Skillfarm "
-"System"
+"{character_name} erfolgreich zum Skillfarm-System hinzugefügt oder "
+"aktualisiert"
 
 msgid "Permission Denied"
 msgstr "Zugriff verweigert"
 
 msgid "Alarm successfully updated"
-msgstr "Alarm erfolgreich geupdated"
+msgstr "Alarm erfolgreich aktualisiert"
 
 #, python-brace-format
 msgid "{character_name} successfully deleted"
@@ -233,7 +233,7 @@ msgstr "{character_name} erfolgreich gelöscht"
 
 #, python-brace-format
 msgid "{character_name} Skillset successfully updated"
-msgstr "{character_name} Skillset erfolgreich geupdated"
+msgstr "{character_name} Skillset erfolgreich aktualisiert"
 
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
