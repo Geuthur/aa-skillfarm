@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
@@ -91,9 +92,8 @@ def add_char(request, token):
     )[0]
     tasks.update_character.apply_async(args=[char.pk], kwargs={"force_refresh": True})
 
-    msg = _(
-        "{character_name} successfully added or updated to Skillfarm System"
-    ).format(
+    msg = format_lazy(
+        _("{character_name} successfully added or updated to Skillfarm System"),
         character_name=char.character.character_name,
     )
     messages.success(request, msg)
@@ -130,7 +130,8 @@ def delete_character(request, character_id: int):
 
     character = SkillFarmAudit.objects.get(character__character_id=character_id)
     character.delete()
-    msg = _("{character_name} successfully deleted").format(
+    msg = format_lazy(
+        _("{character_name} successfully deleted"),
         character_name=character.character.character_name,
     )
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
@@ -155,7 +156,8 @@ def edit_skillsetup(request, character_id: int):
         character=character, defaults={"skillset": skillset_list}
     )
 
-    msg = _("{character_name} Skillset successfully updated").format(
+    msg = format_lazy(
+        _("{character_name} Skillset successfully updated"),
         character_name=character.character.character_name,
     )
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
