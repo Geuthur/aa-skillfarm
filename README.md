@@ -37,7 +37,7 @@ ______________________________________________________________________
 - Graphical Design
 - Characters Overview
 - Skillfarm Information Sheet
-  - Filtered Skill Queue
+  - Filtered Skillqueue
   - Filtered Skills
   - Highlight finished Skills
   - No Active Training hint

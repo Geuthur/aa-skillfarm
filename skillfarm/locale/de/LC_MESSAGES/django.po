@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: AA Skillfarm\n"
+"Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2025-12-22 11:54+0100\n"
+"POT-Creation-Date: 2025-12-22 12:07+0100\n"
 "PO-Revision-Date: 2025-12-22 11:05+0000\n"
 "Last-Translator: Weblate Admin <geuthur@users.noreply.weblate.geuthur.de>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -39,9 +39,9 @@ msgid "Skills"
 msgstr "Skills"
 
 #: skillfarm/models/skillfarmaudit.py:46
-#, fuzzy
-#| msgid "Skillqueue"
-msgid "Skill Queue"
+#: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
+#: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
+msgid "Skillqueue"
 msgstr "Skillwarteschlange"
 
 #: skillfarm/models/skillfarmaudit.py:59
@@ -346,11 +346,6 @@ msgstr "Wenn keine Skills ausgewählt sind, wird der Filter deaktiviert."
 msgid "Accept Edit request"
 msgstr "Anfrage Bearbeiten akzeptieren"
 
-#: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
-#: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
-msgid "Skillqueue"
-msgstr "Skillwarteschlange"
-
 #: skillfarm/templates/skillfarm/partials/navigation.html:9
 msgid "Skillfarm Calculator"
 msgstr "Skillfarm Berechnung"
@@ -439,6 +434,11 @@ msgid ""
 msgstr ""
 "Beim Abrufen der Marktdaten ist ein Fehler aufgetreten. Bitte informieren "
 "Sie einen Administrator, um die Marktdaten abzurufen."
+
+#, fuzzy
+#~| msgid "Skillqueue"
+#~ msgid "Skill Queue"
+#~ msgstr "Skillwarteschlange"
 
 #~ msgid "Toggle Alarm"
 #~ msgstr "Alarm umschalten"
