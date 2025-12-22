@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
@@ -377,10 +378,11 @@ class SkillFarmAudit(models.Model):
 
     def _generate_notification(self, skill_names: list[str]) -> str:
         """Generate notification for the user."""
-        msg = _("%(charname)s: %(skillname)s") % {
-            "charname": self.character.character_name,
-            "skillname": ", ".join(skill_names),
-        }
+        msg = format_lazy(
+            "{charname}: {skillname}",
+            charname=self.character.character_name,
+            skillname=", ".join(skill_names),
+        )
         return msg
 
 
