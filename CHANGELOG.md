@@ -11,6 +11,8 @@ Section Order:
 ### Removed
 -->
 
+## [1.0.4] - 2025-12-22
+
 ### Added
 
 - Translation for DataTable
@@ -21,6 +23,7 @@ Section Order:
 
 ### Changed
 
+- Updated Translations
 - Moved SkillInfo Modal to Actions
 - Added DataTable v2 [Version 2.3.5](https://cdn.datatables.net/2.3.5/)
   - `ColumnControl` Extensions [Docs](https://datatables.net/extensions/columncontrol/)
@@ -504,6 +507,7 @@ This will load all necessary prices
 [1.0.0-beta.1]: https://github.com/Geuthur/aa-skillfarm/compare/v0.5.8...v1.0.0-beta.1 "1.0.0-beta.1"
 [1.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.0...v1.0.1 "1.0.1"
 [1.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.1...v1.0.2 "1.0.2"
-[1.0.3]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.2...v1.0.3 "1.0.2"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.3...HEAD "In Development"
+[1.0.3]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.2...v1.0.3 "1.0.3"
+[1.0.4]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.3...v1.0.4 "1.0.4"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
