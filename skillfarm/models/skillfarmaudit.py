@@ -43,7 +43,7 @@ class SkillFarmAudit(models.Model):
 
     class UpdateSection(models.TextChoices):
         SKILLS = "skills", _("Skills")
-        SKILLQUEUE = "skillqueue", _("Skill Queue")
+        SKILLQUEUE = "skillqueue", _("Skillqueue")
 
         @classmethod
         def get_sections(cls) -> list[str]:
