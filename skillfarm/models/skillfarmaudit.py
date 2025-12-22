@@ -383,7 +383,7 @@ class SkillFarmAudit(models.Model):
             charname=self.character.character_name,
             skillname=", ".join(skill_names),
         )
-        return msg
+        return str(msg)
 
 
 class SkillFarmSetup(models.Model):
