@@ -15,9 +15,6 @@ translation_file_relative_path = LC_MESSAGES/django.po
 git_repository = https://github.com/Geuthur/$(appname)
 git_repository_issues = $(git_repository)/issues
 
-# Set myauth path or default to ../myauth if config file (.make/myauth-path) does not exist
-myauth_path = $(shell path=$$(cat .make/myauth-path 2>/dev/null | grep . || echo "../myauth"); echo "$${path%/}")
-
 # Default goal
 .DEFAULT_GOAL := help
 
