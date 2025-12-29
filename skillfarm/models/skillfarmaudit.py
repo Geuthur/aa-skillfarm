@@ -161,7 +161,7 @@ class SkillFarmAudit(models.Model):
         Return the character ownership object of this character.
         """
         try:
-            return self.eve_character.character_ownership
+            return self.character.character_ownership
         except ObjectDoesNotExist:
             return None
 
