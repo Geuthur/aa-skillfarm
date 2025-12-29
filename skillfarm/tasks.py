@@ -38,11 +38,11 @@ TASK_DEFAULTS = {
     "max_retries": MAX_RETRIES_DEFAULT,
 }
 
+# Default params for tasks that need bind=True and run once only.
+TASK_DEFAULTS_BIND_ONCE = {**TASK_DEFAULTS, **{"bind": True, "base": QueueOnce}}
+
 # Default params for tasks that need run once only.
 TASK_DEFAULTS_ONCE = {**TASK_DEFAULTS, **{"base": QueueOnce}}
-
-# Default params for tasks that need run once only and are bound to the task instance.
-TASK_DEFAULTS_BIND_ONCE = {**TASK_DEFAULTS, **{"bind": True, "base": QueueOnce}}
 
 # Default params for tasks that need run once only per character and are bound to the task instance.
 TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
@@ -54,21 +54,45 @@ TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
 @shared_task(**TASK_DEFAULTS_ONCE)
 def update_all_skillfarm(runs: int = 0, force_refresh=False):
     """Update all skillfarm characters."""
+    # Disable characters with no owner
     SkillFarmAudit.objects.disable_characters_with_no_owner()
+
     characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
     for character in characters:
         update_character.apply_async(
             args=[character.pk], kwargs={"force_refresh": force_refresh}
         )
         runs = runs + 1
+
     logger.info("Queued %s Skillfarm Updates", runs)
 
 
-@shared_task(**TASK_DEFAULTS_ONCE)
-def update_character(character_pk: int, force_refresh=False):
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+def update_character(
+    self: Task,  # pylint: disable=unused-argument
+    character_pk: int,
+    force_refresh=False,
+) -> bool:
+    """
+    Update a SkillFarmAudit character by queuing necessary section updates.
+
+    Args:
+        character_pk (int): Primary key of the SkillFarmAudit character to update.
+        force_refresh (bool): If True, forces a refresh of all sections.
+
+    Returns:
+        bool: True if updates were queued, False otherwise.
+    """
     character = SkillFarmAudit.objects.prefetch_related("skillfarm_update_status").get(
         pk=character_pk
     )
+
+    if character.is_orphan:
+        logger.info(
+            "Character %s is an orphan. Skipping update.",
+            character,
+        )
+        return False
 
     que = []
     priority = 7
@@ -85,7 +109,7 @@ def update_character(character_pk: int, force_refresh=False):
 
     if not needs_update and not force_refresh:
         logger.info("No updates needed for %s", character.character.character_name)
-        return
+        return False
 
     sections = character.UpdateSection.get_sections()
 
@@ -111,6 +135,7 @@ def update_character(character_pk: int, force_refresh=False):
         len(que),
         character.character.character_name,
     )
+    return True
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)

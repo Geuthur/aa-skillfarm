@@ -8,10 +8,12 @@ from collections.abc import Callable
 from aiopenapi3.errors import HTTPClientError, HTTPServerError
 
 # Django
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
@@ -143,6 +145,25 @@ class SkillFarmAudit(models.Model):
         if token:
             return token
         return False
+
+    @cached_property
+    def is_orphan(self) -> bool:
+        """
+        Return True if this character is an orphan else False.
+
+        An orphan is a character that is not owned anymore by a user.
+        """
+        return self.character_ownership is None
+
+    @cached_property
+    def character_ownership(self) -> bool:
+        """
+        Return the character ownership object of this character.
+        """
+        try:
+            return self.character.character_ownership
+        except ObjectDoesNotExist:
+            return None
 
     @property
     def get_status(self) -> UpdateStatus.description:

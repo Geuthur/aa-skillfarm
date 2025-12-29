@@ -11,6 +11,11 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- `is_orphan` Property to check if a Character is not owned anymore
+- `character_ownership` Property for checking ownership
+
 ## [1.0.4] - 2025-12-22
 
 ### Added
