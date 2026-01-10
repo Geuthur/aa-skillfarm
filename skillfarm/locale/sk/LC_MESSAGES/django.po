@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2025-12-22 12:07+0100\n"
+"POT-Creation-Date: 2026-01-10 16:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,66 +33,66 @@ msgstr ""
 msgid "Skill Info"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:45
+#: skillfarm/models/skillfarmaudit.py:47
 #: skillfarm/templates/skillfarm/partials/table/skills.html:4
 msgid "Skills"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:46
+#: skillfarm/models/skillfarmaudit.py:48
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
 #: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
 msgid "Skillqueue"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:59
-msgid "disabled"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:60
-msgid "token error"
-msgstr ""
-
 #: skillfarm/models/skillfarmaudit.py:61
-msgid "error"
+msgid "Disabled"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:62
-msgid "ok"
+msgid "Token Error"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:63
-msgid "incomplete"
+msgid "Error"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:64
-msgid "in progress"
+msgid "OK"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:98
-msgid "Update is disabled"
+#: skillfarm/models/skillfarmaudit.py:65
+msgid "Incomplete"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:99
-msgid "One section has a token error during update"
+#: skillfarm/models/skillfarmaudit.py:66
+msgid "In Progress"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:100
-msgid "One or more sections have not been updated"
+msgid "Update is disabled"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:101
-msgid "Update is in progress"
+msgid "One section has a token error during update"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:102
-msgid "An error occurred during update"
+msgid "One or more sections have not been updated"
 msgstr ""
 
 #: skillfarm/models/skillfarmaudit.py:103
+msgid "Update is in progress"
+msgstr ""
+
+#: skillfarm/models/skillfarmaudit.py:104
+msgid "An error occurred during update"
+msgstr ""
+
+#: skillfarm/models/skillfarmaudit.py:105
 msgid "Updates completed successfully"
 msgstr ""
 
-#: skillfarm/tasks.py:228
+#: skillfarm/tasks.py:253
 msgid "Skillfarm Notifications"
 msgstr ""
 
