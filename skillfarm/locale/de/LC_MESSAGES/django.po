@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: AA Skillfarm\n"
+"Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2025-12-22 12:07+0100\n"
+"POT-Creation-Date: 2026-01-10 16:25+0100\n"
 "PO-Revision-Date: 2025-12-23 02:05+0000\n"
 "Last-Translator: Weblate Admin <geuthur@users.noreply.weblate.geuthur.de>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -33,66 +33,76 @@ msgstr "Kein aktives Training"
 msgid "Skill Info"
 msgstr "Skill-Info"
 
-#: skillfarm/models/skillfarmaudit.py:45
+#: skillfarm/models/skillfarmaudit.py:47
 #: skillfarm/templates/skillfarm/partials/table/skills.html:4
 msgid "Skills"
 msgstr "Skills"
 
-#: skillfarm/models/skillfarmaudit.py:46
+#: skillfarm/models/skillfarmaudit.py:48
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
 #: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
 msgid "Skillqueue"
 msgstr "Skillwarteschlange"
 
-#: skillfarm/models/skillfarmaudit.py:59
-msgid "disabled"
+#: skillfarm/models/skillfarmaudit.py:61
+#, fuzzy
+#| msgid "disabled"
+msgid "Disabled"
 msgstr "deaktiviert"
 
-#: skillfarm/models/skillfarmaudit.py:60
-msgid "token error"
+#: skillfarm/models/skillfarmaudit.py:62
+#, fuzzy
+#| msgid "token error"
+msgid "Token Error"
 msgstr "token Fehler"
 
-#: skillfarm/models/skillfarmaudit.py:61
-msgid "error"
+#: skillfarm/models/skillfarmaudit.py:63
+#, fuzzy
+#| msgid "error"
+msgid "Error"
 msgstr "fehler"
 
-#: skillfarm/models/skillfarmaudit.py:62
-msgid "ok"
-msgstr "Ok"
+#: skillfarm/models/skillfarmaudit.py:64
+msgid "OK"
+msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:63
-msgid "incomplete"
+#: skillfarm/models/skillfarmaudit.py:65
+#, fuzzy
+#| msgid "incomplete"
+msgid "Incomplete"
 msgstr "unvollständig"
 
-#: skillfarm/models/skillfarmaudit.py:64
-msgid "in progress"
-msgstr "in Arbeit"
+#: skillfarm/models/skillfarmaudit.py:66
+#, fuzzy
+#| msgid "Progress"
+msgid "In Progress"
+msgstr "Fortschritt"
 
-#: skillfarm/models/skillfarmaudit.py:98
+#: skillfarm/models/skillfarmaudit.py:100
 msgid "Update is disabled"
 msgstr "Update ist deaktiviert"
 
-#: skillfarm/models/skillfarmaudit.py:99
+#: skillfarm/models/skillfarmaudit.py:101
 msgid "One section has a token error during update"
 msgstr "Eine Sektion hat einen token Fehler während des update"
 
-#: skillfarm/models/skillfarmaudit.py:100
+#: skillfarm/models/skillfarmaudit.py:102
 msgid "One or more sections have not been updated"
 msgstr "Eine oder mehr Sektionen wurden nicht aktualisiert"
 
-#: skillfarm/models/skillfarmaudit.py:101
+#: skillfarm/models/skillfarmaudit.py:103
 msgid "Update is in progress"
 msgstr "Aktualisierung ist in Arbeit"
 
-#: skillfarm/models/skillfarmaudit.py:102
+#: skillfarm/models/skillfarmaudit.py:104
 msgid "An error occurred during update"
 msgstr "Ein Fehler trat während des Update auf"
 
-#: skillfarm/models/skillfarmaudit.py:103
+#: skillfarm/models/skillfarmaudit.py:105
 msgid "Updates completed successfully"
 msgstr "Aktualisierungen erfolgreich abgeschlossen"
 
-#: skillfarm/tasks.py:228
+#: skillfarm/tasks.py:253
 msgid "Skillfarm Notifications"
 msgstr "Skillfarm Benachrichtigung"
 
@@ -434,6 +444,12 @@ msgid ""
 msgstr ""
 "Beim Abrufen der Marktdaten ist ein Fehler aufgetreten. Bitte informieren "
 "Sie einen Administrator, um die Marktdaten abzurufen."
+
+#~ msgid "ok"
+#~ msgstr "Ok"
+
+#~ msgid "in progress"
+#~ msgstr "in Arbeit"
 
 #, fuzzy
 #~| msgid "Skillqueue"
