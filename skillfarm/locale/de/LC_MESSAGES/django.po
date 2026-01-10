@@ -5,11 +5,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: AA Skillfarm \n"
+"Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
 "POT-Creation-Date: 2026-01-10 16:25+0100\n"
-"PO-Revision-Date: 2025-12-23 02:05+0000\n"
-"Last-Translator: Weblate Admin <geuthur@users.noreply.weblate.geuthur.de>\n"
+"PO-Revision-Date: 2026-01-10 20:22+0000\n"
+"Last-Translator: Geuthur <geuthur@users.noreply.github.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
 "skillfarm/de/>\n"
 "Language: de\n"
@@ -45,38 +45,28 @@ msgid "Skillqueue"
 msgstr "Skillwarteschlange"
 
 #: skillfarm/models/skillfarmaudit.py:61
-#, fuzzy
-#| msgid "disabled"
 msgid "Disabled"
 msgstr "deaktiviert"
 
 #: skillfarm/models/skillfarmaudit.py:62
-#, fuzzy
-#| msgid "token error"
 msgid "Token Error"
 msgstr "token Fehler"
 
 #: skillfarm/models/skillfarmaudit.py:63
-#, fuzzy
-#| msgid "error"
 msgid "Error"
-msgstr "fehler"
+msgstr "Fehler"
 
 #: skillfarm/models/skillfarmaudit.py:64
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: skillfarm/models/skillfarmaudit.py:65
-#, fuzzy
-#| msgid "incomplete"
 msgid "Incomplete"
 msgstr "unvollständig"
 
 #: skillfarm/models/skillfarmaudit.py:66
-#, fuzzy
-#| msgid "Progress"
 msgid "In Progress"
-msgstr "Fortschritt"
+msgstr "in Arbeit"
 
 #: skillfarm/models/skillfarmaudit.py:100
 msgid "Update is disabled"
@@ -231,8 +221,7 @@ msgstr "Berechnen"
 
 #: skillfarm/templates/skillfarm/calculator.html:94
 msgid "Please fill out at least one field: Skill Injector or Extractor"
-msgstr ""
-"Bitte füllen Sie mindestens ein Feld aus: Skill Injektor oder Extraktor"
+msgstr "Bitte füllen Sie mindestens ein Feld aus: Skill Injektor oder Extraktor"
 
 #: skillfarm/templates/skillfarm/calculator.html:97
 msgid "Result:"
