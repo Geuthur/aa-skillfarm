@@ -5,7 +5,7 @@ import datetime
 from collections.abc import Callable
 
 # Third Party
-from aiopenapi3.errors import HTTPClientError, HTTPServerError
+from aiopenapi3.errors import HTTPClientError
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -318,9 +318,6 @@ class SkillFarmAudit(models.Model):
             logger.debug("%s: Update has changed, section: %s", self, section.label)
         except HTTPNotModified as exc:
             logger.debug("%s: Update has not changed, section: %s", self, exc)
-            return UpdateSectionResult(is_changed=False, is_updated=False)
-        except HTTPServerError as exc:
-            logger.debug("%s: Update has an HTTP internal server error: %s", self, exc)
             return UpdateSectionResult(is_changed=False, is_updated=False)
         except HTTPClientError as exc:
             error_message = f"{type(exc).__name__}: {str(exc)}"
