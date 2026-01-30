@@ -28,6 +28,15 @@ class SwitchNotification(forms.Form):
         fields = ["character_id"]
 
 
+class SwitchMarkAsRead(forms.Form):
+    """
+    Form to confirm switching mark as read for a character.
+    """
+
+    class Meta:
+        fields = ["character_id"]
+
+
 class SkillSetForm(forms.ModelForm):
     """
     Form to edit Skillset for a character.

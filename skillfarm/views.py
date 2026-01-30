@@ -42,6 +42,7 @@ def index(request, character_id=None):
             "switch_notification": forms.SwitchNotification(),
             "delete": forms.Delete(),
             "skillset": forms.SkillSetForm(),
+            "mark_as_read": forms.SwitchMarkAsRead(),
         },
     }
     return render(request, "skillfarm/skillfarm.html", context=context)
@@ -132,6 +133,27 @@ def delete_character(request, character_id: int):
     character.delete()
     msg = format_lazy(
         _("{character_name} successfully deleted"),
+        character_name=character.character.character_name,
+    )
+    return JsonResponse({"success": True, "message": msg}, status=200, safe=False)
+
+
+@login_required
+@permission_required("skillfarm.basic_access")
+@require_POST
+def mark_as_read(request, character_id: int):
+    """Mark Character as Read"""
+    # Check Permission & If Character Exists
+    perm, __ = get_skillfarm_character(request, character_id)
+    if not perm:
+        msg = _("Permission Denied")
+        return JsonResponse({"success": False, "message": msg}, status=403, safe=False)
+
+    character = SkillFarmAudit.objects.get(character__character_id=character_id)
+    character.is_read = not character.is_read
+    character.save()
+    msg = format_lazy(
+        _("{character_name} successfully toggled Mark as Read"),
         character_name=character.character.character_name,
     )
     return JsonResponse({"success": True, "message": msg}, status=200, safe=False)

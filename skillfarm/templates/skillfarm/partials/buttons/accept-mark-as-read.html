@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<button type="button"
+    class="btn btn-{% if character.is_read %}secondary{% else %}primary{% endif %} btn-sm btn-square me-2"
+    data-bs-toggle="modal"
+    data-bs-target="#skillfarm-accept-mark-as-read"
+    data-bs-tooltip="aa-skillfarm"
+    data-action="{% url 'skillfarm:mark_as_read' character_id=character.character.character_id %}"
+    title="{% translate 'Mark Character as Read' %}"
+    >
+    <span class="fas fa-check"></span>
+</button>

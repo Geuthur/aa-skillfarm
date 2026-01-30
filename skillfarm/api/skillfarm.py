@@ -22,6 +22,7 @@ from skillfarm.api.helpers.core import (
     arabic_number_to_roman,
     generate_delete_character_button,
     generate_edit_skillsetup_button,
+    generate_mark_as_read_character_button,
     generate_progressbar_html,
     generate_skillinfo_button,
     generate_status_icon_html,
@@ -63,6 +64,7 @@ class SkillFarmDetailSchema(Schema):
     last_update: str | None
     is_extraction_ready: str
     is_filter: str
+    is_read: bool | None
     progress: str | None = None
 
 
@@ -268,6 +270,9 @@ class SkillFarmApiEndpoints:
                 )
 
                 char = f"{char_portrait} {character.character.character_name} {character.get_status.bootstrap_icon()} - {character.notification_icon}"
+                is_training = (
+                    character.skillfarm_skillqueue.skill_in_training().exists()
+                )
 
                 # Create the skillfarm action buttons
                 actions = []
@@ -275,6 +280,10 @@ class SkillFarmApiEndpoints:
                 actions.append(generate_toggle_notification_button(character=character))
                 actions.append(generate_edit_skillsetup_button(character=character))
                 actions.append(generate_delete_character_button(character=character))
+                if is_training is False or character.is_read is True:
+                    actions.append(
+                        generate_mark_as_read_character_button(character=character)
+                    )
                 actions_html = format_html(
                     f'<div class="d-flex justify-content-end">{format_html("".join(actions))}</div>'
                 )
@@ -291,12 +300,13 @@ class SkillFarmApiEndpoints:
                         last_update=str(character.last_update),
                         is_extraction_ready=character.extraction_icon,
                         is_filter=generate_status_icon_html(character=character),
+                        is_read=character.is_read,
                     ),
                     actions=actions_html,
                 )
 
                 # Generate the progress bar for the skill queue
-                if character.skillfarm_skillqueue.skill_in_training().exists() is False:
+                if is_training is False:
                     skillfarm_details.details.progress = str(_("No Active Training"))
                     inactive_characters.append(skillfarm_details)
                 else:

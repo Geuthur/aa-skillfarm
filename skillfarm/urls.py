@@ -40,6 +40,11 @@ urlpatterns = [
         views.edit_skillsetup,
         name="edit_skillsetup",
     ),
+    path(
+        "mark_as_read/<int:character_id>/",
+        views.mark_as_read,
+        name="mark_as_read",
+    ),
     # -- Tools
     path("view/calculator/", views.skillfarm_calc, name="calculator"),
     # -- API System

@@ -1,0 +1,41 @@
+{% load bootstrap %}
+{% load i18n %}
+
+<!-- accept mark as read modal -->
+<div class="modal fade" id="skillfarm-accept-mark-as-read" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title fs-5">
+                    {% translate "Accept Mark As Read request" %}
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    {% translate "Are you sure you want to switch Mark As Read for this character?" %}
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {{ forms.mark_as_read|bootstrap }}
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modal-button-cancel-accept-request" type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-hand"></i>
+                    {% translate "Cancel" %}
+                </button>
+
+                <button id="modal-button-confirm-accept-request" type="button" class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-check"></i>
+                    {% translate "Accept Mark As Read request" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
