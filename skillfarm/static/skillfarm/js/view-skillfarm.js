@@ -140,6 +140,10 @@ $(document).ready(() => {
                                 $(row).addClass('table-stripe-red');
                             }
                         }
+
+                        if (details && details.is_read === true) {
+                            $(row).addClass('opacity-25');
+                        }
                     },
                 });
             }
@@ -294,6 +298,7 @@ $(document).ready(() => {
     const modalRequestDelete = $('#skillfarm-accept-delete-character');
     const modalRequestViewSkillqueue = $('#skillfarm-view-skillqueue');
     const modalRequestEditSkillsetup = $('#skillfarm-edit-skillsetup');
+    const modalRequestMarkAsRead = $('#skillfarm-accept-mark-as-read');
 
     /**
      * SkillFarm Switch Notification Modal
@@ -449,5 +454,42 @@ $(document).ready(() => {
         skillSelect.setSelected([]);
         modalRequestEditSkillsetup.find('input[name="selected_skills"]').val('');
         modalRequestEditSkillsetup.find('#modal-button-confirm-accept-request').unbind('click');
+    });
+
+
+    /**
+     * SkillFarm Mark As Read Modal
+     */
+    modalRequestMarkAsRead.on('show.bs.modal', (event) => {
+        const button = $(event.relatedTarget);
+        const url = button.data('action');
+        const form = modalRequestMarkAsRead.find('form');
+        const csrfMiddlewareToken = form.find('input[name="csrfmiddlewaretoken"]').val();
+
+        modalRequestMarkAsRead.find('#modal-button-confirm-accept-request').on('click', () => {
+            fetchPost({
+                url: url,
+                csrfToken: csrfMiddlewareToken,
+            })
+                .then((data) => {
+                    if (data.success === true) {
+                        fetchGet({
+                            url: aaSkillfarmSettings.url.Skillfarm.replace('12345', aaSkillfarmSettings.characterPk)
+                        })
+                            .then((newData) => {
+                                _reloadSkillFarmDataTable(newData);
+                                modalRequestMarkAsRead.modal('hide');
+                            })
+                            .catch((error) => {
+                                console.error('Error fetching Skillfarm DataTable:', error);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error(`Error posting mark as read request: ${error.message}`);
+                });
+        });
+    }).on('hide.bs.modal', () => {
+        modalRequestMarkAsRead.find('#modal-button-confirm-accept-request').unbind('click');
     });
 });

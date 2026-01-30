@@ -122,6 +122,18 @@ def generate_edit_skillsetup_button(character: SkillFarmAudit) -> mark_safe:
     )
 
 
+def generate_mark_as_read_character_button(character: SkillFarmAudit) -> mark_safe:
+    """Generate a mark as read character button for the skillfarm"""
+    return format_html(
+        render_to_string(
+            "skillfarm/partials/buttons/accept-mark-as-read.html",
+            {
+                "character": character,
+            },
+        )
+    )
+
+
 def generate_delete_character_button(character: SkillFarmAudit) -> mark_safe:
     """Generate a delete character button for the skillfarm"""
     return format_html(

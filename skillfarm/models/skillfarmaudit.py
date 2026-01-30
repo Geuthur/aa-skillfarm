@@ -118,6 +118,8 @@ class SkillFarmAudit(models.Model):
     notification_sent = models.BooleanField(default=False)
     last_notification = models.DateTimeField(null=True, default=None, blank=True)
 
+    is_read = models.BooleanField(default=False, help_text="Mark Character as read")
+
     objects: SkillFarmManager = SkillFarmManager()
 
     def __str__(self):
