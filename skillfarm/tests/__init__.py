@@ -86,6 +86,10 @@ class SkillFarmTestCase(NoSocketsTestCase):
         cls.user, cls.user_character = create_user_from_evecharacter(
             character_id=1001,
             permissions=["skillfarm.basic_access"],
+            scopes=[
+                "esi-skills.read_skills.v1",
+                "esi-skills.read_skillqueue.v1",
+            ],
         )
         # User without Access to Skillfarm
         cls.no_permission_user, cls.no_perm_character = create_user_from_evecharacter(

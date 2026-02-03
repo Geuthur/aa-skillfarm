@@ -1,13 +1,14 @@
 # Django
-from django.test import TestCase
 from django.utils import timezone
+
+# Alliance Auth
+from esi.errors import TokenError
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
 )
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
 from skillfarm.tests.testdata.utils import (
     create_skillfarm_character_from_user,
     create_update_status,
@@ -22,7 +23,11 @@ class TestSkillfarmModel(SkillFarmTestCase):
         super().setUpClass()
 
         # Create SkillfarmAudit instance
+
         cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.no_token_audit = create_skillfarm_character_from_user(
+            cls.no_permission_user
+        )
 
     def test_should_return_string_audit(self):
         """
@@ -85,3 +90,17 @@ class TestSkillfarmModel(SkillFarmTestCase):
             last_update_finished_at=timezone.now(),
         )
         self.assertTrue(self.skillfarm_audit.reset_has_token_error())
+
+    def test_get_token_should_return_token(self):
+        """
+        Test should return valid token.
+        """
+        token = self.skillfarm_audit.get_token()
+        self.assertIsNotNone(token)
+
+    def test_get_token_should_raise_token_error(self):
+        """
+        Test should raise TokenError when no valid token exists.
+        """
+        with self.assertRaises(TokenError):
+            self.no_token_audit.get_token()

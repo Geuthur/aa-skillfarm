@@ -144,9 +144,11 @@ class SkillFarmAudit(models.Model):
             .require_valid()
             .first()
         )
-        if token:
-            return token
-        return False
+        if not token:
+            raise TokenError(
+                f"Token does not exist for {self} with scopes {self.get_esi_scopes()}"
+            )
+        return token
 
     @cached_property
     def is_orphan(self) -> bool:
