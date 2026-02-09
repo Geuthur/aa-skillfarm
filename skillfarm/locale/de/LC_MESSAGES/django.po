@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
 "POT-Creation-Date: 2026-01-10 16:25+0100\n"
-"PO-Revision-Date: 2026-01-10 20:22+0000\n"
+"PO-Revision-Date: 2026-02-09 22:00+0000\n"
 "Last-Translator: Geuthur <geuthur@users.noreply.github.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
 "skillfarm/de/>\n"
@@ -292,7 +292,7 @@ msgstr "Inaktiv"
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:10
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:36
 msgid "Accept Delete request"
-msgstr "Anfrage Löschen akzeptieren"
+msgstr "Löschen akzeptieren"
 
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:13
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:13
