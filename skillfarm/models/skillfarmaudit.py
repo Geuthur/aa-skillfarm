@@ -4,9 +4,6 @@
 import datetime
 from collections.abc import Callable
 
-# Third Party
-from aiopenapi3.errors import HTTPClientError
-
 # Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -23,7 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
-from esi.exceptions import HTTPNotModified
+from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # Alliance Auth (External Libs)
 from eveuniverse.models import EveType
@@ -376,6 +373,8 @@ class SkillFarmAudit(models.Model):
         """Perform update status."""
         try:
             result = method(*args, **kwargs)
+        except HTTPServerError as exc:
+            raise exc
         except Exception as exc:
             error_message = f"{type(exc).__name__}: {str(exc)}"
             is_token_error = isinstance(exc, (TokenError))
