@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2026-01-10 16:25+0100\n"
+"POT-Creation-Date: 2026-02-23 06:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,72 +21,72 @@ msgstr ""
 msgid "last update run"
 msgstr ""
 
-#: skillfarm/api/skillfarm.py:300
+#: skillfarm/api/skillfarm.py:310
 msgid "No Active Training"
 msgstr ""
 
-#: skillfarm/api/skillfarm.py:413 skillfarm/templates/skillfarm/base.html:63
+#: skillfarm/api/skillfarm.py:423 skillfarm/templates/skillfarm/base.html:63
 #: skillfarm/templates/skillfarm/partials/table/active-character.html:10
 #: skillfarm/templates/skillfarm/partials/table/inactive-character.html:10
 msgid "Skill Info"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:47
+#: skillfarm/models/skillfarmaudit.py:44
 #: skillfarm/templates/skillfarm/partials/table/skills.html:4
 msgid "Skills"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:48
+#: skillfarm/models/skillfarmaudit.py:45
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
 #: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
 msgid "Skillqueue"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:61
+#: skillfarm/models/skillfarmaudit.py:58
 msgid "Disabled"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:62
+#: skillfarm/models/skillfarmaudit.py:59
 msgid "Token Error"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:63
+#: skillfarm/models/skillfarmaudit.py:60
 msgid "Error"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:64
+#: skillfarm/models/skillfarmaudit.py:61
 msgid "OK"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:65
+#: skillfarm/models/skillfarmaudit.py:62
 msgid "Incomplete"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:66
+#: skillfarm/models/skillfarmaudit.py:63
 msgid "In Progress"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:100
+#: skillfarm/models/skillfarmaudit.py:97
 msgid "Update is disabled"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:101
+#: skillfarm/models/skillfarmaudit.py:98
 msgid "One section has a token error during update"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:102
+#: skillfarm/models/skillfarmaudit.py:99
 msgid "One or more sections have not been updated"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:103
+#: skillfarm/models/skillfarmaudit.py:100
 msgid "Update is in progress"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:104
+#: skillfarm/models/skillfarmaudit.py:101
 msgid "An error occurred during update"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:105
+#: skillfarm/models/skillfarmaudit.py:102
 msgid "Updates completed successfully"
 msgstr ""
 
@@ -245,6 +245,10 @@ msgstr ""
 msgid "Delete Character"
 msgstr ""
 
+#: skillfarm/templates/skillfarm/partials/buttons/accept-mark-as-read.html:9
+msgid "Mark Character as Read"
+msgstr ""
+
 #: skillfarm/templates/skillfarm/partials/buttons/accept-switch-notification.html:9
 msgid "Switch Notification"
 msgstr ""
@@ -291,6 +295,7 @@ msgid "Accept Delete request"
 msgstr ""
 
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:13
+#: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:13
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:13
 #: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:14
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:13
@@ -303,9 +308,19 @@ msgid "Are you sure you want to delete this character?"
 msgstr ""
 
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:31
+#: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:31
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:31
 #: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:40
 msgid "Cancel"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:10
+#: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:36
+msgid "Accept Mark As Read request"
+msgstr ""
+
+#: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:18
+msgid "Are you sure you want to switch Mark As Read for this character?"
 msgstr ""
 
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:10
@@ -388,38 +403,44 @@ msgstr ""
 msgid "Inactive Characters"
 msgstr ""
 
-#: skillfarm/views.py:59
+#: skillfarm/views.py:60
 msgid "You do not have permission to access this page."
 msgstr ""
 
-#: skillfarm/views.py:67
+#: skillfarm/views.py:68
 msgid "Queued Update All Characters"
 msgstr ""
 
-#: skillfarm/views.py:96
+#: skillfarm/views.py:97
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 
-#: skillfarm/views.py:111 skillfarm/views.py:128 skillfarm/views.py:149
+#: skillfarm/views.py:112 skillfarm/views.py:129 skillfarm/views.py:149
+#: skillfarm/views.py:171
 msgid "Permission Denied"
 msgstr ""
 
-#: skillfarm/views.py:116
+#: skillfarm/views.py:117
 msgid "Notification successfully updated"
 msgstr ""
 
-#: skillfarm/views.py:134
+#: skillfarm/views.py:135
 #, python-brace-format
 msgid "{character_name} successfully deleted"
 msgstr ""
 
-#: skillfarm/views.py:160
+#: skillfarm/views.py:156
+#, python-brace-format
+msgid "{character_name} successfully toggled Mark as Read"
+msgstr ""
+
+#: skillfarm/views.py:182
 #, python-brace-format
 msgid "{character_name} Skillset successfully updated"
 msgstr ""
 
-#: skillfarm/views.py:210
+#: skillfarm/views.py:232
 msgid ""
 "An error occurred while fetching the market data. Please inform an admin to "
 "fetch Market Data."

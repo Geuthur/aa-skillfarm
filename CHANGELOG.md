@@ -11,10 +11,27 @@ Section Order:
 ### Removed
 -->
 
+## [1.0.5] - 2026-02-23
+
 ### Added
 
+- Mark as Read for Inactive Characters
 - `is_orphan` Property to check if a Character is not owned anymore
 - `character_ownership` Property for checking ownership
+- add tests for perform_update_status handling token and HTTPServer errors
+- optimized `get_token` function
+
+### Changed
+
+- Update skillfarm task schedule from crontab to 1800 seconds
+- Enhanced task logic to skip updates for orphan characters.
+- Update `django-esi` Stub
+- Handle RequestError in retry_task_on_esi_error function
+
+### Removed
+
+- remove unused import and handle HTTPServerError in SkillFarmAudit
+- HTTPServerError Catch it is now handled by `retry_task_on_esi_error`
 
 ## [1.0.4] - 2025-12-22
 
@@ -514,5 +531,6 @@ This will load all necessary prices
 [1.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.1...v1.0.2 "1.0.2"
 [1.0.3]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.2...v1.0.3 "1.0.3"
 [1.0.4]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.3...v1.0.4 "1.0.4"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...HEAD "In Development"
+[1.0.5]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...v1.0.5 "1.0.45"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
