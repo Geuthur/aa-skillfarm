@@ -20,7 +20,7 @@ from skillfarm.providers import AppLogger, esi
 
 if TYPE_CHECKING:
     # Alliance Auth
-    from esi.stubs import CharactersCharacterIdSkillqueueGetItem as SkillQueueItems
+    from esi.stubs import CharactersSkillqueueSkill
 
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
@@ -146,7 +146,7 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
     def _update_or_create_objs(
         self,
         character: "SkillFarmAudit",
-        character_skillqueue_items: list["SkillQueueItems"],
+        character_skillqueue_items: list["CharactersSkillqueueSkill"],
     ) -> None:
         """Update or Create skill queue entries from objs data."""
         entries = []
