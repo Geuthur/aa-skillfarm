@@ -20,11 +20,12 @@ ______________________________________________________________________
   - [Features](#features)
   - [Upcoming](#upcoming)
   - [Installation](#features)
+    - [Step 0 - Check dependencies are installed](#step0)
     - [Step 1 - Install the Package](#step1)
     - [Step 2 - Configure Alliance Auth](#step2)
     - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
     - [Step 4 - Migration to AA](#step4)
-    - [Step 4.1 - Create/Load Skillfarm Prices](#step41)
+      - [Step 4.1 - Create/Load Skillfarm Prices](#step41)
     - [Step 5 - Setting up Permissions](#step5)
     - [Step 6 - (Optional) Setting up Compatibilies](#step6)
   - [Highlights](#highlights)
@@ -49,6 +50,10 @@ ______________________________________________________________________
 > [!NOTE]
 > AA Skillfarm needs at least Alliance Auth v4.12.0
 > Please make sure to update your Alliance Auth before you install this APP
+
+### Step 0 - Check dependencies are installed<a name="step0"></a>
+
+- Skillfarm needs the app [django-eveonline-sde](https://pypi.org/project/django-eveonline-sde/) to function. Please make sure it is installed.
 
 ### Step 1 - Install the Package<a name="step1"></a>
 
