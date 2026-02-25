@@ -408,11 +408,24 @@ class SkillFarmApiEndpoints:
                     response_skillqueue.append(skillqueue_response)
 
             response_skills: list[SkillFarmSkillSchema] = []
-            if character.is_filtered and character.get_skillsetup is not None:
+
+            is_training = character.skillfarm_skillqueue.skill_in_training().exists()
+            if (
+                character.is_filtered
+                and character.get_skillsetup is not None
+                or is_training is False
+            ):
                 # retrieve all skill entries from character
                 for skill in character.get_skills:
-                    if skill.eve_type.name in character.get_skillsetup.skillset:
+                    if (
+                        is_training is True
+                        and skill.eve_type.name in character.get_skillsetup.skillset
+                    ):
                         # Get skill data for each skill
+                        skill_data = get_filtered_skills_data(skill)
+                        if skill_data is not None:
+                            response_skills.append(skill_data)
+                    elif is_training is False:
                         skill_data = get_filtered_skills_data(skill)
                         if skill_data is not None:
                             response_skills.append(skill_data)
