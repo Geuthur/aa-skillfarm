@@ -9,7 +9,6 @@ from http import HTTPStatus
 # Third Party
 from aiopenapi3 import RequestError
 from celery import Task
-from eve_sde.models.types import ItemCategory, ItemGroup, ItemType
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -22,6 +21,9 @@ from esi.exceptions import (
     HTTPServerError,
 )
 from esi.openapi_clients import ESIClientProvider
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemCategory, ItemGroup, ItemType
 
 # AA Skillfarm
 from skillfarm import (

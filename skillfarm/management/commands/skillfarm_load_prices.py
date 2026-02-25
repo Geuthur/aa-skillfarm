@@ -1,6 +1,5 @@
 # Third Party
 import requests
-from eve_sde.models.types import ItemType as EveType
 
 # Django
 from django.core.management.base import BaseCommand
@@ -9,6 +8,9 @@ from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__

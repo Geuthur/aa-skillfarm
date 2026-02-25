@@ -4,9 +4,6 @@
 import datetime
 from collections.abc import Callable
 
-# Third Party
-from eve_sde.models.types import ItemType as EveType
-
 # Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -24,6 +21,9 @@ from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__, app_settings

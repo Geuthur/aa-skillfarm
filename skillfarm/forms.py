@@ -1,10 +1,10 @@
 """Forms for app."""
 
-# Third Party
-from eve_sde.models.types import ItemType as EveType
-
 # Django
 from django import forms
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmSetup

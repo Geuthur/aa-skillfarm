@@ -1,10 +1,10 @@
 """Model for Prices."""
 
-# Third Party
-from eve_sde.models.types import ItemType as EveType
-
 # Django
 from django.db import models
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__

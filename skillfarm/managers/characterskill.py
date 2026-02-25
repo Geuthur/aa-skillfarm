@@ -1,15 +1,15 @@
 # Standard Library
 from typing import TYPE_CHECKING
 
-# Third Party
-from eve_sde.models.types import ItemType as EveType
-
 # Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
+
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__
