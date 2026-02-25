@@ -16,11 +16,12 @@ from eve_sde.models.types import ItemType as EveType
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.providers import AppLogger
+from skillfarm.providers import AppLogger, esi
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
+# pylint: disable=too-many-locals
 class Command(BaseCommand):
     help = "Preloads price data required for the skillfarm from Fuzzwork market API"
 
@@ -28,17 +29,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         type_ids = []
         market_data = {}
+        skillfarm_ids = [44992, 40520, 40519]
 
         # Get all skillfarm relevant ids
-        typeids = EveType.objects.filter(id__in=[44992, 40520, 40519]).values_list(
+        typeids = EveType.objects.filter(id__in=skillfarm_ids).values_list(
             "id", flat=True
         )
 
         if len(typeids) != 3:
+            missing_ids = set(skillfarm_ids) - set(typeids)
+            for type_id in missing_ids:
+                esi.get_type_or_create_from_esi(eve_id=type_id)
             self.stdout.write(
-                "Error: Not all required types are loaded into the database."
+                "One or more skillfarm relevant types not found. Attempting to fetch from ESI and create in database."
             )
-            return
+            typeids = EveType.objects.filter(id__in=skillfarm_ids).values_list(
+                "id", flat=True
+            )
 
         for item in typeids:
             type_ids.append(item)
@@ -92,6 +99,7 @@ class Command(BaseCommand):
                         EveTypePrice.objects.update_or_create(
                             eve_type_id=obj.eve_type_id,
                             defaults={
+                                "name": obj.name,
                                 "buy": obj.buy,
                                 "sell": obj.sell,
                                 "updated_at": obj.updated_at,

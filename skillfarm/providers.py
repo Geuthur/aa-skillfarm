@@ -28,9 +28,9 @@ from eve_sde.models.types import ItemCategory, ItemGroup, ItemType
 # AA Skillfarm
 from skillfarm import (
     __app_name_useragent__,
-    __characters_operations__,
     __esi_compatibility_date__,
     __github_url__,
+    __operations__,
     __title__,
     __version__,
 )
@@ -40,7 +40,9 @@ class OpenAPI(ESIClientProvider):
     """Custom ESI Client Provider for Skillfarm."""
 
     def _get_type(self, type_id: int):
-        _type = self.client.Universe.GetUniverseTypesTypeId(type_id=type_id).result()
+        _type = self.client.Universe.GetUniverseTypesTypeId(type_id=type_id).result(
+            use_etag=False
+        )
 
         eve_type = ItemType(
             id=type_id,
@@ -60,7 +62,7 @@ class OpenAPI(ESIClientProvider):
     def _get_category(self, category_id: int):
         _category = self.client.Universe.GetUniverseCategoriesCategoryId(
             category_id=category_id
-        ).result()
+        ).result(use_etag=False)
 
         category = ItemCategory(
             id=category_id,
@@ -72,7 +74,7 @@ class OpenAPI(ESIClientProvider):
     def _get_group(self, group_id: int):
         _group = self.client.Universe.GetUniverseGroupsGroupId(
             group_id=group_id
-        ).result()
+        ).result(use_etag=False)
 
         group = ItemGroup(
             id=group_id,
@@ -100,12 +102,11 @@ class OpenAPI(ESIClientProvider):
                 id=eve_id,
                 defaults={
                     "name": response.name,
-                    "eve_group": group,
+                    "group": group,
                     "capacity": response.capacity,
                     "description": response.description,
                     "icon_id": response.icon_id,
                     "mass": response.mass,
-                    "packaged_volume": response.packaged_volume,
                     "portion_size": response.portion_size,
                     "radius": response.radius,
                     "published": response.published,
@@ -204,7 +205,7 @@ esi = OpenAPI(
     ua_appname=__app_name_useragent__,
     ua_version=__version__,
     ua_url=__github_url__,
-    operations=__characters_operations__,
+    operations=__operations__,
 )
 
 
