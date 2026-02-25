@@ -2,9 +2,6 @@
 from django.test import TestCase
 from django.utils import timezone
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
 from skillfarm.api.helpers.core import generate_progressbar_html
 from skillfarm.api.helpers.skilldetails import (
@@ -12,6 +9,7 @@ from skillfarm.api.helpers.skilldetails import (
     calculate_single_progress_bar,
 )
 from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
+from skillfarm.models.prices import EveType
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.utils import create_skillfarm_character_from_user

@@ -9,9 +9,6 @@ from django.utils import timezone
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
@@ -149,10 +146,16 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         character_skillqueue_items: list["CharactersSkillqueueSkill"],
     ) -> None:
         """Update or Create skill queue entries from objs data."""
+        # AA Skillfarm
+        # pylint: disable=import-outside-toplevel
+        from skillfarm.models.prices import EveType
+
         entries = []
 
         for entry in character_skillqueue_items:
-            eve_type_instance, _ = EveType.objects.get_or_create_esi(id=entry.skill_id)
+            eve_type_instance, _ = EveType.objects.get_or_create_from_esi(
+                eve_id=entry.skill_id
+            )
             entries.append(
                 self.model(
                     name=character.name,

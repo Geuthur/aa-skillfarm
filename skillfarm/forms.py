@@ -3,10 +3,8 @@
 # Django
 from django import forms
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
+from skillfarm.models.prices import EveType
 from skillfarm.models.skillfarmaudit import SkillFarmSetup
 
 
@@ -49,7 +47,7 @@ class SkillSetForm(forms.ModelForm):
             "skillset": "Skills",
         }
         querysets = {
-            "skills": EveType.objects.filter(eve_group__eve_category__id=16)
+            "skills": EveType.objects.filter(eve_group__eve_category__category_id=16)
             .select_related("eve_group", "eve_group__eve_category")
             .order_by("name"),
         }

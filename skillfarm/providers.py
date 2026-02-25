@@ -29,7 +29,65 @@ from skillfarm import (
     __version__,
 )
 
-esi = ESIClientProvider(
+
+class OpenAPI(ESIClientProvider):
+    """Custom ESI Client Provider for Skillfarm."""
+
+    def _get_type(self, type_id: int):
+        # AA Skillfarm
+        # pylint: disable=import-outside-toplevel, cyclic-import
+        from skillfarm.models.prices import EveType
+
+        _type = self.client.Universe.GetUniverseTypesTypeId(type_id=type_id).result()
+
+        eve_type = EveType(
+            name=_type.name,
+            type_id=type_id,
+            eve_group_id=_type.group_id,
+            capacity=_type.capacity,
+            description=_type.description,
+            icon_id=_type.icon_id,
+            mass=_type.mass,
+            packaged_volume=_type.packaged_volume,
+            portion_size=_type.portion_size,
+            radius=_type.radius,
+            published=_type.published,
+            volume=_type.volume,
+        )
+        return eve_type
+
+    def _get_category(self, category_id: int):
+        # AA Skillfarm
+        # pylint: disable=import-outside-toplevel, cyclic-import
+        from skillfarm.models.prices import EveCategory
+
+        _category = self.client.Universe.GetUniverseCategoriesCategoryId(
+            category_id=category_id
+        ).result()
+
+        category = EveCategory(
+            category_id=category_id,
+            name=_category.name,
+        )
+        return category
+
+    def _get_group(self, group_id: int):
+        # AA Skillfarm
+        # pylint: disable=import-outside-toplevel, cyclic-import
+        from skillfarm.models.prices import EveGroup
+
+        _group = self.client.Universe.GetUniverseGroupsGroupId(
+            group_id=group_id
+        ).result()
+
+        group = EveGroup(
+            group_id=group_id,
+            name=_group.name,
+        )
+        return group
+
+
+esi = OpenAPI(
     compatibility_date=__esi_compatibility_date__,
     ua_appname=__app_name_useragent__,
     ua_version=__version__,

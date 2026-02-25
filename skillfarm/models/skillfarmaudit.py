@@ -22,9 +22,6 @@ from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
 from skillfarm import __title__, app_settings
 from skillfarm.managers.characterskill import SkillManager
@@ -437,7 +434,7 @@ class CharacterSkill(models.Model):
     character = models.ForeignKey(
         SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_skills"
     )
-    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
+    eve_type = models.ForeignKey("EveType", on_delete=models.CASCADE, related_name="+")
 
     active_skill_level = models.PositiveIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)]
@@ -474,7 +471,7 @@ class CharacterSkillqueueEntry(models.Model):
     )
     level_end_sp = models.PositiveIntegerField(default=None, null=True)
     level_start_sp = models.PositiveIntegerField(default=None, null=True)
-    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
+    eve_type = models.ForeignKey("EveType", on_delete=models.CASCADE, related_name="+")
     start_date = models.DateTimeField(default=None, null=True)
     training_start_sp = models.PositiveIntegerField(default=None, null=True)
 

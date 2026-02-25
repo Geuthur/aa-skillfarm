@@ -7,18 +7,15 @@ from django.core.management import call_command
 from django.db import transaction
 from django.utils import timezone
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
-from skillfarm.models.prices import EveTypePrice
+from skillfarm.models.prices import EveType, EveTypePrice
 from skillfarm.tests import SkillFarmTestCase
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
-@patch(COMMAND_PATH + ".EveType.objects.get_or_create_esi")
+@patch(COMMAND_PATH + ".EveType.objects.get_or_create_from_esi")
 class TestLoadPrices(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
@@ -111,7 +108,7 @@ class TestLoadPrices(SkillFarmTestCase):
         call_command("skillfarm_load_prices", stdout=out)
         output = out.getvalue()
 
-        self.assertIn("Ensure you have loaded the data from eveuniverse.", output)
+        self.assertIn("Ensure you have loaded the data.", output)
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
 

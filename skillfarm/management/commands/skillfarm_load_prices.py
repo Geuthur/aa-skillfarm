@@ -9,13 +9,10 @@ from django.utils import timezone
 # Alliance Auth
 from allianceauth.services.hooks import get_extension_logger
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
-from skillfarm.models.prices import EveTypePrice
+from skillfarm.models.prices import EveType, EveTypePrice
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -30,9 +27,9 @@ class Command(BaseCommand):
         market_data = {}
 
         # Ensure that the required types are loaded into the database
-        EveType.objects.get_or_create_esi(id=44992)
-        EveType.objects.get_or_create_esi(id=40520)
-        EveType.objects.get_or_create_esi(id=40519)
+        EveType.objects.get_or_create_from_esi(eve_id=44992)
+        EveType.objects.get_or_create_from_esi(eve_id=40520)
+        EveType.objects.get_or_create_from_esi(eve_id=40519)
 
         # Get all skillfarm relevant ids
         typeids = EveType.objects.filter(id__in=[44992, 40520, 40519]).values_list(
@@ -76,7 +73,7 @@ class Command(BaseCommand):
                 objs.append(item)
             except EveType.DoesNotExist:
                 self.stdout.write(
-                    f"EveType {key} not found. Skipping... Ensure you have loaded the data from eveuniverse."
+                    f"EveType {key} not found. Skipping... Ensure you have loaded the data."
                 )
                 continue
 
