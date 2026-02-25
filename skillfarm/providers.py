@@ -136,7 +136,8 @@ class OpenAPI(ESIClientProvider):
                 response = self._get_type(eve_id)
 
                 if response.group_id not in _current_groups_ids:
-                    self._get_group(response.group_id)
+                    self.get_group_or_create_from_esi(response.group_id)
+                    _current_groups_ids.add(response.group_id)
                 new_types.append(response)
             except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.error("ESI Error for type ID %s: %s", eve_id, e)
