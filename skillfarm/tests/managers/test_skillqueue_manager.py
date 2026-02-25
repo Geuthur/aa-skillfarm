@@ -25,8 +25,8 @@ TEST_ENDPOINTS = [
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 @patch(MODULE_PATH + ".esi")
-@patch(MODULE_PATH + ".EveType.objects.bulk_get_or_create_esi")
-@patch(MODULE_PATH + ".EveType.objects.get_or_create_from_esi")
+@patch(MODULE_PATH + ".bulk_type_get_or_create_esi")
+@patch(MODULE_PATH + ".get_type_or_create_from_esi")
 class TestSkillQueueManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):

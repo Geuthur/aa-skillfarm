@@ -15,7 +15,6 @@ COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
-@patch(COMMAND_PATH + ".EveType.objects.get_or_create_from_esi")
 class TestLoadPrices(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):

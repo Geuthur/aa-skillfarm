@@ -12,7 +12,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Geuthur", email = "devgeuthur@gmail.com" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
@@ -26,7 +26,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
@@ -34,8 +33,9 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "allianceauth>=4.10,<5",
+    "allianceauth>=4.12,<5",
     "django-esi>=8,<9",
+    "django-eveonline-sde",
     "django-ninja",
 ]
 optional-dependencies.tests-allianceauth-latest = [

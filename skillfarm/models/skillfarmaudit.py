@@ -4,6 +4,9 @@
 import datetime
 from collections.abc import Callable
 
+# Third Party
+from eve_sde.models.types import ItemType as EveType
+
 # Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -434,7 +437,7 @@ class CharacterSkill(models.Model):
     character = models.ForeignKey(
         SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_skills"
     )
-    eve_type = models.ForeignKey("EveType", on_delete=models.CASCADE, related_name="+")
+    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
 
     active_skill_level = models.PositiveIntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)]
@@ -471,7 +474,7 @@ class CharacterSkillqueueEntry(models.Model):
     )
     level_end_sp = models.PositiveIntegerField(default=None, null=True)
     level_start_sp = models.PositiveIntegerField(default=None, null=True)
-    eve_type = models.ForeignKey("EveType", on_delete=models.CASCADE, related_name="+")
+    eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
     start_date = models.DateTimeField(default=None, null=True)
     training_start_sp = models.PositiveIntegerField(default=None, null=True)
 

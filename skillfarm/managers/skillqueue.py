@@ -146,14 +146,10 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         character_skillqueue_items: list["CharactersSkillqueueSkill"],
     ) -> None:
         """Update or Create skill queue entries from objs data."""
-        # AA Skillfarm
-        # pylint: disable=import-outside-toplevel
-        from skillfarm.models.prices import EveType
-
         entries = []
 
         for entry in character_skillqueue_items:
-            eve_type_instance, _ = EveType.objects.get_or_create_from_esi(
+            eve_type_instance, _ = esi.get_type_or_create_from_esi(
                 eve_id=entry.skill_id
             )
             entries.append(

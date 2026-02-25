@@ -1,6 +1,9 @@
 # Standard Library
 from typing import TYPE_CHECKING
 
+# Third Party
+from eve_sde.models.types import ItemType as EveType
+
 # Django
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
@@ -149,16 +152,12 @@ class SkillManager(models.Manager["CharacterSkill"]):
         self, character_skills_items: "CharactersSkills"
     ) -> list[int] | None:
         """Preload EveType objects from a list of skills."""
-        # AA Skillfarm
-        # pylint: disable=import-outside-toplevel
-        from skillfarm.models.prices import EveType
-
         skills_list = [skill.skill_id for skill in character_skills_items.skills]
         if skills_list:
             incoming_ids = set(skills_list)
             existing_ids = set(self.values_list("eve_type_id", flat=True))
             new_ids = incoming_ids.difference(existing_ids)
-            EveType.objects.bulk_get_or_create_esi(eve_ids=list(new_ids))
+            esi.bulk_type_get_or_create_esi(eve_ids=list(new_ids))
             return skills_list
         return None
 
@@ -168,10 +167,6 @@ class SkillManager(models.Manager["CharacterSkill"]):
         skills_list: list["CharactersSkillsSkill"],
         create_ids: set,
     ):
-        # AA Skillfarm
-        # pylint: disable=import-outside-toplevel
-        from skillfarm.models.prices import EveType
-
         logger.debug("%s: Storing %s new skills", character, len(create_ids))
         skills = [
             self.model(

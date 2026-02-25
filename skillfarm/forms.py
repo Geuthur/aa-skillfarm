@@ -1,10 +1,12 @@
 """Forms for app."""
 
+# Third Party
+from eve_sde.models.types import ItemType as EveType
+
 # Django
 from django import forms
 
 # AA Skillfarm
-from skillfarm.models.prices import EveType
 from skillfarm.models.skillfarmaudit import SkillFarmSetup
 
 
@@ -47,8 +49,8 @@ class SkillSetForm(forms.ModelForm):
             "skillset": "Skills",
         }
         querysets = {
-            "skills": EveType.objects.filter(eve_group__eve_category__category_id=16)
-            .select_related("eve_group", "eve_group__eve_category")
+            "skills": EveType.objects.filter(group__category__id=16)
+            .select_related("group", "group__category")
             .order_by("name"),
         }
 

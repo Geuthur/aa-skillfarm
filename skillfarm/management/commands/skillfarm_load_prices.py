@@ -1,5 +1,6 @@
 # Third Party
 import requests
+from eve_sde.models.types import ItemType as EveType
 
 # Django
 from django.core.management.base import BaseCommand
@@ -12,7 +13,7 @@ from allianceauth.services.hooks import get_extension_logger
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
-from skillfarm.models.prices import EveType, EveTypePrice
+from skillfarm.models.prices import EveTypePrice
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -25,11 +26,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         type_ids = []
         market_data = {}
-
-        # Ensure that the required types are loaded into the database
-        EveType.objects.get_or_create_from_esi(eve_id=44992)
-        EveType.objects.get_or_create_from_esi(eve_id=40520)
-        EveType.objects.get_or_create_from_esi(eve_id=40519)
 
         # Get all skillfarm relevant ids
         typeids = EveType.objects.filter(id__in=[44992, 40520, 40519]).values_list(
