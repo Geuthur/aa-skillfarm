@@ -16,7 +16,7 @@ from eve_sde.models.types import ItemType as EveType
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.providers import AppLogger, esi
+from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
@@ -37,15 +37,10 @@ class Command(BaseCommand):
         )
 
         if len(typeids) != 3:
-            missing_ids = set(skillfarm_ids) - set(typeids)
-            for type_id in missing_ids:
-                esi.get_type_or_create_from_esi(eve_id=type_id)
             self.stdout.write(
-                "One or more skillfarm relevant types not found. Attempting to fetch from ESI and create in database."
+                "One or more skillfarm relevant types not found. Ensure you have used `python manage.py esde_load_sde`."
             )
-            typeids = EveType.objects.filter(id__in=skillfarm_ids).values_list(
-                "id", flat=True
-            )
+            return
 
         for item in typeids:
             type_ids.append(item)
