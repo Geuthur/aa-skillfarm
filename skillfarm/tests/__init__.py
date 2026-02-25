@@ -6,7 +6,6 @@ from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
 from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.integrations.eveuniverse import load_eveuniverse
 from skillfarm.tests.testdata.utils import create_user_from_evecharacter
 
 
@@ -77,7 +76,6 @@ class SkillFarmTestCase(NoSocketsTestCase):
         super().setUpClass()
         # Initialize Alliance Auth test data
         load_allianceauth()
-        load_eveuniverse()
 
         # Request Factory
         cls.factory = RequestFactory()

@@ -25,8 +25,6 @@ TEST_ENDPOINTS = [
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 @patch(MODULE_PATH + ".esi")
-@patch(MODULE_PATH + ".bulk_type_get_or_create_esi")
-@patch(MODULE_PATH + ".get_type_or_create_from_esi")
 class TestSkillQueueManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
@@ -37,10 +35,10 @@ class TestSkillQueueManager(SkillFarmTestCase):
         cls.eve_type = EveType.objects.get(id=1)
         cls.eve_type_2 = EveType.objects.get(id=2)
 
-    def test_update_skillqueue(self, mock_get_or_create_from_esi, __, mock_esi):
+    def test_update_skillqueue(self, mock_esi):
         # given
         mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)
-        mock_get_or_create_from_esi.side_effect = [
+        mock_esi.get_type_or_create_from_esi.side_effect = [
             (self.eve_type, True),
             (self.eve_type_2, True),
         ]

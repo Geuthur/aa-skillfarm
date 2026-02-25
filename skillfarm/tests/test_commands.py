@@ -25,7 +25,7 @@ class TestLoadPrices(SkillFarmTestCase):
         }
 
     @patch(COMMAND_PATH + ".logger")
-    def test_should_load_prices(self, mock_logger, _, mock_requests_get):
+    def test_should_load_prices(self, mock_logger, mock_requests_get):
         """
         Test should load prices into the database.
         """
@@ -40,9 +40,7 @@ class TestLoadPrices(SkillFarmTestCase):
         self.assertEqual(excepted_count, 2)
 
     @patch("builtins.input")
-    def test_load_prices_should_get_integrityerror(
-        self, mock_input, _, mock_requests_get
-    ):
+    def test_load_prices_should_get_integrityerror(self, mock_input, mock_requests_get):
         """
         Test should handle IntegrityError when loading prices and not replace.
         """
@@ -67,7 +65,7 @@ class TestLoadPrices(SkillFarmTestCase):
 
     @patch("builtins.input")
     def test_load_prices_should_get_integrityerror_and_replace(
-        self, mock_input, _, mock_requests_get
+        self, mock_input, mock_requests_get
     ):
         """
         Test should handle IntegrityError when loading prices and replace.
@@ -91,7 +89,7 @@ class TestLoadPrices(SkillFarmTestCase):
 
     @patch(COMMAND_PATH + ".EveType.objects.get")
     def test_load_prices_should_evetype_not_exist(
-        self, mock_evetype, _, mock_requests_get
+        self, mock_evetype, mock_requests_get
     ):
         """
         Test should handle EveType.DoesNotExist when loading prices.
@@ -112,7 +110,7 @@ class TestLoadPrices(SkillFarmTestCase):
         self.assertEqual(excepted_count, 0)
 
     @patch(COMMAND_PATH + ".EveType.objects")
-    def test_load_prices_should_get_error(self, mock_evetype, _, mock_requests_get):
+    def test_load_prices_should_get_error(self, mock_evetype, mock_requests_get):
         """
         Test should handle general error when loading prices.
         """
