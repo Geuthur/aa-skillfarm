@@ -112,11 +112,8 @@ class TestLoadPrices(SkillFarmTestCase):
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
 
-    @patch(COMMAND_PATH + ".esi.get_type_or_create_from_esi")
     @patch(COMMAND_PATH + ".EveType.objects.filter")
-    def test_load_prices_should_get_error(
-        self, mock_filter, _mock_get_type_or_create, mock_requests_get
-    ):
+    def test_load_prices_should_get_error(self, mock_filter, mock_requests_get):
         """
         Test should handle general error when loading prices.
         """
@@ -132,7 +129,7 @@ class TestLoadPrices(SkillFarmTestCase):
         output = out.getvalue()
 
         self.assertIn(
-            "One or more skillfarm relevant types not found. Attempting to fetch from ESI and create in database.",
+            "One or more skillfarm relevant types not found. Ensure you have used `python manage.py esde_load_sde`.",
             output,
         )
         excepted_count = EveTypePrice.objects.count()

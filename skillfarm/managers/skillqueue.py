@@ -153,7 +153,7 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
 
         for entry in character_skillqueue_items:
             try:
-                eve_type_instance, _ = EveType.objects.get(id=entry.skill_id)
+                eve_type_instance = EveType.objects.get(id=entry.skill_id)
             except ObjectDoesNotExist:
                 logger.warning(
                     "EveType with id %s not found. Skipping skillqueue entry.",

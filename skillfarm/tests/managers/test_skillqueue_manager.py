@@ -38,10 +38,6 @@ class TestSkillQueueManager(SkillFarmTestCase):
     def test_update_skillqueue(self, mock_esi):
         # given
         mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)
-        mock_esi.get_type_or_create_from_esi.side_effect = [
-            (self.eve_type, True),
-            (self.eve_type_2, True),
-        ]
         self.skillfarm_audit.update_skillqueue(force_refresh=False)
 
         self.assertSetEqual(
