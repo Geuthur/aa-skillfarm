@@ -7,8 +7,11 @@ from django.core.management import call_command
 from django.db import transaction
 from django.utils import timezone
 
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemType as EveType
+
 # AA Skillfarm
-from skillfarm.models.prices import EveType, EveTypePrice
+from skillfarm.models.prices import EveTypePrice
 from skillfarm.tests import SkillFarmTestCase
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
@@ -109,8 +112,11 @@ class TestLoadPrices(SkillFarmTestCase):
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
 
-    @patch(COMMAND_PATH + ".EveType.objects")
-    def test_load_prices_should_get_error(self, mock_evetype, mock_requests_get):
+    @patch(COMMAND_PATH + ".esi.get_type_or_create_from_esi")
+    @patch(COMMAND_PATH + ".EveType.objects.filter")
+    def test_load_prices_should_get_error(
+        self, mock_filter, _mock_get_type_or_create, mock_requests_get
+    ):
         """
         Test should handle general error when loading prices.
         """
@@ -118,8 +124,7 @@ class TestLoadPrices(SkillFarmTestCase):
         mock_requests_get.return_value.json.return_value = {
             666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
         }
-        mock_evetype.get.return_value = EveType.objects.get(id=44992)
-        mock_evetype.filter.return_value.values_list.return_value = []
+        mock_filter.return_value.values_list.return_value = []
 
         # when
         out = StringIO()
@@ -127,7 +132,8 @@ class TestLoadPrices(SkillFarmTestCase):
         output = out.getvalue()
 
         self.assertIn(
-            "Error: Not all required types are loaded into the database.", output
+            "One or more skillfarm relevant types not found. Attempting to fetch from ESI and create in database.",
+            output,
         )
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
