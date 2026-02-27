@@ -23,7 +23,7 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # Alliance Auth (External Libs)
-from eveuniverse.models import EveType
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__, app_settings

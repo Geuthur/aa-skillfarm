@@ -8,7 +8,7 @@ from django.db import transaction
 from django.utils import timezone
 
 # Alliance Auth (External Libs)
-from eveuniverse.models import EveType
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
@@ -18,7 +18,6 @@ COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
-@patch(COMMAND_PATH + ".EveType.objects.get_or_create_esi")
 class TestLoadPrices(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
@@ -29,7 +28,7 @@ class TestLoadPrices(SkillFarmTestCase):
         }
 
     @patch(COMMAND_PATH + ".logger")
-    def test_should_load_prices(self, mock_logger, _, mock_requests_get):
+    def test_should_load_prices(self, mock_logger, mock_requests_get):
         """
         Test should load prices into the database.
         """
@@ -44,9 +43,7 @@ class TestLoadPrices(SkillFarmTestCase):
         self.assertEqual(excepted_count, 2)
 
     @patch("builtins.input")
-    def test_load_prices_should_get_integrityerror(
-        self, mock_input, _, mock_requests_get
-    ):
+    def test_load_prices_should_get_integrityerror(self, mock_input, mock_requests_get):
         """
         Test should handle IntegrityError when loading prices and not replace.
         """
@@ -71,7 +68,7 @@ class TestLoadPrices(SkillFarmTestCase):
 
     @patch("builtins.input")
     def test_load_prices_should_get_integrityerror_and_replace(
-        self, mock_input, _, mock_requests_get
+        self, mock_input, mock_requests_get
     ):
         """
         Test should handle IntegrityError when loading prices and replace.
@@ -95,7 +92,7 @@ class TestLoadPrices(SkillFarmTestCase):
 
     @patch(COMMAND_PATH + ".EveType.objects.get")
     def test_load_prices_should_evetype_not_exist(
-        self, mock_evetype, _, mock_requests_get
+        self, mock_evetype, mock_requests_get
     ):
         """
         Test should handle EveType.DoesNotExist when loading prices.
@@ -111,12 +108,12 @@ class TestLoadPrices(SkillFarmTestCase):
         call_command("skillfarm_load_prices", stdout=out)
         output = out.getvalue()
 
-        self.assertIn("Ensure you have loaded the data from eveuniverse.", output)
+        self.assertIn("Ensure you have loaded the data.", output)
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)
 
-    @patch(COMMAND_PATH + ".EveType.objects")
-    def test_load_prices_should_get_error(self, mock_evetype, _, mock_requests_get):
+    @patch(COMMAND_PATH + ".EveType.objects.filter")
+    def test_load_prices_should_get_error(self, mock_filter, mock_requests_get):
         """
         Test should handle general error when loading prices.
         """
@@ -124,8 +121,7 @@ class TestLoadPrices(SkillFarmTestCase):
         mock_requests_get.return_value.json.return_value = {
             666: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
         }
-        mock_evetype.get.return_value = EveType.objects.get(id=44992)
-        mock_evetype.filter.return_value.values_list.return_value = []
+        mock_filter.return_value.values_list.return_value = []
 
         # when
         out = StringIO()
@@ -133,7 +129,8 @@ class TestLoadPrices(SkillFarmTestCase):
         output = out.getvalue()
 
         self.assertIn(
-            "Error: Not all required types are loaded into the database.", output
+            "One or more skillfarm relevant types not found. Ensure you have used `python manage.py esde_load_sde`.",
+            output,
         )
         excepted_count = EveTypePrice.objects.count()
         self.assertEqual(excepted_count, 0)

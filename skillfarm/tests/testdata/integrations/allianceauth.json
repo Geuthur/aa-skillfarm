@@ -30,5 +30,108 @@
             "alliance_name": "Schweinshausen of War",
             "alliance_ticker": "SHW"
         }
+    ],
+    "EveCategory": [
+        {
+            "id": 1,
+            "name": "Skill",
+            "published": true
+        },
+        {
+            "id": 2,
+            "name": "Test Category",
+            "published": true
+        }
+    ],
+    "EveGroup": [
+        {
+            "category_id": 1,
+            "id": 1,
+            "name": "Spaceship Command",
+            "published": true
+        },
+        {
+            "category_id": 2,
+            "id": 2,
+            "name": "Test Group",
+            "published": true
+        }
+    ],
+    "EveType": [
+        {
+            "capacity": 0.0,
+            "description": "Its a Testskill",
+            "group_id": 1,
+            "id": 1,
+            "mass": 0,
+            "name": "skill1",
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "Its a Testskill 2",
+            "group_id": 1,
+            "id": 2,
+            "mass": 0,
+            "name": "skill2",
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "Test PLEX",
+            "group_id": 2,
+            "id": 3,
+            "mass": 0,
+            "name": "PLEX",
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test PLEX",
+            "group_id": 2,
+            "id": 44992,
+            "mass": 0,
+            "name": "Test PLEX",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test Extractor",
+            "group_id": 2,
+            "id": 40519,
+            "mass": 0,
+            "name": "Test Skill Extractor",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        },
+        {
+            "capacity": 0.0,
+            "description": "A Test Injector",
+            "group_id": 2,
+            "id": 40520,
+            "mass": 0,
+            "name": "Test Skill Injector",
+            "packaged_volume": 1.0,
+            "portion_size": 1,
+            "published": true,
+            "radius": 1,
+            "volume": 0.01
+        }
     ]
 }

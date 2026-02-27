@@ -14,8 +14,11 @@ from esi.exceptions import (
     HTTPServerError,
 )
 
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemGroup, ItemType
+
 # AA Skillfarm
-from skillfarm.providers import retry_task_on_esi_error
+from skillfarm.providers import esi, retry_task_on_esi_error
 from skillfarm.tests import NoSocketsTestCase
 
 

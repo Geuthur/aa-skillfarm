@@ -4,7 +4,6 @@
 from django.apps import AppConfig
 
 # AA Skillfarm
-# AA Example App
 from skillfarm import __version__
 
 
@@ -16,3 +15,8 @@ class SkillfarmConfig(AppConfig):
     name = "skillfarm"
     label = "skillfarm"
     verbose_name = f"Skillfarm v{__version__}"
+
+    def ready(self) -> None:
+        # AA Skillfarm
+        # pylint: disable=unused-import, import-outside-toplevel
+        from skillfarm import checks

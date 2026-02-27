@@ -24,14 +24,13 @@ TEST_ENDPOINTS = [
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 @patch(MODULE_PATH + ".esi")
-@patch(MODULE_PATH + ".EveType.objects.bulk_get_or_create_esi", spec=True)
 class TestCharacterSkillManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
 
-    def test_update_skills(self, _, mock_esi):
+    def test_update_skills(self, mock_esi):
         # given
 
         mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)

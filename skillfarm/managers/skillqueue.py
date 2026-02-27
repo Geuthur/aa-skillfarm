@@ -10,7 +10,7 @@ from django.utils import timezone
 from allianceauth.services.hooks import get_extension_logger
 
 # Alliance Auth (External Libs)
-from eveuniverse.models import EveType
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__
@@ -152,7 +152,15 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         entries = []
 
         for entry in character_skillqueue_items:
-            eve_type_instance, _ = EveType.objects.get_or_create_esi(id=entry.skill_id)
+            try:
+                eve_type_instance = EveType.objects.get(id=entry.skill_id)
+            except ObjectDoesNotExist:
+                logger.warning(
+                    "EveType with id %s not found. Skipping skillqueue entry.",
+                    entry.skill_id,
+                )
+                continue
+
             entries.append(
                 self.model(
                     name=character.name,

@@ -10,7 +10,7 @@ from django.utils import timezone
 from allianceauth.services.hooks import get_extension_logger
 
 # Alliance Auth (External Libs)
-from eveuniverse.models import EveType
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__
@@ -21,6 +21,7 @@ from skillfarm.providers import AppLogger
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
+# pylint: disable=too-many-locals
 class Command(BaseCommand):
     help = "Preloads price data required for the skillfarm from Fuzzwork market API"
 
@@ -28,20 +29,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         type_ids = []
         market_data = {}
-
-        # Ensure that the required types are loaded into the database
-        EveType.objects.get_or_create_esi(id=44992)
-        EveType.objects.get_or_create_esi(id=40520)
-        EveType.objects.get_or_create_esi(id=40519)
+        skillfarm_ids = [44992, 40520, 40519]
 
         # Get all skillfarm relevant ids
-        typeids = EveType.objects.filter(id__in=[44992, 40520, 40519]).values_list(
+        typeids = EveType.objects.filter(id__in=skillfarm_ids).values_list(
             "id", flat=True
         )
 
         if len(typeids) != 3:
             self.stdout.write(
-                "Error: Not all required types are loaded into the database."
+                "One or more skillfarm relevant types not found. Ensure you have used `python manage.py esde_load_sde`."
             )
             return
 
@@ -76,7 +73,7 @@ class Command(BaseCommand):
                 objs.append(item)
             except EveType.DoesNotExist:
                 self.stdout.write(
-                    f"EveType {key} not found. Skipping... Ensure you have loaded the data from eveuniverse."
+                    f"EveType {key} not found. Skipping... Ensure you have loaded the data."
                 )
                 continue
 
@@ -97,6 +94,7 @@ class Command(BaseCommand):
                         EveTypePrice.objects.update_or_create(
                             eve_type_id=obj.eve_type_id,
                             defaults={
+                                "name": obj.name,
                                 "buy": obj.buy,
                                 "sell": obj.sell,
                                 "updated_at": obj.updated_at,

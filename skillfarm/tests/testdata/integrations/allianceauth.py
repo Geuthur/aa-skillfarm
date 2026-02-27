@@ -11,6 +11,9 @@ from allianceauth.eveonline.models import (
     EveCorporationInfo,
 )
 
+# Alliance Auth (External Libs)
+from eve_sde.models.types import ItemCategory, ItemGroup, ItemType
+
 
 def _load_allianceauth_data():
     with open(Path(__file__).parent / "allianceauth.json", encoding="utf-8") as fp:
@@ -61,4 +64,33 @@ def load_allianceauth():
             alliance_id=alliance.alliance_id if alliance else None,
             alliance_name=alliance.alliance_name if alliance else "",
             alliance_ticker=alliance.alliance_ticker if alliance else "",
+        )
+    for item_category in _entities_data.get("EveCategory"):
+        ItemCategory.objects.create(
+            id=item_category.get("id"),
+            name=item_category.get("name"),
+            published=item_category.get("published"),
+        )
+
+    for item_group in _entities_data.get("EveGroup"):
+        ItemGroup.objects.create(
+            id=item_group.get("id"),
+            name=item_group.get("name"),
+            category=ItemCategory.objects.get(id=item_group.get("category_id")),
+            published=item_group.get("published"),
+        )
+
+    for item_type in _entities_data.get("EveType"):
+        ItemType.objects.create(
+            id=item_type.get("id"),
+            name=item_type.get("name"),
+            group=ItemGroup.objects.get(id=item_type.get("group_id")),
+            capacity=item_type.get("capacity"),
+            description=item_type.get("description"),
+            icon_id=item_type.get("icon_id"),
+            mass=item_type.get("mass"),
+            portion_size=item_type.get("portion_size"),
+            radius=item_type.get("radius"),
+            published=item_type.get("published"),
+            volume=item_type.get("volume"),
         )

@@ -9,7 +9,7 @@ from django.db import models, transaction
 from allianceauth.services.hooks import get_extension_logger
 
 # Alliance Auth (External Libs)
-from eveuniverse.models import EveType
+from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm import __title__
@@ -110,12 +110,12 @@ class SkillManager(models.Manager["CharacterSkill"]):
     def _update_or_create_objs(
         self,
         character: "SkillFarmAudit",
-        character_skills_items: "CharactersSkills",
+        character_skills_items: list["CharactersSkills"],
     ) -> None:
         """Update or Create skill entries from objs data."""
         for character_skills in character_skills_items:
-            skills_list = self._preload_types(character_skills)
-            if skills_list is not None:
+            skills_list = [skill.skill_id for skill in character_skills.skills]
+            if len(skills_list) >= 1:
                 incoming_ids = set(skills_list)
                 existing_ids = set(
                     self.filter(character=character).values_list(
@@ -148,19 +148,6 @@ class SkillManager(models.Manager["CharacterSkill"]):
                         update_ids=update_ids,
                     )
 
-    def _preload_types(
-        self, character_skills_items: "CharactersSkills"
-    ) -> list[int] | None:
-        """Preload EveType objects from a list of skills."""
-        skills_list = [skill.skill_id for skill in character_skills_items.skills]
-        if skills_list:
-            incoming_ids = set(skills_list)
-            existing_ids = set(self.values_list("eve_type_id", flat=True))
-            new_ids = incoming_ids.difference(existing_ids)
-            EveType.objects.bulk_get_or_create_esi(ids=list(new_ids))
-            return skills_list
-        return None
-
     def _create_from_list(
         self,
         character: "SkillFarmAudit",
@@ -168,18 +155,29 @@ class SkillManager(models.Manager["CharacterSkill"]):
         create_ids: set,
     ):
         logger.debug("%s: Storing %s new skills", character, len(create_ids))
-        skills = [
-            self.model(
-                name=character.name,
-                character=character,
-                eve_type=EveType.objects.get(id=skill.skill_id),
-                active_skill_level=skill.active_skill_level,
-                skillpoints_in_skill=skill.skillpoints_in_skill,
-                trained_skill_level=skill.trained_skill_level,
-            )
-            for skill in skills_list
-            if skill.skill_id in create_ids
-        ]
+        skills = []
+
+        for skill in skills_list:
+            if skill.skill_id in create_ids:
+                try:
+                    eve_type_instance = EveType.objects.get(id=skill.skill_id)
+                except ObjectDoesNotExist:
+                    logger.warning(
+                        "EveType with id %s not found. Skipping skill entry.",
+                        skill.skill_id,
+                    )
+                    continue
+
+                skills.append(
+                    self.model(
+                        name=character.name,
+                        character=character,
+                        eve_type=eve_type_instance,
+                        active_skill_level=skill.active_skill_level,
+                        skillpoints_in_skill=skill.skillpoints_in_skill,
+                        trained_skill_level=skill.trained_skill_level,
+                    )
+                )
         self.bulk_create(skills, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)
 
     def _update_from_list(

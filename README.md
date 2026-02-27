@@ -20,12 +20,11 @@ ______________________________________________________________________
   - [Features](#features)
   - [Upcoming](#upcoming)
   - [Installation](#features)
-    - [Step 0 - Check dependencies are installed](#step0)
     - [Step 1 - Install the Package](#step1)
     - [Step 2 - Configure Alliance Auth](#step2)
     - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
     - [Step 4 - Migration to AA](#step4)
-    - [Step 4.1 - Create/Load Skillfarm Prices](#step41)
+      - [Step 4.1 - Preload EVE SDE Data & ItemType Prices](#step41)
     - [Step 5 - Setting up Permissions](#step5)
     - [Step 6 - (Optional) Setting up Compatibilies](#step6)
   - [Highlights](#highlights)
@@ -48,12 +47,8 @@ ______________________________________________________________________
 ## Installation<a name="installation"></a>
 
 > [!NOTE]
-> AA Skillfarm needs at least Alliance Auth v4.10.0
+> AA Skillfarm needs at least Alliance Auth v4.12.0
 > Please make sure to update your Alliance Auth before you install this APP
-
-### Step 0 - Check dependencies are installed<a name="step0"></a>
-
-- Skillfarm needs the app [django-eveuniverse](https://apps.allianceauth.org/apps/detail/django-eveuniverse) to function. Please make sure it is installed.
 
 ### Step 1 - Install the Package<a name="step1"></a>
 
@@ -67,27 +62,49 @@ pip install aa-skillfarm
 
 Configure your Alliance Auth settings (`local.py`) as follows:
 
-- Add `'skillfarm',` to `INSTALLED_APPS`
+```python
+INSTALLED_APPS = [
+    # other apps
+    "eve_sde",  # only if it not already existing
+    "skillfarm",
+    # other apps?
+]
+
+# This line is right below the `INSTALLED_APPS` list, if not already exist!
+INSTALLED_APPS = ["modeltranslation"] + INSTALLED_APPS
+```
 
 ### Step 3 - Add the Scheduled Tasks<a name="step3"></a>
 
 To set up the Scheduled Tasks add following code to your `local.py`
 
 ```python
-CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
-    "task": "skillfarm.tasks.update_all_skillfarm",
-    "schedule": 1800,
-}
+if "skillfarm" in INSTALLED_APPS:
+    CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
+        "task": "skillfarm.tasks.update_all_skillfarm",
+        "schedule": 1800,
+    }
 
-CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
-    "task": "skillfarm.tasks.check_skillfarm_notifications",
-    "schedule": crontab(minute=0, hour="*/24"),
-}
+    CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
+        "task": "skillfarm.tasks.check_skillfarm_notifications",
+        "schedule": crontab(minute=0, hour="*/24"),
+    }
 
-CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
-    "task": "skillfarm.tasks.update_all_prices",
-    "schedule": crontab(minute=0, hour="0"),
-}
+    CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
+        "task": "skillfarm.tasks.update_all_prices",
+        "schedule": crontab(minute=0, hour="0"),
+    }
+```
+
+This also only need to be added if it is not already!
+
+```python
+if "eve_sde" in INSTALLED_APPS:
+    # Run at 12:00 UTC each day
+    CELERYBEAT_SCHEDULE["EVE SDE :: Check for SDE Updates"] = {
+        "task": "eve_sde.tasks.check_for_sde_updates",
+        "schedule": crontab(minute="0", hour="12"),
+    }
 ```
 
 ### Step 3.1 - (Optional) Add own Logger File
@@ -117,9 +134,12 @@ python manage.py collectstatic
 python manage.py migrate
 ```
 
-### Step 4.1 - Create/Load Skillfarm Prices<a name="step41">
+### Step 4.1 - Preload EVE SDE Data & ItemType Prices<a name="step41">
+
+AA Skillfarm uses EVE SDE data to map IDs to names for EveTypes. You will need to preload some data from SDE once.
 
 ```shell
+python manage.py esde_load_sde
 python manage.py skillfarm_load_prices
 ```
 

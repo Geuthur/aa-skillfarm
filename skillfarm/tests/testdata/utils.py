@@ -14,11 +14,8 @@ from allianceauth.eveonline.models import EveCharacter
 from allianceauth.tests.auth_utils import AuthUtils
 from esi.models import Scope, Token
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
-from skillfarm.models.prices import EveTypePrice
+from skillfarm.models.prices import EveType, EveTypePrice
 from skillfarm.models.skillfarmaudit import (
     CharacterSkill,
     CharacterUpdateStatus,

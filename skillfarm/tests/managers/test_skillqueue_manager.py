@@ -4,10 +4,8 @@ from unittest.mock import patch
 # Django
 from django.test import override_settings
 
-# Alliance Auth (External Libs)
-from eveuniverse.models import EveType
-
 # AA Skillfarm
+from skillfarm.models.prices import EveType
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.esi_stub_openapi import (
     EsiEndpoint,
@@ -27,8 +25,6 @@ TEST_ENDPOINTS = [
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 @patch(MODULE_PATH + ".esi")
-@patch(MODULE_PATH + ".EveType.objects.bulk_get_or_create_esi")
-@patch(MODULE_PATH + ".EveType.objects.get_or_create_esi")
 class TestSkillQueueManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
@@ -39,13 +35,9 @@ class TestSkillQueueManager(SkillFarmTestCase):
         cls.eve_type = EveType.objects.get(id=1)
         cls.eve_type_2 = EveType.objects.get(id=2)
 
-    def test_update_skillqueue(self, mock_get_or_create_esi, __, mock_esi):
+    def test_update_skillqueue(self, mock_esi):
         # given
         mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)
-        mock_get_or_create_esi.side_effect = [
-            (self.eve_type, True),
-            (self.eve_type_2, True),
-        ]
         self.skillfarm_audit.update_skillqueue(force_refresh=False)
 
         self.assertSetEqual(
