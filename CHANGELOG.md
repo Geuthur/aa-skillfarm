@@ -11,6 +11,8 @@ Section Order:
 ### Removed
 -->
 
+## [2.0.0] - 2026-02-27
+
 ### Changed
 
 - Operational code has been refactored to use `django-eveonline-sde` for all static EVE data. This change requires a manual SDE import via management command post-update. Ensure this command is executed to maintain application stability and functionality.
@@ -576,6 +578,7 @@ This will load all necessary prices
 [1.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.1...v1.0.2 "1.0.2"
 [1.0.3]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.2...v1.0.3 "1.0.3"
 [1.0.4]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.3...v1.0.4 "1.0.4"
-[1.0.5]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...v1.0.5 "1.0.45"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...HEAD "In Development"
+[1.0.5]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...v1.0.5 "1.0.5"
+[2.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...v2.0.0 "2.0.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"

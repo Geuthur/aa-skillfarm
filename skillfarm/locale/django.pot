@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2026-02-23 06:35+0100\n"
+"POT-Creation-Date: 2026-02-27 21:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,7 +25,7 @@ msgstr ""
 msgid "No Active Training"
 msgstr ""
 
-#: skillfarm/api/skillfarm.py:423 skillfarm/templates/skillfarm/base.html:63
+#: skillfarm/api/skillfarm.py:436 skillfarm/templates/skillfarm/base.html:63
 #: skillfarm/templates/skillfarm/partials/table/active-character.html:10
 #: skillfarm/templates/skillfarm/partials/table/inactive-character.html:10
 msgid "Skill Info"
