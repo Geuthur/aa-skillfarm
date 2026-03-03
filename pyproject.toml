@@ -49,10 +49,8 @@ urls.Homepage = "https://github.com/Geuthur/aa-skillfarm"
 urls.Source = "https://github.com/Geuthur/aa-skillfarm"
 urls.Tracker = "https://github.com/Geuthur/aa-skillfarm/issues"
 
-[tool.hatch.build]
-include = [
+[tool.hatch]
+build.include = [
     "/skillfarm",
 ]
-
-[tool.hatch.version]
-path = "skillfarm/__init__.py"
+version.path = "skillfarm/__init__.py"
