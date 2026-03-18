@@ -80,17 +80,17 @@ To set up the Scheduled Tasks add following code to your `local.py`
 
 ```python
 if "skillfarm" in INSTALLED_APPS:
-    CELERYBEAT_SCHEDULE["skillfarm_update_all_skillfarm"] = {
+    CELERYBEAT_SCHEDULE["AA Skillfarm :: Update All Skillfarm"] = {
         "task": "skillfarm.tasks.update_all_skillfarm",
         "schedule": 1800,
     }
 
-    CELERYBEAT_SCHEDULE["skillfarm_check_skillfarm_notifications"] = {
+    CELERYBEAT_SCHEDULE["AA Skillfarm :: Check Skillfarm Notification"] = {
         "task": "skillfarm.tasks.check_skillfarm_notifications",
         "schedule": crontab(minute=0, hour="*/24"),
     }
 
-    CELERYBEAT_SCHEDULE["skillfarm_update_all_prices"] = {
+    CELERYBEAT_SCHEDULE["AA Skillfarm :: Update All Prices"] = {
         "task": "skillfarm.tasks.update_all_prices",
         "schedule": crontab(minute=0, hour="0"),
     }
