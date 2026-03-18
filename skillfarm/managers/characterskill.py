@@ -15,6 +15,7 @@ from eve_sde.models.types import ItemType as EveType
 from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.providers import AppLogger, esi
 
 if TYPE_CHECKING:
@@ -84,8 +85,8 @@ class SkillManager(models.Manager["CharacterSkill"]):
         self, character: "SkillFarmAudit", force_refresh: bool = False
     ) -> "UpdateSectionResult":
         """Update or Create skills for a character from ESI."""
-        return character.update_section_if_changed(
-            section=character.UpdateSection.SKILLS,
+        return character.update_manager.update_section_if_changed(
+            section=CharacterUpdateSection.SKILLS,
             fetch_func=self._fetch_esi_data,
             force_refresh=force_refresh,
         )

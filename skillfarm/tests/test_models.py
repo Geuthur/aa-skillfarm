@@ -3,12 +3,12 @@ from django.utils import timezone
 
 # Alliance Auth
 from esi.errors import TokenError
-from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
+from esi.exceptions import HTTPServerError
 
 # AA Skillfarm
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
-    SkillFarmAudit,
     UpdateSectionResult,
 )
 from skillfarm.tests import SkillFarmTestCase
@@ -75,15 +75,16 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         Test should not reset has_token_error.
         """
-        self.assertFalse(self.skillfarm_audit.reset_has_token_error())
+        self.assertFalse(self.skillfarm_audit.update_manager.reset_has_token_error())
 
     def test_reset_has_token_error_should_return_true(self):
         """
         Test should reset has_token_error.
         """
+        # Test Data
         create_update_status(
             self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
             is_success=False,
             error_message="",
             has_token_error=True,
@@ -92,13 +93,22 @@ class TestSkillfarmModel(SkillFarmTestCase):
             last_update_at=timezone.now(),
             last_update_finished_at=timezone.now(),
         )
-        self.assertTrue(self.skillfarm_audit.reset_has_token_error())
+        # Test Action
+        self.skillfarm_audit.update_manager.reset_has_token_error()
+        # Expected Result
+        update_status = CharacterUpdateStatus.objects.get(
+            character=self.skillfarm_audit,
+            section=CharacterUpdateSection.SKILLQUEUE,
+        )
+        self.assertFalse(update_status.has_token_error)
 
     def test_get_token_should_return_token(self):
         """
         Test should return valid token.
         """
+        # Test Action
         token = self.skillfarm_audit.get_token()
+        # Expected Result
         self.assertIsNotNone(token)
 
     def test_get_token_should_raise_token_error(self):
@@ -115,7 +125,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         # Test Data
         create_update_status(
             character_audit=self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
 
@@ -127,8 +137,8 @@ class TestSkillfarmModel(SkillFarmTestCase):
             )
 
         # Test Action
-        result = self.skillfarm_audit.perform_update_status(
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+        result = self.skillfarm_audit.update_manager.perform_update_status(
+            section=CharacterUpdateSection.SKILLQUEUE,
             method=mock_update_method,
         )
 
@@ -144,7 +154,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         # Test Data
         status_obj = create_update_status(
             character_audit=self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
 
@@ -153,15 +163,15 @@ class TestSkillfarmModel(SkillFarmTestCase):
 
         # Test Action: perform_update_status should persist an error and re-raise
         with self.assertRaises(ValueError):
-            self.skillfarm_audit.perform_update_status(
-                section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            self.skillfarm_audit.update_manager.perform_update_status(
+                section=CharacterUpdateSection.SKILLQUEUE,
                 method=mock_update_method,
             )
 
         # Expected Results: status object updated due to the exception
         status_obj = CharacterUpdateStatus.objects.get(
             character=self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
         )
         self.assertFalse(status_obj.is_success)
         self.assertFalse(status_obj.has_token_error)
@@ -174,7 +184,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         # Test Data
         status_obj = create_update_status(
             character_audit=self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
 
@@ -183,15 +193,15 @@ class TestSkillfarmModel(SkillFarmTestCase):
 
         # Test Action: perform_update_status should persist an error and re-raise
         with self.assertRaises(HTTPServerError):
-            self.skillfarm_audit.perform_update_status(
-                section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            self.skillfarm_audit.update_manager.perform_update_status(
+                section=CharacterUpdateSection.SKILLQUEUE,
                 method=mock_update_method,
             )
 
         # Expected Results: status object updated due to the exception
         status_obj = CharacterUpdateStatus.objects.get(
             character=self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+            section=CharacterUpdateSection.SKILLQUEUE,
         )
         self.assertFalse(status_obj.is_success)
         self.assertFalse(status_obj.has_token_error)

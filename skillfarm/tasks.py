@@ -22,6 +22,7 @@ from allianceauth.services.tasks import QueueOnce
 # AA Skillfarm
 from skillfarm import __title__, app_settings
 from skillfarm.helpers.discord import send_user_notification
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
@@ -103,15 +104,15 @@ def update_character(
 
     if force_refresh:
         # Reset Token Error if we are forcing a refresh
-        character.reset_has_token_error()
+        character.update_manager.reset_has_token_error()
 
-    needs_update = character.calc_update_needed()
+    needs_update = character.update_manager.calc_update_needed()
 
     if not needs_update and not force_refresh:
         logger.info("No updates needed for %s", character.character.character_name)
         return False
 
-    sections = character.UpdateSection.get_sections()
+    sections = CharacterUpdateSection.get_sections()
 
     for section in sections:
         # Skip sections that are not in the needs_update list
@@ -143,7 +144,7 @@ def update_char_skills(self: Task, character_pk: int, force_refresh: bool):
     return _update_character_section(
         task=self,
         character_pk=character_pk,
-        section=SkillFarmAudit.UpdateSection.SKILLS,
+        section=CharacterUpdateSection.SKILLS,
         force_refresh=force_refresh,
     )
 
@@ -153,7 +154,7 @@ def update_char_skillqueue(self: Task, character_pk: int, force_refresh: bool):
     return _update_character_section(
         task=self,
         character_pk=character_pk,
-        section=SkillFarmAudit.UpdateSection.SKILLQUEUE,
+        section=CharacterUpdateSection.SKILLQUEUE,
         force_refresh=force_refresh,
     )
 
@@ -162,10 +163,10 @@ def _update_character_section(
     task: Task, character_pk: int, section: str, force_refresh: bool
 ):
     """Update a specific section of the skillfarm audit."""
-    section = SkillFarmAudit.UpdateSection(section)
+    section = CharacterUpdateSection(section)
     character = SkillFarmAudit.objects.get(pk=character_pk)
     # Reset update status for the section
-    character.reset_update_status(section)
+    character.update_manager.reset_update_status(section)
 
     logger.debug(
         "Updating %s for %s", section.label, character.character.character_name
@@ -183,8 +184,10 @@ def _update_character_section(
 
     # Perform the update within the retry context manager
     with retry_task_on_esi_error(task):
-        result = character.perform_update_status(section, method, **kwargs)
-    character.update_section_log(section, result)
+        result = character.update_manager.perform_update_status(
+            section, method, **kwargs
+        )
+    character.update_manager.update_section_log(section, result)
 
 
 # pylint: disable=too-many-locals

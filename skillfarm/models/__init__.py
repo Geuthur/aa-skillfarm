@@ -1,7 +1,4 @@
-from .general import General
-from .skillfarmaudit import (
-    CharacterSkill,
-    CharacterSkillqueueEntry,
-    SkillFarmAudit,
-    SkillFarmSetup,
-)
+# flake8: noqa
+from .general import *
+from .prices import *
+from .skillfarmaudit import *
