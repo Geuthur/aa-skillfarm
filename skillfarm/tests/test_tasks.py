@@ -7,14 +7,12 @@ from django.db.utils import Error
 from django.test import override_settings
 from django.utils import timezone
 
-# Alliance Auth
-from allianceauth.authentication.models import UserProfile
-
 # AA Skillfarm
 from skillfarm import tasks
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import NoSocketsTestCase, SkillFarmTestCase
+from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.utils import (
     create_character_skill,
     create_eve_type_price,
@@ -71,9 +69,34 @@ class TestUpdateCharacter(SkillFarmTestCase):
         """
         Test should not update character if no updates are needed.
         """
-        # when
-        tasks.update_character(self.skillfarm_audit.pk)
-        # then
+        # Test Data
+
+        create_update_status(
+            self.skillfarm_audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            error_message="",
+            has_token_error=False,
+            last_run_at=timezone.now(),
+            last_run_finished_at=timezone.now(),
+            last_update_at=timezone.now(),
+            last_update_finished_at=timezone.now(),
+        )
+        create_update_status(
+            self.skillfarm_audit,
+            section=CharacterUpdateSection.SKILLQUEUE,
+            is_success=True,
+            error_message="",
+            has_token_error=False,
+            last_run_at=timezone.now(),
+            last_run_finished_at=timezone.now(),
+            last_update_at=timezone.now(),
+            last_update_finished_at=timezone.now(),
+        )
+
+        # Test Action
+        tasks.update_character(character_pk=self.skillfarm_audit.pk)
+        # Expected Result
         mock_logger.info.assert_called_once_with(
             "No updates needed for %s",
             self.skillfarm_audit.character.character_name,
@@ -86,7 +109,7 @@ class TestUpdateCharacter(SkillFarmTestCase):
         # given
         create_update_status(
             self.skillfarm_audit,
-            section=SkillFarmAudit.UpdateSection.SKILLS,
+            section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
             has_token_error=False,

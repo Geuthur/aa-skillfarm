@@ -6,6 +6,7 @@ from django.utils import timezone
 from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import NoSocketsTestCase, SkillFarmTestCase
 from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
@@ -31,7 +32,7 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         """
         # given
         character = create_skillfarm_character_from_user(self.user)
-        sections = SkillFarmAudit.UpdateSection.get_sections()
+        sections = CharacterUpdateSection.get_sections()
         for section in sections:
             create_update_status(
                 character,
@@ -46,13 +47,13 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             )
 
         # when/then
-        self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.OK)
+        self.assertEqual(character.get_status, UpdateStatus.OK)
 
         # when
         qs = SkillFarmAudit.objects.annotate_total_update_status()
         # then
         obj = qs.first()
-        self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.OK)
+        self.assertEqual(obj.total_update_status, UpdateStatus.OK)
 
     def test_should_be_incomplete(self):
         """
@@ -61,15 +62,13 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         # given
         character = create_skillfarm_character_from_user(self.user)
         # when/then
-        self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.INCOMPLETE)
+        self.assertEqual(character.get_status, UpdateStatus.INCOMPLETE)
 
         # when
         qs = SkillFarmAudit.objects.annotate_total_update_status()
         # then
         obj = qs.first()
-        self.assertEqual(
-            obj.total_update_status, SkillFarmAudit.UpdateStatus.INCOMPLETE
-        )
+        self.assertEqual(obj.total_update_status, UpdateStatus.INCOMPLETE)
 
     def test_should_be_token_error(self):
         """
@@ -79,7 +78,7 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         character = create_skillfarm_character_from_user(self.user)
         create_update_status(
             character,
-            section=character.UpdateSection.SKILLS,
+            section=CharacterUpdateSection.SKILLS,
             is_success=False,
             error_message="",
             has_token_error=True,
@@ -89,14 +88,12 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             last_update_finished_at=timezone.now(),
         )
         # when/then
-        self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.TOKEN_ERROR)
+        self.assertEqual(character.get_status, UpdateStatus.TOKEN_ERROR)
         # when
         qs = SkillFarmAudit.objects.annotate_total_update_status()
         # then
         obj = qs.first()
-        self.assertEqual(
-            obj.total_update_status, SkillFarmAudit.UpdateStatus.TOKEN_ERROR
-        )
+        self.assertEqual(obj.total_update_status, UpdateStatus.TOKEN_ERROR)
 
     def test_should_be_disabled(self):
         """
@@ -104,7 +101,7 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         """
         character = create_skillfarm_character_from_user(self.user, active=False)
         # given
-        sections = SkillFarmAudit.UpdateSection.get_sections()
+        sections = CharacterUpdateSection.get_sections()
         for section in sections:
             create_update_status(
                 character,
@@ -119,12 +116,12 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             )
 
         # then
-        self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.DISABLED)
+        self.assertEqual(character.get_status, UpdateStatus.DISABLED)
         # when
         qs = SkillFarmAudit.objects.annotate_total_update_status()
         # then
         obj = qs.first()
-        self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.DISABLED)
+        self.assertEqual(obj.total_update_status, UpdateStatus.DISABLED)
 
     def test_should_be_error(self):
         """
@@ -132,7 +129,7 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         """
         # given
         character = create_skillfarm_character_from_user(self.user)
-        sections = SkillFarmAudit.UpdateSection.get_sections()
+        sections = CharacterUpdateSection.get_sections()
         for section in sections:
             create_update_status(
                 character,
@@ -147,12 +144,12 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             )
 
         # then
-        self.assertEqual(character.get_status, SkillFarmAudit.UpdateStatus.ERROR)
+        self.assertEqual(character.get_status, UpdateStatus.ERROR)
         # when
         qs = SkillFarmAudit.objects.annotate_total_update_status()
         # then
         obj = qs.first()
-        self.assertEqual(obj.total_update_status, SkillFarmAudit.UpdateStatus.ERROR)
+        self.assertEqual(obj.total_update_status, UpdateStatus.ERROR)
 
 
 class TestSkillfarmAuditVisibleTo(NoSocketsTestCase):

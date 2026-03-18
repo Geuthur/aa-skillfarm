@@ -2,7 +2,6 @@
 
 # Standard Library
 import datetime
-from collections.abc import Callable
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,7 +11,6 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -20,7 +18,6 @@ from django.utils.translation import gettext_lazy as _
 from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
-from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # Alliance Auth (External Libs)
 from eve_sde.models.types import ItemType as EveType
@@ -30,7 +27,12 @@ from skillfarm import __title__, app_settings
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
-from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
+from skillfarm.models.general import UpdateSectionResult
+from skillfarm.models.helpers.update_manager import (
+    CharacterUpdateSection,
+    UpdateManager,
+    UpdateStatus,
+)
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -39,69 +41,6 @@ logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 # pylint: disable=too-many-public-methods
 class SkillFarmAudit(models.Model):
     """Skillfarm Character Audit model"""
-
-    class UpdateSection(models.TextChoices):
-        SKILLS = "skills", _("Skills")
-        SKILLQUEUE = "skillqueue", _("Skillqueue")
-
-        @classmethod
-        def get_sections(cls) -> list[str]:
-            """Return list of section values."""
-            return [choice.value for choice in cls]
-
-        @property
-        def method_name(self) -> str:
-            """Return method name for this section."""
-            return f"update_{self.value}"
-
-    class UpdateStatus(models.TextChoices):
-        DISABLED = "disabled", _("Disabled")
-        TOKEN_ERROR = "token_error", _("Token Error")
-        ERROR = "error", _("Error")
-        OK = "ok", _("OK")
-        INCOMPLETE = "incomplete", _("Incomplete")
-        IN_PROGRESS = "in_progress", _("In Progress")
-
-        def bootstrap_icon(self) -> str:
-            """Return bootstrap corresponding icon class."""
-            update_map = {
-                status: mark_safe(
-                    f"<span class='{self.bootstrap_text_style_class()}' data-bs-tooltip='aa-skillfarm' title='{self.description()}'>⬤</span>"
-                )
-                for status in [
-                    self.DISABLED,
-                    self.TOKEN_ERROR,
-                    self.ERROR,
-                    self.INCOMPLETE,
-                    self.IN_PROGRESS,
-                    self.OK,
-                ]
-            }
-            return update_map.get(self, "")
-
-        def bootstrap_text_style_class(self) -> str:
-            """Return bootstrap corresponding bootstrap text style class."""
-            update_map = {
-                self.DISABLED: "text-muted",
-                self.TOKEN_ERROR: "text-warning",
-                self.INCOMPLETE: "text-warning",
-                self.IN_PROGRESS: "text-info",
-                self.ERROR: "text-danger",
-                self.OK: "text-success",
-            }
-            return update_map.get(self, "")
-
-        def description(self) -> str:
-            """Return description for an enum object."""
-            update_map = {
-                self.DISABLED: _("Update is disabled"),
-                self.TOKEN_ERROR: _("One section has a token error during update"),
-                self.INCOMPLETE: _("One or more sections have not been updated"),
-                self.IN_PROGRESS: _("Update is in progress"),
-                self.ERROR: _("An error occurred during update"),
-                self.OK: _("Updates completed successfully"),
-            }
-            return update_map.get(self, "")
 
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -167,16 +106,6 @@ class SkillFarmAudit(models.Model):
             return None
 
     @property
-    def get_status(self) -> UpdateStatus.description:
-        """Get the total update status of this character."""
-        if self.active is False:
-            return self.UpdateStatus.DISABLED
-
-        qs = SkillFarmAudit.objects.filter(pk=self.pk).annotate_total_update_status()
-        total_update_status = list(qs.values_list("total_update_status", flat=True))[0]
-        return self.UpdateStatus(total_update_status)
-
-    @property
     def notification_icon(self) -> str:
         """Get the notification icon for this character."""
         return format_html(
@@ -187,7 +116,17 @@ class SkillFarmAudit(models.Model):
         )
 
     @property
-    def last_update(self) -> UpdateStatus:
+    def get_status(self) -> UpdateStatus.description:
+        """Get the total update status of this character."""
+        if self.active is False:
+            return UpdateStatus.DISABLED
+
+        qs = SkillFarmAudit.objects.filter(pk=self.pk).annotate_total_update_status()
+        total_update_status = list(qs.values_list("total_update_status", flat=True))[0]
+        return UpdateStatus(total_update_status)
+
+    @property
+    def last_update(self) -> "CharacterUpdateStatus":
         """Get the last update status of this character."""
         return SkillFarmAudit.objects.last_update_status(self)
 
@@ -256,6 +195,15 @@ class SkillFarmAudit(models.Model):
             )
         return ""
 
+    @property
+    def update_manager(self):
+        """Return the Update Manager helper for this owner."""
+        return UpdateManager(
+            character=self,
+            update_section=CharacterUpdateSection,
+            update_status=CharacterUpdateStatus,
+        )
+
     def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
         """Update skills for this character."""
         return self.skillfarm_skills.update_or_create_esi(
@@ -267,135 +215,6 @@ class SkillFarmAudit(models.Model):
         return self.skillfarm_skillqueue.update_or_create_esi(
             self, force_refresh=force_refresh
         )
-
-    def calc_update_needed(self) -> _NeedsUpdate:
-        """Calculate if an update is needed."""
-        sections: models.QuerySet[CharacterUpdateStatus] = (
-            self.skillfarm_update_status.all()
-        )
-        needs_update = {}
-        for section in sections:
-            needs_update[section.section] = section.need_update()
-        return _NeedsUpdate(section_map=needs_update)
-
-    def reset_update_status(self, section: UpdateSection) -> "CharacterUpdateStatus":
-        """Reset the status of a given update section and return it."""
-        update_status_obj: CharacterUpdateStatus = (
-            self.skillfarm_update_status.get_or_create(
-                section=section,
-            )[0]
-        )
-        update_status_obj.reset()
-        return update_status_obj
-
-    def reset_has_token_error(self) -> bool:
-        """Reset the has_token_error flag for this character."""
-        update_status = self.get_status
-        if update_status == self.UpdateStatus.TOKEN_ERROR:
-            self.skillfarm_update_status.filter(
-                has_token_error=True,
-            ).update(
-                has_token_error=False,
-            )
-            return True
-        return False
-
-    def update_section_if_changed(
-        self,
-        section: UpdateSection,
-        fetch_func: Callable,
-        force_refresh: bool = False,
-    ):
-        """Update character section if changed from ESI or is forced.
-
-        :param section: The section to update.
-        :param fetch_func: The function to fetch data from ESI.
-        :param force_refresh: Whether to force refresh the data.
-        :return: UpdateSectionResult indicating the result of the update.
-        """
-        section = self.UpdateSection(section)
-        try:
-            data = fetch_func(character=self, force_refresh=force_refresh)
-            logger.debug("%s: Update has changed, section: %s", self, section.label)
-        except HTTPNotModified as exc:
-            logger.debug("%s: Update has not changed, section: %s", self, exc)
-            return UpdateSectionResult(is_changed=False, is_updated=False)
-        except HTTPClientError as exc:
-            error_message = f"{type(exc).__name__}: {str(exc)}"
-            # TODO ADD DISCORD/AUTH NOTIFICATION?
-            logger.error(
-                "%s: %s: Update has Client Error: %s %s",
-                self,
-                section.label,
-                error_message,
-                exc.status_code,
-            )
-            return UpdateSectionResult(
-                is_changed=False,
-                is_updated=False,
-                has_token_error=True,
-                error_message=error_message,
-            )
-        return UpdateSectionResult(
-            is_changed=True,
-            is_updated=True,
-            data=data,
-        )
-
-    def update_section_log(
-        self,
-        section: UpdateSection,
-        result: UpdateSectionResult,
-    ) -> None:
-        """Update the status of a specific section."""
-        error_message = result.error_message if result.error_message else ""
-        is_success = not result.has_token_error
-        defaults = {
-            "is_success": is_success,
-            "error_message": error_message,
-            "has_token_error": result.has_token_error,
-            "last_run_finished_at": timezone.now(),
-        }
-        obj: CharacterUpdateStatus = self.skillfarm_update_status.update_or_create(
-            section=section,
-            defaults=defaults,
-        )[0]
-        if result.is_updated:
-            obj.last_update_at = obj.last_run_at
-            obj.last_update_finished_at = timezone.now()
-            obj.save()
-        status = "successfully" if is_success else "with errors"
-        logger.info("%s: %s Update run completed %s", self, section.label, status)
-
-    def perform_update_status(
-        self, section: UpdateSection, method: Callable, *args, **kwargs
-    ) -> UpdateSectionResult:
-        """Perform update status."""
-        try:
-            result = method(*args, **kwargs)
-        except HTTPServerError as exc:
-            raise exc
-        except Exception as exc:
-            error_message = f"{type(exc).__name__}: {str(exc)}"
-            is_token_error = isinstance(exc, (TokenError))
-            logger.error(
-                "%s: %s: Error during update status: %s",
-                self,
-                section.label,
-                error_message,
-                exc_info=not is_token_error,  # do not log token errors
-            )
-            self.skillfarm_update_status.update_or_create(
-                section=section,
-                defaults={
-                    "is_success": False,
-                    "error_message": error_message,
-                    "has_token_error": is_token_error,
-                    "last_update_at": timezone.now(),
-                },
-            )
-            raise exc
-        return result
 
     def _generate_notification(self, skill_names: list[str]) -> str:
         """Generate notification for the user."""
@@ -498,7 +317,7 @@ class CharacterUpdateStatus(models.Model):
         SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_update_status"
     )
     section = models.CharField(
-        max_length=32, choices=SkillFarmAudit.UpdateSection.choices, db_index=True
+        max_length=32, choices=CharacterUpdateSection.choices, db_index=True
     )
     is_success = models.BooleanField(default=None, null=True, db_index=True)
     error_message = models.TextField()

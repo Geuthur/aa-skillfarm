@@ -13,6 +13,7 @@ from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
 from skillfarm import __title__
+from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -55,11 +56,7 @@ class SkillfarmQuerySet(models.QuerySet):
 
     def annotate_total_update_status(self):
         """Get the total update status."""
-        # pylint: disable=import-outside-toplevel, cyclic-import
-        # AA Skillfarm
-        from skillfarm.models.skillfarmaudit import SkillFarmAudit
-
-        sections = SkillFarmAudit.UpdateSection.get_sections()
+        sections = CharacterUpdateSection.get_sections()
         num_sections_total = len(sections)
         qs = (
             self.annotate(
@@ -100,25 +97,25 @@ class SkillfarmQuerySet(models.QuerySet):
                 total_update_status=Case(
                     When(
                         active=False,
-                        then=Value(SkillFarmAudit.UpdateStatus.DISABLED),
+                        then=Value(UpdateStatus.DISABLED),
                     ),
                     When(
                         num_sections_token_error=1,
-                        then=Value(SkillFarmAudit.UpdateStatus.TOKEN_ERROR),
+                        then=Value(UpdateStatus.TOKEN_ERROR),
                     ),
                     When(
                         num_sections_failed__gt=0,
-                        then=Value(SkillFarmAudit.UpdateStatus.ERROR),
+                        then=Value(UpdateStatus.ERROR),
                     ),
                     When(
                         num_sections_ok=num_sections_total,
-                        then=Value(SkillFarmAudit.UpdateStatus.OK),
+                        then=Value(UpdateStatus.OK),
                     ),
                     When(
                         num_sections_total__lt=num_sections_total,
-                        then=Value(SkillFarmAudit.UpdateStatus.INCOMPLETE),
+                        then=Value(UpdateStatus.INCOMPLETE),
                     ),
-                    default=Value(SkillFarmAudit.UpdateStatus.IN_PROGRESS),
+                    default=Value(UpdateStatus.IN_PROGRESS),
                 )
             )
         )
