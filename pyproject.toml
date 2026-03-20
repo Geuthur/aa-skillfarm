@@ -37,6 +37,14 @@ dependencies = [
     "django-eveonline-sde",
     "django-ninja",
 ]
+optional-dependencies.tests-allianceauth-development = [
+    "aa-discordnotify",
+    "allianceauth @ git+https://gitlab.com/allianceauth/allianceauth#egg=master",
+    "allianceauth-discordbot",
+    "coverage",
+    "discordproxy",
+    "factory-boy",
+]
 optional-dependencies.tests-allianceauth-latest = [
     "aa-discordnotify",
     "allianceauth-discordbot",
@@ -54,3 +62,4 @@ build.include = [
     "/skillfarm",
 ]
 version.path = "skillfarm/__init__.py"
+metadata.allow-direct-references = true

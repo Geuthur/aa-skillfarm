@@ -1,4 +1,4 @@
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 {% load i18n %}
 
 <!-- accept mark as read modal -->
@@ -21,7 +21,7 @@
                 <form method="post">
                     {% csrf_token %}
 
-                    {{ forms.mark_as_read|bootstrap }}
+                    {% bootstrap_form forms.mark_as_read %}
                 </form>
             </div>
 

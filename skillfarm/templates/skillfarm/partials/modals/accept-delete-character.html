@@ -1,4 +1,4 @@
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 {% load i18n %}
 
 <!-- accept delete character modal -->
@@ -21,7 +21,7 @@
                 <form method="post">
                     {% csrf_token %}
 
-                    {{ forms.delete|bootstrap }}
+                    {% bootstrap_form forms.delete %}
                 </form>
             </div>
 
