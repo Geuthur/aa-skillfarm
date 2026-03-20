@@ -1,4 +1,4 @@
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 {% load i18n %}
 
 <!-- accept switch notification modal -->
@@ -21,7 +21,7 @@
                 <form method="post">
                     {% csrf_token %}
 
-                    {{ forms.switch_notification|bootstrap }}
+                    {% bootstrap_form forms.switch_notification %}
                 </form>
             </div>
 
