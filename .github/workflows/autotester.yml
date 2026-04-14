@@ -62,7 +62,7 @@ jobs:
           - mariadb:10.11 # [LTS] Maintained until: February 2028
           - mariadb:11.4 # [LTS] Maintained until: May 2029
 
-#    continue-on-error: ${{ matrix.python-version == '3.13' }}
+    continue-on-error: ${{ matrix.python-version == '3.13' }}
 
     # Set up services
     services:
