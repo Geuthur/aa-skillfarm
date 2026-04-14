@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Changed
+
+- Python version support and AAv5 Test
+
 ## [2.0.0] - 2026-02-27
 
 ### Changed
@@ -52,8 +56,16 @@ if "eve_sde" in INSTALLED_APPS:
 After running migrations, make sure to run the following commands to import the SDE data into your database.
 
 ```shell
+python manage.py migrate eve_sde
 python manage.py esde_load_sde
+```
+
+Migrate the app and collect static.
+
+```shell
+python manage.py migrate skillfarm
 python manage.py skillfarm_load_prices
+python manage.py collectstatic --noinput
 ```
 
 Restart your Auth via `supervisor` after running these commands

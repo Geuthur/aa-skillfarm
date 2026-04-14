@@ -12,7 +12,7 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Geuthur", email = "devgeuthur@gmail.com" },
 ]
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
@@ -25,6 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
@@ -32,14 +33,14 @@ dynamic = [
     "version",
 ]
 dependencies = [
-    "allianceauth>=4.12,<6",
-    "django-esi>=8,<9.1",
+    "allianceauth>=4.12",
+    "django-esi>=8",
     "django-eveonline-sde",
-    "django-ninja",
+    "django-ninja>=1.5,<2",
 ]
 optional-dependencies.tests-allianceauth-development = [
     "aa-discordnotify",
-    "allianceauth @ git+https://gitlab.com/allianceauth/allianceauth#egg=master",
+    "allianceauth==5.0.0b1",
     "allianceauth-discordbot",
     "coverage",
     "discordproxy",

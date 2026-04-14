@@ -53,7 +53,7 @@ jobs:
           - '3.10' # [LTS] Maintained until: October 2026
           - '3.11' # [LTS] Maintained until: October 2027
           - '3.12' # [LTS] Maintained until: October 2028
-        #  - '3.13' # [LTS] Maintained until: October 2029 AA does not yet support Python 3.13
+          - '3.13' # [LTS] Maintained until: October 2029
         # MySQL versions to test against
         database:
           # https://endoflife.date/mysql
@@ -62,7 +62,7 @@ jobs:
           - mariadb:10.11 # [LTS] Maintained until: February 2028
           - mariadb:11.4 # [LTS] Maintained until: May 2029
 
-#    continue-on-error: ${{ matrix.python-version == '3.13' }}
+    continue-on-error: ${{ matrix.python-version == '3.13' }}
 
     # Set up services
     services:
@@ -143,7 +143,7 @@ jobs:
           - '3.10' # [LTS] Maintained until: October 2026
           - '3.11' # [LTS] Maintained until: October 2027
           - '3.12' # [LTS] Maintained until: October 2028
-        #  - '3.13' # [LTS] Maintained until: October 2029 AA does not yet support Python 3.13
+          - '3.13' # [LTS] Maintained until: October 2029
         # MySQL versions to test against
         database:
           # https://endoflife.date/mysql
@@ -185,6 +185,12 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+
+      # AAv5 development branch requires libbz2-dev for some reason, so we need to install it before running Tox
+      - name: Install libbz2-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libbz2-dev
 
       # Install Tox and any other packages
       - name: Install Tox and any other packages
