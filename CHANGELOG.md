@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Changed
+
+- Python version support and AAv5 Test
+
 ## [2.0.0] - 2026-02-27
 
 ### Changed
