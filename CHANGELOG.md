@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- Downtime Checker for ESI Tasks
+
 ### Changed
 
 - Python version support and AAv5 Test

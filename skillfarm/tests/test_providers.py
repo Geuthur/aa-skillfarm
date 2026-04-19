@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 
 # Django
 from django.test import override_settings
+from django.utils import timezone
 
 # Alliance Auth
 from esi.exceptions import (
@@ -14,12 +15,12 @@ from esi.exceptions import (
     HTTPServerError,
 )
 
-# Alliance Auth (External Libs)
-from eve_sde.models.types import ItemGroup, ItemType
-
 # AA Skillfarm
+from skillfarm.errors import DownTimeError
 from skillfarm.providers import esi, retry_task_on_esi_error
 from skillfarm.tests import NoSocketsTestCase
+
+MODULE_PATH = "skillfarm.providers"
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
@@ -99,7 +100,7 @@ class TestRetryTaskOnESIError(NoSocketsTestCase):
         self.task.retry.assert_called_once()
         call_kwargs = self.task.retry.call_args[1]
         self.assertEqual(call_kwargs["exc"], exc)
-        self.assertEqual(call_kwargs["countdown"], 62)
+        self.assertEqual(call_kwargs["countdown"], 602)
 
     @patch("skillfarm.providers.random.uniform")
     def test_should_retry_on_http_503_error(self, mock_random):
@@ -119,7 +120,7 @@ class TestRetryTaskOnESIError(NoSocketsTestCase):
         self.assertEqual(str(context.exception), "Retry called")
         self.task.retry.assert_called_once()
         call_kwargs = self.task.retry.call_args[1]
-        self.assertEqual(call_kwargs["countdown"], 63)
+        self.assertEqual(call_kwargs["countdown"], 603)
 
     @patch("skillfarm.providers.random.uniform")
     def test_should_retry_on_http_504_error(self, mock_random):
@@ -139,7 +140,7 @@ class TestRetryTaskOnESIError(NoSocketsTestCase):
         self.assertEqual(str(context.exception), "Retry called")
         self.task.retry.assert_called_once()
         call_kwargs = self.task.retry.call_args[1]
-        self.assertEqual(call_kwargs["countdown"], 62)
+        self.assertEqual(call_kwargs["countdown"], 602)
 
     def test_should_not_retry_on_http_404_error(self):
         """
@@ -220,3 +221,31 @@ class TestRetryTaskOnESIError(NoSocketsTestCase):
         # Verify retry was NOT called
         self.task.retry.assert_not_called()
         self.assertEqual(str(context.exception), "Some other error")
+
+    @patch(MODULE_PATH + ".random.uniform")
+    def test_should_retry_on_daily_downtime(self, mock_random):
+        """
+        Test should retry task when ESI is in daily downtime.
+
+        Results:
+        - The task.retry method is called with appropriate countdown.
+        """
+        mock_random.return_value = 3.0  # Fixed jitter for testing
+        # Test Data
+        with patch(MODULE_PATH + ".timezone.now") as mock_now:
+            mock_now.return_value = timezone.datetime.strptime("11:05", "%H:%M")
+            exc = Exception("Downtime Error")
+
+            # Test Action
+            with self.assertRaises(Exception) as context:
+                with retry_task_on_esi_error(self.task):
+                    raise exc
+
+            # Expected Result
+            self.assertEqual(str(context.exception), "Retry called")
+            self.task.retry.assert_called_once()
+            call_kwargs = self.task.retry.call_args[1]
+            self.assertEqual(
+                str(call_kwargs["exc"]), str(DownTimeError("ESI is in daily downtime"))
+            )
+            self.assertEqual(call_kwargs["countdown"], 603)
