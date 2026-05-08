@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm \n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2026-02-27 21:40+0100\n"
+"POT-Creation-Date: 2026-05-08 21:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,66 +31,66 @@ msgstr ""
 msgid "Skill Info"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:44
+#: skillfarm/models/helpers/update_manager.py:35
+msgid "Disabled"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:36
+msgid "Token Error"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:37
+msgid "Error"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:38
+msgid "OK"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:39
+msgid "Incomplete"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:40
+msgid "In Progress"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:74
+msgid "Update is disabled"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:75
+msgid "One section has a token error during update"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:76
+msgid "One or more sections have not been updated"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:77
+msgid "Update is in progress"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:78
+msgid "An error occurred during update"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:79
+msgid "Updates completed successfully"
+msgstr ""
+
+#: skillfarm/models/helpers/update_manager.py:85
 #: skillfarm/templates/skillfarm/partials/table/skills.html:4
 msgid "Skills"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:45
+#: skillfarm/models/helpers/update_manager.py:86
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
 #: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
 msgid "Skillqueue"
 msgstr ""
 
-#: skillfarm/models/skillfarmaudit.py:58
-msgid "Disabled"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:59
-msgid "Token Error"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:60
-msgid "Error"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:61
-msgid "OK"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:62
-msgid "Incomplete"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:63
-msgid "In Progress"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:97
-msgid "Update is disabled"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:98
-msgid "One section has a token error during update"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:99
-msgid "One or more sections have not been updated"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:100
-msgid "Update is in progress"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:101
-msgid "An error occurred during update"
-msgstr ""
-
-#: skillfarm/models/skillfarmaudit.py:102
-msgid "Updates completed successfully"
-msgstr ""
-
-#: skillfarm/tasks.py:253
+#: skillfarm/tasks.py:256
 msgid "Skillfarm Notifications"
 msgstr ""
 
@@ -297,7 +297,7 @@ msgstr ""
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:13
 #: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:13
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:13
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:14
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:13
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:13
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:28
 msgid "Close"
@@ -310,7 +310,7 @@ msgstr ""
 #: skillfarm/templates/skillfarm/partials/modals/accept-delete-character.html:31
 #: skillfarm/templates/skillfarm/partials/modals/accept-mark-as-read.html:31
 #: skillfarm/templates/skillfarm/partials/modals/accept-switch-notification.html:31
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:40
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:39
 msgid "Cancel"
 msgstr ""
 
@@ -335,23 +335,23 @@ msgstr ""
 msgid "Accept Switch Alarm request"
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:11
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:10
 msgid "Edit SkillSetup request"
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:21
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:20
 msgid "Select the skills you want to filter for this character."
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:22
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:21
 msgid "You can add multiple skills to the filter."
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:23
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:22
 msgid "If no skills are selected, the filter will be disabled."
 msgstr ""
 
-#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:45
+#: skillfarm/templates/skillfarm/partials/modals/edit-skillsetup.html:44
 msgid "Accept Edit request"
 msgstr ""
 
