@@ -11,15 +11,21 @@ Section Order:
 ### Removed
 -->
 
-## [2.0.1] - 2026-05-08
+## [3.0.0] - 2026-05-08
+
+> [!IMPORTANT]
+>
+> This Release needs at least Alliance Auth v5
+> Please make sure to update your Alliance Auth before you install this APP
 
 ### Added
 
 - Downtime Checker for ESI Tasks
+- Compatibility to Alliance Auth v5
 
-### Changed
+### Removed
 
-- Python version support and AAv5 Test
+- Compatibility to Alliance Auth v4
 
 ## [2.0.0] - 2026-02-27
 
@@ -598,5 +604,6 @@ This will load all necessary prices
 [1.0.4]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.3...v1.0.4 "1.0.4"
 [1.0.5]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...v1.0.5 "1.0.5"
 [2.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...v2.0.0 "2.0.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.1...HEAD "In Development"
+[3.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.0...v2.0.1 "3.0.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
