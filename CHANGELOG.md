@@ -11,6 +11,10 @@ Section Order:
 ### Removed
 -->
 
+### Fixed
+
+- AttributeError in Permission Model since AAv5.2
+
 ### Changed
 
 - `DownTimeError` Will no longer send out warning logs
