@@ -9,9 +9,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-)
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 from skillfarm.views import switch_notification
 
 MODULE_PATH = "skillfarm.views"
@@ -24,8 +22,8 @@ class TestSwitchNotificationView(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
-        cls.skillfarm_audit_2 = create_skillfarm_character_from_user(cls.superuser)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.superuser)
 
     def test_switch_notification(self):
         """

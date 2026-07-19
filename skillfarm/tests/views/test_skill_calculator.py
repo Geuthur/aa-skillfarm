@@ -9,9 +9,7 @@ from django.utils import timezone
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_eve_type_price,
-)
+from skillfarm.tests.testdata.factory import EveTypePriceFactory
 from skillfarm.views import skillfarm_calc
 
 MODULE_PATH = "skillfarm.views"
@@ -24,17 +22,17 @@ class TestSkillFarmCalculator(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.plex = create_eve_type_price(
+        cls.plex = EveTypePriceFactory(
             name="PLEX", eve_type_id=44992, buy=100, sell=200, updated_at=timezone.now()
         )
-        cls.skillinjector = create_eve_type_price(
+        cls.skillinjector = EveTypePriceFactory(
             name="Skill Injector",
             eve_type_id=40520,
             buy=300,
             sell=400,
             updated_at=timezone.now(),
         )
-        cls.extractor = create_eve_type_price(
+        cls.extractor = EveTypePriceFactory(
             name="Skill Extractor",
             eve_type_id=40519,
             buy=500,

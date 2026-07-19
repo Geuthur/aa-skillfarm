@@ -13,12 +13,12 @@ from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_character_skill,
-    create_eve_type_price,
-    create_skillfarm_character_from_user,
-    create_skillsetup_character,
-    create_update_status,
+from skillfarm.tests.testdata.factory import (
+    CharacterSkillFactory,
+    CharacterUpdateStatusFactory,
+    EveTypePriceFactory,
+    SkillFarmAuditFactory,
+    SkillFarmSetupFactory,
 )
 
 TASK_PATH = "skillfarm.tasks"
@@ -36,7 +36,7 @@ class TestUpdateAllSkillfarm(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_should_update_all_skillfarm(self, mock_update_all_skillfarm):
         """
@@ -63,7 +63,7 @@ class TestUpdateCharacter(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_update_character_should_no_updated(self, mock_logger, __):
         """
@@ -71,8 +71,8 @@ class TestUpdateCharacter(SkillFarmTestCase):
         """
         # Test Data
 
-        create_update_status(
-            self.skillfarm_audit,
+        CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
@@ -82,8 +82,8 @@ class TestUpdateCharacter(SkillFarmTestCase):
             last_update_at=timezone.now(),
             last_update_finished_at=timezone.now(),
         )
-        create_update_status(
-            self.skillfarm_audit,
+        CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=True,
             error_message="",
@@ -107,8 +107,8 @@ class TestUpdateCharacter(SkillFarmTestCase):
         Test should update character if updates are needed.
         """
         # given
-        create_update_status(
-            self.skillfarm_audit,
+        CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
@@ -135,11 +135,9 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
-        cls.skillfarm_audit_2 = create_skillfarm_character_from_user(
-            cls.no_permission_user
-        )
-        cls.skillfarm_audit_3 = create_skillfarm_character_from_user(cls.superuser)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.no_permission_user)
+        cls.skillfarm_audit_3 = SkillFarmAuditFactory(user=cls.superuser)
 
     def _set_notification_status(
         self, audits: models.QuerySet[SkillFarmAudit], status: bool
@@ -185,18 +183,20 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         Test should send notification if notification is enabled and SkillFarmSetup exists.
         """
         # given
-        create_skillsetup_character(
-            character_id=self.skillfarm_audit.character.character_id,
-            skillset=["skill1"],
+        skill = CharacterSkillFactory(
+            character=self.skillfarm_audit,
+            trained_skill_level=5,
         )
-        create_character_skill(
-            character_id=self.skillfarm_audit.character.character_id, evetype_id=1
+        SkillFarmSetupFactory(
+            character=self.skillfarm_audit,
+            skillset=[skill.eve_type.name],
         )
-        # Ensure we operate on fresh model instances
-        self.skillfarm_audit.refresh_from_db()
 
         audits = [self.skillfarm_audit]
         self._set_notification_status(audits, True)
+
+        # Ensure we operate on fresh model instances
+        self.skillfarm_audit.refresh_from_db()
 
         mock_audit_filter.return_value = audits
         # when
@@ -247,14 +247,14 @@ class TestSkillfarmPrices(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.price = create_eve_type_price(
+        cls.price = EveTypePriceFactory(
             name="TestPrice",
             eve_type_id=44992,
             buy=100,
             sell=200,
             updated_at=timezone.now(),
         )
-        cls.price2 = create_eve_type_price(
+        cls.price2 = EveTypePriceFactory(
             name="TestPrice2",
             eve_type_id=40519,
             buy=300,

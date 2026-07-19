@@ -17,9 +17,9 @@ from skillfarm.models.helpers.update_manager import (
 )
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-    create_update_status,
+from skillfarm.tests.testdata.factory import (
+    CharacterUpdateStatusFactory,
+    SkillFarmAuditFactory,
 )
 
 
@@ -61,7 +61,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the calc_update_needed method.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -83,7 +83,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the reset_update_status method.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -107,14 +107,14 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the reset_has_token_error method.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        create_update_status(
-            character_audit=self.audit,
+        CharacterUpdateStatusFactory(
+            character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             has_token_error=True,
             error_message="Token error occurred.",
@@ -135,7 +135,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the update_section_if_changed method for a successful update.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -163,7 +163,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the update_section_if_changed method for a token error scenario.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -195,7 +195,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the update_section_if_changed method for no change scenario.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -222,7 +222,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the update_section_log method for an updated section.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -256,7 +256,7 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the update_section_log method for a section with token error.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
@@ -291,14 +291,14 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the perform_update_status method.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        create_update_status(
-            character_audit=self.audit,
+        CharacterUpdateStatusFactory(
+            character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -329,14 +329,14 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the perform_update_status method for token error scenario.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        status_obj = create_update_status(
-            character_audit=self.audit,
+        status_obj = CharacterUpdateStatusFactory(
+            character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -367,16 +367,18 @@ class TestUpdateManager(SkillFarmTestCase):
         Test the perform_update_status method for HTTPServerError scenario.
         """
         # Test Data
-        self.audit = create_skillfarm_character_from_user(self.user)
+        self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
             character=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        status_obj = create_update_status(
-            character_audit=self.audit,
+        status_obj = CharacterUpdateStatusFactory(
+            character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
+            is_success=False,  # Ensure is_success is False to test the HTTPServerError scenario
+            has_token_error=False,  # Ensure has_token_error is False to test the HTTPServer
         )
 
         def mock_update_method(character, force_refresh=False):

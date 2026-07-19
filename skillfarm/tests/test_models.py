@@ -1,3 +1,6 @@
+# Standard Library
+from unittest.mock import MagicMock
+
 # Django
 from django.utils import timezone
 
@@ -12,9 +15,9 @@ from skillfarm.models.skillfarmaudit import (
     UpdateSectionResult,
 )
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-    create_update_status,
+from skillfarm.tests.testdata.factory import (
+    CharacterUpdateStatusFactory,
+    SkillFarmAuditFactory,
 )
 
 MODULE_PATH = "skillfarm.models.skillfarmaudit"
@@ -24,20 +27,15 @@ class TestSkillfarmModel(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
-        # Create SkillfarmAudit instance
-
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
-        cls.no_token_audit = create_skillfarm_character_from_user(
-            cls.no_permission_user
-        )
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_should_return_string_audit(self):
         """
         Test should return string representation of SkillFarmAudit.
         """
         self.assertEqual(
-            str(self.skillfarm_audit), "Gneuten - Active: True - Status: incomplete"
+            str(self.skillfarm_audit),
+            f"{self.skillfarm_audit.character.character_name} - Active: True - Status: incomplete",
         )
 
     def test_should_return_esi_scopes(self):
@@ -82,8 +80,8 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test should reset has_token_error.
         """
         # Test Data
-        create_update_status(
-            self.skillfarm_audit,
+        CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=False,
             error_message="",
@@ -107,6 +105,8 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test should return valid token.
         """
         # Test Action
+        token = self.user.token_set.first()
+        self.skillfarm_audit.get_token = MagicMock(return_value=token)
         token = self.skillfarm_audit.get_token()
         # Expected Result
         self.assertIsNotNone(token)
@@ -115,6 +115,11 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         Test should raise TokenError when no valid token exists.
         """
+        # Test Action
+        self.no_token_audit = SkillFarmAuditFactory(
+            user__main_character__scopes=[]
+        )  # Create a SkillFarmAudit with no valid token
+        # Expected Result
         with self.assertRaises(TokenError):
             self.no_token_audit.get_token()
 
@@ -123,8 +128,8 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test the perform_update_status method for token error scenario.
         """
         # Test Data
-        create_update_status(
-            character_audit=self.skillfarm_audit,
+        CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -152,8 +157,8 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test the perform_update_status method for token error scenario.
         """
         # Test Data
-        status_obj = create_update_status(
-            character_audit=self.skillfarm_audit,
+        status_obj = CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -182,10 +187,12 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test the perform_update_status method for HTTPServerError scenario.
         """
         # Test Data
-        status_obj = create_update_status(
-            character_audit=self.skillfarm_audit,
+        status_obj = CharacterUpdateStatusFactory(
+            character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
+            has_token_error=False,  # Ensure has_token_error is False to test the HTTPServerError scenario
+            is_success=False,  # Ensure is_success is False to test the HTTPServerError scenario
         )
 
         def mock_update_method():

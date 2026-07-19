@@ -1,39 +1,51 @@
 # Standard Library
-from unittest.mock import patch
+from http import HTTPStatus
+from unittest.mock import MagicMock
 
-# Django
-from django.test import override_settings
+# Third Party
+import pook
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.esi_stub_openapi import (
-    EsiEndpoint,
-    create_esi_client_stub,
-)
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-)
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.characterskill"
 
-# Endpoints used in tests
-TEST_ENDPOINTS = [
-    EsiEndpoint("Skills", "GetCharactersCharacterIdSkills", "character_id"),
-]
 
-
-@override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
-@patch(MODULE_PATH + ".esi")
 class TestCharacterSkillManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.token = cls.user.token_set.first()
+        cls.skillfarm_audit.get_token = MagicMock(return_value=cls.token)
 
-    def test_update_skills(self, mock_esi):
+    @pook.on
+    def test_update_skills(self):
         # given
 
-        mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)
+        pook.get(
+            f"https://esi.evetech.net/characters/{self.skillfarm_audit.character.character_id}/skills",
+            reply=HTTPStatus.OK,
+            response_json={
+                "skills": [
+                    {
+                        "skill_id": 1,
+                        "trained_skill_level": 5,
+                        "active_skill_level": 4,
+                        "skillpoints_in_skill": 128000,
+                    },
+                    {
+                        "skill_id": 2,
+                        "trained_skill_level": 4,
+                        "active_skill_level": 2,
+                        "skillpoints_in_skill": 4000,
+                    },
+                ],
+                "total_sp": 75000000,
+                "unallocated_sp": 250000,
+            },
+        )
         self.skillfarm_audit.update_skills(force_refresh=False)
 
         self.assertSetEqual(

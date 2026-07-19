@@ -9,9 +9,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-)
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 from skillfarm.views import edit_skillsetup
 
 MODULE_PATH = "skillfarm.views"
@@ -24,7 +22,7 @@ class TestSkillSetView(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_skillset(self):
         """
@@ -84,7 +82,8 @@ class TestSkillSetView(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTrue(response_data["success"])
         self.assertEqual(
-            response_data["message"], "Gneuten Skillset successfully updated"
+            response_data["message"],
+            f"{self.skillfarm_audit.character.character_name} Skillset successfully updated",
         )
 
     def test_skillset_no_permission(self):

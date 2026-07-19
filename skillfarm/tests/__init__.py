@@ -5,8 +5,8 @@ import socket
 from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
+from skillfarm.tests.testdata.factory import EveCorporationInfoFactory, UserMainFactory
 from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
-from skillfarm.tests.testdata.utils import create_user_from_evecharacter
 
 
 class SocketAccessError(Exception):
@@ -74,6 +74,9 @@ class SkillFarmTestCase(NoSocketsTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.corp = EveCorporationInfoFactory(
+            corporation_id=98_000_000, corporation_name="Test Corporation"
+        )
         # Initialize Alliance Auth test data
         load_allianceauth()
 
@@ -81,24 +84,15 @@ class SkillFarmTestCase(NoSocketsTestCase):
         cls.factory = RequestFactory()
 
         # User with Standard Access
-        cls.user, cls.user_character = create_user_from_evecharacter(
-            character_id=1001,
-            permissions=["skillfarm.basic_access"],
-            scopes=[
-                "esi-skills.read_skills.v1",
-                "esi-skills.read_skillqueue.v1",
-            ],
-        )
-        # User without Access to Skillfarm
-        cls.no_permission_user, cls.no_perm_character = create_user_from_evecharacter(
-            character_id=1002,
-            permissions=[],
-        )
+        cls.user = UserMainFactory(main_character__corporation=cls.corp)
+        cls.user_character = cls.user.profile.main_character
 
         # User with Superuser Access
-        cls.superuser, cls.superuser_character = create_user_from_evecharacter(
-            character_id=1003,
-            permissions=[],
-        )
+        cls.superuser = UserMainFactory()
         cls.superuser.is_superuser = True
         cls.superuser.save()
+        cls.superuser_character = cls.superuser.profile.main_character
+
+        # User without Access to Skillfarm
+        cls.no_permission_user = UserMainFactory(permissions__=[])
+        cls.no_perm_character = cls.no_permission_user.profile.main_character

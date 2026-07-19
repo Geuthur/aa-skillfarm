@@ -49,15 +49,18 @@ class TestAddCharView(SkillFarmTestCase):
         * Redirect to index
         """
         # given
-        user = self.user
-        token = user.token_set.get(character_id=1001)
+        token = self.user.token_set.get(
+            character_id=self.user.profile.main_character.character_id
+        )
         # when
-        response = self._add_character(user, token)
+        response = self._add_character(self.user, token)
         # then
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(response.url, reverse("skillfarm:index"))
         self.assertTrue(mock_tasks.update_character.apply_async.called)
         self.assertTrue(mock_messages.success.called)
         self.assertTrue(
-            SkillFarmAudit.objects.filter(character__character_id=1001).exists()
+            SkillFarmAudit.objects.filter(
+                character__character_id=self.user.profile.main_character.character_id
+            ).exists()
         )
