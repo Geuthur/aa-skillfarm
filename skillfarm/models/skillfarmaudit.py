@@ -2,6 +2,7 @@
 
 # Standard Library
 import datetime
+from typing import TYPE_CHECKING
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -25,13 +26,12 @@ from eve_sde.models.types import ItemType as EveType
 # AA Skillfarm
 from skillfarm import __title__, app_settings
 from skillfarm.managers.characterskill import SkillManager
+from skillfarm.managers.characterupdatestatus import UpdateStatusManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
-from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManager,
-    UpdateStatus,
 )
 from skillfarm.providers import AppLogger
 
@@ -41,6 +41,17 @@ logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 # pylint: disable=too-many-public-methods
 class SkillFarmAudit(models.Model):
     """Skillfarm Character Audit model"""
+
+    if TYPE_CHECKING:  # Give type hints for related names
+        skillfarm_skillqueue: SkillqueueManager
+        skillfarm_skills: SkillManager
+        skillfarm_update_status: UpdateStatusManager
+        skillfarm_setup: "SkillFarmSetup"  # OneToOne reverse
+
+    class Meta:
+        default_permissions = ()
+
+    objects: SkillFarmManager = SkillFarmManager()
 
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -56,13 +67,8 @@ class SkillFarmAudit(models.Model):
 
     is_read = models.BooleanField(default=False, help_text="Mark Character as read")
 
-    objects: SkillFarmManager = SkillFarmManager()
-
     def __str__(self):
-        return f"{self.character.character_name} - Active: {self.active} - Status: {self.get_status}"
-
-    class Meta:
-        default_permissions = ()
+        return f"{self.character.character_name} - Active: {self.active}"
 
     @classmethod
     def get_esi_scopes(cls) -> list[str]:
@@ -116,21 +122,6 @@ class SkillFarmAudit(models.Model):
         )
 
     @property
-    def get_status(self) -> UpdateStatus.description:
-        """Get the total update status of this character."""
-        if self.active is False:
-            return UpdateStatus.DISABLED
-
-        qs = SkillFarmAudit.objects.filter(pk=self.pk).annotate_total_update_status()
-        total_update_status = list(qs.values_list("total_update_status", flat=True))[0]
-        return UpdateStatus(total_update_status)
-
-    @property
-    def last_update(self) -> "CharacterUpdateStatus":
-        """Get the last update status of this character."""
-        return SkillFarmAudit.objects.last_update_status(self)
-
-    @property
     def is_filtered(self) -> bool:
         """Check if the character has Skill Queue filter active."""
         return (
@@ -140,16 +131,6 @@ class SkillFarmAudit(models.Model):
                 skillset__isnull=False,
             ).exists()
         )
-
-    @property
-    def is_skill_ready(self) -> bool:
-        """Check if a character has skills for extraction."""
-        return self.skillfarm_skills.extractions(self).exists()
-
-    @property
-    def is_skillqueue_ready(self) -> bool:
-        """Check if a character has skillqueue ready for extraction."""
-        return self.skillfarm_skillqueue.extractions(self).exists()
 
     @property
     def is_cooldown(self) -> bool:
@@ -166,30 +147,12 @@ class SkillFarmAudit(models.Model):
         return True
 
     @property
-    def get_skillqueue(self) -> models.QuerySet["CharacterSkillqueueEntry"]:
-        """Get the skillqueue for this character."""
-        return self.skillfarm_skillqueue.all().select_related("eve_type")
-
-    @property
-    def get_skills(self) -> models.QuerySet["CharacterSkill"]:
-        """Get the skills for this character."""
-        return self.skillfarm_skills.all().select_related("eve_type")
-
-    @property
-    def get_skillsetup(self) -> models.QuerySet["SkillFarmSetup"] | None:
-        """Get the skill setup for this character."""
-        try:
-            return self.skillfarm_setup
-        except SkillFarmSetup.DoesNotExist:
-            return None
-
-    @property
     def extraction_icon(self) -> str:
-        if self.is_skill_ready is True:
+        if self.skillfarm_skills.extractions(self).exists():
             return format_html(
                 render_to_string("skillfarm/partials/icons/extraction_ready.html")
             )
-        if self.is_skillqueue_ready is True:
+        if self.skillfarm_skillqueue.extractions(self).exists():
             return format_html(
                 render_to_string("skillfarm/partials/icons/extraction_sb_ready.html")
             )
@@ -202,18 +165,6 @@ class SkillFarmAudit(models.Model):
             character=self,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
-        )
-
-    def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
-        """Update skills for this character."""
-        return self.skillfarm_skills.update_or_create_esi(
-            self, force_refresh=force_refresh
-        )
-
-    def update_skillqueue(self, force_refresh: bool = False) -> UpdateSectionResult:
-        """Update skillqueue for this character."""
-        return self.skillfarm_skillqueue.update_or_create_esi(
-            self, force_refresh=force_refresh
         )
 
     def _generate_notification(self, skill_names: list[str]) -> str:
@@ -229,6 +180,11 @@ class SkillFarmAudit(models.Model):
 class SkillFarmSetup(models.Model):
     """Skillfarm Character Skill Setup model for app"""
 
+    objects: SkillFarmManager = SkillFarmManager()
+
+    class Meta:
+        default_permissions = ()
+
     id = models.AutoField(primary_key=True)
 
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -242,14 +198,14 @@ class SkillFarmSetup(models.Model):
     def __str__(self):
         return f"{self.skillset}'s Skill Setup"
 
-    objects: SkillFarmManager = SkillFarmManager()
-
-    class Meta:
-        default_permissions = ()
-
 
 class CharacterSkill(models.Model):
     """Skillfarm Character Skill model for app"""
+
+    objects: SkillManager = SkillManager()
+
+    class Meta:
+        default_permissions = ()
 
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -266,17 +222,17 @@ class CharacterSkill(models.Model):
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
 
-    objects: SkillManager = SkillManager()
-
-    class Meta:
-        default_permissions = ()
-
     def __str__(self) -> str:
         return f"{self.character}-{self.eve_type.name}"
 
 
 class CharacterSkillqueueEntry(models.Model):
     """Skillfarm Skillqueue model for app"""
+
+    objects: SkillqueueManager = SkillqueueManager()
+
+    class Meta:
+        default_permissions = ()
 
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -301,17 +257,17 @@ class CharacterSkillqueueEntry(models.Model):
     has_no_skillqueue = models.BooleanField(default=False)
     last_check = models.DateTimeField(default=None, null=True)
 
-    objects = SkillqueueManager()
-
-    class Meta:
-        default_permissions = ()
-
     def __str__(self) -> str:
         return f"{self.character}-{self.queue_position}"
 
 
 class CharacterUpdateStatus(models.Model):
     """A Model to track the status of the last update."""
+
+    class Meta:
+        default_permissions = ()
+
+    objects: UpdateStatusManager = UpdateStatusManager()
 
     character = models.ForeignKey(
         SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_update_status"
@@ -347,9 +303,6 @@ class CharacterUpdateStatus(models.Model):
         db_index=True,
         help_text="Last update has been successful finished at this time",
     )
-
-    class Meta:
-        default_permissions = ()
 
     def __str__(self) -> str:
         return f"{self.character} - {self.section} - {self.is_success}"

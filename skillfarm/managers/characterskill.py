@@ -29,9 +29,11 @@ if TYPE_CHECKING:
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
-class SkillManagerQuerySet(models.QuerySet):
+class SkillManagerQuerySet(models.QuerySet["CharacterSkill"]):
     # pylint: disable=duplicate-code
-    def extractions(self, character: "SkillFarmAudit") -> bool:
+    def extractions(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkill"]:
         """Return extraction ready skills from a training queue."""
         try:
             skillsetup = character.skillfarm_setup
@@ -50,7 +52,9 @@ class SkillManagerQuerySet(models.QuerySet):
         return extraction
 
     # pylint: disable=duplicate-code
-    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+    def skill_filtered(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkill"]:
         """Return filtered skills from a training queue."""
         try:
             skillsetup = character.skillfarm_setup
@@ -72,11 +76,15 @@ class SkillManager(models.Manager["CharacterSkill"]):
         """Get the base QuerySet for Skill entries."""
         return SkillManagerQuerySet(self.model, using=self._db)
 
-    def extractions(self, character: "SkillFarmAudit") -> bool:
+    def extractions(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkill"]:
         """Return extraction ready skills from a training queue."""
         return self.get_queryset().extractions(character)
 
-    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+    def skill_filtered(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkill"]:
         """Return filtered skills from a training queue."""
         return self.get_queryset().skill_filtered(character)
 

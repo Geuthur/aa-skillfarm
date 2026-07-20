@@ -48,17 +48,17 @@ def calculate_single_progress_bar(skill: CharacterSkillqueueEntry) -> float:
 
 
 def _calculate_sum_progress_bar(
-    skill_queue_response: list["SkillFarmQueueSchema"],
+    skillqueue_response: list["SkillFarmQueueSchema"],
 ) -> str:
     """Calculate the progress bar for the skillqueue"""
     # Calculate the progress percentage for each skill individually
     total_progress_percent = 0
-    skill_count = len(skill_queue_response)
+    skill_count = len(skillqueue_response)
 
     if skill_count == 0:
         return generate_progressbar_html(0)
 
-    for skill in skill_queue_response:
+    for skill in skillqueue_response:
         if skill.start_date and skill.finish_date == "-":
             continue
         total_progress_percent += skill.progress["value"]

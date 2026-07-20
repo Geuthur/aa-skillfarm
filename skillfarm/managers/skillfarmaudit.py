@@ -2,9 +2,7 @@
 from typing import TYPE_CHECKING
 
 # Django
-from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
-from django.db.models import Case, Count, Q, Value, When
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
@@ -13,7 +11,6 @@ from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
 from skillfarm import __title__
-from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -54,74 +51,6 @@ class SkillfarmQuerySet(models.QuerySet):
             logger.debug("User %s has no main character. Nothing visible.", user)
             return self.none()
 
-    def annotate_total_update_status(self):
-        """Get the total update status."""
-        sections = CharacterUpdateSection.get_sections()
-        num_sections_total = len(sections)
-        qs = (
-            self.annotate(
-                num_sections_total=Count(
-                    "skillfarm_update_status",
-                    filter=Q(skillfarm_update_status__section__in=sections),
-                )
-            )
-            .annotate(
-                num_sections_ok=Count(
-                    "skillfarm_update_status",
-                    filter=Q(
-                        skillfarm_update_status__section__in=sections,
-                        skillfarm_update_status__is_success=True,
-                    ),
-                )
-            )
-            .annotate(
-                num_sections_failed=Count(
-                    "skillfarm_update_status",
-                    filter=Q(
-                        skillfarm_update_status__section__in=sections,
-                        skillfarm_update_status__is_success=False,
-                    ),
-                )
-            )
-            .annotate(
-                num_sections_token_error=Count(
-                    "skillfarm_update_status",
-                    filter=Q(
-                        skillfarm_update_status__section__in=sections,
-                        skillfarm_update_status__has_token_error=True,
-                    ),
-                )
-            )
-            # pylint: disable=no-member
-            .annotate(
-                total_update_status=Case(
-                    When(
-                        active=False,
-                        then=Value(UpdateStatus.DISABLED),
-                    ),
-                    When(
-                        num_sections_token_error=1,
-                        then=Value(UpdateStatus.TOKEN_ERROR),
-                    ),
-                    When(
-                        num_sections_failed__gt=0,
-                        then=Value(UpdateStatus.ERROR),
-                    ),
-                    When(
-                        num_sections_ok=num_sections_total,
-                        then=Value(UpdateStatus.OK),
-                    ),
-                    When(
-                        num_sections_total__lt=num_sections_total,
-                        then=Value(UpdateStatus.INCOMPLETE),
-                    ),
-                    default=Value(UpdateStatus.IN_PROGRESS),
-                )
-            )
-        )
-
-        return qs
-
     def disable_characters_with_no_owner(self) -> int:
         """Disable characters which have no owner. Return count of disabled characters."""
         orphaned_characters = self.filter(
@@ -142,21 +71,6 @@ class SkillfarmQuerySet(models.QuerySet):
             return len(orphans)
         return 0
 
-    def last_update_status(self, character):
-        """Return the last update status for the given character."""
-        # Filter update status
-        update_status = (
-            character.skillfarm_update_status.order_by("last_update_finished_at")
-            .exclude(last_update_finished_at__isnull=True)
-            .first()
-        )
-
-        if update_status:
-            last_update_display = naturaltime(update_status.last_update_finished_at)
-        else:
-            last_update_display = character.get_status.description()
-        return last_update_display
-
 
 class SkillFarmManager(models.Manager["SkillFarmAuditType"]):
     def get_queryset(self):
@@ -166,17 +80,9 @@ class SkillFarmManager(models.Manager["SkillFarmAuditType"]):
         """Return characters visible to the given user."""
         return self.get_queryset().visible_to(user)
 
-    def annotate_total_update_status(self):
-        """Return the total update status."""
-        return self.get_queryset().annotate_total_update_status()
-
     def disable_characters_with_no_owner(self) -> int:
         """Disable characters which have no owner. Return count of disabled characters."""
         return self.get_queryset().disable_characters_with_no_owner()
-
-    def last_update_status(self, character):
-        """Proxy to QuerySet.last_update_status for a given character."""
-        return self.get_queryset().last_update_status(character)
 
     @staticmethod
     def visible_eve_characters(user):

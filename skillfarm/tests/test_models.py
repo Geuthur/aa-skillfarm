@@ -9,10 +9,10 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPServerError
 
 # AA Skillfarm
+from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
-    UpdateSectionResult,
 )
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.factory import (
@@ -35,7 +35,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         self.assertEqual(
             str(self.skillfarm_audit),
-            f"{self.skillfarm_audit.character.character_name} - Active: True - Status: incomplete",
+            f"{self.skillfarm_audit.character.character_name} - Active: True",
         )
 
     def test_should_return_esi_scopes(self):
@@ -65,7 +65,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test should return incomplete for last_update Property.
         """
         self.assertEqual(
-            self.skillfarm_audit.last_update,
+            self.skillfarm_audit.skillfarm_update_status.last_update_status(),
             "One or more sections have not been updated",
         )
 
