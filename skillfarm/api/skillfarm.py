@@ -270,7 +270,8 @@ class SkillFarmApiEndpoints:
                     as_html=True,
                 )
 
-                char = f"{char_portrait} {character.character.character_name} {character.get_status.bootstrap_icon()} - {character.notification_icon}"
+                update_status = character.skillfarm_update_status.get_status()
+                char = f"{char_portrait} {character.character.character_name} {update_status.bootstrap_icon()} - {character.notification_icon}"
                 is_training = (
                     character.skillfarm_skillqueue.skill_in_training().exists()
                 )
@@ -296,9 +297,9 @@ class SkillFarmApiEndpoints:
                         character_name=character.character.character_name,
                     ),
                     details=SkillFarmDetailSchema(
-                        update_status=character.get_status,
+                        update_status=update_status,
                         notification=character.notification,
-                        last_update=str(character.last_update),
+                        last_update=character.skillfarm_update_status.last_update_status(),
                         is_extraction_ready=character.extraction_icon,
                         is_filter=generate_status_icon_html(character=character),
                         is_read=character.is_read,
@@ -328,9 +329,10 @@ class SkillFarmApiEndpoints:
                     active_characters.append(skillfarm_details)
 
                 # Count skills ready for extraction
-                if character.is_skill_ready:
-                    skills_ready += 1
-                if character.is_skillqueue_ready:
+                if (
+                    character.skillfarm_skills.extractions(character).exists()
+                    or character.skillfarm_skillqueue.extractions(character).exists()
+                ):
                     skills_ready += 1
 
             logger.info(

@@ -21,7 +21,7 @@ Section Order:
 
 ### Removed
 
-- unnecessary properties (get_skills, get_skillqueue, get_skillsetup)
+- Unnecessary properties
 
 ## [3.0.0] - 2026-05-08
 

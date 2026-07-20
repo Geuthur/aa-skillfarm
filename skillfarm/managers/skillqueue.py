@@ -41,7 +41,9 @@ class SkillqueueQuerySet(models.QuerySet):
             finished_level=5,
         )
 
-    def extractions(self, character: "SkillFarmAudit") -> bool:
+    def extractions(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
         """Return extraction ready skills from a training queue."""
         try:
             skillsetup = character.skillfarm_setup
@@ -80,7 +82,9 @@ class SkillqueueQuerySet(models.QuerySet):
             finish_date__gt=now_,
         )
 
-    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+    def skill_filtered(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
         """Return filtered skills from a training queue."""
         try:
             skillsetup = character.skillfarm_setup
@@ -102,14 +106,18 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         """Get the base QuerySet for Skillqueue entries."""
         return SkillqueueQuerySet(self.model, using=self._db)
 
-    def extractions(self, character: "SkillFarmAudit") -> bool:
+    def extractions(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
         """Return extraction ready skills from a training queue."""
         return self.get_queryset().extractions(character)
 
     def skill_in_training(self):
         return self.get_queryset().skill_in_training()
 
-    def skill_filtered(self, character: "SkillFarmAudit") -> bool:
+    def skill_filtered(
+        self, character: "SkillFarmAudit"
+    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
         """Return filtered skills from a training queue."""
         return self.get_queryset().skill_filtered(character)
 

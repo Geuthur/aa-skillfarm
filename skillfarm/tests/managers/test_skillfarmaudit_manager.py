@@ -47,13 +47,9 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             )
 
         # when/then
-        self.assertEqual(character.get_status, UpdateStatus.OK)
-
-        # when
-        qs = SkillFarmAudit.objects.annotate_total_update_status()
-        # then
-        obj = qs.first()
-        self.assertEqual(obj.total_update_status, UpdateStatus.OK)
+        self.assertEqual(
+            character.skillfarm_update_status.get_status(), UpdateStatus.OK
+        )
 
     def test_should_be_incomplete(self):
         """
@@ -62,13 +58,9 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         # given
         character = SkillFarmAuditFactory(user=self.user)
         # when/then
-        self.assertEqual(character.get_status, UpdateStatus.INCOMPLETE)
-
-        # when
-        qs = SkillFarmAudit.objects.annotate_total_update_status()
-        # then
-        obj = qs.first()
-        self.assertEqual(obj.total_update_status, UpdateStatus.INCOMPLETE)
+        self.assertEqual(
+            character.skillfarm_update_status.get_status(), UpdateStatus.INCOMPLETE
+        )
 
     def test_should_be_token_error(self):
         """
@@ -88,12 +80,9 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
             last_update_finished_at=timezone.now(),
         )
         # when/then
-        self.assertEqual(character.get_status, UpdateStatus.TOKEN_ERROR)
-        # when
-        qs = SkillFarmAudit.objects.annotate_total_update_status()
-        # then
-        obj = qs.first()
-        self.assertEqual(obj.total_update_status, UpdateStatus.TOKEN_ERROR)
+        self.assertEqual(
+            character.skillfarm_update_status.get_status(), UpdateStatus.TOKEN_ERROR
+        )
 
     def test_should_be_disabled(self):
         """
@@ -115,13 +104,10 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
                 last_update_finished_at=timezone.now(),
             )
 
-        # then
-        self.assertEqual(character.get_status, UpdateStatus.DISABLED)
-        # when
-        qs = SkillFarmAudit.objects.annotate_total_update_status()
-        # then
-        obj = qs.first()
-        self.assertEqual(obj.total_update_status, UpdateStatus.DISABLED)
+        # when/then
+        self.assertEqual(
+            character.skillfarm_update_status.get_status(), UpdateStatus.DISABLED
+        )
 
     def test_should_be_error(self):
         """
@@ -143,13 +129,10 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
                 last_update_finished_at=timezone.now(),
             )
 
-        # then
-        self.assertEqual(character.get_status, UpdateStatus.ERROR)
-        # when
-        qs = SkillFarmAudit.objects.annotate_total_update_status()
-        # then
-        obj = qs.first()
-        self.assertEqual(obj.total_update_status, UpdateStatus.ERROR)
+        # when/then
+        self.assertEqual(
+            character.skillfarm_update_status.get_status(), UpdateStatus.ERROR
+        )
 
 
 class TestSkillfarmAuditVisibleTo(SkillFarmTestCase):
