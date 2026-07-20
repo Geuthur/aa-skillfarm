@@ -6,7 +6,7 @@ from django.test import RequestFactory
 from skillfarm.admin import SkillFarmAuditAdmin
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import create_skillfarm_character_from_user
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.admin."
 
@@ -19,7 +19,7 @@ class TestAdminView(SkillFarmTestCase):
         cls.adminmodel = SkillFarmAuditAdmin(
             model=SkillFarmAudit, admin_site=AdminSite()
         )
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_column_entity_pic(self):
         """
@@ -27,7 +27,7 @@ class TestAdminView(SkillFarmTestCase):
         """
         self.assertEqual(
             self.adminmodel._entity_pic(self.skillfarm_audit),
-            '<img src="https://images.evetech.net/characters/1001/portrait?size=32" class="img-circle">',
+            f'<img src="https://images.evetech.net/characters/{self.skillfarm_audit.character.character_id}/portrait?size=32" class="img-circle">',
         )
 
     def test_column_character(self):
@@ -35,7 +35,8 @@ class TestAdminView(SkillFarmTestCase):
         Test should display the character id correctly
         """
         self.assertEqual(
-            self.adminmodel._character__character_id(self.skillfarm_audit), 1001
+            self.adminmodel._character__character_id(self.skillfarm_audit),
+            self.skillfarm_audit.character.character_id,
         )
 
     def test_column_character_name(self):
@@ -43,7 +44,8 @@ class TestAdminView(SkillFarmTestCase):
         Test should display the character name correctly.
         """
         self.assertEqual(
-            self.adminmodel._character__character_name(self.skillfarm_audit), "Gneuten"
+            self.adminmodel._character__character_name(self.skillfarm_audit),
+            self.skillfarm_audit.character.character_name,
         )
 
     def test_has_add_permission(self):

@@ -1,45 +1,55 @@
-# Standard Library
-from unittest.mock import patch
-
-# Django
-from django.test import override_settings
+# Third Party
+import pook
 
 # AA Skillfarm
 from skillfarm.models.prices import EveType
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.esi_stub_openapi import (
-    EsiEndpoint,
-    create_esi_client_stub,
-)
-from skillfarm.tests.testdata.utils import (
-    create_skillfarm_character_from_user,
-)
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.skillqueue"
 
-# Endpoints used in tests
-TEST_ENDPOINTS = [
-    EsiEndpoint("Skills", "GetCharactersCharacterIdSkillqueue", "character_id"),
-]
 
-
-@override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
-@patch(MODULE_PATH + ".esi")
 class TestSkillQueueManager(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
         cls.eve_type = EveType.objects.get(id=1)
         cls.eve_type_2 = EveType.objects.get(id=2)
 
-    def test_update_skillqueue(self, mock_esi):
+    @pook.on
+    def test_update_skillqueue(self):
         # given
-        mock_esi.client = create_esi_client_stub(endpoints=TEST_ENDPOINTS)
+        pook.get(
+            f"https://esi.evetech.net/characters/{self.skillfarm_audit.character.character_id}/skillqueue",
+            reply=200,
+            response_json=[
+                {
+                    "finish_date": "2024-06-01T00:00:00Z",
+                    "finished_level": 5,
+                    "level_end_sp": 512000,
+                    "level_start_sp": 128000,
+                    "queue_position": 0,
+                    "skill_id": 1,
+                    "start_date": "2024-05-01T00:00:00Z",
+                    "training_start_sp": 312345,
+                },
+                {
+                    "finish_date": "2024-06-02T00:00:00Z",
+                    "finished_level": 4,
+                    "level_end_sp": 16000,
+                    "level_start_sp": 4000,
+                    "queue_position": 1,
+                    "skill_id": 2,
+                    "start_date": "2024-05-02T00:00:00Z",
+                    "training_start_sp": 5000,
+                },
+            ],
+        )
+        # when
         self.skillfarm_audit.update_skillqueue(force_refresh=False)
-
         self.assertSetEqual(
             set(
                 self.skillfarm_audit.skillfarm_skillqueue.values_list(

@@ -12,7 +12,7 @@ from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
 from skillfarm.models.prices import EveType
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import create_skillfarm_character_from_user
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.api.helpers."
 
@@ -22,7 +22,7 @@ class Test_Calculate_Single_Progress_Bar(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
         cls.skill1 = EveType.objects.get(name="skill1")
         cls.skill2 = EveType.objects.get(name="skill2")
 
@@ -96,7 +96,7 @@ class Test_Calculate_Sum_Progress_bar(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
         cls.skill1 = EveType.objects.get(name="skill1")
         cls.skill2 = EveType.objects.get(name="skill2")
 

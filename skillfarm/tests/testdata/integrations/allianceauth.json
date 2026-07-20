@@ -1,36 +1,5 @@
 {
-    "EveCharacter": [
-        {
-            "character_id": 1001,
-            "character_name": "Gneuten",
-            "corporation_id": 2001,
-            "corporation_name": "Hell RiderZ",
-            "corporation_ticker": "HRZ",
-            "alliance_id": 3001,
-            "alliance_name": "Voices of War",
-            "alliance_ticker": "VOW"
-        },
-        {
-            "character_id": 1002,
-            "character_name": "rotze Rotineque",
-            "corporation_id": 2002,
-            "corporation_name": "Eulenclub",
-            "corporation_ticker": "EC",
-            "alliance_id": 3002,
-            "alliance_name": "Eulen of War",
-            "alliance_ticker": "EOW"
-        },
-        {
-            "character_id": 1003,
-            "character_name": "Hector Fieramosca",
-            "corporation_id": 2003,
-            "corporation_name": "Schweinshausen",
-            "corporation_ticker": "SH",
-            "alliance_id": 3003,
-            "alliance_name": "Schweinshausen of War",
-            "alliance_ticker": "SHW"
-        }
-    ],
+    "EveCharacter": [],
     "EveCategory": [
         {
             "id": 1,
@@ -40,6 +9,11 @@
         {
             "id": 2,
             "name": "Test Category",
+            "published": true
+        },
+        {
+            "id": 16,
+            "name": "Skill",
             "published": true
         }
     ],
@@ -55,13 +29,19 @@
             "id": 2,
             "name": "Test Group",
             "published": true
+        },
+        {
+            "category_id": 16,
+            "id": 3,
+            "name": "Test Skill Group",
+            "published": true
         }
     ],
     "EveType": [
         {
             "capacity": 0.0,
             "description": "Its a Testskill",
-            "group_id": 1,
+            "group_id": 3,
             "id": 1,
             "mass": 0,
             "name": "skill1",
@@ -73,7 +53,7 @@
         {
             "capacity": 0.0,
             "description": "Its a Testskill 2",
-            "group_id": 1,
+            "group_id": 3,
             "id": 2,
             "mass": 0,
             "name": "skill2",
@@ -85,7 +65,7 @@
         {
             "capacity": 0.0,
             "description": "Test PLEX",
-            "group_id": 2,
+            "group_id": 3,
             "id": 3,
             "mass": 0,
             "name": "PLEX",
@@ -97,7 +77,7 @@
         {
             "capacity": 0.0,
             "description": "A Test PLEX",
-            "group_id": 2,
+            "group_id": 3,
             "id": 44992,
             "mass": 0,
             "name": "Test PLEX",
@@ -110,7 +90,7 @@
         {
             "capacity": 0.0,
             "description": "A Test Extractor",
-            "group_id": 2,
+            "group_id": 3,
             "id": 40519,
             "mass": 0,
             "name": "Test Skill Extractor",
@@ -123,7 +103,7 @@
         {
             "capacity": 0.0,
             "description": "A Test Injector",
-            "group_id": 2,
+            "group_id": 3,
             "id": 40520,
             "mass": 0,
             "name": "Test Skill Injector",

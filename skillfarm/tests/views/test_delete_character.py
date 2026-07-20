@@ -9,7 +9,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.utils import create_skillfarm_character_from_user
+from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
 from skillfarm.views import delete_character
 
 MODULE_PATH = "skillfarm.views"
@@ -24,8 +24,8 @@ class TestDeleteCharacterView(SkillFarmTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.skillfarm_audit = create_skillfarm_character_from_user(cls.user)
-        cls.skillfarm_audit_2 = create_skillfarm_character_from_user(cls.superuser)
+        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.superuser)
 
     def test_delete_character(self):
         """
@@ -40,14 +40,16 @@ class TestDeleteCharacterView(SkillFarmTestCase):
             content_type="application/json",
         )
         request.user = self.user
-
         response = delete_character(request, character_id=character_id)
 
         response_data = json.loads(response.content)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTrue(response_data["success"])
-        self.assertEqual(response_data["message"], "Gneuten successfully deleted")
+        self.assertEqual(
+            response_data["message"],
+            f"{self.skillfarm_audit.character.character_name} successfully deleted",
+        )
 
     def test_delete_character_no_permission(self):
         """
@@ -56,13 +58,18 @@ class TestDeleteCharacterView(SkillFarmTestCase):
         form_data = {}
 
         request = self.factory.post(
-            reverse("skillfarm:delete_character", args=[1003]),
+            reverse(
+                "skillfarm:delete_character",
+                args=[self.skillfarm_audit_2.character.character_id],
+            ),
             data=json.dumps(form_data),
             content_type="application/json",
         )
         request.user = self.user
 
-        response = delete_character(request, character_id=1003)
+        response = delete_character(
+            request, character_id=self.skillfarm_audit_2.character.character_id
+        )
         response_data = json.loads(response.content)
 
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)

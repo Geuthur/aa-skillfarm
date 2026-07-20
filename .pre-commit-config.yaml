@@ -26,6 +26,7 @@ ci:
 exclude: |
   (?x)(
     .github/|
+    openapi_2026-06-09.json|
     LICENSE|
     .min(.css|.css.map|.js|.js.map)|
     locale/|
