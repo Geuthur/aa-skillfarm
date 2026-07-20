@@ -9,10 +9,10 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPServerError
 
 # AA Skillfarm
+from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
-    UpdateSectionResult,
 )
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.factory import (
