@@ -2,6 +2,7 @@
 
 # Standard Library
 import datetime
+from typing import TYPE_CHECKING
 
 # Django
 from django.core.exceptions import ObjectDoesNotExist
@@ -27,7 +28,6 @@ from skillfarm import __title__, app_settings
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
-from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManager,
@@ -41,6 +41,11 @@ logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 # pylint: disable=too-many-public-methods
 class SkillFarmAudit(models.Model):
     """Skillfarm Character Audit model"""
+
+    if TYPE_CHECKING:  # Give type hints for related names
+        skillfarm_skillqueue: SkillqueueManager
+        skillfarm_skills: SkillManager
+        skillfarm_setup: "SkillFarmSetup"  # OneToOne reverse
 
     name = models.CharField(max_length=255, blank=True, null=True)
 
@@ -166,24 +171,6 @@ class SkillFarmAudit(models.Model):
         return True
 
     @property
-    def get_skillqueue(self) -> models.QuerySet["CharacterSkillqueueEntry"]:
-        """Get the skillqueue for this character."""
-        return self.skillfarm_skillqueue.all().select_related("eve_type")
-
-    @property
-    def get_skills(self) -> models.QuerySet["CharacterSkill"]:
-        """Get the skills for this character."""
-        return self.skillfarm_skills.all().select_related("eve_type")
-
-    @property
-    def get_skillsetup(self) -> models.QuerySet["SkillFarmSetup"] | None:
-        """Get the skill setup for this character."""
-        try:
-            return self.skillfarm_setup
-        except SkillFarmSetup.DoesNotExist:
-            return None
-
-    @property
     def extraction_icon(self) -> str:
         if self.is_skill_ready is True:
             return format_html(
@@ -202,18 +189,6 @@ class SkillFarmAudit(models.Model):
             character=self,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
-        )
-
-    def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
-        """Update skills for this character."""
-        return self.skillfarm_skills.update_or_create_esi(
-            self, force_refresh=force_refresh
-        )
-
-    def update_skillqueue(self, force_refresh: bool = False) -> UpdateSectionResult:
-        """Update skillqueue for this character."""
-        return self.skillfarm_skillqueue.update_or_create_esi(
-            self, force_refresh=force_refresh
         )
 
     def _generate_notification(self, skill_names: list[str]) -> str:
@@ -301,7 +276,7 @@ class CharacterSkillqueueEntry(models.Model):
     has_no_skillqueue = models.BooleanField(default=False)
     last_check = models.DateTimeField(default=None, null=True)
 
-    objects = SkillqueueManager()
+    objects: SkillqueueManager = SkillqueueManager()
 
     class Meta:
         default_permissions = ()

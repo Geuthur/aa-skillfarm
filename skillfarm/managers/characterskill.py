@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
-class SkillManagerQuerySet(models.QuerySet):
+class SkillManagerQuerySet(models.QuerySet["CharacterSkill"]):
     # pylint: disable=duplicate-code
     def extractions(self, character: "SkillFarmAudit") -> bool:
         """Return extraction ready skills from a training queue."""

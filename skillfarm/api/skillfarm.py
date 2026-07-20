@@ -5,6 +5,7 @@ from typing import Any
 from ninja import NinjaAPI, Schema
 
 # Django
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -312,16 +313,17 @@ class SkillFarmApiEndpoints:
                 else:
                     skillqueue_response: list[SkillFarmQueueSchema] = []
                     # Get skillqueue data for each skill
+                    c_skillqueue = character.skillfarm_skillqueue.all().select_related(
+                        "eve_type"
+                    )
                     for (
                         skill
-                    ) in (
-                        character.get_skillqueue
-                    ):  # retrieve all skillqueue entries from character
+                    ) in c_skillqueue:  # retrieve all skillqueue entries from character
                         skillqueue_response.append(get_skillqueue_data(skill))
 
                     # Calculate sum progress bar
                     skillfarm_details.details.progress = _calculate_sum_progress_bar(
-                        skill_queue_response=skillqueue_response
+                        skillqueue_response=skillqueue_response
                     )
                     active_characters.append(skillfarm_details)
 
@@ -397,8 +399,11 @@ class SkillFarmApiEndpoints:
 
             response_skillqueue: list[SkillFarmQueueSchema] = []
             response_skillqueue_filtered: list[SkillFarmQueueSchema] = []
+            c_skillqueue = character.skillfarm_skillqueue.all().select_related(
+                "eve_type"
+            )
             # retrieve all skillqueue entries from character
-            for skill in character.get_skillqueue:
+            for skill in c_skillqueue:
                 # Get skillqueue data for each skill
                 skillqueue_response = get_skillqueue_data(skill)
                 # Check if skill is filtered
@@ -410,17 +415,22 @@ class SkillFarmApiEndpoints:
             response_skills: list[SkillFarmSkillSchema] = []
 
             is_training = character.skillfarm_skillqueue.skill_in_training().exists()
+            # Get all Skills for the current character
+            try:
+                skillsetup = character.skillfarm_setup
+            except ObjectDoesNotExist:
+                skillsetup = None
+
             if (
-                character.is_filtered
-                and character.get_skillsetup is not None
-                or is_training is False
-            ):
+                character.is_filtered and skillsetup is not None
+            ) or is_training is False:
                 # retrieve all skill entries from character
-                for skill in character.get_skills:
-                    if (
-                        is_training is True
-                        and skill.eve_type.name in character.get_skillsetup.skillset
-                    ):
+                c_skills = character.skillfarm_skills.all().select_related("eve_type")
+                c_skillsetup = (
+                    character.skillfarm_setup.skillset if skillsetup is not None else []
+                )
+                for skill in c_skills:
+                    if is_training is True and skill.eve_type.name in c_skillsetup:
                         # Get skill data for each skill
                         skill_data = get_filtered_skills_data(skill)
                         if skill_data is not None:

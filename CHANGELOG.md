@@ -19,6 +19,10 @@ Section Order:
 
 - `DownTimeError` Will no longer send out warning logs
 
+### Removed
+
+- unnecessary properties (get_skills, get_skillqueue, get_skillsetup)
+
 ## [3.0.0] - 2026-05-08
 
 > [!IMPORTANT]
