@@ -29,6 +29,7 @@ from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.characterupdatestatus import UpdateStatusManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
+from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManager,
@@ -175,6 +176,19 @@ class SkillFarmAudit(models.Model):
             skillname=", ".join(skill_names),
         )
         return str(msg)
+
+    # Task Area
+    def update_skills(self, force_refresh: bool = False) -> UpdateSectionResult:
+        """Update skills for this character."""
+        return self.skillfarm_skills.update_or_create_esi(
+            self, force_refresh=force_refresh
+        )
+
+    def update_skillqueue(self, force_refresh: bool = False) -> UpdateSectionResult:
+        """Update skillqueue for this character."""
+        return self.skillfarm_skillqueue.update_or_create_esi(
+            self, force_refresh=force_refresh
+        )
 
 
 class SkillFarmSetup(models.Model):
