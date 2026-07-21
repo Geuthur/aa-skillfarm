@@ -46,10 +46,7 @@ class TestCharacterSkillManager(SkillFarmTestCase):
                 "unallocated_sp": 250000,
             },
         )
-        self.skillfarm_audit.skillfarm_skills.update_or_create_esi(
-            character=self.skillfarm_audit, force_refresh=False
-        )
-
+        self.skillfarm_audit.update_skills()
         self.assertSetEqual(
             set(
                 self.skillfarm_audit.skillfarm_skills.all().values_list(
