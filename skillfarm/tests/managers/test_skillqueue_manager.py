@@ -49,9 +49,7 @@ class TestSkillQueueManager(SkillFarmTestCase):
             ],
         )
         # when
-        self.skillfarm_audit.skillfarm_skillqueue.update_or_create_esi(
-            character=self.skillfarm_audit, force_refresh=False
-        )
+        self.skillfarm_audit.update_skillqueue()
         self.assertSetEqual(
             set(
                 self.skillfarm_audit.skillfarm_skillqueue.values_list(
