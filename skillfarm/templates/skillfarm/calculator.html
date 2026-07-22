@@ -112,11 +112,14 @@
 {% endblock %}
 
 {% block extra_css %}
-    {% include 'bundles/datatables-css-bs5.html' %}
+    {% include 'bundles/datatables-2-css-bs5.html' %}
+    {% include 'bundles/datatables-2-columncontrol-css-bs5.html' %}
     {% include 'skillfarm/bundles/aa-skillfarm-css.html' %}
 {% endblock %}
 
 {% block extra_javascript %}
+    {% include 'bundles/datatables-2-js-bs5.html' %}
+    {% include 'bundles/datatables-2-columncontrol-js-bs5.html' %}
     {% include 'skillfarm/bundles/x-editable.html' %}
     {% include 'skillfarm/bundles/aa-skillfarm-js.html' %}
     {% include 'skillfarm/bundles/view-calculator-js.html' %}

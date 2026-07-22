@@ -11,6 +11,11 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- `Pook` package that provides a more efficient approach to handling ESI calls at the http level.
+- Tox `USE_MYSQL` Env for Test purposes
+
 ### Fixed
 
 - AttributeError in Permission Model since AAv5.2
@@ -18,10 +23,15 @@ Section Order:
 ### Changed
 
 - `DownTimeError` Will no longer send out warning logs
+- Modernized Test Enviroment
+- pin `allianceauth` to `>=5.2`
+- Update Authentication Foreign from AA v5.2
+- update ESI compatibility date to latest "2026-07-21"
 
 ### Removed
 
 - Unnecessary properties
+- DataTable v2 (use AAv5 DT2)
 
 ## [3.0.0] - 2026-05-08
 
