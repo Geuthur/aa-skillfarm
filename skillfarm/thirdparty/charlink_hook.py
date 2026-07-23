@@ -5,7 +5,7 @@ from charlink.app_imports.utils import AppImport, LoginImport
 from django.db.models import Exists, OuterRef
 
 # Alliance Auth
-from allianceauth.authentication.models import Permission, User
+from allianceauth.authentication.models import Permission
 from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
@@ -35,16 +35,18 @@ def _users_with_perms_charaudit():
     permission = Permission.objects.get(
         content_type__app_label=__app_name__, codename="basic_access"
     )
+    # Use Alliance Auth's User model to get users with the permission, including those in groups and superusers (Fix Issue with Proxy Model)
+    user_model = permission.user_set.model
 
     users_qs = (
         permission.user_set.all()
-        | User.objects.filter(
+        | user_model.objects.filter(
             groups__in=list(permission.group_set.values_list("pk", flat=True))
         )
-        | User.objects.select_related("profile").filter(
+        | user_model.objects.select_related("profile").filter(
             profile__state__in=list(permission.state_set.values_list("pk", flat=True))
         )
-        | User.objects.filter(is_superuser=True)
+        | user_model.objects.filter(is_superuser=True)
     )
     return users_qs.distinct()
 
