@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: AA Skillfarm \n"
+"Project-Id-Version: AA Skillfarm 3.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Geuthur/aa-skillfarm/issues\n"
-"POT-Creation-Date: 2026-05-09 10:02+0200\n"
+"POT-Creation-Date: 2026-08-02 21:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,70 +21,70 @@ msgstr ""
 msgid "last update run"
 msgstr ""
 
-#: skillfarm/api/skillfarm.py:310
+#: skillfarm/api/skillfarm.py:312
 msgid "No Active Training"
 msgstr ""
 
-#: skillfarm/api/skillfarm.py:436 skillfarm/templates/skillfarm/base.html:63
+#: skillfarm/api/skillfarm.py:448 skillfarm/templates/skillfarm/base.html:63
 #: skillfarm/templates/skillfarm/partials/table/active-character.html:10
 #: skillfarm/templates/skillfarm/partials/table/inactive-character.html:10
 msgid "Skill Info"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:35
+#: skillfarm/models/helpers/update_manager.py:33
 msgid "Disabled"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:36
+#: skillfarm/models/helpers/update_manager.py:34
 msgid "Token Error"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:37
+#: skillfarm/models/helpers/update_manager.py:35
 msgid "Error"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:38
+#: skillfarm/models/helpers/update_manager.py:36
 msgid "OK"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:39
+#: skillfarm/models/helpers/update_manager.py:37
 msgid "Incomplete"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:40
+#: skillfarm/models/helpers/update_manager.py:38
 msgid "In Progress"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:74
+#: skillfarm/models/helpers/update_manager.py:72
 msgid "Update is disabled"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:75
+#: skillfarm/models/helpers/update_manager.py:73
 msgid "One section has a token error during update"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:76
+#: skillfarm/models/helpers/update_manager.py:74
 msgid "One or more sections have not been updated"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:77
+#: skillfarm/models/helpers/update_manager.py:75
 msgid "Update is in progress"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:78
+#: skillfarm/models/helpers/update_manager.py:76
 msgid "An error occurred during update"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:79
+#: skillfarm/models/helpers/update_manager.py:77
 msgid "Updates completed successfully"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:85
+#: skillfarm/models/helpers/update_manager.py:83
 #: skillfarm/templates/skillfarm/partials/table/skills.html:4
 msgid "Skills"
 msgstr ""
 
-#: skillfarm/models/helpers/update_manager.py:86
+#: skillfarm/models/helpers/update_manager.py:84
 #: skillfarm/templates/skillfarm/partials/modals/view-skillqueue.html:10
 #: skillfarm/templates/skillfarm/partials/table/skillqueue.html:4
 msgid "Skillqueue"

@@ -11,6 +11,8 @@ Section Order:
 ### Removed
 -->
 
+## [3.1.0] - 2026-08-03
+
 ### Added
 
 - `Pook` package that provides a more efficient approach to handling ESI calls at the http level.
@@ -630,5 +632,6 @@ This will load all necessary prices
 [1.0.5]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.4...v1.0.5 "1.0.5"
 [2.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...v2.0.0 "2.0.0"
 [3.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.0...v2.0.1 "3.0.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...HEAD "In Development"
+[3.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...v3.1.0 "3.1.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
