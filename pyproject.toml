@@ -12,11 +12,11 @@ license = { file = "LICENSE" }
 authors = [
     { name = "Geuthur", email = "devgeuthur@gmail.com" },
 ]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 classifiers = [
     "Environment :: Web Environment",
     "Framework :: Django",
-    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
 ]
@@ -34,7 +35,6 @@ dynamic = [
 ]
 dependencies = [
     "allianceauth>=5.2",
-    "django-esi>=9",
     "django-eveonline-sde",
     "django-ninja>=1.5,<2",
 ]
@@ -47,6 +47,8 @@ optional-dependencies.tests-allianceauth-latest = [
     "pook",
 ]
 urls.Changelog = "https://github.com/Geuthur/aa-skillfarm/blob/master/CHANGELOG.md"
+urls.Discord = "https://discord.gg/WrHzA4rnxA"
+urls.Donations = "https://ko-fi.com/Geuthur"
 urls.Homepage = "https://github.com/Geuthur/aa-skillfarm"
 urls.Source = "https://github.com/Geuthur/aa-skillfarm"
 urls.Tracker = "https://github.com/Geuthur/aa-skillfarm/issues"

@@ -2,9 +2,9 @@
 import pook
 
 # AA Skillfarm
-from skillfarm.models.prices import EveType
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
+from skillfarm.tests.testdata.factory import ItemTypeFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.skillqueue"
 
@@ -16,8 +16,8 @@ class TestSkillQueueManager(SkillFarmTestCase):
 
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
-        cls.eve_type = EveType.objects.get(id=1)
-        cls.eve_type_2 = EveType.objects.get(id=2)
+        cls.eve_type = ItemTypeFactory(id=1)
+        cls.eve_type_2 = ItemTypeFactory(id=2)
 
     @pook.on
     def test_update_skillqueue(self):

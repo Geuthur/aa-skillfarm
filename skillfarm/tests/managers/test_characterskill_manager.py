@@ -7,7 +7,8 @@ import pook
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
+from skillfarm.tests.testdata.factory import ItemTypeFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.characterskill"
 
@@ -22,8 +23,9 @@ class TestCharacterSkillManager(SkillFarmTestCase):
 
     @pook.on
     def test_update_skills(self):
-        # given
-
+        # Test Data
+        ItemTypeFactory(name="skill1", id=1)
+        ItemTypeFactory(name="skill2", id=2)
         pook.get(
             f"https://esi.evetech.net/characters/{self.skillfarm_audit.character.character_id}/skills",
             reply=HTTPStatus.OK,
@@ -46,7 +48,10 @@ class TestCharacterSkillManager(SkillFarmTestCase):
                 "unallocated_sp": 250000,
             },
         )
+        # Test Action
         self.skillfarm_audit.update_skills()
+
+        # Expected Result
         self.assertSetEqual(
             set(
                 self.skillfarm_audit.skillfarm_skills.all().values_list(

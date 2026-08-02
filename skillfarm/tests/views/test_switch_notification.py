@@ -9,7 +9,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 from skillfarm.views import switch_notification
 
 MODULE_PATH = "skillfarm.views"

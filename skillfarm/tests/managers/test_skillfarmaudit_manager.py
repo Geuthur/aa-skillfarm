@@ -9,8 +9,10 @@ from skillfarm.models.helpers.update_manager import CharacterUpdateSection, Upda
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.factory import (
-    CharacterUpdateStatusFactory,
     EveCharacterFactory,
+)
+from skillfarm.tests.testdata.skillfarm import (
+    CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
     UserMainFactory,
 )

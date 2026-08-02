@@ -15,7 +15,7 @@ from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
 )
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
+from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
 )
@@ -117,7 +117,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         # Test Action
         self.no_token_audit = SkillFarmAuditFactory(
-            user__main_character__scopes=[]
+            user__scopes__=[]
         )  # Create a SkillFarmAudit with no valid token
         # Expected Result
         with self.assertRaises(TokenError):

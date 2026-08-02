@@ -13,7 +13,7 @@ from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
+from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterUpdateStatusFactory,
     EveTypePriceFactory,

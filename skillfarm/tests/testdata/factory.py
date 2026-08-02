@@ -1,3 +1,9 @@
+"""
+Factory for Alliance Auth and Django EVE SDE.
+
+This module provides factory classes for generating test data for Alliance Auth and Django EVE SDE.
+"""
+
 # Standard Library
 from typing import Generic, TypeVar
 
@@ -8,7 +14,6 @@ import factory.fuzzy
 # Django
 from django.contrib.auth import get_user_model
 from django.db.models import Max
-from django.utils import timezone
 
 # Alliance Auth
 from allianceauth.eveonline.models import (
@@ -19,20 +24,15 @@ from allianceauth.eveonline.models import (
 from allianceauth.tests.auth_utils import AuthUtils
 
 # Alliance Auth (External Libs)
-from eve_sde.models import ItemType
-
-# AA Skillfarm
-# AA SkillFarm
-from skillfarm.models import (
-    CharacterSkill,
-    CharacterSkillqueueEntry,
-    CharacterUpdateStatus,
-    EveTypePrice,
-    SkillFarmAudit,
-    SkillFarmSetup,
+from eve_sde.models import (
+    Constellation,
+    ItemCategory,
+    ItemGroup,
+    ItemType,
+    Planet,
+    Region,
+    SolarSystem,
 )
-from skillfarm.models.helpers.update_manager import CharacterUpdateSection
-from skillfarm.tests.testdata.utils import add_character_to_user
 
 T = TypeVar("T")
 User = get_user_model()
@@ -68,6 +68,14 @@ class UserFactory(factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[U
         for permission_name in permissions:
             AuthUtils.add_permission_to_user_by_name(permission_name, obj)
 
+    @factory.post_generation
+    def scopes(obj, create, extracted, **kwargs):
+        """Set default scopes. Overwrite with `scopes=["scope1"]`."""
+        if not create:
+            return
+        scopes = extracted or []
+        obj._main_character_scopes = scopes
+
     @classmethod
     def _after_postgeneration(cls, obj, create, results=None):
         """Reset permission cache to force an update."""
@@ -76,27 +84,6 @@ class UserFactory(factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[U
             del obj._perm_cache
         if hasattr(obj, "_user_perm_cache"):
             del obj._user_perm_cache
-
-
-class UserMainFactory(UserFactory):
-    """Generate a User object with a main character and default permissions for SkillFarm."""
-
-    permissions__ = ["skillfarm.basic_access"]
-
-    @factory.post_generation
-    def main_character(obj, create, _, **kwargs):
-        if not create:
-            return
-        if "character" in kwargs:
-            character = kwargs["character"]
-        else:
-            character_name = f"{obj.first_name} {obj.last_name}"
-            character = EveCharacterFactory(character_name=character_name)
-
-        scopes = kwargs.get("scopes", SkillFarmAudit.get_esi_scopes())
-        add_character_to_user(
-            user=obj, character=character, is_main=True, scopes=scopes
-        )
 
 
 class EveAllianceInfoFactory(
@@ -215,161 +202,168 @@ class EveCharacterFactory(
         )
 
 
-class SkillFarmAuditFactory(
-    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[SkillFarmAudit]
+class ItemCategoryFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[ItemCategory]
 ):
-    """
-    Generate a SkillFarmAudit object.
-
-    Args:
-        user (User, optional): The user associated with the SkillFarmAudit. If not provided, it will be created.
-        character (EveCharacter, optional): The character associated with the SkillFarmAudit. If not provided, it will be created.
-        name (str, optional): The name of the SkillFarmAudit. If not provided, it will be derived from the character's name.
-        active (bool, optional): Whether the SkillFarmAudit is active. Defaults to True.
-        notification (bool, optional): Whether notifications are enabled for the SkillFarmAudit. Defaults to False.
-        notification_sent (datetime, optional): The datetime when the last notification was sent. Defaults to None.
-        is_read (bool, optional): Whether the SkillFarmAudit has been read. Defaults to False.
-    """
+    """Generate an ItemCategory object for testing."""
 
     class Meta:
-        model = SkillFarmAudit
-        exclude = ("user",)
-
-    user = factory.SubFactory(UserMainFactory)
-    character = factory.SubFactory(
-        EveCharacterFactory,
-        character_id=factory.SelfAttribute(
-            "..user.profile.main_character.character_id"
-        ),
-        character_name=factory.SelfAttribute(
-            "..user.profile.main_character.character_name"
-        ),
-    )
-
-    name = factory.LazyAttribute(lambda o: o.character.character_name)
-    active = True
-    notification = False
-    notification_sent = False
-    last_notification = None
-    is_read = False
-
-
-class SkillFarmSetupFactory(
-    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[SkillFarmSetup]
-):
-    """Generate a SkillFarmSetup object."""
-
-    class Meta:
-        model = SkillFarmSetup
-        django_get_or_create = ("character",)
+        model = ItemCategory
+        django_get_or_create = ("id",)
 
     id = factory.Sequence(lambda n: n + 1)
-    name = factory.LazyAttribute(lambda o: o.character.name)
-    character = factory.SubFactory(SkillFarmAuditFactory)
-    skillset = None
-
-
-class CharacterSkillFactory(
-    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[CharacterSkill]
-):
-    """Generate a CharacterSkill object."""
-
-    class Meta:
-        model = CharacterSkill
-        django_get_or_create = ("character", "eve_type")
-
-    character = factory.SubFactory(SkillFarmAuditFactory)
-    eve_type = factory.LazyFunction(
-        lambda: ItemType.objects.filter(group__category__id=16).order_by("?").first()
-    )
-    skillpoints_in_skill = factory.fuzzy.FuzzyInteger(0, 5_000_000)
-    trained_skill_level = factory.fuzzy.FuzzyInteger(1, 5)
-    active_skill_level = factory.fuzzy.FuzzyInteger(1, 5)
-
-
-class CharacterSkillqueueEntryFactory(
-    factory.django.DjangoModelFactory,
-    metaclass=BaseMetaFactory[CharacterSkillqueueEntry],
-):
-    """Generate a CharacterSkillqueueEntry object."""
-
-    class Meta:
-        model = CharacterSkillqueueEntry
-        django_get_or_create = ("character", "eve_type")
-
-    name = factory.LazyAttribute(lambda o: o.eve_type.name_en)
-    character = factory.SubFactory(SkillFarmAuditFactory)
-    queue_position = factory.fuzzy.FuzzyInteger(1, 20)
-    finish_date = None
-    finished_level = factory.fuzzy.FuzzyInteger(1, 5)
-    level_end_sp = factory.fuzzy.FuzzyInteger(0, 5_000_000)
-    level_start_sp = factory.fuzzy.FuzzyInteger(0, 5_000_000)
-    eve_type = factory.LazyFunction(
-        lambda: ItemType.objects.filter(group__category__id=16).order_by("?").first()
-    )
-    start_date = None
-    training_start_sp = factory.fuzzy.FuzzyInteger(0, 5_000_000)
-    has_no_skillqueue = False
-    last_check = None
-
-
-class CharacterUpdateStatusFactory(
-    factory.django.DjangoModelFactory,
-    metaclass=BaseMetaFactory[CharacterUpdateStatus],
-):
-    """Generate a CharacterUpdateStatus object for testing."""
-
-    class Meta:
-        model = CharacterUpdateStatus
-        django_get_or_create = ("character", "section")
-
-    character = factory.SubFactory(SkillFarmAuditFactory)
-    section = factory.fuzzy.FuzzyChoice(CharacterUpdateSection.values)
-    is_success = factory.fuzzy.FuzzyChoice([True, False])
-    error_message = factory.Faker("sentence")
-    has_token_error = factory.fuzzy.FuzzyChoice([True, False])
-    last_run_at = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
-        end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
-    )
-    last_run_finished_at = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
-        end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
-    )
-    last_update_at = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
-        end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
-    )
-    last_update_finished_at = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
-        end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
-    )
-
-
-class EveTypePriceFactory(
-    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[EveTypePrice]
-):
-    """Generate an EveTypePrice object."""
-
-    class Meta:
-        model = EveTypePrice
-        django_get_or_create = ("eve_type_id",)
-
     name = factory.Faker("word")
-    eve_type_id = factory.Sequence(lambda n: n + 1)
-    eve_type = factory.LazyAttribute(
-        lambda obj: (
-            ItemType.objects.get_or_create(
-                id=obj.eve_type_id,
-                defaults={"name": obj.name, "group_id": 3},
-            )[0]
-            if getattr(obj, "eve_type_id", None)
-            else ItemType.objects.filter(group__category__id=16).order_by("?").first()
-        )
-    )
-    buy = factory.fuzzy.FuzzyInteger(1, 1000)
-    sell = factory.fuzzy.FuzzyInteger(1, 1000)
-    updated_at = factory.fuzzy.FuzzyDateTime(
-        start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
-        end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
-    )
+    published = True
+    icon_id = factory.fuzzy.FuzzyInteger(0, 100)
+
+
+class ItemGroupFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[ItemGroup]
+):
+    """Generate an ItemGroup object for testing."""
+
+    class Meta:
+        model = ItemGroup
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+    anchorable = False
+    anchored = False
+    category = factory.SubFactory(ItemCategoryFactory)
+    fittable_non_singleton = False
+    icon_id = factory.fuzzy.FuzzyInteger(0, 100)
+    published = True
+    use_base_price = False
+
+
+class ItemTypeFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[ItemType]
+):
+    """Generate an ItemType object for testing."""
+
+    class Meta:
+        model = ItemType
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+    base_price = factory.fuzzy.FuzzyFloat(1, 10000, 2)
+    capacity = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+    description = factory.Faker("sentence")
+    faction_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    graphic_id = factory.fuzzy.FuzzyInteger(0, 100)
+    group = factory.SubFactory(ItemGroupFactory)
+    icon_id = factory.fuzzy.FuzzyInteger(0, 100)
+    market_group = None  # This can be set to a MarketGroup object if needed
+    mass = factory.fuzzy.FuzzyDecimal(0, 1000, 2)
+    meta_group_id_raw = factory.fuzzy.FuzzyInteger(0, 10)
+    portion_size = factory.fuzzy.FuzzyInteger(0, 1000)
+    published = True
+    race_id = factory.fuzzy.FuzzyInteger(0, 10)
+    radius = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+    sound_id = None  # Not needed for testing, can be set to a Sound object if needed
+    variation_parent_type_id = factory.fuzzy.FuzzyInteger(0, 1000)
+    volume = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+    packaged_volume = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+
+
+class RegionFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[Region]
+):
+    """Generate a Region object for testing."""
+
+    class Meta:
+        model = Region
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+    x = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    y = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    z = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+
+    description = factory.Faker("sentence")
+    faction_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    nebular_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    wormhole_class_id_raw = factory.fuzzy.FuzzyInteger(0, 10)
+
+
+class ConstellationFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[Constellation]
+):
+    """Generate a Constellation object for testing."""
+
+    class Meta:
+        model = Constellation
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+    x = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    y = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    z = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+
+    region = factory.SubFactory(RegionFactory)
+    faction_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    wormhole_class_id_raw = factory.fuzzy.FuzzyInteger(0, 10)
+
+
+class SolarSystemFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[SolarSystem]
+):
+    """Generate a SolarSystem object for testing."""
+
+    class Meta:
+        model = SolarSystem
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+    x = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    y = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    z = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+
+    border = False
+    constellation = factory.SubFactory(ConstellationFactory)
+    corridor = False
+    faction_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    fringe = False
+    hub = False
+    international = False
+    luminosity = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+    radius = factory.fuzzy.FuzzyFloat(0, 1000, 2)
+    regional = False
+    security_class = factory.fuzzy.FuzzyChoice([None, "A", "B", "C", "D", "E"])
+    security_status = factory.fuzzy.FuzzyFloat(0, 1, 2)
+    star_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
+    visual_effect = factory.fuzzy.FuzzyText(length=20)
+    wormhole_class_id_raw = factory.fuzzy.FuzzyInteger(0, 10)
+    security_status = factory.fuzzy.FuzzyFloat(0, 1, 2)
+
+    x_2d = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    y_2d = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+
+
+class PlanetFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[Planet]
+):
+    """Generate a Planet object for testing."""
+
+    class Meta:
+        model = Planet
+        django_get_or_create = ("id",)
+
+    id = factory.Sequence(lambda n: n + 1)
+    name = factory.Faker("word")
+
+    x = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    y = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+    z = factory.fuzzy.FuzzyFloat(-1000, 1000, 2)
+
+    celestial_index = factory.fuzzy.FuzzyInteger(1, 100)
+    item_type = factory.SubFactory(ItemTypeFactory)
+    orbit_id_raw = factory.fuzzy.FuzzyInteger(1, 100)
+    orbit_index = factory.fuzzy.FuzzyInteger(1, 100)
+    radius = factory.fuzzy.FuzzyFloat(1, 1000, 2)
+    solar_system = factory.SubFactory(SolarSystemFactory)
