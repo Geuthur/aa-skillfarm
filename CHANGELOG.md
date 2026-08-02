@@ -15,6 +15,7 @@ Section Order:
 
 - `Pook` package that provides a more efficient approach to handling ESI calls at the http level.
 - Tox `USE_MYSQL` Env for Test purposes
+- Support Python 3.14
 
 ### Fixed
 
@@ -27,11 +28,13 @@ Section Order:
 - pin `allianceauth` to `>=5.2`
 - Update Authentication Foreign from AA v5.2
 - update ESI compatibility date to latest "2026-07-21"
+- Updated Pre-Commit Dependencies & GitHub Workflow
 
 ### Removed
 
 - Unnecessary properties
 - DataTable v2 (use AAv5 DT2)
+- `django-esi` dependency is already required for AAv5.
 
 ## [3.0.0] - 2026-05-08
 
