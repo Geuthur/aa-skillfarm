@@ -116,5 +116,8 @@ DEFAULT_FROM_EMAIL = ""
 # Add any custom settings below here. #
 #######################################
 
+# Keep tests deterministic: never trigger ESI downtime handling by wall-clock time.
+DISABLE_DAILY_DOWNTIME_CHECK = True
+
 # Discord
 DISCORD_GUILD_ID = "1234567890123456789"
