@@ -3,9 +3,9 @@ from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
 from skillfarm.api.helpers import core
-from skillfarm.models import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import EveCharacterFactory, SkillFarmAuditFactory
+from skillfarm.tests.testdata.factory import EveCharacterFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 from skillfarm.tests.testdata.utils import add_character_to_user
 
 MODULE_PATH = "skillfarm.api.helpers."

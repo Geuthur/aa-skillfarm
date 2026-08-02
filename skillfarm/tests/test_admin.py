@@ -6,7 +6,7 @@ from django.test import RequestFactory
 from skillfarm.admin import SkillFarmAuditAdmin
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.admin."
 

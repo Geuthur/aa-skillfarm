@@ -5,8 +5,8 @@ import socket
 from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
-from skillfarm.tests.testdata.factory import EveCorporationInfoFactory, UserMainFactory
-from skillfarm.tests.testdata.integrations.allianceauth import load_allianceauth
+from skillfarm.tests.testdata.factory import EveCorporationInfoFactory
+from skillfarm.tests.testdata.skillfarm import UserMainFactory
 
 
 class SocketAccessError(Exception):
@@ -45,23 +45,16 @@ class SkillFarmTestCase(NoSocketsTestCase):
     """
     Preloaded Testcase class for SkillFarm tests without Network access.
 
-    Pre-Load:
-        * Alliance Auth Characters, Corporation, Alliance Data
-        * Eve Universe Data
-
     Available Request Factory:
         `self.factory`
 
     Available test users:
         * `user` User with standard Skillfarm access.
             * 'skillfarm.basic_access' Permission
-            * Character ID 1001
         * `no_permission_user` User without any Skillfarm permissions.
             * No Permissions
-            * Character ID 1002
         * `superuser` Superuser.
             * Access to whole Application
-            * Character ID 1003
 
     Example:
         .. code-block:: python
@@ -77,8 +70,6 @@ class SkillFarmTestCase(NoSocketsTestCase):
         cls.corp = EveCorporationInfoFactory(
             corporation_id=98_000_000, corporation_name="Test Corporation"
         )
-        # Initialize Alliance Auth test data
-        load_allianceauth()
 
         # Request Factory
         cls.factory = RequestFactory()

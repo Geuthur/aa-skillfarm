@@ -7,7 +7,7 @@ from django.urls import reverse
 # AA Skillfarm
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
+from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
     SkillFarmSetupFactory,

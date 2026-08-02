@@ -9,7 +9,7 @@ from django.utils import timezone
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import EveTypePriceFactory
+from skillfarm.tests.testdata.skillfarm import EveTypePriceFactory
 from skillfarm.views import skillfarm_calc
 
 MODULE_PATH = "skillfarm.views"

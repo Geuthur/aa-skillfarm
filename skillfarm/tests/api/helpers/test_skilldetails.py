@@ -1,5 +1,4 @@
 # Django
-from django.test import TestCase
 from django.utils import timezone
 
 # AA Skillfarm
@@ -9,10 +8,10 @@ from skillfarm.api.helpers.skilldetails import (
     calculate_single_progress_bar,
 )
 from skillfarm.api.skillfarm import SkillFarmQueueSchema, get_skillqueue_data
-from skillfarm.models.prices import EveType
 from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import SkillFarmAuditFactory
+from skillfarm.tests.testdata.factory import ItemTypeFactory
+from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.api.helpers."
 
@@ -23,8 +22,8 @@ class Test_Calculate_Single_Progress_Bar(SkillFarmTestCase):
         super().setUpClass()
 
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
-        cls.skill1 = EveType.objects.get(name="skill1")
-        cls.skill2 = EveType.objects.get(name="skill2")
+        cls.skill1 = ItemTypeFactory(name="skill1")
+        cls.skill2 = ItemTypeFactory(name="skill2")
 
     def test_calc_single_progress_bar_no_end_sp(self):
         """
@@ -97,8 +96,8 @@ class Test_Calculate_Sum_Progress_bar(SkillFarmTestCase):
         super().setUpClass()
 
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
-        cls.skill1 = EveType.objects.get(name="skill1")
-        cls.skill2 = EveType.objects.get(name="skill2")
+        cls.skill1 = ItemTypeFactory(name="skill1")
+        cls.skill2 = ItemTypeFactory(name="skill2")
 
     def test_calc_sum_progress_bar_no_skills(self):
         """

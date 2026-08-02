@@ -17,7 +17,7 @@ from skillfarm.models.helpers.update_manager import (
 )
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
+from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
 )

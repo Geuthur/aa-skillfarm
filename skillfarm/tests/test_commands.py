@@ -13,6 +13,7 @@ from eve_sde.models.types import ItemType as EveType
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests.testdata.factory import ItemTypeFactory
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
@@ -22,6 +23,12 @@ class TestLoadPrices(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        ItemTypeFactory(id=1, name="Skill 1")
+        ItemTypeFactory(id=2, name="Skill 2")
+        ItemTypeFactory(id=44992, name="PLEX")
+        ItemTypeFactory(id=40520, name="Large Skill Injector")
+        ItemTypeFactory(id=40519, name="SKill Extractor")
+
         cls.json = {
             1: {"buy": {"percentile": 100}, "sell": {"percentile": 200}},
             2: {"buy": {"percentile": 300}, "sell": {"percentile": 400}},

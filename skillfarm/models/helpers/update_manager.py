@@ -20,11 +20,9 @@ from skillfarm.models.general import (
 )
 
 if TYPE_CHECKING:
-    # AA SkillFarm
     # AA Skillfarm
     from skillfarm.models import CharacterUpdateStatus, SkillFarmAudit
 
-# AA SkillFarm
 # AA Skillfarm
 from skillfarm.providers import AppLogger
 
