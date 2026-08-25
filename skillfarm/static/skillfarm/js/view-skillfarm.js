@@ -220,20 +220,32 @@ $(document).ready(() => {
             { data: 'skill' },
             {
                 data: {
-                    display: (data) => data.progress.display,
-                    sort: (data) => data.progress.sort,
-                    filter: (data) => data.progress.sort
+                    display: (data) => data.progress?.display ?? '',
+                    sort: (data) => data.progress?.sort ?? 0,
+                    filter: (data) => data.progress?.sort ?? 0
                 }
             },
-            { data: 'start_date'},
-            { data: 'finish_date' },
+            {
+                data: {
+                    display: (data) => data.start_date ?? data.startDate ?? '-',
+                    sort: (data) => data.start_date ?? data.startDate ?? '',
+                    filter: (data) => data.start_date ?? data.startDate ?? '',
+                }
+            },
+            {
+                data: {
+                    display: (data) => data.finish_date ?? data.finishDate ?? '-',
+                    sort: (data) => data.finish_date ?? data.finishDate ?? '',
+                    filter: (data) => data.finish_date ?? data.finishDate ?? '',
+                }
+            },
         ],
         columnDefs: [
             { targets: [1], type: 'num' }
         ],
         pageLength: 25,
         rowCallback: function (row, data, index) {
-            if (data.progress.sort == 100) {
+            if ((data.progress?.sort ?? 0) == 100) {
                 $(row).addClass('table-stripe-green');
             }
         },
@@ -252,20 +264,32 @@ $(document).ready(() => {
             { data: 'skill' },
             {
                 data: {
-                    display: (data) => data.progress.display,
-                    sort: (data) => data.progress.sort,
-                    filter: (data) => data.progress.sort
+                    display: (data) => data.progress?.display ?? '',
+                    sort: (data) => data.progress?.sort ?? 0,
+                    filter: (data) => data.progress?.sort ?? 0
                 }
             },
-            { data: 'start_date'},
-            { data: 'finish_date' },
+            {
+                data: {
+                    display: (data) => data.start_date ?? data.startDate ?? '-',
+                    sort: (data) => data.start_date ?? data.startDate ?? '',
+                    filter: (data) => data.start_date ?? data.startDate ?? '',
+                }
+            },
+            {
+                data: {
+                    display: (data) => data.finish_date ?? data.finishDate ?? '-',
+                    sort: (data) => data.finish_date ?? data.finishDate ?? '',
+                    filter: (data) => data.finish_date ?? data.finishDate ?? '',
+                }
+            },
         ],
         columnDefs: [
             { targets: [1], type: 'num' }
         ],
         pageLength: 25,
         rowCallback: function (row, data, index) {
-            if (data.progress.sort == 100) {
+            if ((data.progress?.sort ?? 0) == 100) {
                 $(row).addClass('table-stripe-green');
             }
         },
@@ -283,11 +307,24 @@ $(document).ready(() => {
         order: [[1, 'desc']],
         columns: [
             { data: 'skill' },
-            { data: 'level' },
-            { data: 'skillpoints'},
+            {
+                data: {
+                    display: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
+                    sort: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
+                    filter: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
+                }
+            },
+            {
+                data: {
+                    display: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
+                    sort: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
+                    filter: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
+                }
+            },
         ],
         rowCallback: function (row, data, index) {
-            if (data.level >= 5) {
+            const skillLevel = data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0;
+            if (skillLevel >= 5) {
                 $(row).addClass('table-stripe-red');
             }
         },
