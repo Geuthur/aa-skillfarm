@@ -336,7 +336,6 @@ class SolarSystemFactory(
     regional = False
     security_class = factory.fuzzy.FuzzyChoice([None, "A", "B", "C", "D", "E"])
     security_status = factory.fuzzy.FuzzyFloat(0, 1, 2)
-    star_id_raw = factory.fuzzy.FuzzyInteger(0, 100)
     visual_effect = factory.fuzzy.FuzzyText(length=20)
     wormhole_class_id_raw = factory.fuzzy.FuzzyInteger(0, 10)
     security_status = factory.fuzzy.FuzzyFloat(0, 1, 2)

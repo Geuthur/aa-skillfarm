@@ -7,12 +7,19 @@
     <table class="table table-striped w-100" id="skillfarm-skills">
         <thead>
             <tr>
-                <th scope="col">{% translate "Skill" %}</th>
-                <th scope="col">{% translate "Level" %}</th>
-                <th scope="col">{% translate "Skillpoints" %}</th>
+                <th class="w-auto">{% translate "Skill" %}</th>
+                <th class="w-auto">{% translate "Level" %}</th>
+                <th class="w-auto">{% translate "Skillpoints" %}</th>
             </tr>
         </thead>
         <tbody>
+            <tr>
+                <td colspan="3" class="text-center" id="loading-message-container">
+                    <div class="spinner-border text-primary">
+                        <span class="visually-hidden">{% translate "Loading..." %}</span>
+                    </div>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>
