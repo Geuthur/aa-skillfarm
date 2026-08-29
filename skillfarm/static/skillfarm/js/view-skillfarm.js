@@ -1,4 +1,4 @@
-/* global aaSkillfarmSettings, aaSkillfarmSettingsOverride, _bootstrapTooltip, fetchGet, fetchPost, DataTable, SlimSelect */
+/* global aaSkillfarmSettings, aaSkillfarmSettingsOverride, _bootstrapTooltip, fetchGet, fetchPost, DataTable, SlimSelect, numberFormatter */
 $(document).ready(() => {
 
     /**
@@ -220,32 +220,20 @@ $(document).ready(() => {
             { data: 'skill' },
             {
                 data: {
-                    display: (data) => data.progress?.display ?? '',
-                    sort: (data) => data.progress?.sort ?? 0,
-                    filter: (data) => data.progress?.sort ?? 0
+                    display: (data) => data.progress?.display,
+                    sort: (data) => data.progress?.sort,
+                    filter: (data) => data.progress?.sort
                 }
             },
-            {
-                data: {
-                    display: (data) => data.start_date ?? data.startDate ?? '-',
-                    sort: (data) => data.start_date ?? data.startDate ?? '',
-                    filter: (data) => data.start_date ?? data.startDate ?? '',
-                }
-            },
-            {
-                data: {
-                    display: (data) => data.finish_date ?? data.finishDate ?? '-',
-                    sort: (data) => data.finish_date ?? data.finishDate ?? '',
-                    filter: (data) => data.finish_date ?? data.finishDate ?? '',
-                }
-            },
+            { data: 'start_date'},
+            { data: 'finish_date' },
         ],
         columnDefs: [
             { targets: [1], type: 'num' }
         ],
         pageLength: 25,
         rowCallback: function (row, data, index) {
-            if ((data.progress?.sort ?? 0) == 100) {
+            if (data.progress.sort == 100) {
                 $(row).addClass('table-stripe-green');
             }
         },
@@ -264,32 +252,20 @@ $(document).ready(() => {
             { data: 'skill' },
             {
                 data: {
-                    display: (data) => data.progress?.display ?? '',
-                    sort: (data) => data.progress?.sort ?? 0,
-                    filter: (data) => data.progress?.sort ?? 0
+                    display: (data) => data.progress?.display,
+                    sort: (data) => data.progress?.sort,
+                    filter: (data) => data.progress?.sort
                 }
             },
-            {
-                data: {
-                    display: (data) => data.start_date ?? data.startDate ?? '-',
-                    sort: (data) => data.start_date ?? data.startDate ?? '',
-                    filter: (data) => data.start_date ?? data.startDate ?? '',
-                }
-            },
-            {
-                data: {
-                    display: (data) => data.finish_date ?? data.finishDate ?? '-',
-                    sort: (data) => data.finish_date ?? data.finishDate ?? '',
-                    filter: (data) => data.finish_date ?? data.finishDate ?? '',
-                }
-            },
+            { data: 'start_date'},
+            { data: 'finish_date' },
         ],
         columnDefs: [
             { targets: [1], type: 'num' }
         ],
         pageLength: 25,
         rowCallback: function (row, data, index) {
-            if ((data.progress?.sort ?? 0) == 100) {
+            if (data.progress.sort == 100) {
                 $(row).addClass('table-stripe-green');
             }
         },
@@ -309,22 +285,24 @@ $(document).ready(() => {
             { data: 'skill' },
             {
                 data: {
-                    display: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
-                    sort: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
-                    filter: (data) => data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0,
+                    display: (data) => data.level,
+                    sort: (data) => data.level,
+                    filter: (data) => data.level,
                 }
             },
             {
                 data: {
-                    display: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
-                    sort: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
-                    filter: (data) => data.skillpoints ?? data.skillpoints_in_skill ?? 0,
+                    display: (data) => numberFormatter({
+                        value: data.skillpoints,
+                        locales: aaSkillfarmSettings.locale,
+                    }),
+                    sort: (data) => data.skillpoints,
+                    filter: (data) => data.skillpoints,
                 }
             },
         ],
         rowCallback: function (row, data, index) {
-            const skillLevel = data.level ?? data.active_skill_level ?? data.trained_skill_level ?? 0;
-            if (skillLevel >= 5) {
+            if (data.level >= 5) {
                 $(row).addClass('table-stripe-red');
             }
         },
