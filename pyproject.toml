@@ -48,6 +48,7 @@ optional-dependencies.tests-allianceauth-latest = [
 ]
 urls.Changelog = "https://github.com/Geuthur/aa-skillfarm/blob/master/CHANGELOG.md"
 urls.Discord = "https://discord.gg/WrHzA4rnxA"
+urls.Documentation = "https://github.com/Geuthur/aa-skillfarm/blob/master/README.md"
 urls.Donations = "https://ko-fi.com/Geuthur"
 urls.Homepage = "https://github.com/Geuthur/aa-skillfarm"
 urls.Source = "https://github.com/Geuthur/aa-skillfarm"
