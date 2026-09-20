@@ -23,6 +23,8 @@ class General(models.Model):
     class Meta:
         managed = False
         default_permissions = ()
+        verbose_name = "AA-Skillfarm"
+        verbose_name_plural = "AA-Skillfarm"
         permissions = (
             ("basic_access", "Can access this app, Skillfarm."),
             ("corp_access", "Has access to all characters in the corporation."),
