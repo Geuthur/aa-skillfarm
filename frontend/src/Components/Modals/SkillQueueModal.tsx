@@ -3,6 +3,7 @@ import React from "react";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, Sparkles } from "lucide-react";
 
 // Styles
@@ -13,7 +14,78 @@ import { queryKeys } from "@/Api/query";
 import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
 import type { ModalData } from "@/Components/Modals/BaseModal";
 import { QueueEntryProgress } from "@/Components/QueueEntryProgress";
+import { BaseTable } from "@/Components/Tables/BaseTable";
 import { TrainingProgressBar } from "@/Components/TrainingProgressBar";
+import type { SkillQueueEntrySchema } from "@/Api/schema";
+
+const queueColumns: ColumnDef<SkillQueueEntrySchema>[] = [
+  {
+    id: "position",
+    header: "#",
+    accessorFn: (entry) => entry.queue_position + 1,
+  },
+  {
+    accessorKey: "skill_name",
+    header: "Skill",
+    cell: ({ row }) => <span className={styles["skill-name"]}>{row.original.skill_name}</span>,
+  },
+  {
+    accessorKey: "finished_level_roman",
+    header: "Level",
+  },
+  {
+    id: "progress",
+    header: "Progress",
+    accessorFn: (entry) => entry.progress_percent,
+    cell: ({ row }) => {
+      const entry = row.original;
+      return entry.is_active ? (
+        <div className={styles["progress-cell"]}>
+          <QueueEntryProgress
+            startDate={entry.start_date}
+            finishDate={entry.finish_date}
+            fallbackPercent={entry.progress_percent}
+          />
+        </div>
+      ) : (
+        <span className={styles["muted-text"]}>-</span>
+      );
+    },
+  },
+  {
+    accessorKey: "finish_date",
+    header: "Finish Date",
+    cell: ({ row }) => (
+      <span className={styles["date-cell"]}>{row.original.finish_date || "-"}</span>
+    ),
+  },
+  {
+    id: "status",
+    header: "Status",
+    enableSorting: false,
+    accessorFn: (entry) => (entry.is_active ? "Training" : entry.is_extractable ? "Ready" : "Queued"),
+    cell: ({ row }) => {
+      const entry = row.original;
+      if (entry.is_active) {
+        return (
+          <span className="sf-badge-training">
+            <Clock size={12} />
+            <span>Training</span>
+          </span>
+        );
+      }
+      if (entry.is_extractable) {
+        return (
+          <span className="sf-badge-extraction-pending">
+            <Sparkles size={12} />
+            <span>Ready</span>
+          </span>
+        );
+      }
+      return <span className={styles["muted-text"]}>Queued</span>;
+    },
+  },
+];
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -60,7 +132,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
         {data && (
           <div>
             {/* Header info */}
-            <div className="d-flex align-items-center gap-3 mb-3">
+            <div className="aa-panel d-flex align-items-center gap-3 mb-3">
               {data.character.portrait_url && (
                 <img
                   src={data.character.portrait_url}
@@ -129,62 +201,14 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                 No skills in queue. Training is inactive.
               </div>
             ) : (
-              <div className="sf-table-container">
-                <table className="sf-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Skill</th>
-                      <th>Level</th>
-                      <th>Progress</th>
-                      <th>Finish Date</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.skillqueue.map((entry) => (
-                      <tr key={`${entry.skill_id}-${entry.queue_position}`}>
-                        <td>{entry.queue_position + 1}</td>
-                        <td className={styles["skill-name"]}>{entry.skill_name}</td>
-                        <td>{entry.finished_level_roman}</td>
-                        <td className={styles["progress-cell"]}>
-                          {entry.is_active ? (
-                            <QueueEntryProgress
-                              startDate={entry.start_date}
-                              finishDate={entry.finish_date}
-                              fallbackPercent={entry.progress_percent}
-                            />
-                          ) : (
-                            <span className={styles["muted-text"]}>
-                              -
-                            </span>
-                          )}
-                        </td>
-                        <td className={styles["date-cell"]}>
-                          {entry.finish_date || "-"}
-                        </td>
-                        <td>
-                          {entry.is_active ? (
-                            <span className="sf-badge-training">
-                              <Clock size={12} />
-                              <span>Training</span>
-                            </span>
-                          ) : entry.is_extractable ? (
-                            <span className="sf-badge-extraction-pending">
-                              <Sparkles size={12} />
-                              <span>Ready</span>
-                            </span>
-                          ) : (
-                            <span className={styles["muted-text"]}>
-                              Queued
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <BaseTable
+                data={data.skillqueue}
+                columns={queueColumns}
+                variant="skillfarm"
+                itemLabel="skills"
+                exportFileName="SkillQueue"
+                initialState={{ pagination: { pageSize: 10 } }}
+              />
             )}
 
             {/* Farmed Skills in Setup */}
