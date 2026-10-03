@@ -24,7 +24,6 @@ describe("AuthLeftMenu", () => {
     const testData = [
       { name: "Characters", link: "/" },
       { name: "Calculator", link: "/calculator/" },
-      { name: "Administration", link: "/admin/" },
     ];
 
     // Test Action
@@ -42,10 +41,6 @@ describe("AuthLeftMenu", () => {
     const calcLink = screen.getByText("Calculator");
     expect(calcLink).toBeDefined();
     expect(calcLink.getAttribute("href")).toBe("/skillfarm/calculator/");
-
-    const adminLink = screen.getByText("Administration");
-    expect(adminLink).toBeDefined();
-    expect(adminLink.getAttribute("href")).toBe("/skillfarm/admin/");
   });
 
   it("should render external links with standard href", () => {

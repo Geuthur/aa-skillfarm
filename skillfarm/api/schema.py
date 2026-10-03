@@ -29,6 +29,18 @@ class UserData(Schema):
     has_corp_access: bool = False
 
 
+class UserSettingsSchema(Schema):
+    """Notification settings of the current user."""
+
+    disable_notifications: bool
+
+
+class UserSettingsUpdateRequest(Schema):
+    """User-editable notification preferences."""
+
+    disable_notifications: bool
+
+
 class MenuLink(Schema):
     """A single link item in the menu bar."""
 

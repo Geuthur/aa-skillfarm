@@ -82,24 +82,6 @@ class SkillqueueQuerySet(models.QuerySet):
             finish_date__gt=now_,
         )
 
-    def skill_filtered(
-        self, character: "SkillFarmAudit"
-    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
-        """Return filtered skills from a training queue."""
-        try:
-            skillsetup = character.skillfarm_setup
-            if not skillsetup or not skillsetup.skillset:
-                skillset = []
-            else:
-                skillset = skillsetup.skillset
-        except ObjectDoesNotExist:
-            skillset = []
-
-        skillqueue = self.filter(
-            eve_type__name__in=skillset,
-        )
-        return skillqueue
-
 
 class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
     def get_queryset(self):
@@ -114,12 +96,6 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
 
     def skill_in_training(self):
         return self.get_queryset().skill_in_training()
-
-    def skill_filtered(
-        self, character: "SkillFarmAudit"
-    ) -> models.QuerySet["CharacterSkillqueueEntry"]:
-        """Return filtered skills from a training queue."""
-        return self.get_queryset().skill_filtered(character)
 
     @log_timing(logger)
     def update_or_create_esi(

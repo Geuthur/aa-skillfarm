@@ -15,6 +15,7 @@ from allianceauth.services.hooks import get_extension_logger
 # AA Skillfarm
 from skillfarm import __title__
 from skillfarm.constants import DISCORD_EMBED_COLOR_MAP
+from skillfarm.models.general import UserSettings
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -112,6 +113,10 @@ def send_user_notification(
         logger.warning(
             "User with ID %s does not exist. Notification not sent.", user_id
         )
+        return
+
+    if UserSettings.objects.filter(user=user, disable_notifications=True).exists():
+        logger.info("Notifications are disabled for user %s; skipping delivery.", user)
         return
 
     getattr(notify, level)(user=user, title=title, message=message)

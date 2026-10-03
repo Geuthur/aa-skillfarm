@@ -148,8 +148,6 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         ]:
             audit.refresh_from_db()
             audit.notification = False
-            audit.notification_sent = False
-            audit.last_notification = None
             audit.extraction_acknowledged = False
             audit.save()
 
@@ -162,41 +160,35 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
             audit.save()
 
     def test_no_notification_should_return_false(self, mock_audit_filter):
-        """
-        Test should not send notification if notification is disabled.
-        """
-        # given
+        # Test Data
         audits = [self.skillfarm_audit, self.skillfarm_audit_2]
         self._set_notification_status(audits, False)
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
 
     def test_notifiaction_with_no_skillsetup_should_return_false(
         self, mock_audit_filter
     ):
-        """
-        Test should not send notification if no SkillFarmSetup is found.
-        """
+        # Test Data
         audits = [self.skillfarm_audit, self.skillfarm_audit_2, self.skillfarm_audit_3]
         self._set_notification_status(audits, True)
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
 
     def test_notification_should_return_true(self, mock_audit_filter):
-        """
-        Test should send notification if notification is enabled and SkillFarmSetup exists.
-        """
-        # given
+        # Test Data
         skill = CharacterSkillFactory(
             character=self.skillfarm_audit,
             trained_skill_level=5,
@@ -213,12 +205,13 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         self.skillfarm_audit.refresh_from_db()
 
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertTrue(audit.notification_sent)
-            self.assertIsNotNone(audit.last_notification)
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_called_once()
 
     def test_notification_should_not_notify_when_acknowledged(self, mock_audit_filter):
         """
@@ -243,12 +236,11 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         mock_audit_filter.return_value = audits
 
         # Test Action
-        tasks.check_skillfarm_notifications()
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
 
         # Expected Result
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
+        send_notification.delay.assert_not_called()
 
     @patch(TASK_PATH + ".logger", spec=True)
     def test_notifiaction_no_main_should_return_false(
@@ -269,16 +261,16 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         audits = [SkillFarmAudit.objects.get(pk=audit.pk) for audit in audits]
 
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
-            mock_logger.warning.assert_called_once_with(
-                "Main Character not found for %s, skipping notification",
-                self.skillfarm_audit.character.character_name,
-            )
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
+        mock_logger.warning.assert_called_once_with(
+            "Main Character not found for %s, skipping notification",
+            self.skillfarm_audit.character.character_name,
+        )
 
 
 @patch(TASK_PATH + ".requests.get", spec=True)

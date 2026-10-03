@@ -15,6 +15,7 @@ from django.utils.translation import gettext as _
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import can_view_overview
 from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.models.general import UserSettings
 
 
 class ApiEndpoints:
@@ -41,8 +42,17 @@ class ApiEndpoints:
                 ),
             ]
 
+            left_menu.append(
+                schema.MenuLink(
+                    name=_("Settings"),
+                    link="/settings/",
+                )
+            )
+
+            right_menu: list[schema.MenuLink] = []
+
             if can_view_overview(request.user):
-                left_menu.append(
+                right_menu.append(
                     schema.MenuLink(
                         name=_("Overview"),
                         link="/overview/",
@@ -52,20 +62,20 @@ class ApiEndpoints:
             if request.user.is_superuser or request.user.has_perm(
                 "skillfarm.admin_access"
             ):
-                left_menu.append(
+                right_menu.append(
                     schema.MenuLink(
                         name=_("Administration"),
                         link="/admin/",
                     )
                 )
 
-            right_menu: list[schema.MenuLink] = [
+            right_menu.append(
                 schema.MenuLink(
                     name=_("Add Character"),
                     link=reverse("skillfarm:add_char"),
                     is_external=True,
                 )
-            ]
+            )
 
             return schema.MenuSchema(
                 left_links=left_menu,
@@ -113,4 +123,44 @@ class ApiEndpoints:
                 portrait=portrait,
                 is_admin=is_admin,
                 has_corp_access=request.user.has_perm("skillfarm.corp_access"),
+            )
+
+        @api.get(
+            "settings/",
+            response={
+                HTTPStatus.OK: schema.UserSettingsSchema,
+                HTTPStatus.FORBIDDEN: dict,
+            },
+            tags=self.tags,
+            summary="Get current user's Skillfarm settings",
+        )
+        def get_user_settings(request: WSGIRequest):
+            if not request.user.has_perm("skillfarm.basic_access"):
+                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
+
+            user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
+            return schema.UserSettingsSchema(
+                disable_notifications=user_settings.disable_notifications
+            )
+
+        @api.put(
+            "settings/",
+            response={
+                HTTPStatus.OK: schema.UserSettingsSchema,
+                HTTPStatus.FORBIDDEN: dict,
+            },
+            tags=self.tags,
+            summary="Update current user's Skillfarm settings",
+        )
+        def update_user_settings(
+            request: WSGIRequest, payload: schema.UserSettingsUpdateRequest
+        ):
+            if not request.user.has_perm("skillfarm.basic_access"):
+                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
+
+            user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
+            user_settings.disable_notifications = payload.disable_notifications
+            user_settings.save(update_fields=["disable_notifications"])
+            return schema.UserSettingsSchema(
+                disable_notifications=user_settings.disable_notifications
             )

@@ -11,6 +11,8 @@ import type {
   OverviewUserCharactersResponse,
   SkillSetupSchema,
   UserData,
+  UserSettingsSchema,
+  UserSettingsUpdateRequest,
 } from "@/Api/schema";
 
 const API_BASE = "/skillfarm/api";
@@ -29,6 +31,26 @@ export async function loadMenu(): Promise<MenuSchema> {
     throw new Error("Failed to load menu");
   }
   return data as MenuSchema;
+}
+
+export async function fetchUserSettings(): Promise<UserSettingsSchema> {
+  const { data, error } = await apiClient.GET("/skillfarm/api/settings/", {});
+  if (error || !data) {
+    throw new Error("Failed to load user settings");
+  }
+  return data;
+}
+
+export async function updateUserSettings(
+  settings: UserSettingsUpdateRequest,
+): Promise<UserSettingsSchema> {
+  const { data, error } = await apiClient.PUT("/skillfarm/api/settings/", {
+    body: settings,
+  });
+  if (error || !data) {
+    throw new Error("Failed to update user settings");
+  }
+  return data;
 }
 
 function buildFilterQuery(filters: CharacterFilterParams): Record<string, string | number> {

@@ -38,6 +38,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/skillfarm/api/settings/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user's Skillfarm settings */
+        get: operations["skillfarm_api_general_get_user_settings"];
+        /** Update current user's Skillfarm settings */
+        put: operations["skillfarm_api_general_update_user_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/skillfarm/api/characters/": {
         parameters: {
             query?: never;
@@ -327,6 +345,22 @@ export interface components {
              * @default false
              */
             has_corp_access: boolean;
+        };
+        /**
+         * UserSettingsSchema
+         * @description Notification settings of the current user.
+         */
+        UserSettingsSchema: {
+            /** Disable Notifications */
+            disable_notifications: boolean;
+        };
+        /**
+         * UserSettingsUpdateRequest
+         * @description User-editable notification preferences.
+         */
+        UserSettingsUpdateRequest: {
+            /** Disable Notifications */
+            disable_notifications: boolean;
         };
         /**
          * CharacterFilter
@@ -762,6 +796,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserData"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_general_get_user_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSettingsSchema"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_general_update_user_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserSettingsUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSettingsSchema"];
                 };
             };
             /** @description Forbidden */

@@ -202,8 +202,6 @@ def _update_character_section(
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.filter(active=True)
-    notified_characters = []
-
     # Create a dictionary to map main characters to their alts
     main_to_alts = {}
     for character in characters:
@@ -248,12 +246,6 @@ def check_skillfarm_notifications(runs: int = 0):
                         # Create and Add Notification Message
                         msg = alt._generate_notification(skill_names)
                         msg_items.append(msg)
-                        notified_characters.append(alt)
-            else:
-                # Reset Settings for Alts that have no notification enabled
-                alt.notification_sent = False
-                alt.last_notification = None
-                alt.save()
 
         if msg_items:
             # Add each message to Main Character
@@ -276,13 +268,6 @@ def check_skillfarm_notifications(runs: int = 0):
                 level="warning",
             )
             runs = runs + 1
-
-    if notified_characters:
-        # Set notification_sent to True for all characters that were notified
-        for character in notified_characters:
-            character.notification_sent = True
-            character.last_notification = timezone.now()
-            character.save()
 
     logger.info("Queued %s Skillfarm Notifications", runs)
 

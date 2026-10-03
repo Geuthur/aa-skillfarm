@@ -21,10 +21,6 @@ SKILLFARM_BULK_METHODS_BATCH_SIZE = getattr(
     settings, "SKILLFARM_BULK_METHODS_BATCH_SIZE", 500
 )
 
-# Set Notification Cooldown in Days
-SKILLFARM_NOTIFICATION_COOLDOWN = getattr(
-    settings, "SKILLFARM_NOTIFICATION_COOLDOWN", 3
-)
 # Global timeout for tasks in seconds to reduce task accumulation during outages.
 SKILLFARM_TASKS_TIME_LIMIT = getattr(settings, "SKILLFARM_TASKS_TIME_LIMIT", 7200)
 

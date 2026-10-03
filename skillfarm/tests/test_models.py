@@ -47,19 +47,6 @@ class TestSkillfarmModel(SkillFarmTestCase):
             ["esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"],
         )
 
-    def test_is_cooldown_should_return_false(self):
-        """
-        Test should return False for is_cooldown Property.
-        """
-        self.assertFalse(self.skillfarm_audit.is_cooldown)
-
-    def test_is_cooldown_should_return_true(self):
-        """
-        Test should return True for is_cooldown Property.
-        """
-        self.skillfarm_audit.last_notification = timezone.now()
-        self.assertTrue(self.skillfarm_audit.is_cooldown)
-
     def test_last_update_should_return_incomplete(self):
         """
         Test should return incomplete for last_update Property.

@@ -41,6 +41,7 @@ Section Order:
 - React tooling and Makefile automation (`make react-build`, `make react-test`, `make react-copy-assets`).
 - Overview menu entry (requires `corp_access` or `admin_access`) with a list of all visible users and a detail page per user showing their characters.
 - `owned_by` access queryset method returning only the characters of the requesting user.
+- User Settings page with a per-user global opt-out for Skillfarm notifications.
 
 ### Fixed
 
@@ -65,6 +66,8 @@ Section Order:
 
 - Legacy template/DataTables API (`SkillFarmApiEndpoints`), legacy schemas and helpers, legacy static assets, and the template based `notification_icon`/`extraction_icon` model properties.
 - `visible_eve_characters` manager method and the `character/:characterId` frontend route.
+- Unused `is_filtered` / `skill_filtered` and cooldown APIs, the obsolete read marker, and write-only notification state fields.
+- Unreferenced legacy forms and unused skillqueue metadata fields (`has_no_skillqueue`, `last_check`).
 
 ## [3.1.0] - 2026-08-03
 

@@ -85,7 +85,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
       }}
     >
       <div>
-        <p className="text-secondary small mb-3">
+        <p className="aa-panel text-secondary small mb-3">
           Select which skills trigger extraction readiness alerts when reaching Level 5.
         </p>
 
@@ -97,7 +97,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
 
         {data && (
           <div>
-            <div className={styles["search-wrapper"]}>
+            <div className={`${styles["search-wrapper"]}`}>
               <Search
                 size={16}
                 className={styles["search-icon"]}

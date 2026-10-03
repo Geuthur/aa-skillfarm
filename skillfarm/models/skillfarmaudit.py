@@ -1,7 +1,6 @@
 """Models for Skillfarm."""
 
 # Standard Library
-import datetime
 from typing import TYPE_CHECKING
 
 # Django
@@ -62,11 +61,6 @@ class SkillFarmAudit(models.Model):
     )
 
     notification = models.BooleanField(default=False)
-    notification_sent = models.BooleanField(default=False)
-    last_notification = models.DateTimeField(null=True, default=None, blank=True)
-
-    is_read = models.BooleanField(default=False, help_text="Mark Character as read")
-
     # Cached / denormalized training status
     is_training = models.BooleanField(
         default=False,
@@ -276,31 +270,6 @@ class SkillFarmAudit(models.Model):
             return None
 
     @property
-    def is_filtered(self) -> bool:
-        """Check if the character has Skill Queue filter active."""
-        return (
-            self.skillfarm_skillqueue.skill_filtered(self).exists()
-            or SkillFarmSetup.objects.filter(
-                character=self,
-                skillset__isnull=False,
-            ).exists()
-        )
-
-    @property
-    def is_cooldown(self) -> bool:
-        """Check if a character has a notification cooldown."""
-        if (
-            self.last_notification is not None
-            and self.last_notification
-            < timezone.now()
-            - datetime.timedelta(days=app_settings.SKILLFARM_NOTIFICATION_COOLDOWN)
-        ):
-            return False
-        if self.last_notification is None:
-            return False
-        return True
-
-    @property
     def update_manager(self):
         """Return the Update Manager helper for this owner."""
         return UpdateManager(
@@ -407,10 +376,6 @@ class CharacterSkillqueueEntry(models.Model):
     eve_type = models.ForeignKey(EveType, on_delete=models.CASCADE, related_name="+")
     start_date = models.DateTimeField(default=None, null=True)
     training_start_sp = models.PositiveIntegerField(default=None, null=True)
-
-    # TODO: Add to Notification System
-    has_no_skillqueue = models.BooleanField(default=False)
-    last_check = models.DateTimeField(default=None, null=True)
 
     def __str__(self) -> str:
         return f"{self.character}-{self.queue_position}"

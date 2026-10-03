@@ -51,25 +51,6 @@ class SkillManagerQuerySet(models.QuerySet["CharacterSkill"]):
 
         return extraction
 
-    # pylint: disable=duplicate-code
-    def skill_filtered(
-        self, character: "SkillFarmAudit"
-    ) -> models.QuerySet["CharacterSkill"]:
-        """Return filtered skills from a training queue."""
-        try:
-            skillsetup = character.skillfarm_setup
-            if not skillsetup or not skillsetup.skillset:
-                skillset = []
-            else:
-                skillset = skillsetup.skillset
-        except ObjectDoesNotExist:
-            skillset = []
-
-        skills = self.filter(
-            eve_type__name__in=skillset,
-        )
-        return skills
-
 
 class SkillManager(models.Manager["CharacterSkill"]):
     def get_queryset(self):
@@ -81,12 +62,6 @@ class SkillManager(models.Manager["CharacterSkill"]):
     ) -> models.QuerySet["CharacterSkill"]:
         """Return extraction ready skills from a training queue."""
         return self.get_queryset().extractions(character)
-
-    def skill_filtered(
-        self, character: "SkillFarmAudit"
-    ) -> models.QuerySet["CharacterSkill"]:
-        """Return filtered skills from a training queue."""
-        return self.get_queryset().skill_filtered(character)
 
     @log_timing(logger)
     def update_or_create_esi(
