@@ -1,9 +1,6 @@
 # Django
 from django.utils import timezone
 
-# Alliance Auth
-from allianceauth.eveonline.models import EveCharacter
-
 # AA Skillfarm
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
@@ -186,42 +183,210 @@ class TestSkillfarmAuditVisibleTo(SkillFarmTestCase):
         self.assertEqual(list(qs), [character, character2])
 
 
-class TestSkillfarmAuditVisibleEveCharacter(SkillFarmTestCase):
+class TestSkillfarmAuditOwnedBy(SkillFarmTestCase):
+    def test_should_return_only_own_audits(self):
+        # Test Data
+        own_audit = SkillFarmAuditFactory(user=self.user)
+        SkillFarmAuditFactory(user=UserMainFactory())
+
+        # Test Action
+        qs = SkillFarmAudit.objects.owned_by(self.user)
+
+        # Expected Result
+        self.assertEqual(list(qs), [own_audit])
+
+    def test_should_return_alt_audits_of_user(self):
+        # Test Data
+        main_audit = SkillFarmAuditFactory(user=self.user)
+        alt = EveCharacterFactory()
+        add_alt_character_to_user(user=self.user, character_id=alt.character_id)
+        alt_audit = SkillFarmAuditFactory(user=self.user, character=alt)
+
+        # Test Action
+        qs = SkillFarmAudit.objects.owned_by(self.user)
+
+        # Expected Result
+        self.assertCountEqual(list(qs), [main_audit, alt_audit])
+
+    def test_should_not_return_all_audits_for_admin(self):
+        # Test Data
+        admin_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        )
+        SkillFarmAuditFactory(user=self.user)
+        admin_audit = SkillFarmAuditFactory(user=admin_user)
+
+        # Test Action
+        qs = SkillFarmAudit.objects.owned_by(admin_user)
+
+        # Expected Result
+        self.assertEqual(list(qs), [admin_audit])
+
+
+class TestSkillfarmAuditCorpAccess(SkillFarmTestCase):
+    def test_visible_to_with_corp_access_should_return_audits_of_same_corporation(
+        self,
+    ):
+        # Test Data
+        corp_char = EveCharacterFactory(corporation=self.corp)
+        corp_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.corp_access"],
+            main_character__character=corp_char,
+        )
+        colleague_char = EveCharacterFactory(corporation=self.corp)
+        colleague = UserMainFactory(main_character__character=colleague_char)
+        colleague_audit = SkillFarmAuditFactory(user=colleague)
+        SkillFarmAuditFactory(user=UserMainFactory())
+
+        # Test Action
+        qs = SkillFarmAudit.objects.visible_to(corp_user)
+
+        # Expected Result
+        self.assertEqual(list(qs), [colleague_audit])
+
+
+class TestSkillfarmFilterMethods(SkillFarmTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-    def test_should_return_audit(self):
-        # given
-        SkillFarmAuditFactory(user=self.user)
-        eve_character = EveCharacter.objects.get(
-            character_id=self.user.profile.main_character.character_id
-        )
-        # when
-        qs = SkillFarmAudit.objects.visible_eve_characters(self.user)
-        # then
-        self.assertEqual(list(qs), [eve_character])
+    def test_filter_by_schema_training_status_active_should_return_active(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.api.schema import CharacterFilter
 
-    def test_should_return_multiple_audits_for_user_with_multiple_characters(self):
-        # given
-        SkillFarmAuditFactory(user=self.user)
-        character = EveCharacterFactory()
-        add_alt_character_to_user(user=self.user, character_id=character.character_id)
-        eve_character = EveCharacter.objects.get(
-            character_id=self.user.profile.main_character.character_id
+        char_active = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            is_training=True,
         )
-        # when
-        qs = SkillFarmAudit.objects.visible_eve_characters(self.user)
-        # then
-        self.assertCountEqual(list(qs), [eve_character, character])
+        char_paused = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            is_training=False,
+        )
+        filters = CharacterFilter(training_status="training")
 
-    def test_should_return_all_characters(self):
-        # given
-        other_user = UserMainFactory(
-            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(
+            id__in=[char_active.id, char_paused.id]
+        ).filter_by_schema(filters)
+
+        # Expected Result
+        self.assertIn(char_active, qs)
+        self.assertNotIn(char_paused, qs)
+
+    def test_filter_by_schema_training_status_paused_should_return_paused(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.api.schema import CharacterFilter
+
+        char_active = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            is_training=True,
         )
-        eve_characters = EveCharacter.objects.all()
-        # when
-        qs = SkillFarmAudit.objects.visible_eve_characters(other_user)
-        # then
-        self.assertEqual(list(qs), list(eve_characters))
+        char_paused = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            is_training=False,
+        )
+        filters = CharacterFilter(training_status="paused")
+
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(
+            id__in=[char_active.id, char_paused.id]
+        ).filter_by_schema(filters)
+
+        # Expected Result
+        self.assertIn(char_paused, qs)
+        self.assertNotIn(char_active, qs)
+
+    def test_filter_by_schema_extraction_status_pending_should_filter_correctly(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.api.schema import CharacterFilter
+
+        char_pending = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            extractions_ready_count=2,
+            extraction_acknowledged=False,
+        )
+        char_ack = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            extractions_ready_count=2,
+            extraction_acknowledged=True,
+        )
+        char_none = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            extractions_ready_count=0,
+            extraction_acknowledged=False,
+        )
+        filters = CharacterFilter(extraction_status="pending")
+
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(
+            id__in=[char_pending.id, char_ack.id, char_none.id]
+        ).filter_by_schema(filters)
+
+        # Expected Result
+        self.assertIn(char_pending, qs)
+        self.assertNotIn(char_ack, qs)
+        self.assertNotIn(char_none, qs)
+
+    def test_filter_by_schema_extraction_status_acknowledged_should_filter_correctly(
+        self,
+    ):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.api.schema import CharacterFilter
+
+        char_pending = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            extractions_ready_count=2,
+            extraction_acknowledged=False,
+        )
+        char_ack = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(),
+            extractions_ready_count=2,
+            extraction_acknowledged=True,
+        )
+        filters = CharacterFilter(extraction_status="acknowledged")
+
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(
+            id__in=[char_pending.id, char_ack.id]
+        ).filter_by_schema(filters)
+
+        # Expected Result
+        self.assertIn(char_ack, qs)
+        self.assertNotIn(char_pending, qs)
+
+    def test_filter_by_schema_search_should_match_character_name(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.api.schema import CharacterFilter
+
+        char1 = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(character_name="Alpha Pilot Special"),
+        )
+        char2 = SkillFarmAuditFactory(
+            user=self.user,
+            character=EveCharacterFactory(character_name="Bravo Miner"),
+        )
+        filters = CharacterFilter(search="Special")
+
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(
+            id__in=[char1.id, char2.id]
+        ).filter_by_schema(filters)
+
+        # Expected Result
+        self.assertIn(char1, qs)
+        self.assertNotIn(char2, qs)

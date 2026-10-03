@@ -10,43 +10,14 @@ from skillfarm.api import api
 app_name: str = "skillfarm"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    # -- Views
-    path("view/skillfarm/", views.index, name="index"),
-    path(
-        "<int:character_id>/view/skillfarm/",
-        views.index,
-        name="index",
-    ),
-    path("admin/", views.admin, name="admin"),
-    path(
-        "view/overview/",
-        views.character_overview,
-        name="character_overview",
-    ),
-    # -- Administration
-    path("char/add/", views.add_char, name="add_char"),
-    path(
-        "switch_notification/<int:character_id>/",
-        views.switch_notification,
-        name="switch_notification",
-    ),
-    path(
-        "delete_character/<int:character_id>/",
-        views.delete_character,
-        name="delete_character",
-    ),
-    path(
-        "edit_skillsetup/<int:character_id>/",
-        views.edit_skillsetup,
-        name="edit_skillsetup",
-    ),
-    path(
-        "mark_as_read/<int:character_id>/",
-        views.mark_as_read,
-        name="mark_as_read",
-    ),
-    # -- Tools
-    path("view/calculator/", views.skillfarm_calc, name="calculator"),
     # -- API System
     re_path(r"^api/", api.urls),
+    # -- ESI Character Addition
+    path("char/add/", views.add_char, name="add_char"),
+    # -- React SPA Routes
+    re_path(
+        r"^(?!api/|char/add).*$",
+        views.react_base,
+        name="react_base",
+    ),
 ]

@@ -56,7 +56,7 @@ class TestAddCharView(SkillFarmTestCase):
         response = self._add_character(self.user, token)
         # then
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        self.assertEqual(response.url, reverse("skillfarm:index"))
+        self.assertEqual(response.url, reverse("skillfarm:react_base"))
         self.assertTrue(mock_tasks.update_character.apply_async.called)
         self.assertTrue(mock_messages.success.called)
         self.assertTrue(

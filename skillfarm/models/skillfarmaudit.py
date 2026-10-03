@@ -8,14 +8,13 @@ from typing import TYPE_CHECKING
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.html import format_html
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
+from allianceauth.authentication.models import User
 from allianceauth.eveonline.models import EveCharacter, Token
 from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
@@ -68,6 +67,170 @@ class SkillFarmAudit(models.Model):
 
     is_read = models.BooleanField(default=False, help_text="Mark Character as read")
 
+    # Cached / denormalized training status
+    is_training = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Whether the character currently has an active training queue.",
+    )
+    training_finish_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        default=None,
+        db_index=True,
+        help_text="Finish date of the currently training skill.",
+    )
+    queue_finish_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        default=None,
+        db_index=True,
+        help_text="Finish date of the entire skill queue.",
+    )
+    current_training_skill = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+        help_text="Name and level of current skill in training.",
+    )
+    total_sp = models.PositiveBigIntegerField(
+        default=0,
+        help_text="Total accumulated skill points.",
+    )
+
+    # Extraction Readiness & Acknowledgment
+    extractions_ready_count = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        help_text="Number of farm skills ready for extraction.",
+    )
+    extraction_acknowledged = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Whether ready extractions have been acknowledged by the user.",
+    )
+    extraction_acknowledged_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        default=None,
+        help_text="Timestamp when extractions were acknowledged.",
+    )
+    extraction_acknowledged_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="User who acknowledged the ready extractions.",
+    )
+
+    # Queue Paused Acknowledgment
+    queue_paused_acknowledged = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Whether paused training has been acknowledged by the user.",
+    )
+
+    def update_training_and_extraction_state(self) -> None:
+        """
+        Recalculate and persist the character's training status, current skill in training,
+        total SP, and ready extractions count.
+        """
+        now = timezone.now()
+
+        # 1. Total SP
+        skills_qs = self.skillfarm_skills.all()
+        total_sp = (
+            skills_qs.aggregate(total=models.Sum("skillpoints_in_skill"))["total"] or 0
+        )
+
+        # 2. Training Queue Status
+        queue_qs = self.skillfarm_skillqueue.filter(finish_date__isnull=False)
+        active_skill = (
+            queue_qs.filter(start_date__lte=now, finish_date__gt=now)
+            .select_related("eve_type")
+            .first()
+        )
+
+        if active_skill:
+            is_training = True
+            training_finish_date = active_skill.finish_date
+            level_roman = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V"}.get(
+                active_skill.finished_level, str(active_skill.finished_level)
+            )
+            current_training_skill = f"{active_skill.eve_type.name} {level_roman}"
+            self.queue_paused_acknowledged = False
+        else:
+            is_training = False
+            training_finish_date = None
+            current_training_skill = None
+
+        last_queue_item = queue_qs.order_by("-finish_date").first()
+        queue_finish_date = (
+            last_queue_item.finish_date
+            if last_queue_item and last_queue_item.finish_date > now
+            else None
+        )
+
+        # 3. Extraction readiness
+        extractions_from_skills = self.skillfarm_skills.extractions(self).count()
+        extractions_from_queue = self.skillfarm_skillqueue.extractions(self).count()
+        new_extractions_count = max(extractions_from_skills, extractions_from_queue)
+
+        if new_extractions_count > self.extractions_ready_count or (
+            new_extractions_count > 0 and not self.extractions_ready_count
+        ):
+            self.extraction_acknowledged = False
+            self.extraction_acknowledged_at = None
+            self.extraction_acknowledged_by = None
+        elif new_extractions_count == 0:
+            self.extraction_acknowledged = False
+            self.extraction_acknowledged_at = None
+            self.extraction_acknowledged_by = None
+
+        self.total_sp = total_sp
+        self.is_training = is_training
+        self.training_finish_date = training_finish_date
+        self.queue_finish_date = queue_finish_date
+        self.current_training_skill = current_training_skill
+        self.extractions_ready_count = new_extractions_count
+
+        self.save(
+            update_fields=[
+                "total_sp",
+                "is_training",
+                "training_finish_date",
+                "queue_finish_date",
+                "current_training_skill",
+                "extractions_ready_count",
+                "extraction_acknowledged",
+                "extraction_acknowledged_at",
+                "extraction_acknowledged_by",
+                "queue_paused_acknowledged",
+            ]
+        )
+
+    def acknowledge_extractions(self, user=None) -> None:
+        """Mark extractions as acknowledged/reviewed by the user."""
+        self.extraction_acknowledged = True
+        self.extraction_acknowledged_at = timezone.now()
+        if user and user.is_authenticated:
+            self.extraction_acknowledged_by = user
+        self.save(
+            update_fields=[
+                "extraction_acknowledged",
+                "extraction_acknowledged_at",
+                "extraction_acknowledged_by",
+            ]
+        )
+
+    def acknowledge_queue_paused(self) -> None:
+        """Mark paused training state as acknowledged/reviewed by the user."""
+        self.queue_paused_acknowledged = True
+        self.save(update_fields=["queue_paused_acknowledged"])
+
     def __str__(self):
         return f"{self.character.character_name} - Active: {self.active}"
 
@@ -113,16 +276,6 @@ class SkillFarmAudit(models.Model):
             return None
 
     @property
-    def notification_icon(self) -> str:
-        """Get the notification icon for this character."""
-        return format_html(
-            render_to_string(
-                "skillfarm/partials/icons/notification.html",
-                {"status": self.notification},
-            )
-        )
-
-    @property
     def is_filtered(self) -> bool:
         """Check if the character has Skill Queue filter active."""
         return (
@@ -146,18 +299,6 @@ class SkillFarmAudit(models.Model):
         if self.last_notification is None:
             return False
         return True
-
-    @property
-    def extraction_icon(self) -> str:
-        if self.skillfarm_skills.extractions(self).exists():
-            return format_html(
-                render_to_string("skillfarm/partials/icons/extraction_ready.html")
-            )
-        if self.skillfarm_skillqueue.extractions(self).exists():
-            return format_html(
-                render_to_string("skillfarm/partials/icons/extraction_sb_ready.html")
-            )
-        return ""
 
     @property
     def update_manager(self):

@@ -86,6 +86,16 @@ class SkillFarmAuditFactory(
     notification_sent = False
     last_notification = None
     is_read = False
+    is_training = False
+    training_finish_date = None
+    queue_finish_date = None
+    current_training_skill = None
+    total_sp = 0
+    extractions_ready_count = 0
+    extraction_acknowledged = False
+    extraction_acknowledged_at = None
+    extraction_acknowledged_by = None
+    queue_paused_acknowledged = False
 
 
 class SkillFarmSetupFactory(

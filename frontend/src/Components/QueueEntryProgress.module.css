@@ -1,0 +1,8 @@
+.track {
+    height: 6px;
+}
+
+.meta {
+    font-size: 11px;
+    color: var(--aa-text-secondary);
+}

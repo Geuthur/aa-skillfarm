@@ -28,6 +28,44 @@ Section Order:
 
 <!-- Your changes go here -->
 
+### Added
+
+- Modern React 19 Single Page Application (SPA) frontend built with Vite, TanStack Query, and TanStack Table.
+- Alliance Auth CSS Framework styling using native CSS custom properties (`--aa-*`), panels, and tabs without Tailwind CSS.
+- Prominent alert banner and visual presentation for characters with paused or inactive skill training.
+- "Acknowledged / Read" review state for skill extractions, with single-character and bulk acknowledgment actions.
+- Full filterability by training queue status (all, training, paused) and extraction status (all, pending, acknowledged, none).
+- Animated pulsing effect (`@keyframes sf-pulse-glow`) on icons for pending unacknowledged extractions.
+- Django Ninja API V2 endpoints (`/skillfarm/api/`) covering characters, calculator, administration, and menus.
+- Denormalized state fields on `SkillFarmAudit` for fast, efficient filtering and reduced database overhead.
+- React tooling and Makefile automation (`make react-build`, `make react-test`, `make react-copy-assets`).
+- Overview menu entry (requires `corp_access` or `admin_access`) with a list of all visible users and a detail page per user showing their characters.
+- `owned_by` access queryset method returning only the characters of the requesting user.
+
+### Fixed
+
+- `corp_access` queried a non-existing `corporation` relation and now filters by the corporation of the main character.
+- Calculator endpoint failed with `Decimal * float` type error.
+
+### Changed
+
+- Dashboard and bulk acknowledgment only handle the characters owned by the current user, regardless of permissions.
+
+- Actions on characters of other users (acknowledge, notification, skillset, delete) are checked against `manage_to`.
+
+- Add Character redirects to the dashboard.
+
+- Modernized application architecture by migrating from Django template views to a decoupled React frontend and REST API.
+
+- Suppressed duplicate background extraction notifications once acknowledged by the user.
+
+- Upgraded test suite with `AuthTestCase`, Factory Boy data fixtures, and comprehensive unit test coverage.
+
+### Removed
+
+- Legacy template/DataTables API (`SkillFarmApiEndpoints`), legacy schemas and helpers, legacy static assets, and the template based `notification_icon`/`extraction_icon` model properties.
+- `visible_eve_characters` manager method and the `character/:characterId` frontend route.
+
 ## [3.1.0] - 2026-08-03
 
 ### Added

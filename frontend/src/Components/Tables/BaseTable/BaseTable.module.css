@@ -1,0 +1,29 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.refreshanimate {
+  animation: spin 2s infinite linear;
+}
+
+.cell {
+    vertical-align: middle;
+}
+
+.page-size-select {
+    width: auto;
+}
+
+.cell-right {
+    text-align: right;
+}
+
+.cell-left {
+    text-align: left;
+}

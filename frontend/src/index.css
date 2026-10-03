@@ -1,0 +1,233 @@
+@import "@/skillfarm.css";
+
+/*
+ * AllianceAuth CSS Framework Tokens (from Killstats)
+ */
+
+/* ═══ DESIGN TOKENS for AA ═══════════════════════════════════════════════════════ */
+:root {
+    --font-hud: 'Rajdhani', sans-serif;
+    --font-tech: 'Chakra Petch', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+    --aa-body: var(--aa-color-body);
+    --aa-link-body: rgba(39, 39, 42, 1);
+    --aa-link-body-light: rgb(61, 61, 66, 1);
+
+    --aa-color-body: #18181b;
+    --aa-color-body-dark: #0b0e14;
+    --aa-color-light: #27272a;
+    --aa-color-white: #ffffff;
+    --aa-color-black: #000000;
+    --aa-color-secondary: #808080;
+    --aa-color-tertiary: #a1a1aa;
+    --aa-color-muted: #71717a;
+    --aa-color-emerald: #10b981;
+    --aa-color-emerald-light: #00bc7d;
+    --aa-color-emerald-dark: #047857;
+    --aa-color-amber: #f59e0b;
+    --aa-color-amber-light: #fcd34d;
+    --aa-color-amber-dark: #b45309;
+    --aa-color-rose: #f43f5e;
+    --aa-color-rose-light: #fda4af;
+    --aa-color-rose-dark: #4d0218;
+    --aa-color-green: #0ed14f;
+    --aa-color-red: #cc1130;
+    --aa-color-blue: #3b82f6;
+
+    --aa-text-primary: var(--aa-color-white);
+    --aa-text-secondary: var(--aa-color-secondary);
+    --aa-text-tertiary: var(--aa-color-tertiary);
+    --aa-text-muted: var(--aa-color-muted);
+    --aa-text-emerald: var(--aa-color-emerald);
+    --aa-text-emerald-light: var(--aa-color-emerald-light);
+    --aa-text-emerald-dark: var(--aa-color-emerald-dark);
+    --aa-text-amber: var(--aa-color-amber);
+    --aa-text-amber-light: var(--aa-color-amber-light);
+    --aa-text-amber-dark: var(--aa-color-amber-dark);
+    --aa-text-rose: var(--aa-color-rose);
+    --aa-text-rose-light: var(--aa-color-rose-light);
+    --aa-text-rose-dark: var(--aa-color-rose-dark);
+
+    --aa-font-size: .75rem;
+    --aa-font-size-xs: .625rem;
+    --aa-font-size-sm: .875rem;
+    --aa-font-size-md: 1rem;
+    --aa-font-size-lg: 1.25rem;
+    --aa-font-size-xl: 1.5rem;
+    --aa-font-size-2xl: 2rem;
+
+    --aa-font-weight: 600;
+    --aa-font-weight-bold: 700;
+    --aa-font-weight-medium: 500;
+    --aa-font-weight-light: 400;
+
+    --aa-blue-active: #2563eb;
+    --aa-blue-focus: #3b82f6;
+
+    --aa-border: var(--aa-color-body);
+    --aa-border-light: var(--aa-color-light);
+    --aa-border-rose: var(--aa-color-rose);
+    --aa-border-amber: var(--aa-color-amber);
+    --aa-border-emerald: var(--aa-color-emerald);
+    --aa-border-green: var(--aa-color-green);
+    --aa-border-red: var(--aa-color-red);
+
+    --aa-border-solid: 2px solid var(--aa-border);
+    --aa-border-solid-lg: 3px solid var(--aa-border);
+    --aa-border-solid-xl: 5px solid var(--aa-border);
+    --aa-border-radius: 12px;
+
+    --aa-bg-emerald: color-mix(in srgb, var(--aa-color-emerald) 100%, var(--aa-color-black) 50%);
+    --aa-bg-emerald-light: color-mix(in srgb, var(--aa-color-emerald-light) 50%, var(--aa-color-black) 50%);
+    --aa-bg-emerald-dark: color-mix(in srgb, var(--aa-color-emerald-dark) 100%, var(--aa-color-black) 50%);
+    --aa-bg-amber: color-mix(in srgb, var(--aa-color-amber) 100%, var(--aa-color-black) 50%);
+    --aa-bg-amber-light: color-mix(in srgb, var(--aa-color-amber-light) 50%, var(--aa-color-black) 50%);
+    --aa-bg-amber-dark: color-mix(in srgb, var(--aa-color-amber-dark) 100%, var(--aa-color-black) 50%);
+    --aa-bg-rose: color-mix(in srgb, var(--aa-color-rose) 100%, var(--aa-color-black) 50%);
+    --aa-bg-rose-light: color-mix(in srgb, var(--aa-color-rose-light) 50%, var(--aa-color-black) 50%);
+    --aa-bg-rose-dark: color-mix(in srgb, var(--aa-color-rose-dark) 100%, var(--aa-color-black) 50%);
+    --aa-bg-dark: color-mix(in srgb, var(--aa-color-black) 100%, var(--aa-color-black) 50%);
+    --aa-bg-light: color-mix(in srgb, var(--aa-color-white) 100%, var(--aa-color-black) 50%);
+
+    --aa-shadow: 0 4px 6px rgba(0, 0, 0, var(--aa-shadow-opacity));
+    --aa-shadow-dark: 0 1px 2px rgba(0, 0, 0, var(--aa-shadow-opacity));
+    --aa-shadow-opacity: 0.1;
+}
+
+/* ═══ General AA Classes ═══════════════════════════════════════════════════════ */
+.aa-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    color: var(--aa-text-primary);
+    padding: 16px;
+    max-width: 128rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.aa-badge,
+.aa-badge-xs {
+    display: inline-flex;
+    align-items: center;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    text-transform: uppercase;
+    box-shadow: var(--aa-shadow-dark);
+}
+
+.aa-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: var(--aa-font-size-xs);
+    font-weight: var(--aa-font-weight-bold);
+    letter-spacing: .05em;
+}
+
+.aa-badge-xs {
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: var(--aa-font-size-xs);
+    font-weight: var(--aa-font-weight-light);
+    letter-spacing: .03em;
+}
+
+.aa-cursor-pointer {
+    display: block;
+    cursor: pointer;
+}
+
+/* ═══ Panels ═══════════════════════════════════════════════════════════════ */
+.aa-panel {
+    border-radius: var(--aa-border-radius);
+    border: var(--aa-border-solid);
+    border-color: var(--aa-border-light);
+    background-color: var(--aa-body);
+    padding: 16px;
+    box-shadow: var(--aa-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.aa-panel-lg {
+    border-radius: var(--aa-border-radius);
+    border: var(--aa-border-solid);
+    border-color: var(--aa-border-light);
+    background-color: var(--aa-body);
+    padding: 20px;
+    box-shadow: var(--aa-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+@media (min-width: 640px) {
+    .aa-panel-lg {
+        padding: 24px;
+    }
+}
+
+/* ═══ Tab Bar ═══════════════════════════════════════════════════════════════ */
+.aa-tab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 4px;
+    background-color: var(--aa-bg-dark);
+    border: var(--aa-border-solid);
+    border-radius: 8px;
+    box-shadow: var(--aa-shadow);
+}
+
+.aa-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: var(--aa-font-size);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--aa-text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.aa-tab-btn:not(.active):hover {
+    color: #e4e4e7;
+    background-color: rgba(39, 39, 42, .5);
+}
+
+.aa-tab-btn.active {
+    background-color: var(--aa-blue-active);
+    color: var(--aa-text-primary);
+}
+
+/* ═══ Portraits ═══════════════════════════════════════════════════════════════ */
+.aa-portrait img {
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border: 2px solid var(--aa-border-light);
+}
+
+/* ═══ Scrollbar ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0c0d11;
+}
+::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
+}

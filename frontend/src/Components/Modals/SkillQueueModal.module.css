@@ -1,0 +1,98 @@
+.loading-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--aa-text-secondary);
+}
+
+.error-state {
+    padding: 20px;
+    color: var(--aa-color-rose);
+    text-align: center;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-value {
+    font-size: var(--aa-font-size-md);
+    font-weight: 700;
+    color: var(--aa-text-primary);
+}
+
+.summary-value-sm {
+    font-size: var(--aa-font-size-sm);
+    font-weight: 700;
+}
+
+.status-active {
+    color: var(--aa-color-emerald-light);
+}
+
+.status-paused {
+    color: var(--aa-color-amber-light);
+}
+
+.summary-card {
+    padding: 12px;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-secondary);
+}
+
+.summary-value-amber {
+    font-size: var(--aa-font-size-md);
+    font-weight: 700;
+    color: var(--aa-color-amber-light);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 24px;
+    color: var(--aa-text-muted);
+}
+
+.progress-cell {
+    min-width: 120px;
+}
+
+.training-panel {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.date-cell {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-secondary);
+}
+
+.farmed-section {
+    margin-top: 24px;
+}
+
+.section-title {
+    font-size: var(--aa-font-size-sm);
+    color: var(--aa-text-secondary);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.skill-name {
+    font-weight: 600;
+}
+
+.muted-text {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-muted);
+}

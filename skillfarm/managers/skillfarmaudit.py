@@ -6,11 +6,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
-from allianceauth.eveonline.models import EveCharacter
 from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
 from skillfarm import __title__
+from skillfarm.managers.general import AccessManager, AccessQuerySet
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
@@ -20,36 +20,61 @@ if TYPE_CHECKING:
     from skillfarm.models.skillfarmaudit import SkillFarmAudit as SkillFarmAuditType
 
 
-class SkillfarmQuerySet(models.QuerySet):
-    def visible_to(self, user):
-        # superusers get all visible
-        if user.is_superuser:
-            logger.debug("Returning all characters for superuser %s.", user)
-            return self
+class SkillfarmQuerySet(AccessQuerySet["SkillFarmAuditType"]):
+    def training_active(self):
+        """Return characters with active training."""
+        return self.filter(is_training=True)
 
-        if user.has_perm("skillfarm.admin_access"):
-            logger.debug("Returning all characters for admin %s.", user)
-            return self
+    def training_paused(self):
+        """Return characters with paused or empty training queues."""
+        return self.filter(is_training=False)
 
-        try:
-            char = user.profile.main_character
-            assert char
-            queries = [models.Q(character__character_ownership__user=user)]
+    def extractions_pending(self):
+        """Return characters with ready extractions that have not yet been acknowledged."""
+        return self.filter(extractions_ready_count__gt=0, extraction_acknowledged=False)
 
-            if user.has_perm("skillfarm.corp_access"):
-                queries.append(models.Q(character__corporation_id=char.corporation_id))
+    def extractions_acknowledged(self):
+        """Return characters with ready extractions that have been acknowledged."""
+        return self.filter(extractions_ready_count__gt=0, extraction_acknowledged=True)
 
-            logger.debug(
-                "%s queries for user %s visible chracters.", len(queries), user
+    def filter_by_schema(self, filters) -> "SkillfarmQuerySet":
+        """Filter queryset by CharacterFilter schema."""
+        qs = self
+
+        search = getattr(filters, "search", None)
+        if search:
+            search_term = str(search).strip()
+            qs = qs.filter(
+                models.Q(character__character_name__icontains=search_term)
+                | models.Q(character__corporation_name__icontains=search_term)
+                | models.Q(character__corporation_ticker__icontains=search_term)
             )
 
-            query = queries.pop()
-            for q in queries:
-                query |= q
-            return self.filter(query)
-        except AssertionError:
-            logger.debug("User %s has no main character. Nothing visible.", user)
-            return self.none()
+        corp_id = getattr(filters, "corporation_id", None)
+        if corp_id:
+            qs = qs.filter(character__corporation_id=corp_id)
+
+        training_status = getattr(filters, "training_status", "all")
+        if training_status == "training":
+            qs = qs.filter(is_training=True)
+        elif training_status == "paused":
+            qs = qs.filter(is_training=False)
+
+        extraction_status = getattr(filters, "extraction_status", "all")
+        if extraction_status == "pending":
+            qs = qs.filter(extractions_ready_count__gt=0, extraction_acknowledged=False)
+        elif extraction_status == "acknowledged":
+            qs = qs.filter(extractions_ready_count__gt=0, extraction_acknowledged=True)
+        elif extraction_status == "none":
+            qs = qs.filter(extractions_ready_count=0)
+
+        notification_status = getattr(filters, "notification_status", "all")
+        if notification_status == "enabled":
+            qs = qs.filter(notification=True)
+        elif notification_status == "disabled":
+            qs = qs.filter(notification=False)
+
+        return qs
 
     def disable_characters_with_no_owner(self) -> int:
         """Disable characters which have no owner. Return count of disabled characters."""
@@ -72,45 +97,30 @@ class SkillfarmQuerySet(models.QuerySet):
         return 0
 
 
-class SkillFarmManager(models.Manager["SkillFarmAuditType"]):
+class SkillFarmManager(AccessManager["SkillFarmAuditType"]):
     def get_queryset(self):
         return SkillfarmQuerySet(self.model, using=self._db)
 
-    def visible_to(self, user):
-        """Return characters visible to the given user."""
-        return self.get_queryset().visible_to(user)
+    def training_active(self):
+        """Return characters with active training."""
+        return self.get_queryset().training_active()
+
+    def training_paused(self):
+        """Return characters with paused or empty training queues."""
+        return self.get_queryset().training_paused()
+
+    def extractions_pending(self):
+        """Return characters with ready extractions that have not yet been acknowledged."""
+        return self.get_queryset().extractions_pending()
+
+    def extractions_acknowledged(self):
+        """Return characters with ready extractions that have been acknowledged."""
+        return self.get_queryset().extractions_acknowledged()
+
+    def filter_by_schema(self, filters):
+        """Filter characters by CharacterFilter schema."""
+        return self.get_queryset().filter_by_schema(filters)
 
     def disable_characters_with_no_owner(self) -> int:
         """Disable characters which have no owner. Return count of disabled characters."""
         return self.get_queryset().disable_characters_with_no_owner()
-
-    @staticmethod
-    def visible_eve_characters(user):
-        qs = EveCharacter.objects.get_queryset()
-        if user.is_superuser:
-            logger.debug("Returning all characters for superuser %s.", user)
-            return qs.all()
-
-        if user.has_perm("skillfarm.admin_access"):
-            logger.debug("Returning all characters for admin %s.", user)
-            return qs.all()
-
-        try:
-            char = user.profile.main_character
-            assert char
-            queries = [models.Q(character_ownership__user=user)]
-
-            if user.has_perm("skillfarm.corp_access"):
-                queries.append(models.Q(corporation_id=char.corporation_id))
-
-            logger.debug(
-                "%s queries for user %s visible chracters.", len(queries), user
-            )
-
-            query = queries.pop()
-            for q in queries:
-                query |= q
-            return qs.filter(query)
-        except AssertionError:
-            logger.debug("User %s has no main character. Nothing visible.", user)
-            return qs.none()

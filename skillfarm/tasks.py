@@ -188,9 +188,17 @@ def _update_character_section(
             section, method, **kwargs
         )
     character.update_manager.update_section_log(section, result)
+    try:
+        character.update_training_and_extraction_state()
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning(
+            "Failed to update training/extraction state for %s: %s",
+            character,
+            e,
+        )
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-branches
 @shared_task(**TASK_DEFAULTS_ONCE)
 def check_skillfarm_notifications(runs: int = 0):
     characters = SkillFarmAudit.objects.filter(active=True)
@@ -223,22 +231,24 @@ def check_skillfarm_notifications(runs: int = 0):
             alt: SkillFarmAudit
 
             if alt.notification:
-                skill_names = []
-                skillqueue_extractions = alt.skillfarm_skillqueue.extractions(
-                    alt
-                ).values_list("eve_type__name", flat=True)
-                skill_names.extend(skillqueue_extractions)
+                # Do not notify if user has already reviewed/acknowledged ready extractions
+                if not alt.extraction_acknowledged:
+                    skill_names = []
+                    skillqueue_extractions = alt.skillfarm_skillqueue.extractions(
+                        alt
+                    ).values_list("eve_type__name", flat=True)
+                    skill_names.extend(skillqueue_extractions)
 
-                skills_extractions = alt.skillfarm_skills.extractions(alt).values_list(
-                    "eve_type__name", flat=True
-                )
-                skill_names.extend(skills_extractions)
+                    skills_extractions = alt.skillfarm_skills.extractions(
+                        alt
+                    ).values_list("eve_type__name", flat=True)
+                    skill_names.extend(skills_extractions)
 
-                if len(skill_names) > 0:
-                    # Create and Add Notification Message
-                    msg = alt._generate_notification(skill_names)
-                    msg_items.append(msg)
-                    notified_characters.append(alt)
+                    if len(skill_names) > 0:
+                        # Create and Add Notification Message
+                        msg = alt._generate_notification(skill_names)
+                        msg_items.append(msg)
+                        notified_characters.append(alt)
             else:
                 # Reset Settings for Alts that have no notification enabled
                 alt.notification_sent = False

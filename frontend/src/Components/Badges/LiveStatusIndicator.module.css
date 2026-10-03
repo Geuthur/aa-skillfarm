@@ -1,0 +1,48 @@
+.indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot-wrapper {
+    position: relative;
+    display: inline-flex;
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+}
+
+.dot-ping {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: var(--aa-color-emerald-light, #34d399);
+    opacity: 0.75;
+}
+
+.label {
+    font-family: monospace;
+    font-size: var(--aa-font-size-xs, 0.75rem);
+    color: var(--aa-text-muted, #888);
+}
+
+.dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot-ok {
+    background-color: var(--aa-color-emerald, #10b981);
+}
+
+.dot-busy {
+    background-color: var(--aa-color-amber, #f59e0b);
+}
+
+.dot-error {
+    background-color: var(--aa-color-rose, #ef4444);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}

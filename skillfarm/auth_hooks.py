@@ -17,7 +17,7 @@ class SkillfarmMenuItem(MenuItemHook):
         super().__init__(
             f"{app_settings.SKILLFARM_APP_NAME}",
             "fas fa-book-medical fa-fw",
-            "skillfarm:index",
+            "skillfarm:react_base",
             navactive=["skillfarm:"],
         )
 

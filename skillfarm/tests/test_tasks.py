@@ -139,6 +139,20 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.no_permission_user)
         cls.skillfarm_audit_3 = SkillFarmAuditFactory(user=cls.superuser)
 
+    def setUp(self):
+        super().setUp()
+        for audit in [
+            self.skillfarm_audit,
+            self.skillfarm_audit_2,
+            self.skillfarm_audit_3,
+        ]:
+            audit.refresh_from_db()
+            audit.notification = False
+            audit.notification_sent = False
+            audit.last_notification = None
+            audit.extraction_acknowledged = False
+            audit.save()
+
     def _set_notification_status(
         self, audits: models.QuerySet[SkillFarmAudit], status: bool
     ):
@@ -205,6 +219,36 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         for audit in audits:
             self.assertTrue(audit.notification_sent)
             self.assertIsNotNone(audit.last_notification)
+
+    def test_notification_should_not_notify_when_acknowledged(self, mock_audit_filter):
+        """
+        Test should not send notification if extraction has already been acknowledged.
+        """
+        # Test Data
+        skill = CharacterSkillFactory(
+            character=self.skillfarm_audit_2,
+            trained_skill_level=5,
+        )
+        SkillFarmSetupFactory(
+            character=self.skillfarm_audit_2,
+            skillset=[skill.eve_type.name],
+        )
+
+        audits = [self.skillfarm_audit_2]
+        self._set_notification_status(audits, True)
+        self.skillfarm_audit_2.extraction_acknowledged = True
+        self.skillfarm_audit_2.save()
+        self.skillfarm_audit_2.refresh_from_db()
+
+        mock_audit_filter.return_value = audits
+
+        # Test Action
+        tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        for audit in audits:
+            self.assertFalse(audit.notification_sent)
+            self.assertIsNone(audit.last_notification)
 
     @patch(TASK_PATH + ".logger", spec=True)
     def test_notifiaction_no_main_should_return_false(
