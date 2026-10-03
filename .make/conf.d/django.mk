@@ -106,6 +106,7 @@ showmigrations: check-python-venv check-myauth-path
 collectstatic: check-python-venv check-myauth-path
 	@echo "Starting Django collectstatic"
 	@$(PYTHON__EXECUTABLE) $(DJANGO__MYAUTH_PATH)/manage.py collectstatic --noinput
+	@echo "Collectstatic completed"
 
 # Help message
 .PHONY: help

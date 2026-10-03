@@ -1,5 +1,5 @@
 // React
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 // Third Party
 import {
@@ -22,13 +22,20 @@ import type {
 import {
   ArrowUpDown,
   ChevronDown,
+  ChevronFirst,
+  ChevronLast,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
 } from "lucide-react";
-import { Table } from "react-bootstrap";
+import { Button, Form, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Utils
+import { renderTooltip } from "@/Utils";
+
 // Styles
-import styles from "./BaseTable.module.css";
+import styles from "@/Components/Tables/BaseTable/BaseTable.module.css";
 
 import BaseHeader from "@/Components/Tables/BaseTable/BaseTableHeader";
 import BasePages from "@/Components/Tables/BaseTable/BaseTablePages";
@@ -45,7 +52,7 @@ export interface BaseTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[];
   initialState?: InitialTableState;
   exportFileName?: string;
-  variant?: "bootstrap" | "skillfarm";
+  variant?: "bootstrap" | "vowra";
   emptyText?: string;
   className?: string;
   tableClassName?: string;
@@ -64,10 +71,12 @@ const BaseTable = <TData, TValue = unknown>({
   hover = false,
   initialState = undefined,
   exportFileName = undefined,
-  variant = "skillfarm",
+  variant = "vowra",
   emptyText,
   className,
   tableClassName,
+  pageSizeOptions = [10, 25, 50, 100],
+  itemLabel,
   getRowClassName,
 }: BaseTableProps<TData, TValue>) => {
   const location = useLocation();
@@ -75,7 +84,7 @@ const BaseTable = <TData, TValue = unknown>({
 
   // TanStack Table's useReactTable() returns functions the compiler can't
   // safely memoize; this is inherent to the library, not fixable here.
-
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -97,12 +106,21 @@ const BaseTable = <TData, TValue = unknown>({
   const fileName =
     exportFileName !== undefined ? exportFileName : `ExportedData_${location.pathname}`;
 
-  if (variant === "skillfarm") {
+  if (variant === "vowra") {
+    const totalCount = table.getPrePaginationRowModel().rows.length;
+    const pageIndex = table.getState().pagination.pageIndex;
+    const pageSize = table.getState().pagination.pageSize;
+    const pageCount = table.getPageCount();
+
     return (
-      <>
-        <div className={`sf-table-container ${className ?? ""}`}>
-          <table className={`sf-table ${tableClassName ?? ""}`}>
-            <thead>
+      <div
+        className={`aa-table-shell ${className ?? ""}`}
+      >
+        <div className="aa-table-scroll">
+          <table
+            className={`aa-table ${tableClassName ?? ""}`}
+          >
+            <thead className="aa-table-head">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -113,37 +131,66 @@ const BaseTable = <TData, TValue = unknown>({
                         key={header.id}
                         colSpan={header.colSpan}
                         onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                        style={canSort ? { cursor: "pointer", userSelect: "none" } : undefined}
+                        className={`aa-table-heading-cell ${
+                          canSort
+                            ? "aa-table-sortable"
+                            : ""
+                        }`}
                       >
-                        <span className="d-inline-flex align-items-center gap-1">
+                        <div className="aa-table-heading">
                           {flexRender(header.column.columnDef.header, header.getContext())}
-                          {canSort &&
-                            (isSorted === "asc" ? (
-                              <ChevronUp size={14} />
-                            ) : isSorted === "desc" ? (
-                              <ChevronDown size={14} />
-                            ) : (
-                              <ArrowUpDown size={12} opacity={0.5} />
-                            ))}
-                        </span>
+                          {canSort && (
+                            <span>
+                              {isSorted === "asc" ? (
+                                <ChevronUp className="aa-table-sort-icon aa-table-sort-icon-active" />
+                              ) : isSorted === "desc" ? (
+                                <ChevronDown className="aa-table-sort-icon aa-table-sort-icon-active" />
+                              ) : (
+                                <ArrowUpDown className="aa-table-sort-icon" />
+                              )}
+                            </span>
+                          )}
+                        </div>
                       </th>
                     );
                   })}
                 </tr>
               ))}
             </thead>
-            <tbody>
-              {isError || rows.length === 0 ? (
+            <tbody className="aa-table-body">
+              {isError ? (
                 <tr>
-                  <td colSpan={table.getVisibleLeafColumns().length} className="text-center">
-                    {isError ? t("Something went wrong.") : (emptyText ?? t("No Data Available"))}
+                  <td
+                    colSpan={table.getVisibleLeafColumns().length}
+                    className="aa-table-message"
+                  >
+                    {t("Something went wrong.")}
+                  </td>
+                </tr>
+              ) : rows.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={table.getVisibleLeafColumns().length}
+                    className="aa-table-message"
+                  >
+                    {emptyText ?? t("No Data Available")}
                   </td>
                 </tr>
               ) : (
                 rows.map((row) => (
-                  <tr key={row.id} className={getRowClassName?.(row)}>
+                  <tr
+                    key={row.id}
+                    className={`aa-table-row ${
+                      getRowClassName
+                        ? getRowClassName(row)
+                        : "aa-table-row-hover"
+                    }`}
+                  >
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id}>
+                      <td
+                        key={cell.id}
+                        className={`aa-table-cell ${styles["cell-middle"]}`}
+                      >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -153,10 +200,104 @@ const BaseTable = <TData, TValue = unknown>({
             </tbody>
           </table>
         </div>
-        <div className="mt-2">
-          <BasePages table={table} isFetching={isFetching} fileName={fileName} />
+
+        {/* DataTable Footer Controls */}
+        <div className="aa-table-footer">
+          {/* Page Size Selector & Count Indicator */}
+          <div className="aa-table-controls">
+            <div className="aa-table-page-size">
+              <span>{t("Page Size:")}</span>
+              <Form.Select
+                size="sm"
+                value={pageSize}
+                onChange={(e) => table.setPageSize(Number(e.target.value))}
+                className={`aa-table-select ${styles["page-size-select"]}`}
+              >
+                {pageSizeOptions.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+                <option value={1000000}>{t("Show All")}</option>
+              </Form.Select>
+            </div>
+
+            {totalCount > 0 && (
+              <span className="aa-table-count">
+                {pageSize >= 1000000
+                  ? t("Showing all {{total}} {{items}}", {
+                      total: totalCount,
+                      items: itemLabel ?? t("entries"),
+                    })
+                  : t("Showing {{start}}-{{end}} of {{total}} {{items}}", {
+                      start: pageIndex * pageSize + 1,
+                      end: Math.min((pageIndex + 1) * pageSize, totalCount),
+                      total: totalCount,
+                      items: itemLabel ?? t("entries"),
+                    })}
+              </span>
+            )}
+          </div>
+
+          {/* Pagination Buttons */}
+          {pageCount > 1 && (
+            <div className="aa-table-pagination">
+              {renderTooltip(
+                t("First Page"),
+                <Button
+                  size="sm"
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={() => table.setPageIndex(0)}
+                  className="aa-table-page-button"
+                >
+                  <ChevronFirst className="aa-table-page-icon" />
+                </Button>
+              )}
+              {renderTooltip(
+                t("Previous Page"),
+                <Button
+                  size="sm"
+                  disabled={!table.getCanPreviousPage()}
+                  onClick={() => table.previousPage()}
+                  className="aa-table-page-button"
+                >
+                  <ChevronLeft className="aa-table-page-icon" />
+                </Button>
+              )}
+
+              <span className="aa-table-page-number">
+                {t("Page {{page}} of {{total}}", {
+                  page: pageIndex + 1,
+                  total: pageCount,
+                })}
+              </span>
+
+              {renderTooltip(
+                t("Next Page"),
+                <Button
+                  size="sm"
+                  disabled={!table.getCanNextPage()}
+                  onClick={() => table.nextPage()}
+                  className="aa-table-page-button"
+                >
+                  <ChevronRight className="aa-table-page-icon" />
+                </Button>
+              )}
+              {renderTooltip(
+                t("Last Page"),
+                <Button
+                  size="sm"
+                  disabled={!table.getCanNextPage()}
+                  onClick={() => table.setPageIndex(pageCount - 1)}
+                  className="aa-table-page-button"
+                >
+                  <ChevronLast className="aa-table-page-icon" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
-      </>
+      </div>
     );
   }
 
@@ -179,7 +320,7 @@ const BaseTable = <TData, TValue = unknown>({
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className={`${styles["cell"]} ${isNumber(cell) ? styles["cell-right"] : styles["cell-left"]}`}
+                    className={`${styles["cell-middle"]} ${isNumber(cell) ? styles["cell-right"] : styles["cell-left"]}`}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

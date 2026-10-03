@@ -1,10 +1,11 @@
 // React
-import React from "react";
+import React, { useMemo } from "react";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "./SkillQueueModal.module.css";
@@ -13,79 +14,10 @@ import { fetchCharacterDetail } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
 import type { ModalData } from "@/Components/Modals/BaseModal";
-import { QueueEntryProgress } from "@/Components/QueueEntryProgress";
+import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
 import { BaseTable } from "@/Components/Tables/BaseTable";
-import { TrainingProgressBar } from "@/Components/TrainingProgressBar";
+import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 import type { SkillQueueEntrySchema } from "@/Api/schema";
-
-const queueColumns: ColumnDef<SkillQueueEntrySchema>[] = [
-  {
-    id: "position",
-    header: "#",
-    accessorFn: (entry) => entry.queue_position + 1,
-  },
-  {
-    accessorKey: "skill_name",
-    header: "Skill",
-    cell: ({ row }) => <span className={styles["skill-name"]}>{row.original.skill_name}</span>,
-  },
-  {
-    accessorKey: "finished_level_roman",
-    header: "Level",
-  },
-  {
-    id: "progress",
-    header: "Progress",
-    accessorFn: (entry) => entry.progress_percent,
-    cell: ({ row }) => {
-      const entry = row.original;
-      return entry.is_active ? (
-        <div className={styles["progress-cell"]}>
-          <QueueEntryProgress
-            startDate={entry.start_date}
-            finishDate={entry.finish_date}
-            fallbackPercent={entry.progress_percent}
-          />
-        </div>
-      ) : (
-        <span className={styles["muted-text"]}>-</span>
-      );
-    },
-  },
-  {
-    accessorKey: "finish_date",
-    header: "Finish Date",
-    cell: ({ row }) => (
-      <span className={styles["date-cell"]}>{row.original.finish_date || "-"}</span>
-    ),
-  },
-  {
-    id: "status",
-    header: "Status",
-    enableSorting: false,
-    accessorFn: (entry) => (entry.is_active ? "Training" : entry.is_extractable ? "Ready" : "Queued"),
-    cell: ({ row }) => {
-      const entry = row.original;
-      if (entry.is_active) {
-        return (
-          <span className="sf-badge-training">
-            <Clock size={12} />
-            <span>Training</span>
-          </span>
-        );
-      }
-      if (entry.is_extractable) {
-        return (
-          <span className="sf-badge-extraction-pending">
-            <Sparkles size={12} />
-            <span>Ready</span>
-          </span>
-        );
-      }
-      return <span className={styles["muted-text"]}>Queued</span>;
-    },
-  },
-];
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -93,6 +25,81 @@ interface SkillQueueModalProps {
 }
 
 export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, onClose }) => {
+  const { t } = useTranslation();
+
+  const queueColumns = useMemo<ColumnDef<SkillQueueEntrySchema>[]>(
+    () => [
+      {
+        id: "position",
+        header: "#",
+        accessorFn: (entry) => entry.queue_position + 1,
+      },
+      {
+        accessorKey: "skill_name",
+        header: t("Skill"),
+        cell: ({ row }) => <span className={styles["skill-name"]}>{row.original.skill_name}</span>,
+      },
+      {
+        accessorKey: "finished_level_roman",
+        header: t("Level"),
+      },
+      {
+        id: "progress",
+        header: t("Progress"),
+        accessorFn: (entry) => entry.progress_percent,
+        cell: ({ row }) => {
+          const entry = row.original;
+          return entry.is_active ? (
+            <div className={styles["progress-cell"]}>
+              <QueueEntryProgress
+                startDate={entry.start_date}
+                finishDate={entry.finish_date}
+                fallbackPercent={entry.progress_percent}
+              />
+            </div>
+          ) : (
+            <span className={styles["muted-text"]}>-</span>
+          );
+        },
+      },
+      {
+        accessorKey: "finish_date",
+        header: t("Finish Date"),
+        cell: ({ row }) => (
+          <span className={styles["date-cell"]}>{row.original.finish_date || "-"}</span>
+        ),
+      },
+      {
+        id: "status",
+        header: t("Status"),
+        enableSorting: false,
+        accessorFn: (entry) =>
+          entry.is_active ? t("Training") : entry.is_extractable ? t("Ready") : t("Queued"),
+        cell: ({ row }) => {
+          const entry = row.original;
+          if (entry.is_active) {
+            return (
+              <span className="sf-badge-training">
+                <Clock size={12} />
+                <span>{t("Training")}</span>
+              </span>
+            );
+          }
+          if (entry.is_extractable) {
+            return (
+              <span className="sf-badge-extraction-pending">
+                <Sparkles size={12} />
+                <span>{t("Ready")}</span>
+              </span>
+            );
+          }
+          return <span className={styles["muted-text"]}>{t("Queued")}</span>;
+        },
+      },
+    ],
+    [t]
+  );
+
   const { data, isLoading, error } = useQuery({
     queryKey: queryKeys.CharacterDetail(characterId),
     queryFn: () => (characterId ? fetchCharacterDetail(characterId) : Promise.reject("No ID")),
@@ -103,7 +110,9 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
   const modalData: ModalData = {
     modal_id: "skillqueue-modal",
-    title: data ? `${data.character.character_name} — Skill Queue` : "Skill Queue",
+    title: data
+      ? t("{{character}} — Skill Queue", { character: data.character.character_name })
+      : t("Skill Queue"),
     url: "",
   };
 
@@ -119,13 +128,13 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
       <div>
         {isLoading && (
           <div className={styles["loading-state"]}>
-            Loading queue details...
+            {t("Loading queue details...")}
           </div>
         )}
 
         {error && (
           <div className={styles["error-state"]}>
-            Failed to load skill queue.
+            {t("Failed to load skill queue.")}
           </div>
         )}
 
@@ -153,25 +162,25 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
               className={styles["summary-grid"]}
             >
               <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>Total SP</div>
+                <div className={styles["summary-label"]}>{t("Total SP")}</div>
                 <div className={styles["summary-value"]}>
                   {(data.character.total_sp / 1_000_000).toFixed(2)}M
                 </div>
               </div>
 
               <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>Queue State</div>
+                <div className={styles["summary-label"]}>{t("Queue State")}</div>
                 <div className={styles["summary-value-sm"]}>
                   {data.character.is_training ? (
-                    <span className={styles["status-active"]}>Active</span>
+                    <span className={styles["status-active"]}>{t("Active")}</span>
                   ) : (
-                    <span className={styles["status-paused"]}>Paused / Empty</span>
+                    <span className={styles["status-paused"]}>{t("Paused / Empty")}</span>
                   )}
                 </div>
               </div>
 
               <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>Ready Extractions</div>
+                <div className={styles["summary-label"]}>{t("Ready Extractions")}</div>
                 <div className={styles["summary-value-amber"]}>
                   {data.character.extractions_ready_count}
                 </div>
@@ -193,19 +202,18 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
             {/* Queue List */}
             <h6 className={styles["section-title"]}>
-              Active Training Queue ({data.skillqueue.length})
+              {t("Active Training Queue ({{count}})", { count: data.skillqueue.length })}
             </h6>
 
             {data.skillqueue.length === 0 ? (
               <div className={`aa-panel ${styles["empty-state"]}`}>
-                No skills in queue. Training is inactive.
+                {t("No skills in queue. Training is inactive.")}
               </div>
             ) : (
               <BaseTable
                 data={data.skillqueue}
                 columns={queueColumns}
-                variant="skillfarm"
-                itemLabel="skills"
+                itemLabel={t("skills")}
                 exportFileName="SkillQueue"
                 initialState={{ pagination: { pageSize: 10 } }}
               />
@@ -215,33 +223,33 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
             {data.farmed_skills.length > 0 && (
               <div className={styles["farmed-section"]}>
                 <h6 className={styles["section-title"]}>
-                  Configured Farm Skills ({data.farmed_skills.length})
+                  {t("Configured Farm Skills ({{count}})", { count: data.farmed_skills.length })}
                 </h6>
                 <div className="sf-table-container">
                   <table className="sf-table">
                     <thead>
                       <tr>
-                        <th>Skill</th>
-                        <th>Trained Level</th>
-                        <th>SP</th>
-                        <th>Extraction Status</th>
+                        <th>{t("Skill")}</th>
+                        <th>{t("Trained Level")}</th>
+                        <th>{t("SP")}</th>
+                        <th>{t("Extraction Status")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {data.farmed_skills.map((skill) => (
                         <tr key={skill.skill_id}>
                           <td className={styles["skill-name"]}>{skill.skill_name}</td>
-                          <td>Level {skill.trained_level}</td>
+                          <td>{t("Level {{level}}", { level: skill.trained_level })}</td>
                           <td>{skill.skillpoints.toLocaleString()} SP</td>
                           <td>
                             {skill.is_extractable ? (
                               <span className="sf-badge-extraction-pending">
                                 <Sparkles size={12} />
-                                <span>Extractable (Lvl 5)</span>
+                                <span>{t("Extractable (Lvl 5)")}</span>
                               </span>
                             ) : (
                               <span className={styles["muted-text"]}>
-                                In Progress
+                                {t("In Progress")}
                               </span>
                             )}
                           </td>

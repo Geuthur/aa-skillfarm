@@ -1,36 +1,48 @@
 // Third Party
 import react from "@vitejs/plugin-react-swc"
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from "url"
 import { defineConfig } from 'vitest/config'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
+// https://vitejs.dev/config/
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    globals: true,
     setupFiles: ['./src/setupTests.ts'],
   },
-  plugins: [react()],
+  plugins: [react(),],
+  server: {
+    port: 3002,
+    proxy: {
+      "/api/": {
+        target: "http://localhost:8002",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/static": {
+        target: "http://localhost:8002",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   build: {
-    outDir: 'build/static/',
+    outDir: "build/static/",
     sourcemap: true,
     manifest: true,
     rollupOptions: {
-      onwarn(warning, warn) {
-        warn(warning);
-      },
       output: {
         entryFileNames: "react/js/[name]-[hash].js",
         chunkFileNames: "react/js/[name]-[hash].js",
         assetFileNames: (assetInfo) => {
-          let extType = assetInfo.names?.at(-1) ?? "bin";
+          let extType = assetInfo.name?.split(".").at(-1) ?? "bin";
           if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
             extType = "img";
           }

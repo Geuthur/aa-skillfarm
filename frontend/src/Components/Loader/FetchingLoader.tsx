@@ -1,3 +1,6 @@
+// Third Party
+import { useTranslation } from "react-i18next";
+
 // Styles
 import styles from "./FetchingLoader.module.css";
 
@@ -7,13 +10,14 @@ interface LoaderProps {
 }
 
 export const FetchingLoader = ({ message, className = "" }: LoaderProps = {}) => {
+  const { t } = useTranslation();
   return (
     <div className={`${styles["flex-container-loader"]} ${className}`}>
       <div
         className={`spinner-border text-info ${styles["spinner-size"]}`}
         role="status"
       >
-        <span className="visually-hidden">Loading...</span>
+        <span className="visually-hidden">{t("Loading...")}</span>
       </div>
       {message && (
         <span>

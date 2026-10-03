@@ -8,9 +8,8 @@ import { loadMenu } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import AuthRightMenu from "@/Menu/AuthRightMenu";
 
-export const AuthRightMenuAsync = () => {
-  const menuRoot =
-    typeof document !== "undefined" ? document.getElementById("nav-right") : null;
+const AuthRightMenuAsync = () => {
+  const menuRoot = typeof document !== "undefined" ? document.getElementById("nav-right") : null;
   const { isLoading, error, data } = useQuery({
     queryKey: queryKeys.Menu,
     queryFn: () => loadMenu(),
@@ -22,11 +21,7 @@ export const AuthRightMenuAsync = () => {
   }
 
   return ReactDOM.createPortal(
-    <AuthRightMenu
-      error={Boolean(error)}
-      isLoading={isLoading}
-      data={data.right_links}
-    />,
+    <AuthRightMenu error={error ? true : false} isLoading={isLoading} data={data.right_links} />,
     menuRoot,
   );
 };

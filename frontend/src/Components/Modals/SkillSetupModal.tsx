@@ -4,6 +4,7 @@ import React, { useState } from "react";
 // Third Party
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "./SkillSetupModal.module.css";
@@ -19,6 +20,7 @@ interface SkillSetupModalProps {
 }
 
 export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, onClose }) => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   // null = untouched, the saved skillset is shown
@@ -65,8 +67,10 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
 
   const modalData: ModalData = {
     modal_id: "skillsetup-modal",
-    title: data ? `${data.character_name} — Farm Skillset Setup` : "Farm Skillset Setup",
-    buttonText: "Save Skillset",
+    title: data
+      ? t("{{character}} — Farm Skillset Setup", { character: data.character_name })
+      : t("Farm Skillset Setup"),
+    buttonText: t("Save Skillset"),
     color: "primary",
     url: "",
   };
@@ -86,12 +90,12 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
     >
       <div>
         <p className="aa-panel text-secondary small mb-3">
-          Select which skills trigger extraction readiness alerts when reaching Level 5.
+          {t("Select which skills trigger extraction readiness alerts when reaching Level 5.")}
         </p>
 
         {isLoading && (
           <div className={styles["loading-state"]}>
-            Loading skills...
+            {t("Loading skills...")}
           </div>
         )}
 
@@ -105,14 +109,14 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
               <input
                 type="text"
                 className={`sf-search-input ${styles["search-input"]}`}
-                placeholder="Filter available skills..."
+                placeholder={t("Filter available skills...")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
             <div className={styles["selection-summary"]}>
-              Selected for extraction: <strong className={styles["selection-count"]}>{selectedSkills.length}</strong> skills
+              {t("Selected for extraction:")} <strong className={styles["selection-count"]}>{selectedSkills.length}</strong> {t("skills")}
             </div>
 
             <div
@@ -120,7 +124,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
             >
               {filteredSkills.length === 0 ? (
                 <div className={styles["empty-state"]}>
-                  No matching skills found.
+                  {t("No matching skills found.")}
                 </div>
               ) : (
                 <div className={styles["skill-grid"]}>
