@@ -6,15 +6,14 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "./OverviewUserPage.module.css";
 
 import { ProjectName } from "@/App";
 import { CharacterDashboard } from "@/Components/Sections/CharacterDashboard";
 import { ErrorPage } from "@/Pages/404";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 export const OverviewUserPage: React.FC = () => {
   const { t } = useTranslation();

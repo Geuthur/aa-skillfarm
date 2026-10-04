@@ -5,13 +5,12 @@ import React from "react";
 import { CheckCheck, Search, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "./SkillfarmFilterBar.module.css";
 
 import type { CharacterFilterParams } from "@/Api/schema";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 interface SkillfarmFilterBarProps {
   filters: CharacterFilterParams;

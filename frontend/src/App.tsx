@@ -4,9 +4,9 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 // Third Party
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 import i18n from "i18next";
 import Backend from "i18next-http-backend";
+import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 import { initReactI18next } from "react-i18next";
 
 // Styles

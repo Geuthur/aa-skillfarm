@@ -7,15 +7,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Eye, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "./OverviewPage.module.css";
 
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import { ProjectName } from "@/App";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 export const OverviewPage: React.FC = () => {
   const { t } = useTranslation();

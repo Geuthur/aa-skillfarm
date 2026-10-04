@@ -12,12 +12,12 @@ import styles from "./SkillQueueModal.module.css";
 
 import { fetchCharacterDetail } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
+import type { SkillQueueEntrySchema } from "@/Api/schema";
+import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
+import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
 import type { ModalData } from "@/Components/Modals/BaseModal";
-import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
 import { BaseTable } from "@/Components/Tables/BaseTable";
-import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-import type { SkillQueueEntrySchema } from "@/Api/schema";
 
 interface SkillQueueModalProps {
   characterId: number | null;

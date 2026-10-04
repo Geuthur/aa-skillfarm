@@ -6,14 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "./ProfitCalculator.module.css";
 
 import { fetchCalculatorData } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 export const ProfitCalculator: React.FC = () => {
   const { t } = useTranslation();

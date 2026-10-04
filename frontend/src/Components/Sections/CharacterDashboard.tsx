@@ -27,10 +27,10 @@ import type {
 } from "@/Api/schema";
 import { CharacterTable } from "@/Components/Dashboard/CharacterTable";
 import { InactiveTrainingAlert } from "@/Components/Dashboard/InactiveTrainingAlert";
+import { SkillfarmFilterBar } from "@/Components/Dashboard/SkillfarmFilterBar";
 import { DeleteCharacterModal } from "@/Components/Modals/DeleteCharacterModal";
 import { SkillQueueModal } from "@/Components/Modals/SkillQueueModal";
 import { SkillSetupModal } from "@/Components/Modals/SkillSetupModal";
-import { SkillfarmFilterBar } from "@/Components/Dashboard/SkillfarmFilterBar";
 
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */

@@ -5,15 +5,14 @@ import React from "react";
 import { Bell, BellOff, Check, Eye, PauseCircle, Settings, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "./CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 interface CharacterTableProps {
   characters: CharacterSummarySchema[];

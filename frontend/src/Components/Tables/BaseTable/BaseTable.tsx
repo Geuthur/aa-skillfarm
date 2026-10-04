@@ -31,14 +31,13 @@ import {
 import { Button, Form, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils";
-
 // Styles
 import styles from "@/Components/Tables/BaseTable/BaseTable.module.css";
 
 import BaseHeader from "@/Components/Tables/BaseTable/BaseTableHeader";
 import BasePages from "@/Components/Tables/BaseTable/BaseTablePages";
+// Utils
+import { renderTooltip } from "@/Utils";
 
 const isNumber = <TData,>(cell: Cell<TData, unknown>) => typeof cell.getValue() === "number";
 
@@ -82,9 +81,6 @@ const BaseTable = <TData, TValue = unknown>({
   const location = useLocation();
   const { t } = useTranslation();
 
-  // TanStack Table's useReactTable() returns functions the compiler can't
-  // safely memoize; this is inherent to the library, not fixable here.
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

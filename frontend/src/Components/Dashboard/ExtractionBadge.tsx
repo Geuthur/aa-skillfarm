@@ -5,11 +5,11 @@ import React from "react";
 import { CheckCircle2, Sparkles, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Utils
-import { renderTooltip } from "@/Utils/bootsTrap";
-
 // Styles
 import styles from "./ExtractionBadge.module.css";
+
+// Utils
+import { renderTooltip } from "@/Utils/bootsTrap";
 
 interface ExtractionBadgeProps {
   readyCount: number;
