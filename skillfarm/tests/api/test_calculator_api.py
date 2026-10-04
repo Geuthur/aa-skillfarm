@@ -14,20 +14,23 @@ API_URL = "skillfarm:api"
 
 
 class TestCalculatorApiEndpoints(SkillFarmTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.plex = EveTypePriceFactory(
-            name="PLEX", eve_type_id=44992, buy=100, sell=200, updated_at=timezone.now()
+    def setUp(self):
+        super().setUp()
+        EveTypePriceFactory(
+            name="PLEX",
+            eve_type_id=44992,
+            buy=100,
+            sell=200,
+            updated_at=timezone.now(),
         )
-        cls.skillinjector = EveTypePriceFactory(
+        EveTypePriceFactory(
             name="Skill Injector",
             eve_type_id=40520,
             buy=300,
             sell=400,
             updated_at=timezone.now(),
         )
-        cls.extractor = EveTypePriceFactory(
+        EveTypePriceFactory(
             name="Skill Extractor",
             eve_type_id=40519,
             buy=500,

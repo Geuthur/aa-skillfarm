@@ -13,6 +13,10 @@ API_URL = "skillfarm:api"
 
 
 class TestGeneralApiEndpoints(SkillFarmTestCase):
+    def setUp(self):
+        super().setUp()
+        UserSettings.objects.filter(user=self.user).delete()
+
     def test_get_menu_as_standard_user_should_return_menu_without_admin(self):
         # Test Data
         url = reverse(f"{API_URL}:get_menu")
@@ -27,11 +31,12 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertIn("left_links", data)
         self.assertIn("right_links", data)
         left_names = [link["name"] for link in data["left_links"]]
+        right_names = [link["name"] for link in data["right_links"]]
         self.assertIn("Characters", left_names)
         self.assertIn("Calculator", left_names)
         self.assertIn("Settings", left_names)
-        self.assertNotIn("Administration", left_names)
-        self.assertNotIn("Overview", left_names)
+        self.assertNotIn("Administration", right_names)
+        self.assertNotIn("Overview", right_names)
 
     def test_get_menu_as_superuser_should_include_administration(self):
         # Test Data
@@ -44,8 +49,8 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
-        left_names = [link["name"] for link in data["left_links"]]
-        self.assertIn("Administration", left_names)
+        right_names = [link["name"] for link in data["right_links"]]
+        self.assertIn("Administration", right_names)
 
     def test_get_menu_as_admin_permission_user_should_include_administration(self):
         # Test Data
@@ -61,8 +66,8 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
-        left_names = [link["name"] for link in data["left_links"]]
-        self.assertIn("Administration", left_names)
+        right_names = [link["name"] for link in data["right_links"]]
+        self.assertIn("Administration", right_names)
 
     def test_get_menu_as_corp_access_user_should_include_overview(self):
         # Test Data
@@ -77,9 +82,9 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        left_names = [link["name"] for link in response.json()["left_links"]]
-        self.assertIn("Overview", left_names)
-        self.assertNotIn("Administration", left_names)
+        right_names = [link["name"] for link in response.json()["right_links"]]
+        self.assertIn("Overview", right_names)
+        self.assertNotIn("Administration", right_names)
 
     def test_get_user_with_permission_should_return_user_data(self):
         # Test Data

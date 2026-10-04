@@ -1,6 +1,5 @@
 # Django
 from django.contrib.admin.sites import AdminSite
-from django.test import RequestFactory
 
 # AA Skillfarm
 from skillfarm.admin import SkillFarmAuditAdmin
@@ -52,10 +51,10 @@ class TestAdminView(SkillFarmTestCase):
         """
         Test should disable adding SkillFarmAudit entries via admin.
         """
-        self.assertFalse(self.adminmodel.has_add_permission(RequestFactory()))
+        self.assertFalse(self.adminmodel.has_add_permission(self.factory.get("/")))
 
     def test_has_change_permission(self):
         """
         Test should disable changing SkillFarmAudit entries via admin.
         """
-        self.assertFalse(self.adminmodel.has_change_permission(RequestFactory()))
+        self.assertFalse(self.adminmodel.has_change_permission(self.factory.get("/")))

@@ -34,6 +34,19 @@ class TestCharactersApiEndpoints(SkillFarmTestCase):
             character=cls.audit, skillset=["Cybernetics"]
         )
 
+    def setUp(self):
+        super().setUp()
+        self.audit.refresh_from_db()
+        self.audit.is_training = True
+        self.audit.extractions_ready_count = 2
+        self.audit.extraction_acknowledged = False
+        self.audit.queue_paused_acknowledged = False
+        self.audit.notification = False
+        self.audit.save()
+        self.skillsetup.refresh_from_db()
+        self.skillsetup.skillset = ["Cybernetics"]
+        self.skillsetup.save()
+
     def test_list_characters_should_return_character_list_and_counters(self):
         # Test Data
         url = reverse(f"{API_URL}:list_characters")

@@ -5,6 +5,7 @@ from http import HTTPStatus
 from django.urls import reverse
 
 # AA Skillfarm
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory, UserMainFactory
@@ -32,6 +33,12 @@ class TestOverviewApiEndpoints(SkillFarmTestCase):
             user=cls.user, character=cls.alt, is_training=False
         )
         cls.other_audit = SkillFarmAuditFactory(user=UserMainFactory())
+
+    def tearDown(self):
+        super().tearDown()
+        SkillFarmAudit.objects.exclude(
+            id__in=[self.audit.id, self.alt_audit.id, self.other_audit.id]
+        ).delete()
 
     def test_get_overview_as_standard_user_should_return_forbidden(self):
         # Test Data

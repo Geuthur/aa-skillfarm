@@ -14,6 +14,7 @@ from skillfarm.models import (
     EveTypePrice,
     SkillFarmAudit,
     SkillFarmSetup,
+    UserSettings,
 )
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.tests.testdata.factory import (
@@ -207,3 +208,16 @@ class EveTypePriceFactory(
         start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
         end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
     )
+
+
+class UserSettingsFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[UserSettings]
+):
+    """Generate a UserSettings object."""
+
+    class Meta:
+        model = UserSettings
+        django_get_or_create = ("user",)
+
+    user = factory.SubFactory(UserMainFactory)
+    disable_notifications = False
