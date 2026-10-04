@@ -111,7 +111,9 @@ class CharacterListResponse(Schema):
 
     characters: list[CharacterSummarySchema]
     total_count: int
+    active_training_count: int = 0
     paused_training_count: int
+    unacknowledged_paused_count: int = 0
     pending_extractions_count: int
     acknowledged_extractions_count: int
 

@@ -408,8 +408,18 @@ export interface components {
             characters: components["schemas"]["CharacterSummarySchema"][];
             /** Total Count */
             total_count: number;
+            /**
+             * Active Training Count
+             * @default 0
+             */
+            active_training_count: number;
             /** Paused Training Count */
             paused_training_count: number;
+            /**
+             * Unacknowledged Paused Count
+             * @default 0
+             */
+            unacknowledged_paused_count: number;
             /** Pending Extractions Count */
             pending_extractions_count: number;
             /** Acknowledged Extractions Count */
@@ -720,8 +730,18 @@ export interface components {
             characters: components["schemas"]["CharacterSummarySchema"][];
             /** Total Count */
             total_count: number;
+            /**
+             * Active Training Count
+             * @default 0
+             */
+            active_training_count: number;
             /** Paused Training Count */
             paused_training_count: number;
+            /**
+             * Unacknowledged Paused Count
+             * @default 0
+             */
+            unacknowledged_paused_count: number;
             /** Pending Extractions Count */
             pending_extractions_count: number;
             /** Acknowledged Extractions Count */

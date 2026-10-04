@@ -1,3 +1,6 @@
+// React
+import { MemoryRouter } from "react-router-dom";
+
 // Third Party
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
@@ -5,6 +8,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { ProfitCalculator } from "./ProfitCalculator";
+// AA Skillfarm
 import * as ApiCalls from "@/Api/ApiCalls";
 import type { CalculatorResponse } from "@/Api/schema";
 
@@ -41,7 +45,9 @@ describe("ProfitCalculator", () => {
     // Test Action
     render(
       <QueryClientProvider client={queryClient}>
-        <ProfitCalculator />
+        <MemoryRouter>
+          <ProfitCalculator />
+        </MemoryRouter>
       </QueryClientProvider>
     );
 
@@ -61,7 +67,9 @@ describe("ProfitCalculator", () => {
 
     render(
       <QueryClientProvider client={queryClient}>
-        <ProfitCalculator />
+        <MemoryRouter>
+          <ProfitCalculator />
+        </MemoryRouter>
       </QueryClientProvider>
     );
 

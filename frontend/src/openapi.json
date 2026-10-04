@@ -1359,8 +1359,18 @@
             "title": "Total Count",
             "type": "integer"
           },
+          "active_training_count": {
+            "default": 0,
+            "title": "Active Training Count",
+            "type": "integer"
+          },
           "paused_training_count": {
             "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "unacknowledged_paused_count": {
+            "default": 0,
+            "title": "Unacknowledged Paused Count",
             "type": "integer"
           },
           "pending_extractions_count": {
@@ -1975,8 +1985,18 @@
             "title": "Total Count",
             "type": "integer"
           },
+          "active_training_count": {
+            "default": 0,
+            "title": "Active Training Count",
+            "type": "integer"
+          },
           "paused_training_count": {
             "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "unacknowledged_paused_count": {
+            "default": 0,
+            "title": "Unacknowledged Paused Count",
             "type": "integer"
           },
           "pending_extractions_count": {

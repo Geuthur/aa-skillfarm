@@ -1,8 +1,9 @@
 // React
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -11,6 +12,7 @@ import styles from "./ProfitCalculator.module.css";
 
 import { fetchCalculatorData } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
+import { BaseTable } from "@/Components/Tables/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 
@@ -80,6 +82,84 @@ export const ProfitCalculator: React.FC = () => {
   const netProfit = grossRevenue - extractorCost - totalPlexCost;
   const hasInputs = injAmt > 0 || extAmt > 0;
 
+  interface FinancialBreakdownItem {
+    id: string;
+    description: string;
+    amount: string;
+    amountClass: string;
+    isTotal?: boolean;
+  }
+
+  const breakdownColumns = useMemo<ColumnDef<FinancialBreakdownItem>[]>(
+    () => [
+      {
+        accessorKey: "description",
+        header: t("Description"),
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className={row.original.isTotal ? "fw-bold text-white" : "text-secondary"}>
+            {row.original.description}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: () => (
+          <div className="w-100 text-end">
+            {t("Amount (ISK)")}
+          </div>
+        ),
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className={`text-end ${row.original.amountClass}`}>
+            {row.original.amount}
+          </div>
+        ),
+      },
+    ],
+    [t]
+  );
+
+  const breakdownData = useMemo<FinancialBreakdownItem[]>(
+    () => [
+      {
+        id: "gross-revenue",
+        description: t("Gross Injector Revenue ({{amount}} × {{price}})", {
+          amount: injAmt,
+          price: formatISK(injPrice),
+        }),
+        amount: `+${formatISK(grossRevenue)}`,
+        amountClass: "text-success fw-bold",
+      },
+      {
+        id: "extractor-cost",
+        description: t("Extractor Cost ({{amount}} × {{price}})", {
+          amount: extAmt,
+          price: formatISK(extPrice),
+        }),
+        amount: `-${formatISK(extractorCost)}`,
+        amountClass: "text-danger fw-bold",
+      },
+      {
+        id: "plex-cost",
+        description: t("PLEX Subscription Cost ({{amount}} PLEX × {{price}})", {
+          amount: plexMultiplier,
+          price: formatISK(plxPrice),
+        }),
+        amount: `-${formatISK(totalPlexCost)}`,
+        amountClass: "text-danger fw-bold",
+      },
+      {
+        id: "net-profit",
+        description: t("Total Net Profit / Loss"),
+        amount: formatISK(netProfit),
+        amountClass: `fw-bold ${getProfitClass(netProfit)}`,
+        isTotal: true,
+      },
+    ],
+    [t, injAmt, injPrice, grossRevenue, extAmt, extPrice, extractorCost, plexMultiplier, plxPrice, totalPlexCost, netProfit]
+  );
+
   if (isLoading) {
     return (
       <div className={`aa-panel ${styles["state-panel"]}`}>
@@ -114,7 +194,7 @@ export const ProfitCalculator: React.FC = () => {
     <div>
       {/* Header */}
       <div
-        className={styles["header"]}
+        className={`aa-panel ${styles["header"]}`}
       >
         <div>
           <h3 className={styles["title"]}>
@@ -303,9 +383,9 @@ export const ProfitCalculator: React.FC = () => {
               {t("Please enter an amount for Skill Injectors or Extractors to calculate profit.")}
             </div>
           ) : (
-            <div>
+            <div className="aa-panel-light">
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <span className={`text-secondary fw-bold ${styles["summary-label"]}`}>
+                <span className={styles["summary-label"]}>
                   {t("Calculated Net Result:")}
                 </span>
                 <span className={`${styles["net-profit"]} ${getProfitClass(netProfit)}`}>
@@ -314,30 +394,20 @@ export const ProfitCalculator: React.FC = () => {
               </div>
 
               {/* Financial Breakdown Table */}
-              <div className="table-responsive">
-                <table className={`table table-dark table-sm table-striped mb-0 ${styles["breakdown-table"]}`}>
-                  <tbody>
-                    <tr>
-                      <td className="text-secondary">{t("Gross Injector Revenue ({{amount}} × {{price}})", { amount: injAmt, price: formatISK(injPrice) })}</td>
-                      <td className="text-end text-success fw-bold">+{formatISK(grossRevenue)}</td>
-                    </tr>
-                    <tr>
-                      <td className="text-secondary">{t("Extractor Cost ({{amount}} × {{price}})", { amount: extAmt, price: formatISK(extPrice) })}</td>
-                      <td className="text-end text-danger fw-bold">-{formatISK(extractorCost)}</td>
-                    </tr>
-                    <tr>
-                      <td className="text-secondary">{t("PLEX Subscription Cost ({{amount}} PLEX × {{price}})", { amount: plexMultiplier, price: formatISK(plxPrice) })}</td>
-                      <td className="text-end text-danger fw-bold">-{formatISK(totalPlexCost)}</td>
-                    </tr>
-                    <tr className="table-active">
-                      <td className="fw-bold">{t("Total Net Profit / Loss")}</td>
-                      <td className={`text-end fw-bold ${getProfitClass(netProfit)}`}>
-                        {formatISK(netProfit)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <BaseTable
+                data={breakdownData}
+                columns={breakdownColumns}
+                itemLabel={t("items")}
+                className={styles["breakdown-shell"]}
+                tableClassName={styles["breakdown-table"]}
+                exportFileName="ProfitBreakdown"
+                initialState={{ pagination: { pageSize: 10 } }}
+                getRowClassName={(row) =>
+                  row.original.isTotal
+                    ? `table-active ${styles["breakdown-total-row"]}`
+                    : ""
+                }
+              />
             </div>
           )}
         </div>

@@ -7,7 +7,7 @@ import { BellOff, Settings2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SettingsPage.module.css";
+import styles from "@/Pages/SettingsPage.module.css";
 
 import { fetchUserSettings, updateUserSettings } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
@@ -57,7 +57,7 @@ export const SettingsPage: React.FC = () => {
   }
 
   return (
-    <main className={styles["page"]}>
+    <main className={`aa-panel-light ${styles["page"]}`}>
       <header className={styles["header"]}>
         <Settings2 size={24} aria-hidden="true" />
         <div>

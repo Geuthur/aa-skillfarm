@@ -118,8 +118,6 @@
   "All ({{count}})_one": "All ({{count}})",
   "All ({{count}})_other": "All ({{count}})",
   "Active Training": "Active Training",
-  "Active Training ({{count}})_one": "Active Training ({{count}})",
-  "Active Training ({{count}})_other": "Active Training ({{count}})",
   "Paused Training ({{count}})_one": "Paused Training ({{count}})",
   "Paused Training ({{count}})_other": "Paused Training ({{count}})",
   "Pending Extractions ({{count}})_one": "Pending Extractions ({{count}})",
@@ -209,5 +207,7 @@
   "Disable all notifications": "Disable all notifications",
   "When enabled, Skillfarm will not send notifications to your Alliance Auth or Discord account.": "When enabled, Skillfarm will not send notifications to your Alliance Auth or Discord account.",
   "Could not save this setting. Your previous preference was restored.": "Could not save this setting. Your previous preference was restored.",
-  "Saving...": "Saving..."
+  "Saving...": "Saving...",
+  "Active Training ({{count}})_one": "Active Training ({{count}})",
+  "Active Training ({{count}})_other": "Active Training ({{count}})"
 }

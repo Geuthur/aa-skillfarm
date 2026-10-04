@@ -135,7 +135,11 @@ def build_character_list(
     )
 
     total_count = audits.count()
+    active_count = audits.filter(is_training=True).count()
     paused_count = audits.filter(is_training=False).count()
+    unacknowledged_paused_count = audits.filter(
+        is_training=False, queue_paused_acknowledged=False
+    ).count()
     pending_extractions = audits.filter(
         extractions_ready_count__gt=0, extraction_acknowledged=False
     ).count()
@@ -152,7 +156,9 @@ def build_character_list(
     return schema.CharacterListResponse(
         characters=[_serialize_character_summary(audit) for audit in filtered_audits],
         total_count=total_count,
+        active_training_count=active_count,
         paused_training_count=paused_count,
+        unacknowledged_paused_count=unacknowledged_paused_count,
         pending_extractions_count=pending_extractions,
         acknowledged_extractions_count=acknowledged_extractions,
     )

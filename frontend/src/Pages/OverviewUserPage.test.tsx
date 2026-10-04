@@ -41,7 +41,9 @@ describe("OverviewUserPage", () => {
     vi.mocked(ApiCalls.fetchOverviewUser).mockResolvedValueOnce({
       characters: [],
       total_count: 0,
+      active_training_count: 0,
       paused_training_count: 0,
+      unacknowledged_paused_count: 0,
       pending_extractions_count: 0,
       acknowledged_extractions_count: 0,
       user: {

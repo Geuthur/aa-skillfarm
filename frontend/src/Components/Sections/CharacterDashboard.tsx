@@ -127,6 +127,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       {/* Noticeable Banner for characters with paused training */}
       <InactiveTrainingAlert
         pausedCount={data?.paused_training_count ?? 0}
+        unacknowledgedCount={data?.unacknowledged_paused_count ?? 0}
         currentFilter={trainingStatus}
         onFilterInactive={() => handleFilterChange({ training_status: "paused", extraction_status: "all" })}
       />
@@ -136,6 +137,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
         filters={filterParams}
         onFilterChange={handleFilterChange}
         totalCount={data?.total_count ?? 0}
+        activeCount={data?.active_training_count ?? 0}
         pausedCount={data?.paused_training_count ?? 0}
         pendingCount={data?.pending_extractions_count ?? 0}
         reviewedCount={data?.acknowledged_extractions_count ?? 0}

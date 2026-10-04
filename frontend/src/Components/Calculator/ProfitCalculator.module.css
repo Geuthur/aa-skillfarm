@@ -103,10 +103,37 @@
 
 .summary-label {
     font-size: var(--aa-font-size-md);
+    color: var(--aa-text-primary);
+    font-weight: 700;
+}
+
+.breakdown-shell {
+    margin-top: 12px;
+    border: 1px solid var(--aa-border-light);
+    border-radius: var(--aa-border-radius);
+    background-color: var(--aa-color-body);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .breakdown-table {
     font-size: var(--aa-font-size-sm);
+}
+
+.breakdown-table th:last-child {
+    text-align: right;
+}
+
+.breakdown-table th:last-child > div {
+    justify-content: flex-end;
+}
+
+.breakdown-total-row {
+    font-weight: var(--aa-font-weight-bold);
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.breakdown-total-row td {
+    border-top: 2px solid var(--aa-border-light);
 }
 
 .results-title {

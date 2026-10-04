@@ -193,5 +193,6 @@
   "Disable all notifications": "Disable all notifications",
   "When enabled, Skillfarm will not send notifications to your Alliance Auth or Discord account.": "When enabled, Skillfarm will not send notifications to your Alliance Auth or Discord account.",
   "Could not save this setting. Your previous preference was restored.": "Could not save this setting. Your previous preference was restored.",
-  "Saving...": "Saving..."
+  "Saving...": "Saving...",
+  "Active Training ({{count}})_other": "Active Training ({{count}})"
 }

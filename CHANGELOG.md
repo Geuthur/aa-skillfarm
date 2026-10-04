@@ -57,6 +57,8 @@ Section Order:
 
 - Acknowledged paused characters now display with a muted gray/secondary style instead of yellow/amber highlight (`.sf-card-idle-acknowledged`, `.sf-badge-idle-acknowledged`), while unacknowledged paused characters remain prominently highlighted in yellow/amber.
 
+- Profit calculator financial breakdown now uses the centralized Alliance Auth `BaseTable` component for consistent typography, borders, and dark styling.
+
 - Dashboard and bulk acknowledgment only handle the characters owned by the current user, regardless of permissions.
 
 - Actions on characters of other users (acknowledge, notification, skillset, delete) are checked against `manage_to`.
