@@ -10,6 +10,7 @@ from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import (
+    CharacterSkillqueueEntryFactory,
     SkillFarmAuditFactory,
     SkillFarmSetupFactory,
     UserMainFactory,
@@ -133,6 +134,33 @@ class TestCharactersApiEndpoints(SkillFarmTestCase):
         self.assertIn("skillqueue", data)
         self.assertIn("farmed_skills", data)
         self.assertEqual(data["configured_skillset"], ["Cybernetics"])
+
+    def test_get_character_detail_with_null_dates_should_return_boolean_is_extractable(
+        self,
+    ):
+        # Test Data
+        CharacterSkillqueueEntryFactory(
+            character=self.audit,
+            finished_level=5,
+            start_date=None,
+            finish_date=None,
+        )
+        url = reverse(
+            f"{API_URL}:get_character_detail",
+            kwargs={"character_id": self.user_character.character_id},
+        )
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        self.assertTrue(len(data["skillqueue"]) > 0)
+        for entry in data["skillqueue"]:
+            self.assertIsInstance(entry["is_extractable"], bool)
+            self.assertIsInstance(entry["is_active"], bool)
 
     def test_get_character_detail_nonexistent_should_return_404(self):
         # Test Data

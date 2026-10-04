@@ -241,11 +241,11 @@ class ApiEndpoints:
                     and entry.finish_date
                     and entry.start_date <= now < entry.finish_date
                 )
-                is_extractable = (
-                    entry.eve_type.name in skillset
+                is_extractable = bool(
+                    entry.finish_date
                     and entry.finished_level == 5
-                    and entry.finish_date
                     and entry.finish_date <= now
+                    and entry.eve_type.name in skillset
                 )
 
                 serialized_queue.append(

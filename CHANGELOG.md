@@ -49,6 +49,7 @@ Section Order:
 
 - `corp_access` queried a non-existing `corporation` relation and now filters by the corporation of the main character.
 - Calculator endpoint failed with `Decimal * float` type error.
+- Resolved `pydantic.ValidationError` on `SkillQueueEntrySchema.is_extractable` by ensuring explicit boolean casting when queue entry finish date is `None`.
 
 ### Changed
 
