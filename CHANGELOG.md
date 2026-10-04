@@ -42,6 +42,8 @@ Section Order:
 - Overview menu entry (requires `corp_access` or `admin_access`) with a list of all visible users and a detail page per user showing their characters.
 - `owned_by` access queryset method returning only the characters of the requesting user.
 - User Settings page with a per-user global opt-out for Skillfarm notifications.
+- `UserSettingsFactory` for factory-boy test fixtures.
+- Active training counter in the dashboard filter bar tab and `CharacterListResponse` API (`active_training_count`).
 
 ### Fixed
 
@@ -49,6 +51,10 @@ Section Order:
 - Calculator endpoint failed with `Decimal * float` type error.
 
 ### Changed
+
+- Inactive training alert banner automatically hides when all paused characters have been acknowledged (`unacknowledged_paused_count === 0`).
+
+- Acknowledged paused characters now display with a muted gray/secondary style instead of yellow/amber highlight (`.sf-card-idle-acknowledged`, `.sf-badge-idle-acknowledged`), while unacknowledged paused characters remain prominently highlighted in yellow/amber.
 
 - Dashboard and bulk acknowledgment only handle the characters owned by the current user, regardless of permissions.
 

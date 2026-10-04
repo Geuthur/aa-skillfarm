@@ -33,9 +33,13 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   const currentProgress = useLiveProgress(trainingStartDate, trainingFinishDate, progressPercent, isTraining);
 
   if (!isTraining) {
+    const badgeClass = queuePausedAcknowledged
+      ? "sf-badge-idle-acknowledged"
+      : "sf-badge-idle";
+
     return (
       <div className={styles["idle"]}>
-        <span className="sf-badge-idle">
+        <span className={badgeClass}>
           <PauseCircle size={14} />
           <span>{t("Training Inactive")}</span>
         </span>

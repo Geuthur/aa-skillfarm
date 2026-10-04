@@ -118,6 +118,8 @@
   "All ({{count}})_one": "All ({{count}})",
   "All ({{count}})_other": "All ({{count}})",
   "Active Training": "Active Training",
+  "Active Training ({{count}})_one": "Active Training ({{count}})",
+  "Active Training ({{count}})_other": "Active Training ({{count}})",
   "Paused Training ({{count}})_one": "Paused Training ({{count}})",
   "Paused Training ({{count}})_other": "Paused Training ({{count}})",
   "Pending Extractions ({{count}})_one": "Pending Extractions ({{count}})",

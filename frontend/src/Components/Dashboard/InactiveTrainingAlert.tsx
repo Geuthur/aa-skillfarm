@@ -10,18 +10,21 @@ import styles from "./InactiveTrainingAlert.module.css";
 
 interface InactiveTrainingAlertProps {
   pausedCount: number;
+  unacknowledgedCount?: number;
   currentFilter: string;
   onFilterInactive: () => void;
 }
 
 export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
   pausedCount,
+  unacknowledgedCount,
   currentFilter,
   onFilterInactive,
 }) => {
   const { t } = useTranslation();
+  const effectiveCount = unacknowledgedCount !== undefined ? unacknowledgedCount : pausedCount;
 
-  if (pausedCount <= 0 || currentFilter === "paused") {
+  if (effectiveCount <= 0 || currentFilter === "paused") {
     return null;
   }
 

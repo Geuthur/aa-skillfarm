@@ -16,6 +16,7 @@ interface SkillfarmFilterBarProps {
   filters: CharacterFilterParams;
   onFilterChange: (newFilters: Partial<CharacterFilterParams>) => void;
   totalCount: number;
+  activeCount: number;
   pausedCount: number;
   pendingCount: number;
   reviewedCount: number;
@@ -27,6 +28,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
   filters,
   onFilterChange,
   totalCount,
+  activeCount,
   pausedCount,
   pendingCount,
   reviewedCount,
@@ -81,7 +83,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           className={`aa-tab-btn ${activeTab === "training" ? "active" : ""}`}
           onClick={() => handleTabClick("training")}
         >
-          {t("Active Training")}
+          {t("Active Training ({{count}})", { count: activeCount })}
         </button>
 
         <button

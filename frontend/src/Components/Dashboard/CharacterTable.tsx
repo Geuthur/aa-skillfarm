@@ -63,7 +63,11 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
           {characters.map((char) => {
             const hasPendingExtractions = char.extractions_ready_count > 0 && !char.extraction_acknowledged;
             const hasUnacknowledgedPaused = !char.is_training && !char.queue_paused_acknowledged;
-            const rowClass = !char.is_training ? "sf-card-idle" : "sf-card-active";
+            const rowClass = char.is_training
+              ? "sf-card-active"
+              : char.queue_paused_acknowledged
+                ? "sf-card-idle-acknowledged"
+                : "sf-card-idle";
 
             return (
               <tr key={char.character_id} className={rowClass}>
