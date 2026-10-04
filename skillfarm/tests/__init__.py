@@ -5,6 +5,7 @@ import socket
 from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
+from skillfarm.tests import pook_httpx2
 from skillfarm.tests.testdata.factory import EveCorporationInfoFactory
 from skillfarm.tests.testdata.skillfarm import UserMainFactory
 
