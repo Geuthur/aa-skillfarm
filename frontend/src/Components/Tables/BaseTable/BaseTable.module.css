@@ -12,7 +12,8 @@
   animation: spin 2s infinite linear;
 }
 
-.cell {
+.cell,
+.cell-middle {
     vertical-align: middle;
 }
 

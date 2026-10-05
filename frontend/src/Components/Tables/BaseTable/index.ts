@@ -1,4 +1,5 @@
 export { default as BaseTable } from '@/Components/Tables/BaseTable/BaseTable';
+export { default as DataTable } from '@/Components/Tables/BaseTable/BaseTable';
 export { default } from '@/Components/Tables/BaseTable/BaseTable';
 export * from '@/Components/Tables/BaseTable/BaseTable';
 export { default as BaseTableHeader } from '@/Components/Tables/BaseTable/BaseTableHeader';

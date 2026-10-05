@@ -122,6 +122,8 @@ const BaseTable = <TData, TValue = unknown>({
                   {headerGroup.headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const isSorted = header.column.getIsSorted();
+                    const meta = header.column.columnDef.meta as { align?: string; className?: string } | undefined;
+                    const isRight = meta?.align === "right";
                     return (
                       <th
                         key={header.id}
@@ -131,9 +133,9 @@ const BaseTable = <TData, TValue = unknown>({
                           canSort
                             ? "aa-table-sortable"
                             : ""
-                        }`}
+                        } ${meta?.className ?? ""} ${isRight ? "text-end" : ""}`}
                       >
-                        <div className="aa-table-heading">
+                        <div className={`aa-table-heading ${isRight ? "justify-content-end" : ""}`}>
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort && (
                             <span>
@@ -182,14 +184,18 @@ const BaseTable = <TData, TValue = unknown>({
                         : "aa-table-row-hover"
                     }`}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className={`aa-table-cell ${styles["cell-middle"]}`}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const meta = cell.column.columnDef.meta as { align?: string; className?: string } | undefined;
+                      const isRight = meta?.align === "right";
+                      return (
+                        <td
+                          key={cell.id}
+                          className={`aa-table-cell ${styles["cell-middle"]} ${meta?.className ?? ""} ${isRight ? "text-end" : ""}`}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))
               )}

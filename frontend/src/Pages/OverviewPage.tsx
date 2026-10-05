@@ -1,9 +1,10 @@
 // React
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +13,9 @@ import styles from "./OverviewPage.module.css";
 
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
+import type { OverviewUserSchema } from "@/Api/schema";
 import { ProjectName } from "@/App";
+import { BaseTable } from "@/Components/Tables/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 
@@ -22,6 +25,84 @@ export const OverviewPage: React.FC = () => {
     queryKey: queryKeys.Overview,
     queryFn: fetchOverview,
   });
+
+  const columns = useMemo<ColumnDef<OverviewUserSchema>[]>(
+    () => [
+      {
+        id: "user",
+        header: t("User"),
+        accessorFn: (row) => row.main_character_name,
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <div className={styles["user-info"]}>
+              {user.portrait_url && (
+                <img
+                  src={user.portrait_url}
+                  alt={user.main_character_name}
+                  width={40}
+                  height={40}
+                  className={styles["avatar"]}
+                />
+              )}
+              <div>
+                <div className={styles["user-name"]}>{user.main_character_name}</div>
+                {user.corporation_name && (
+                  <div className={styles["user-corp"]}>
+                    {user.corporation_name} [{user.corporation_ticker}]
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "characters",
+        header: t("Characters"),
+        accessorFn: (row) => row.character_count,
+      },
+      {
+        id: "training",
+        header: t("Training"),
+        accessorFn: (row) => row.training_count,
+      },
+      {
+        id: "paused",
+        header: t("Paused"),
+        accessorFn: (row) => row.paused_count,
+      },
+      {
+        id: "pending_extractions",
+        header: t("Pending Extractions"),
+        accessorFn: (row) => row.pending_extractions_count,
+      },
+      {
+        id: "actions",
+        header: t("Actions"),
+        enableSorting: false,
+        meta: { className: styles["col-actions"], align: "right" },
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <div className={styles["actions-cell"]}>
+              {renderTooltip(
+                t("Show characters of {{user}}", { user: user.main_character_name }),
+                <Link
+                  to={`/${ProjectName}/overview/${user.user_id}/`}
+                  className="sf-btn"
+                >
+                  <Eye size={16} />
+                  <span>{t("Characters")}</span>
+                </Link>,
+              )}
+            </div>
+          );
+        },
+      },
+    ],
+    [t],
+  );
 
   if (isError) {
     return (
@@ -56,63 +137,17 @@ export const OverviewPage: React.FC = () => {
   }
 
   return (
-    <div className="sf-table-container">
-      <table className="sf-table">
-        <thead>
-          <tr>
-            <th>{t("User")}</th>
-            <th>{t("Characters")}</th>
-            <th>{t("Training")}</th>
-            <th>{t("Paused")}</th>
-            <th>{t("Pending Extractions")}</th>
-            <th className={styles["col-actions"]}>{t("Actions")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.users.map((user) => (
-            <tr key={user.user_id}>
-              <td>
-                <div className={styles["user-info"]}>
-                  {user.portrait_url && (
-                    <img
-                      src={user.portrait_url}
-                      alt={user.main_character_name}
-                      width={40}
-                      height={40}
-                      className={styles["avatar"]}
-                    />
-                  )}
-                  <div>
-                    <div className={styles["user-name"]}>{user.main_character_name}</div>
-                    {user.corporation_name && (
-                      <div className={styles["user-corp"]}>
-                        {user.corporation_name} [{user.corporation_ticker}]
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td>{user.character_count}</td>
-              <td>{user.training_count}</td>
-              <td>{user.paused_count}</td>
-              <td>{user.pending_extractions_count}</td>
-              <td className={styles["actions-cell"]}>
-                {renderTooltip(
-                  t("Show characters of {{user}}", { user: user.main_character_name }),
-                  <Link
-                    to={`/${ProjectName}/overview/${user.user_id}/`}
-                    className="sf-btn"
-                  >
-                    <Eye size={16} />
-                    <span>{t("Characters")}</span>
-                  </Link>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <BaseTable
+      data={data.users}
+      columns={columns}
+      variant="vowra"
+      itemLabel={t("Users")}
+      pageSizeOptions={[10, 25, 50, 100]}
+      initialState={{
+        pagination: { pageSize: 15 },
+        sorting: [{ id: "user", desc: false }],
+      }}
+    />
   );
 };
 
