@@ -28,57 +28,35 @@ Section Order:
 
 <!-- Your changes go here -->
 
+## [4.0.0] - 2026-10-06
+
 ### Added
 
-- Modern React 19 Single Page Application (SPA) frontend built with Vite, TanStack Query, and TanStack Table.
-- Alliance Auth CSS Framework styling using native CSS custom properties (`--aa-*`), panels, and tabs without Tailwind CSS.
-- Prominent alert banner and visual presentation for characters with paused or inactive skill training.
-- "Acknowledged / Read" review state for skill extractions, with single-character and bulk acknowledgment actions.
-- Full filterability by training queue status (all, training, paused) and extraction status (all, pending, acknowledged, none).
-- Animated pulsing effect (`@keyframes sf-pulse-glow`) on icons for pending unacknowledged extractions.
-- Django Ninja API V2 endpoints (`/skillfarm/api/`) covering characters, calculator, administration, and menus.
-- Denormalized state fields on `SkillFarmAudit` for fast, efficient filtering and reduced database overhead.
-- React tooling and Makefile automation (`make react-build`, `make react-test`, `make react-copy-assets`).
-- Overview menu entry (requires `corp_access` or `admin_access`) with a list of all visible users and a detail page per user showing their characters.
-- `owned_by` access queryset method returning only the characters of the requesting user.
-- User Settings page with a per-user global opt-out for Skillfarm notifications.
-- `UserSettingsFactory` for factory-boy test fixtures.
-- Active training counter in the dashboard filter bar tab and `CharacterListResponse` API (`active_training_count`).
-
-### Fixed
-
-- `corp_access` queried a non-existing `corporation` relation and now filters by the corporation of the main character.
-- Calculator endpoint failed with `Decimal * float` type error.
-- Resolved `pydantic.ValidationError` on `SkillQueueEntrySchema.is_extractable` by ensuring explicit boolean casting when queue entry finish date is `None`.
+- **React Single-Page Application**: Complete user interface redesign for the character dashboard, skill training queues, profit calculator, user overview, and settings using the Alliance Auth design system.
+- **Skill Training Alerts**: Prominent alert banner highlighting characters with paused or inactive skill training queues.
+- **Review & Acknowledgment Workflow**: "Acknowledged" review state for skill extractions and paused queues, including individual character and bulk acknowledgment actions.
+- **Flexible Filter Controls**: Quick filtering by training queue status (all, training, paused) and extraction status (all, pending, acknowledged, none), complete with an active training counter.
+- **Extraction Visual Indicator**: Subtle animated pulsing effect on status icons for pending, unacknowledged skill extractions.
+- **User Overview for Leadership**: Dedicated overview menu with member lists and per-user character detail pages for leadership with corporation or administrator permissions.
+- **Notification Settings**: User settings page with a personal opt-out toggle for Skillfarm notifications.
+- **Interactive Tables**: Sortable, paginated tables for character lists, member overviews, and the profit calculator.
 
 ### Changed
 
-- Inactive training alert banner automatically hides when all paused characters have been acknowledged (`unacknowledged_paused_count === 0`).
+- **Smart Alert Handling**: Inactive training alert banner automatically hides once all paused characters have been acknowledged.
+- **Status Badges & Visual Clarity**: Acknowledged paused characters display in a muted gray style, keeping unacknowledged paused characters clearly highlighted in amber.
+- **Enhanced Permission Scoping**: Dashboard and bulk actions operate strictly on characters owned by the current user, while administrative actions on other users' characters are validated against management permissions.
+- **Notification Suppression**: Suppressed duplicate notifications for skill extractions that have already been acknowledged.
+- **Workflow Improvement**: Adding a new character now redirects directly back to the dashboard.
 
-- Acknowledged paused characters now display with a muted gray/secondary style instead of yellow/amber highlight (`.sf-card-idle-acknowledged`, `.sf-badge-idle-acknowledged`), while unacknowledged paused characters remain prominently highlighted in yellow/amber.
+### Fixed
 
-- Converted the character table (`CharacterTable`) and user overview (`OverviewPage`) to TanStack `BaseTable` DataTables with sortable columns, pagination controls, and responsive layout.
-
-- Profit calculator financial breakdown now uses the centralized Alliance Auth `BaseTable` component for consistent typography, borders, and dark styling.
-
-- Dashboard and bulk acknowledgment only handle the characters owned by the current user, regardless of permissions.
-
-- Actions on characters of other users (acknowledge, notification, skillset, delete) are checked against `manage_to`.
-
-- Add Character redirects to the dashboard.
-
-- Modernized application architecture by migrating from Django template views to a decoupled React frontend and REST API.
-
-- Suppressed duplicate background extraction notifications once acknowledged by the user.
-
-- Upgraded test suite with `AuthTestCase`, Factory Boy data fixtures, and comprehensive unit test coverage.
+- Fixed corporation permission scoping to accurately resolve member characters.
+- Fixed calculation errors and edge cases in the profit calculator when skill queue entries have undefined completion dates.
 
 ### Removed
 
-- Legacy template/DataTables API (`SkillFarmApiEndpoints`), legacy schemas and helpers, legacy static assets, and the template based `notification_icon`/`extraction_icon` model properties.
-- `visible_eve_characters` manager method and the `character/:characterId` frontend route.
-- Unused `is_filtered` / `skill_filtered` and cooldown APIs, the obsolete read marker, and write-only notification state fields.
-- Unreferenced legacy forms and unused skillqueue metadata fields (`has_no_skillqueue`, `last_check`).
+- Removed legacy server-rendered Django templates and outdated views in favor of the React single-page application.
 
 ## [3.1.0] - 2026-08-03
 
@@ -704,5 +682,6 @@ This will load all necessary prices
 [2.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v1.0.5...v2.0.0 "2.0.0"
 [3.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.0...v2.0.1 "3.0.0"
 [3.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...v3.1.0 "3.1.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...HEAD "In Development"
+[4.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...v4.0.0 "v4.0.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
