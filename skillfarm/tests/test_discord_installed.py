@@ -1,14 +1,15 @@
 # Django
-from django.test import TestCase, modify_settings
+from django.test import modify_settings
 
 # AA Skillfarm
 from skillfarm.helpers.discord import (
     allianceauth_discordbot_installed,
     discordnotify_installed,
 )
+from skillfarm.tests import SkillFarmTestCase
 
 
-class TestModulesInstalled(TestCase):
+class TestModulesInstalled(SkillFarmTestCase):
     @modify_settings(INSTALLED_APPS={"remove": "aadiscordbot"})
     def test_allianceauth_discordbot_installed_should_return_false(self):
         """

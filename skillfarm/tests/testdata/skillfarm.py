@@ -14,6 +14,7 @@ from skillfarm.models import (
     EveTypePrice,
     SkillFarmAudit,
     SkillFarmSetup,
+    UserSettings,
 )
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.tests.testdata.factory import (
@@ -61,8 +62,6 @@ class SkillFarmAuditFactory(
         name (str, optional): The name of the SkillFarmAudit. If not provided, it will be derived from the character's name.
         active (bool, optional): Whether the SkillFarmAudit is active. Defaults to True.
         notification (bool, optional): Whether notifications are enabled for the SkillFarmAudit. Defaults to False.
-        notification_sent (datetime, optional): The datetime when the last notification was sent. Defaults to None.
-        is_read (bool, optional): Whether the SkillFarmAudit has been read. Defaults to False.
     """
 
     class Meta:
@@ -83,9 +82,16 @@ class SkillFarmAuditFactory(
     name = factory.LazyAttribute(lambda o: o.character.character_name)
     active = True
     notification = False
-    notification_sent = False
-    last_notification = None
-    is_read = False
+    is_training = False
+    training_finish_date = None
+    queue_finish_date = None
+    current_training_skill = None
+    total_sp = 0
+    extractions_ready_count = 0
+    extraction_acknowledged = False
+    extraction_acknowledged_at = None
+    extraction_acknowledged_by = None
+    queue_paused_acknowledged = False
 
 
 class SkillFarmSetupFactory(
@@ -139,8 +145,6 @@ class CharacterSkillqueueEntryFactory(
     eve_type = factory.SubFactory(ItemTypeFactory, group__category__id=16)
     start_date = None
     training_start_sp = factory.fuzzy.FuzzyInteger(0, 5_000_000)
-    has_no_skillqueue = False
-    last_check = None
 
 
 class CharacterUpdateStatusFactory(
@@ -204,3 +208,16 @@ class EveTypePriceFactory(
         start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
         end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),
     )
+
+
+class UserSettingsFactory(
+    factory.django.DjangoModelFactory, metaclass=BaseMetaFactory[UserSettings]
+):
+    """Generate a UserSettings object."""
+
+    class Meta:
+        model = UserSettings
+        django_get_or_create = ("user",)
+
+    user = factory.SubFactory(UserMainFactory)
+    disable_notifications = False

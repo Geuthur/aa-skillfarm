@@ -1,0 +1,11 @@
+.loader-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 12px;
+}
+
+.error-panel {
+    color: var(--aa-color-rose);
+    padding: 24px;
+    text-align: center;
+}

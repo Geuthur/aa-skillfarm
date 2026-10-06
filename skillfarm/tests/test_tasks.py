@@ -11,7 +11,11 @@ from django.utils import timezone
 from skillfarm import tasks
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.models.skillfarmaudit import (
+    CharacterSkill,
+    SkillFarmAudit,
+    SkillFarmSetup,
+)
 from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
@@ -19,6 +23,7 @@ from skillfarm.tests.testdata.skillfarm import (
     EveTypePriceFactory,
     SkillFarmAuditFactory,
     SkillFarmSetupFactory,
+    UserMainFactory,
 )
 
 TASK_PATH = "skillfarm.tasks"
@@ -59,20 +64,15 @@ class TestUpdateAllSkillfarm(SkillFarmTestCase):
 class TestUpdateCharacter(SkillFarmTestCase):
     """Test the update_character task."""
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
-
     def test_update_character_should_no_updated(self, mock_logger, __):
         """
         Test should not update character if no updates are needed.
         """
         # Test Data
-
+        user = UserMainFactory()
+        audit = SkillFarmAuditFactory(user=user)
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            character=audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
@@ -83,7 +83,7 @@ class TestUpdateCharacter(SkillFarmTestCase):
             last_update_finished_at=timezone.now(),
         )
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            character=audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=True,
             error_message="",
@@ -95,20 +95,22 @@ class TestUpdateCharacter(SkillFarmTestCase):
         )
 
         # Test Action
-        tasks.update_character(character_pk=self.skillfarm_audit.pk)
+        tasks.update_character(character_pk=audit.pk)
         # Expected Result
         mock_logger.info.assert_called_once_with(
             "No updates needed for %s",
-            self.skillfarm_audit.character.character_name,
+            audit.character.character_name,
         )
 
     def test_update_character_should_update(self, mock_logger, mock_chain):
         """
         Test should update character if updates are needed.
         """
-        # given
+        # Test Data
+        user = UserMainFactory()
+        audit = SkillFarmAuditFactory(user=user)
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            character=audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
@@ -119,10 +121,34 @@ class TestUpdateCharacter(SkillFarmTestCase):
             last_update_finished_at=None,
         )
 
-        # when
-        tasks.update_character(self.skillfarm_audit.pk)
-        # then
+        # Test Action
+        tasks.update_character(character_pk=audit.pk)
+        # Expected Result
         mock_chain.assert_called_once()
+
+    def test_update_char_skills_should_call_section_update(self, mock_logger, __):
+        # Test Data
+        user = UserMainFactory()
+        audit = SkillFarmAuditFactory(user=user)
+
+        # Test Action
+        with patch.object(tasks, "_update_character_section") as mock_update_section:
+            tasks.update_char_skills(character_pk=audit.pk, force_refresh=False)
+
+        # Expected Result
+        mock_update_section.assert_called_once()
+
+    def test_update_char_skillqueue_should_call_section_update(self, mock_logger, __):
+        # Test Data
+        user = UserMainFactory()
+        audit = SkillFarmAuditFactory(user=user)
+
+        # Test Action
+        with patch.object(tasks, "_update_character_section") as mock_update_section:
+            tasks.update_char_skillqueue(character_pk=audit.pk, force_refresh=False)
+
+        # Expected Result
+        mock_update_section.assert_called_once()
 
 
 @patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
@@ -139,6 +165,32 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.no_permission_user)
         cls.skillfarm_audit_3 = SkillFarmAuditFactory(user=cls.superuser)
 
+    def setUp(self):
+        super().setUp()
+        CharacterSkill.objects.filter(
+            character__in=[
+                self.skillfarm_audit,
+                self.skillfarm_audit_2,
+                self.skillfarm_audit_3,
+            ]
+        ).delete()
+        SkillFarmSetup.objects.filter(
+            character__in=[
+                self.skillfarm_audit,
+                self.skillfarm_audit_2,
+                self.skillfarm_audit_3,
+            ]
+        ).delete()
+        for audit in [
+            self.skillfarm_audit,
+            self.skillfarm_audit_2,
+            self.skillfarm_audit_3,
+        ]:
+            audit.refresh_from_db()
+            audit.notification = False
+            audit.extraction_acknowledged = False
+            audit.save()
+
     def _set_notification_status(
         self, audits: models.QuerySet[SkillFarmAudit], status: bool
     ):
@@ -148,41 +200,35 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
             audit.save()
 
     def test_no_notification_should_return_false(self, mock_audit_filter):
-        """
-        Test should not send notification if notification is disabled.
-        """
-        # given
+        # Test Data
         audits = [self.skillfarm_audit, self.skillfarm_audit_2]
         self._set_notification_status(audits, False)
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
 
-    def test_notifiaction_with_no_skillsetup_should_return_false(
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
+
+    def test_notification_with_no_skillsetup_should_return_false(
         self, mock_audit_filter
     ):
-        """
-        Test should not send notification if no SkillFarmSetup is found.
-        """
+        # Test Data
         audits = [self.skillfarm_audit, self.skillfarm_audit_2, self.skillfarm_audit_3]
         self._set_notification_status(audits, True)
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
 
     def test_notification_should_return_true(self, mock_audit_filter):
-        """
-        Test should send notification if notification is enabled and SkillFarmSetup exists.
-        """
-        # given
+        # Test Data
         skill = CharacterSkillFactory(
             character=self.skillfarm_audit,
             trained_skill_level=5,
@@ -199,42 +245,73 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
         self.skillfarm_audit.refresh_from_db()
 
         mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertTrue(audit.notification_sent)
-            self.assertIsNotNone(audit.last_notification)
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_called_once()
+
+    def test_notification_should_not_notify_when_acknowledged(self, mock_audit_filter):
+        """
+        Test should not send notification if extraction has already been acknowledged.
+        """
+        # Test Data
+        skill = CharacterSkillFactory(
+            character=self.skillfarm_audit_2,
+            trained_skill_level=5,
+        )
+        SkillFarmSetupFactory(
+            character=self.skillfarm_audit_2,
+            skillset=[skill.eve_type.name],
+        )
+
+        audits = [self.skillfarm_audit_2]
+        self._set_notification_status(audits, True)
+        self.skillfarm_audit_2.extraction_acknowledged = True
+        self.skillfarm_audit_2.save()
+        self.skillfarm_audit_2.refresh_from_db()
+
+        mock_audit_filter.return_value = audits
+
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
 
     @patch(TASK_PATH + ".logger", spec=True)
-    def test_notifiaction_no_main_should_return_false(
+    def test_notification_no_main_should_return_false(
         self, mock_logger, mock_audit_filter
     ):
         """
         Test should not send notification if no main character is found.
         """
-        audits = [self.skillfarm_audit]
-        self._set_notification_status(audits, True)
+        # Test Data
+        user_no_main = UserMainFactory()
+        audit = SkillFarmAuditFactory(user=user_no_main)
+        audit.notification = True
+        audit.save()
 
-        # Delete the main character and clear the relation
-        self.user.profile.main_character = None
-        self.user.profile.save()
-        self.user.profile.refresh_from_db()
+        user_no_main.profile.main_character = None
+        user_no_main.profile.save()
+        user_no_main.refresh_from_db()
+        audit.refresh_from_db()
 
-        # Ensure we operate on fresh model instances (no cached relations)
-        audits = [SkillFarmAudit.objects.get(pk=audit.pk) for audit in audits]
+        mock_audit_filter.return_value = [audit]
 
-        mock_audit_filter.return_value = audits
-        # when
-        tasks.check_skillfarm_notifications()
-        # then
-        for audit in audits:
-            self.assertFalse(audit.notification_sent)
-            self.assertIsNone(audit.last_notification)
-            mock_logger.warning.assert_called_once_with(
-                "Main Character not found for %s, skipping notification",
-                self.skillfarm_audit.character.character_name,
-            )
+        # Test Action
+        with patch(TASK_PATH + ".send_user_notification") as send_notification:
+            tasks.check_skillfarm_notifications()
+
+        # Expected Result
+        send_notification.delay.assert_not_called()
+        mock_logger.warning.assert_called_once_with(
+            "Main Character not found for %s, skipping notification",
+            audit.character.character_name,
+        )
 
 
 @patch(TASK_PATH + ".requests.get", spec=True)

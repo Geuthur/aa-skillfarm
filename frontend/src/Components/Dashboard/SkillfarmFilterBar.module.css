@@ -1,0 +1,32 @@
+.pulse-icon {
+    margin-right: 4px;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.search-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--aa-text-muted);
+    pointer-events: none;
+}
+
+.search-input {
+    padding-left: 34px;
+}
+
+.tab-alert:global(.aa-tab-btn) {
+    border-color: var(--aa-color-amber);
+    color: var(--aa-text-amber-light);
+}

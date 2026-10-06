@@ -1,0 +1,28 @@
+.idle {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.idle-label {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-muted);
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.skill-name {
+    font-weight: 600;
+    font-size: var(--aa-font-size-sm);
+    color: var(--aa-text-primary);
+}
+
+.level-badge {
+    padding: 1px 6px;
+    font-size: 10px;
+}

@@ -1,0 +1,2084 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AA Skillfarm API",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "paths": {
+    "/skillfarm/api/menu/": {
+      "get": {
+        "operationId": "skillfarm_api_general_get_menu",
+        "summary": "Get Skillfarm navigation menu",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MenuSchema"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "General"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/user/": {
+      "get": {
+        "operationId": "skillfarm_api_general_get_user",
+        "summary": "Get current user data and permissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserData"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "General"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/settings/": {
+      "get": {
+        "operationId": "skillfarm_api_general_get_user_settings",
+        "summary": "Get current user's Skillfarm settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsSchema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "General"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "skillfarm_api_general_update_user_settings",
+        "summary": "Update current user's Skillfarm settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSettingsSchema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "General"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSettingsUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/": {
+      "get": {
+        "operationId": "skillfarm_api_characters_list_characters",
+        "summary": "List skillfarm characters with filterable metrics",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by character name, corporation name, or ticker",
+              "title": "Search"
+            },
+            "required": false,
+            "description": "Filter by character name, corporation name, or ticker"
+          },
+          {
+            "in": "query",
+            "name": "training_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by active training status",
+              "enum": [
+                "all",
+                "training",
+                "paused"
+              ],
+              "title": "Training Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by active training status"
+          },
+          {
+            "in": "query",
+            "name": "extraction_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by extraction readiness and acknowledgment review state",
+              "enum": [
+                "all",
+                "pending",
+                "acknowledged",
+                "none"
+              ],
+              "title": "Extraction Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by extraction readiness and acknowledgment review state"
+          },
+          {
+            "in": "query",
+            "name": "notification_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by notification enabled/disabled",
+              "enum": [
+                "all",
+                "enabled",
+                "disabled"
+              ],
+              "title": "Notification Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by notification enabled/disabled"
+          },
+          {
+            "in": "query",
+            "name": "corporation_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by corporation ID",
+              "title": "Corporation Id"
+            },
+            "required": false,
+            "description": "Filter by corporation ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/{character_id}/": {
+      "get": {
+        "operationId": "skillfarm_api_characters_get_character_detail",
+        "summary": "Get character details including skillqueue and farm setup",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterDetailResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "skillfarm_api_characters_delete_character",
+        "summary": "Remove character from skillfarm",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/{character_id}/acknowledge-extractions/": {
+      "post": {
+        "operationId": "skillfarm_api_characters_acknowledge_extractions",
+        "summary": "Acknowledge ready skill extractions for a character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/{character_id}/acknowledge-paused/": {
+      "post": {
+        "operationId": "skillfarm_api_characters_acknowledge_paused",
+        "summary": "Acknowledge paused or empty queue for a character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/{character_id}/toggle-notification/": {
+      "post": {
+        "operationId": "skillfarm_api_characters_toggle_notification",
+        "summary": "Toggle notifications for a character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/characters/{character_id}/setup/": {
+      "get": {
+        "operationId": "skillfarm_api_characters_get_skillsetup",
+        "summary": "Get configured skillset for character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillSetupSchema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "skillfarm_api_characters_update_skillsetup",
+        "summary": "Update configured skillset for character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SkillSetupUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/acknowledge-all-extractions/": {
+      "post": {
+        "operationId": "skillfarm_api_characters_acknowledge_all_extractions",
+        "summary": "Bulk acknowledge all pending ready extractions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/calculator/": {
+      "get": {
+        "operationId": "skillfarm_api_calculator_get_calculator_data",
+        "summary": "Get skillfarm market prices and profit margins",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculatorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Calculator"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/overview/": {
+      "get": {
+        "operationId": "skillfarm_api_overview_get_overview",
+        "summary": "List all users with visible skillfarm characters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Overview"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/overview/{user_id}/": {
+      "get": {
+        "operationId": "skillfarm_api_overview_get_overview_user",
+        "summary": "Get the skillfarm characters of a single user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "schema": {
+              "title": "User Id",
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by character name, corporation name, or ticker",
+              "title": "Search"
+            },
+            "required": false,
+            "description": "Filter by character name, corporation name, or ticker"
+          },
+          {
+            "in": "query",
+            "name": "training_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by active training status",
+              "enum": [
+                "all",
+                "training",
+                "paused"
+              ],
+              "title": "Training Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by active training status"
+          },
+          {
+            "in": "query",
+            "name": "extraction_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by extraction readiness and acknowledgment review state",
+              "enum": [
+                "all",
+                "pending",
+                "acknowledged",
+                "none"
+              ],
+              "title": "Extraction Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by extraction readiness and acknowledgment review state"
+          },
+          {
+            "in": "query",
+            "name": "notification_status",
+            "schema": {
+              "default": "all",
+              "description": "Filter by notification enabled/disabled",
+              "enum": [
+                "all",
+                "enabled",
+                "disabled"
+              ],
+              "title": "Notification Status",
+              "type": "string"
+            },
+            "required": false,
+            "description": "Filter by notification enabled/disabled"
+          },
+          {
+            "in": "query",
+            "name": "corporation_id",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by corporation ID",
+              "title": "Corporation Id"
+            },
+            "required": false,
+            "description": "Filter by corporation ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewUserCharactersResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Overview"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/admin/stats/": {
+      "get": {
+        "operationId": "skillfarm_api_admin_get_admin_stats",
+        "summary": "Get administrative statistics for all Skillfarm characters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStatsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/admin/update-all/": {
+      "post": {
+        "operationId": "skillfarm_api_admin_trigger_update_all",
+        "summary": "Queue full update task for all Skillfarm characters",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AdminUpdateRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": false
+        },
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/admin/update-prices/": {
+      "post": {
+        "operationId": "skillfarm_api_admin_trigger_update_prices",
+        "summary": "Queue market prices update task",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MenuLink": {
+        "description": "A single link item in the menu bar.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "is_external": {
+            "default": false,
+            "title": "Is External",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "MenuLink",
+        "type": "object"
+      },
+      "MenuSchema": {
+        "description": "Top navigation menu structure.",
+        "properties": {
+          "left_links": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MenuLink"
+            },
+            "title": "Left Links",
+            "type": "array"
+          },
+          "right_links": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MenuLink"
+            },
+            "title": "Right Links",
+            "type": "array"
+          }
+        },
+        "title": "MenuSchema",
+        "type": "object"
+      },
+      "UserData": {
+        "description": "User profile data including character identity and admin state.",
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          },
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "alliance_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alliance Id"
+          },
+          "alliance_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alliance Name"
+          },
+          "portrait": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait"
+          },
+          "is_admin": {
+            "default": false,
+            "title": "Is Admin",
+            "type": "boolean"
+          },
+          "has_corp_access": {
+            "default": false,
+            "title": "Has Corp Access",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "user_id",
+          "character_id",
+          "character_name",
+          "corporation_id",
+          "corporation_name"
+        ],
+        "title": "UserData",
+        "type": "object"
+      },
+      "UserSettingsSchema": {
+        "description": "Notification settings of the current user.",
+        "properties": {
+          "disable_notifications": {
+            "title": "Disable Notifications",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "disable_notifications"
+        ],
+        "title": "UserSettingsSchema",
+        "type": "object"
+      },
+      "UserSettingsUpdateRequest": {
+        "description": "User-editable notification preferences.",
+        "properties": {
+          "disable_notifications": {
+            "title": "Disable Notifications",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "disable_notifications"
+        ],
+        "title": "UserSettingsUpdateRequest",
+        "type": "object"
+      },
+      "CharacterFilter": {
+        "description": "Filter schema for skillfarm characters.",
+        "properties": {
+          "search": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by character name, corporation name, or ticker",
+            "title": "Search"
+          },
+          "training_status": {
+            "default": "all",
+            "description": "Filter by active training status",
+            "enum": [
+              "all",
+              "training",
+              "paused"
+            ],
+            "title": "Training Status",
+            "type": "string"
+          },
+          "extraction_status": {
+            "default": "all",
+            "description": "Filter by extraction readiness and acknowledgment review state",
+            "enum": [
+              "all",
+              "pending",
+              "acknowledged",
+              "none"
+            ],
+            "title": "Extraction Status",
+            "type": "string"
+          },
+          "notification_status": {
+            "default": "all",
+            "description": "Filter by notification enabled/disabled",
+            "enum": [
+              "all",
+              "enabled",
+              "disabled"
+            ],
+            "title": "Notification Status",
+            "type": "string"
+          },
+          "corporation_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filter by corporation ID",
+            "title": "Corporation Id"
+          }
+        },
+        "title": "CharacterFilter",
+        "type": "object"
+      },
+      "CharacterListResponse": {
+        "description": "Response payload for character dashboard.",
+        "properties": {
+          "characters": {
+            "items": {
+              "$ref": "#/components/schemas/CharacterSummarySchema"
+            },
+            "title": "Characters",
+            "type": "array"
+          },
+          "total_count": {
+            "title": "Total Count",
+            "type": "integer"
+          },
+          "active_training_count": {
+            "default": 0,
+            "title": "Active Training Count",
+            "type": "integer"
+          },
+          "paused_training_count": {
+            "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "unacknowledged_paused_count": {
+            "default": 0,
+            "title": "Unacknowledged Paused Count",
+            "type": "integer"
+          },
+          "pending_extractions_count": {
+            "title": "Pending Extractions Count",
+            "type": "integer"
+          },
+          "acknowledged_extractions_count": {
+            "title": "Acknowledged Extractions Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "characters",
+          "total_count",
+          "paused_training_count",
+          "pending_extractions_count",
+          "acknowledged_extractions_count"
+        ],
+        "title": "CharacterListResponse",
+        "type": "object"
+      },
+      "CharacterSummarySchema": {
+        "description": "Summary of a skillfarm character for table and card views.",
+        "properties": {
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          },
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "corporation_ticker": {
+            "title": "Corporation Ticker",
+            "type": "string"
+          },
+          "portrait_url": {
+            "title": "Portrait Url",
+            "type": "string"
+          },
+          "total_sp": {
+            "title": "Total Sp",
+            "type": "integer"
+          },
+          "is_training": {
+            "title": "Is Training",
+            "type": "boolean"
+          },
+          "training_start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Start Date"
+          },
+          "training_finish_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Training Finish Date"
+          },
+          "queue_finish_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Queue Finish Date"
+          },
+          "current_training_skill": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Training Skill"
+          },
+          "progress_percent": {
+            "default": 0.0,
+            "title": "Progress Percent",
+            "type": "number"
+          },
+          "extractions_ready_count": {
+            "default": 0,
+            "title": "Extractions Ready Count",
+            "type": "integer"
+          },
+          "extraction_acknowledged": {
+            "default": false,
+            "title": "Extraction Acknowledged",
+            "type": "boolean"
+          },
+          "extraction_acknowledged_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Acknowledged At"
+          },
+          "queue_paused_acknowledged": {
+            "default": false,
+            "title": "Queue Paused Acknowledged",
+            "type": "boolean"
+          },
+          "notification_enabled": {
+            "default": false,
+            "title": "Notification Enabled",
+            "type": "boolean"
+          },
+          "update_status": {
+            "default": "ok",
+            "title": "Update Status",
+            "type": "string"
+          },
+          "last_update": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Update"
+          }
+        },
+        "required": [
+          "character_id",
+          "character_name",
+          "corporation_id",
+          "corporation_name",
+          "corporation_ticker",
+          "portrait_url",
+          "total_sp",
+          "is_training"
+        ],
+        "title": "CharacterSummarySchema",
+        "type": "object"
+      },
+      "CharacterDetailResponse": {
+        "description": "Full detail response for a single character.",
+        "properties": {
+          "character": {
+            "$ref": "#/components/schemas/CharacterSummarySchema"
+          },
+          "skillqueue": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SkillQueueEntrySchema"
+            },
+            "title": "Skillqueue",
+            "type": "array"
+          },
+          "farmed_skills": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FarmedSkillSchema"
+            },
+            "title": "Farmed Skills",
+            "type": "array"
+          },
+          "configured_skillset": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Configured Skillset",
+            "type": "array"
+          }
+        },
+        "required": [
+          "character"
+        ],
+        "title": "CharacterDetailResponse",
+        "type": "object"
+      },
+      "FarmedSkillSchema": {
+        "description": "Schema for trained skill in character skillset.",
+        "properties": {
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "integer"
+          },
+          "skill_name": {
+            "title": "Skill Name",
+            "type": "string"
+          },
+          "active_level": {
+            "title": "Active Level",
+            "type": "integer"
+          },
+          "trained_level": {
+            "title": "Trained Level",
+            "type": "integer"
+          },
+          "skillpoints": {
+            "title": "Skillpoints",
+            "type": "integer"
+          },
+          "is_extractable": {
+            "default": false,
+            "title": "Is Extractable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "skill_id",
+          "skill_name",
+          "active_level",
+          "trained_level",
+          "skillpoints"
+        ],
+        "title": "FarmedSkillSchema",
+        "type": "object"
+      },
+      "SkillQueueEntrySchema": {
+        "description": "Schema for individual skillqueue entries.",
+        "properties": {
+          "skill_id": {
+            "title": "Skill Id",
+            "type": "integer"
+          },
+          "skill_name": {
+            "title": "Skill Name",
+            "type": "string"
+          },
+          "finished_level": {
+            "title": "Finished Level",
+            "type": "integer"
+          },
+          "finished_level_roman": {
+            "title": "Finished Level Roman",
+            "type": "string"
+          },
+          "queue_position": {
+            "title": "Queue Position",
+            "type": "integer"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "finish_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finish Date"
+          },
+          "start_sp": {
+            "default": 0,
+            "title": "Start Sp",
+            "type": "integer"
+          },
+          "end_sp": {
+            "default": 0,
+            "title": "End Sp",
+            "type": "integer"
+          },
+          "training_start_sp": {
+            "default": 0,
+            "title": "Training Start Sp",
+            "type": "integer"
+          },
+          "progress_percent": {
+            "default": 0.0,
+            "title": "Progress Percent",
+            "type": "number"
+          },
+          "is_active": {
+            "default": false,
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "is_extractable": {
+            "default": false,
+            "title": "Is Extractable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "skill_id",
+          "skill_name",
+          "finished_level",
+          "finished_level_roman",
+          "queue_position"
+        ],
+        "title": "SkillQueueEntrySchema",
+        "type": "object"
+      },
+      "ActionResponse": {
+        "description": "Generic action response schema.",
+        "properties": {
+          "success": {
+            "title": "Success",
+            "type": "boolean"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "success",
+          "message"
+        ],
+        "title": "ActionResponse",
+        "type": "object"
+      },
+      "SkillSetupSchema": {
+        "description": "Configured farm skillset for a character.",
+        "properties": {
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          },
+          "skillset": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Skillset",
+            "type": "array"
+          },
+          "available_skills": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Available Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "character_id",
+          "character_name"
+        ],
+        "title": "SkillSetupSchema",
+        "type": "object"
+      },
+      "SkillSetupUpdateRequest": {
+        "description": "Request payload to update configured skillset.",
+        "properties": {
+          "selected_skills": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Selected Skills",
+            "type": "array"
+          }
+        },
+        "required": [
+          "selected_skills"
+        ],
+        "title": "SkillSetupUpdateRequest",
+        "type": "object"
+      },
+      "CalculatorItemSchema": {
+        "description": "Market price information for a trade item.",
+        "properties": {
+          "type_id": {
+            "title": "Type Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "buy": {
+            "title": "Buy",
+            "type": "number"
+          },
+          "sell": {
+            "title": "Sell",
+            "type": "number"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "type_id",
+          "name",
+          "buy",
+          "sell"
+        ],
+        "title": "CalculatorItemSchema",
+        "type": "object"
+      },
+      "CalculatorResponse": {
+        "description": "Skillfarm calculation and ROI summary.",
+        "properties": {
+          "error": {
+            "default": false,
+            "title": "Error",
+            "type": "boolean"
+          },
+          "error_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Message"
+          },
+          "plex": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorItemSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "injector": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorItemSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extractor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalculatorItemSchema"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "month_calc": {
+            "default": 0.0,
+            "title": "Month Calc",
+            "type": "number"
+          },
+          "month12_calc": {
+            "default": 0.0,
+            "title": "Month12 Calc",
+            "type": "number"
+          },
+          "month24_calc": {
+            "default": 0.0,
+            "title": "Month24 Calc",
+            "type": "number"
+          }
+        },
+        "title": "CalculatorResponse",
+        "type": "object"
+      },
+      "OverviewResponse": {
+        "description": "Response payload for the overview of all visible users.",
+        "properties": {
+          "users": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewUserSchema"
+            },
+            "title": "Users",
+            "type": "array"
+          }
+        },
+        "required": [
+          "users"
+        ],
+        "title": "OverviewResponse",
+        "type": "object"
+      },
+      "OverviewUserSchema": {
+        "description": "Aggregated skillfarm state of a single user (grouped by main character).",
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          },
+          "main_character_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Character Id"
+          },
+          "main_character_name": {
+            "title": "Main Character Name",
+            "type": "string"
+          },
+          "corporation_name": {
+            "default": "",
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "corporation_ticker": {
+            "default": "",
+            "title": "Corporation Ticker",
+            "type": "string"
+          },
+          "portrait_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Url"
+          },
+          "character_count": {
+            "default": 0,
+            "title": "Character Count",
+            "type": "integer"
+          },
+          "training_count": {
+            "default": 0,
+            "title": "Training Count",
+            "type": "integer"
+          },
+          "paused_count": {
+            "default": 0,
+            "title": "Paused Count",
+            "type": "integer"
+          },
+          "pending_extractions_count": {
+            "default": 0,
+            "title": "Pending Extractions Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "user_id",
+          "username",
+          "main_character_name"
+        ],
+        "title": "OverviewUserSchema",
+        "type": "object"
+      },
+      "OverviewUserCharactersResponse": {
+        "description": "Characters of a single user for the overview detail page.",
+        "properties": {
+          "characters": {
+            "items": {
+              "$ref": "#/components/schemas/CharacterSummarySchema"
+            },
+            "title": "Characters",
+            "type": "array"
+          },
+          "total_count": {
+            "title": "Total Count",
+            "type": "integer"
+          },
+          "active_training_count": {
+            "default": 0,
+            "title": "Active Training Count",
+            "type": "integer"
+          },
+          "paused_training_count": {
+            "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "unacknowledged_paused_count": {
+            "default": 0,
+            "title": "Unacknowledged Paused Count",
+            "type": "integer"
+          },
+          "pending_extractions_count": {
+            "title": "Pending Extractions Count",
+            "type": "integer"
+          },
+          "acknowledged_extractions_count": {
+            "title": "Acknowledged Extractions Count",
+            "type": "integer"
+          },
+          "user": {
+            "$ref": "#/components/schemas/OverviewUserSchema"
+          }
+        },
+        "required": [
+          "characters",
+          "total_count",
+          "paused_training_count",
+          "pending_extractions_count",
+          "acknowledged_extractions_count",
+          "user"
+        ],
+        "title": "OverviewUserCharactersResponse",
+        "type": "object"
+      },
+      "AdminStatsResponse": {
+        "properties": {
+          "total_characters": {
+            "title": "Total Characters",
+            "type": "integer"
+          },
+          "active_characters": {
+            "title": "Active Characters",
+            "type": "integer"
+          },
+          "in_training_count": {
+            "title": "In Training Count",
+            "type": "integer"
+          },
+          "paused_training_count": {
+            "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "total_sp": {
+            "title": "Total Sp",
+            "type": "integer"
+          },
+          "total_pending_extractions": {
+            "title": "Total Pending Extractions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_characters",
+          "active_characters",
+          "in_training_count",
+          "paused_training_count",
+          "total_sp",
+          "total_pending_extractions"
+        ],
+        "title": "AdminStatsResponse",
+        "type": "object"
+      },
+      "AdminUpdateRequest": {
+        "properties": {
+          "force_refresh": {
+            "default": false,
+            "title": "Force Refresh",
+            "type": "boolean"
+          }
+        },
+        "title": "AdminUpdateRequest",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "SessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sessionid"
+      }
+    }
+  },
+  "servers": []
+}

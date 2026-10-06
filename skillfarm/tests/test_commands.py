@@ -34,6 +34,10 @@ class TestLoadPrices(SkillFarmTestCase):
             2: {"buy": {"percentile": 300}, "sell": {"percentile": 400}},
         }
 
+    def setUp(self):
+        super().setUp()
+        EveTypePrice.objects.all().delete()
+
     @patch(COMMAND_PATH + ".logger")
     def test_should_load_prices(self, mock_logger, mock_requests_get):
         """

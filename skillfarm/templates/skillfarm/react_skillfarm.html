@@ -1,0 +1,102 @@
+{% extends 'allianceauth/base-bs5.html' %}
+{% load i18n %}
+
+{% block page_title %}
+    {{ title }} ⋗ Skillfarm ⋖
+{% endblock %}
+
+{% block content %}
+    <div class="aa-skillfarm">
+        <div class="aa-skillfarm-body">
+            {% get_momentjs_language_code LANGUAGE_CODE as MOMENTJS_LANG_CODE %}
+            <div id="aa-skillfarm-root" lang="{{ MOMENTJS_LANG_CODE }}">
+                <!-- React Fallback Indicators -->
+                <div
+                    id="error-spinner"
+                    class="d-none justify-content-center align-items-center gap-2 py-5"
+                    role="alert"
+                >
+                    <span class="text-danger fs-1" aria-hidden="true">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </span>
+                    <span class="fs-4">{% translate "Error loading Skillfarm frontend" %}</span>
+                </div>
+
+                <div
+                    id="loading-spinner"
+                    class="d-flex justify-content-center align-items-center gap-2 py-5"
+                    role="status"
+                >
+                    <span
+                        class="spinner-border flex-shrink-0"
+                        style="width: 3rem; height: 3rem;"
+                        aria-hidden="true"
+                    ></span>
+                    <span class="fs-4">{% translate "Loading Skillfarm..." %}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block extra_javascript %}
+<script type="module">
+    const BASE_URL = '/static/{{ app_name }}/';
+    const manifestUrl = `${BASE_URL}manifest.json?version={{ version }}`;
+
+    const errorSpinner = document.querySelector('#error-spinner');
+    const loadingSpinner = document.querySelector('#loading-spinner');
+
+    function showLoadingError() {
+        if (errorSpinner) {
+            errorSpinner.classList.remove('d-none');
+            errorSpinner.classList.add('d-flex');
+        }
+        if (loadingSpinner) {
+            loadingSpinner.classList.remove('d-flex');
+            loadingSpinner.classList.add('d-none');
+        }
+    }
+
+    function loadCSS(cssFiles) {
+        cssFiles.forEach(function (cssFile) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = BASE_URL + cssFile;
+            document.head.appendChild(link);
+        });
+    }
+
+    function loadReactScript(scriptFile) {
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = BASE_URL + scriptFile;
+        script.addEventListener('error', showLoadingError);
+        document.head.appendChild(script);
+    }
+
+    fetch(manifestUrl, { cache: 'no-store' })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('Manifest could not be loaded');
+            }
+            return response.json();
+        })
+        .then(function (manifest) {
+            const entry = manifest['index.html'];
+            if (!entry || !entry.file) {
+                throw new Error('React entry missing from manifest');
+            }
+            loadCSS(entry.css || []);
+            loadReactScript(entry.file);
+        })
+        .catch(function (error) {
+            console.error('React could not be loaded:', error);
+            showLoadingError();
+        });
+</script>
+{% endblock extra_javascript %}

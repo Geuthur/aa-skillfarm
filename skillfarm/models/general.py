@@ -8,6 +8,7 @@ from typing import Any, NamedTuple
 from django.db import models
 
 # Alliance Auth
+from allianceauth.authentication.models import User
 from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
@@ -30,6 +31,19 @@ class General(models.Model):
             ("corp_access", "Has access to all characters in the corporation."),
             ("admin_access", "Has access to all characters."),
         )
+
+
+class UserSettings(models.Model):
+    class Meta:
+        default_permissions = ()
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="skillfarm_settings",
+    )
+
+    disable_notifications = models.BooleanField(default=False)
 
 
 class UpdateSectionResult(NamedTuple):

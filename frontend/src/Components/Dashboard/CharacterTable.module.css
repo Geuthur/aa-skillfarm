@@ -1,0 +1,69 @@
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-title {
+    color: var(--aa-text-secondary);
+    margin-bottom: 8px;
+}
+
+.empty-text {
+    color: var(--aa-text-muted);
+    margin: 0;
+    font-size: var(--aa-font-size-sm);
+}
+
+.col-queue {
+    min-width: 260px;
+}
+
+.col-extractions {
+    min-width: 150px;
+}
+
+.col-actions {
+    text-align: right;
+}
+
+.pilot-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pilot-name {
+    font-weight: 700;
+    font-size: var(--aa-font-size-md);
+    color: var(--aa-text-primary);
+    cursor: pointer;
+}
+
+.pilot-corp {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-secondary);
+}
+
+.total-sp {
+    font-weight: 600;
+    font-size: var(--aa-font-size-sm);
+}
+
+.last-sync {
+    font-size: var(--aa-font-size-xs);
+    color: var(--aa-text-secondary);
+}
+
+.actions-cell {
+    text-align: right;
+}
+
+.actions-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.notification-on:global(.sf-btn) {
+    color: var(--aa-color-amber-light);
+}
