@@ -4,6 +4,7 @@
 ![Licence](https://img.shields.io/github/license/geuthur/aa-skillfarm)
 ![Python](https://img.shields.io/pypi/pyversions/aa-skillfarm)
 ![Django](https://img.shields.io/pypi/frameworkversions/django/aa-skillfarm.svg?label=django)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg)](frontend/)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/Geuthur/aa-skillfarm/master.svg)](https://results.pre-commit.ci/latest/github/Geuthur/aa-skillfarm/master)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Tests](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml/badge.svg)](https://github.com/Geuthur/aa-skillfarm/actions/workflows/autotester.yml)
@@ -16,20 +17,23 @@ The Skillfarm Tracker Module for Alliance Auth tracks skill queues, sends notifi
 
 ______________________________________________________________________
 
-- [AA Skillfarm](#aa-skillfarm)
-  - [Features](#features)
-  - [Upcoming](#upcoming)
-  - [Installation](#features)
-    - [Step 1 - Install the Package](#step1)
-    - [Step 2 - Configure Alliance Auth](#step2)
-    - [Step 3 - Add the Scheduled Tasks and Settings](#step3)
-    - [Step 4 - Migrate & Preload EVE SDE Data](#step4)
-      - [Step 4.1 - Migrate App and collect static](#step41)
-    - [Step 5 - Setting up Permissions](#step5)
-    - [Step 6 - (Optional) Setting up Compatibilies](#step6)
-  - [Highlights](#highlights)
-  - [Translations](#translations)
-  - [Contributing](#contributing)
+<!-- mdformat-toc start --slug=github --maxlevel=6 --minlevel=2 -->
+
+- [Features](#features)
+- [Highlights](#highlights)
+- [Installation](#installation)
+  - [Step 1 - Install the Package](#step-1---install-the-package)
+  - [Step 2 - Configure Alliance Auth](#step-2---configure-alliance-auth)
+  - [Step 3 - Add the Scheduled Tasks](#step-3---add-the-scheduled-tasks)
+  - [Step 3.1 - (Optional) Add own Logger File](#step-31---optional-add-own-logger-file)
+  - [Step 4 - Migrate & Preload EVE SDE Data](#step-4---migrate--preload-eve-sde-data)
+  - [Step 4.1 - Migrate App and collect static](#step-41---migrate-app-and-collect-static)
+  - [Step 5 - Setting up Permissions](#step-5---setting-up-permissions)
+  - [Step 6 - (Optional) Setting up Compatibilies](#step-6---optional-setting-up-compatibilies)
+- [Translations](#translations)
+- [Contributing](#contributing)
+
+<!-- mdformat-toc end -->
 
 ## Features<a name="features"></a>
 
@@ -44,13 +48,20 @@ ______________________________________________________________________
 - Notification System
 - Enable/Disable Characters
 
+## Highlights<a name="highlights"></a>
+
+![Image: dashbaord]
+![Image: skillqueue]
+![Image: skillsetup]
+![Image: calculator]
+
 ## Installation<a name="installation"></a>
 
 > [!NOTE]
 > AA Skillfarm needs at least Alliance Auth v5
 > Please make sure to update your Alliance Auth before you install this APP
 
-### Step 1 - Install the Package<a name="step1"></a>
+### Step 1 - Install the Package<a name="step-1---install-the-package"></a>
 
 Make sure you're in your virtual environment (venv) of your Alliance Auth then install the pakage.
 
@@ -58,7 +69,7 @@ Make sure you're in your virtual environment (venv) of your Alliance Auth then i
 pip install aa-skillfarm
 ```
 
-### Step 2 - Configure Alliance Auth<a name="step2"></a>
+### Step 2 - Configure Alliance Auth<a name="step-2---configure-alliance-auth"></a>
 
 Configure your Alliance Auth settings (`local.py`) as follows:
 
@@ -74,7 +85,7 @@ INSTALLED_APPS = [
 INSTALLED_APPS = ["modeltranslation"] + INSTALLED_APPS
 ```
 
-### Step 3 - Add the Scheduled Tasks<a name="step3"></a>
+### Step 3 - Add the Scheduled Tasks<a name="step-3---add-the-scheduled-tasks"></a>
 
 To set up the Scheduled Tasks add following code to your `local.py`
 
@@ -107,7 +118,7 @@ if "eve_sde" in INSTALLED_APPS:
     }
 ```
 
-### Step 3.1 - (Optional) Add own Logger File
+### Step 3.1 - (Optional) Add own Logger File<a name="step-31---optional-add-own-logger-file"></a>
 
 To set up the Logger add following code to your `local.py`
 Ensure that you have writing permission in logs folder.
@@ -127,7 +138,7 @@ LOGGING["loggers"]["extensions.skillfarm"] = {
 }
 ```
 
-### Step 4 - Migrate & Preload EVE SDE Data<a name="step4"></a>
+### Step 4 - Migrate & Preload EVE SDE Data<a name="step-4---migrate--preload-eve-sde-data"></a>
 
 AA Skillfarm uses EVE SDE data to map IDs to names for EveTypes. You will need to preload some data from SDE once.
 
@@ -136,7 +147,7 @@ python manage.py migrate eve_sde
 python manage.py esde_load_sde
 ```
 
-### Step 4.1 - Migrate App and collect static<a name="step41">
+### Step 4.1 - Migrate App and collect static<a name="step-41---migrate-app-and-collect-static"></a>
 
 Migrate the app and collect static.
 
@@ -146,7 +157,7 @@ python manage.py skillfarm_load_prices
 python manage.py collectstatic --noinput
 ```
 
-### Step 5 - Setting up Permissions<a name="step5"></a>
+### Step 5 - Setting up Permissions<a name="step-5---setting-up-permissions"></a>
 
 With the Following IDs you can set up the permissions for the Skillfarm
 
@@ -156,7 +167,7 @@ With the Following IDs you can set up the permissions for the Skillfarm
 | `corp_access`  | Has access to all characters in the corporation. | Can see all Skillfarm Characters from own Corporation.    |
 | `admin_access` | Has access to all characters                     | Can see all Skillfarm Characters.                         |
 
-### Step 6 - (Optional) Setting up Compatibilies<a name="step6"></a>
+### Step 6 - (Optional) Setting up Compatibilies<a name="step-6---optional-setting-up-compatibilies"></a>
 
 The Following Settings can be setting up in the `local.py`
 
@@ -169,18 +180,18 @@ Advanced Settings: Stale Status for Each Section
 
 - SKILLFARM_STALE_TYPES = `{     "skills": 30,     "skillqueue": 30, }` - Defines the stale status duration (in minutes) for each section.
 
-## Highlights<a name="highlights"></a>
-
-![skillfarm1](https://github.com/user-attachments/assets/b7a99b75-39c0-4349-84ae-89c5c48262c2)
-![Screenshot 2024-09-21 012008](https://github.com/user-attachments/assets/567197cc-c55f-4b0e-b470-d4ceeadcfb15)
-
 ## Translations<a name="translations"></a>
 
 [![Translations](https://weblate.geuthur.de/widget/allianceauth/aa-skillfarm/multi-auto.svg)](https://weblate.geuthur.de/engage/allianceauth/)
 
 Help us translate this app into your language or improve existing translations. Join our team!"
 
-## Contributing <a name="contributing"></a>
+## Contributing<a name="contributing"></a>
 
 You want to improve the project?
 Please ensure you read the [contribution guidelines](https://github.com/Geuthur/aa-skillfarm/blob/master/CONTRIBUTING.md)
+
+[image: calculator]: https://raw.githubusercontent.com/geuthur/aa-skillfarm/master/docs/images/calculator.png "Skill Calculator"
+[image: dashbaord]: https://raw.githubusercontent.com/geuthur/aa-skillfarm/master/docs/images/dashbaord.png "Dashboard"
+[image: skillqueue]: https://raw.githubusercontent.com/geuthur/aa-skillfarm/master/docs/images/skillqueue.png "Character Skillqueue"
+[image: skillsetup]: https://raw.githubusercontent.com/geuthur/aa-skillfarm/master/docs/images/skillsetup.png "Character Skillsetup"
