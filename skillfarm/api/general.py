@@ -59,16 +59,6 @@ class ApiEndpoints:
                     )
                 )
 
-            if request.user.is_superuser or request.user.has_perm(
-                "skillfarm.admin_access"
-            ):
-                right_menu.append(
-                    schema.MenuLink(
-                        name=_("Administration"),
-                        link="/admin/",
-                    )
-                )
-
             right_menu.append(
                 schema.MenuLink(
                     name=_("Add Character"),
@@ -76,6 +66,14 @@ class ApiEndpoints:
                     is_external=True,
                 )
             )
+
+            if request.user.is_superuser:
+                right_menu.append(
+                    schema.MenuLink(
+                        name=_("Superuser"),
+                        link="/admin/",
+                    )
+                )
 
             return schema.MenuSchema(
                 left_links=left_menu,
