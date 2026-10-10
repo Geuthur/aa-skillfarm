@@ -251,9 +251,7 @@ class TestUpdateCharacter(SkillFarmTestCase):
 
         # Expected Result
         mock_apply_async.assert_called_once_with(
-            args=[alt.pk],
-            kwargs={"force_refresh": True, "update_alts": False},
-            priority=7,
+            args=[alt.pk], kwargs={"force_refresh": True, "update_alts": False}
         )
 
 

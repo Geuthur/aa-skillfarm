@@ -50,9 +50,8 @@ TASK_DEFAULTS_BIND_ONCE_USER = {
     **{"once": {"keys": ["user_id"], "graceful": True}},
 }
 
-# Default params for tasks that need run once only per character and are bound to the task instance.
-TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
-    **TASK_DEFAULTS_BIND_ONCE,
+TASK_DEFAULTS_ONCE_CHARACTER = {
+    **TASK_DEFAULTS,
     **{"once": {"keys": ["character_pk"], "graceful": True}},
 }
 
@@ -144,12 +143,9 @@ def update_all_skillfarm(force_refresh=False):
     logger.info("Queued %s Skillfarm Updates", len(queued_pks))
 
 
-@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
 def update_character(
-    self: Task,  # pylint: disable=unused-argument
-    character_pk: int,
-    force_refresh: bool = False,
-    update_alts: bool = False,
+    character_pk: int, force_refresh: bool = False, update_alts: bool = False
 ) -> bool:
     """
     Update a SkillFarmAudit character by running necessary section updates directly.
@@ -236,27 +232,17 @@ def update_character(
                 .exclude(pk=character_pk)
                 .values_list("pk", flat=True)
             )
-            priority = (
-                self.request.delivery_info.get("priority", 7)
-                if hasattr(self, "request")
-                and self.request
-                and self.request.delivery_info
-                else 7
-            )
             for alt_pk in alts:
                 update_character.apply_async(
                     args=[alt_pk],
                     kwargs={"force_refresh": force_refresh, "update_alts": False},
-                    priority=priority,
                 )
 
     return True
 
 
-@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
-def update_char_skills(
-    self: Task, character_pk: int, force_refresh: bool
-):  # pylint: disable=unused-argument
+@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
+def update_char_skills(character_pk: int, force_refresh: bool):
     return _update_character_section(
         character_pk=character_pk,
         section=CharacterUpdateSection.SKILLS,
@@ -264,10 +250,8 @@ def update_char_skills(
     )
 
 
-@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
-def update_char_skillqueue(
-    self: Task, character_pk: int, force_refresh: bool
-):  # pylint: disable=unused-argument
+@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
+def update_char_skillqueue(character_pk: int, force_refresh: bool):
     return _update_character_section(
         character_pk=character_pk,
         section=CharacterUpdateSection.SKILLQUEUE,
