@@ -57,7 +57,7 @@ class UpdateStatusQuerySet(models.QuerySet["CharacterUpdateStatusType"]):
         sections = CharacterUpdateSection.get_sections()
         total_sections = len(sections)
         qs = (
-            self.values("character_id", "character__active")
+            self.values("owner_id", "owner__active")
             .annotate(
                 num_sections_found=Count(
                     "pk",
@@ -95,7 +95,7 @@ class UpdateStatusQuerySet(models.QuerySet["CharacterUpdateStatusType"]):
             .annotate(
                 total_update_status=Case(
                     When(
-                        character__active=False,
+                        owner__active=False,
                         then=Value(UpdateStatus.DISABLED),
                     ),
                     When(

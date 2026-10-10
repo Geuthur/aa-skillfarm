@@ -35,7 +35,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         self.assertEqual(
             str(self.skillfarm_audit),
-            f"{self.skillfarm_audit.character.character_name} - Active: True",
+            f"{self.skillfarm_audit.character.character_name}",
         )
 
     def test_should_return_esi_scopes(self):
@@ -82,7 +82,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         self.skillfarm_audit.update_manager.reset_has_token_error()
         # Expected Result
         update_status = CharacterUpdateStatus.objects.get(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
         )
         self.assertFalse(update_status.has_token_error)
@@ -144,58 +144,51 @@ class TestSkillfarmModel(SkillFarmTestCase):
         Test the perform_update_status method for token error scenario.
         """
         # Test Data
-        status_obj = CharacterUpdateStatusFactory(
+        CharacterUpdateStatusFactory(
             character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
 
         def mock_update_method():
-            raise ValueError("Token error occurred.")
+            raise TokenError("Token error occurred.")
 
-        # Test Action: perform_update_status should persist an error and re-raise
-        with self.assertRaises(ValueError):
-            self.skillfarm_audit.update_manager.perform_update_status(
-                section=CharacterUpdateSection.SKILLQUEUE,
-                method=mock_update_method,
-            )
-
-        # Expected Results: status object updated due to the exception
-        status_obj = CharacterUpdateStatus.objects.get(
-            character=self.skillfarm_audit,
+        # Test Action
+        result = self.skillfarm_audit.update_manager.perform_update_status(
             section=CharacterUpdateSection.SKILLQUEUE,
+            method=mock_update_method,
         )
-        self.assertFalse(status_obj.is_success)
-        self.assertFalse(status_obj.has_token_error)
-        self.assertIn("ValueError: Token error occurred.", status_obj.error_message)
+
+        # Expected Results
+        self.assertFalse(result.is_changed)
+        self.assertFalse(result.is_updated)
+        self.assertTrue(result.has_token_error)
+        self.assertIn("TokenError: Token error occurred.", result.error_message)
 
     def test_perform_update_Status_httpserver_error(self):
         """
         Test the perform_update_status method for HTTPServerError scenario.
         """
         # Test Data
-        status_obj = CharacterUpdateStatusFactory(
+        CharacterUpdateStatusFactory(
             character=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
-            has_token_error=False,  # Ensure has_token_error is False to test the HTTPServerError scenario
-            is_success=False,  # Ensure is_success is False to test the HTTPServerError scenario
+            has_token_error=False,
+            is_success=False,
         )
 
         def mock_update_method():
             raise HTTPServerError(status_code=500, headers={}, data=None)
 
-        # Test Action: perform_update_status should persist an error and re-raise
-        with self.assertRaises(HTTPServerError):
-            self.skillfarm_audit.update_manager.perform_update_status(
-                section=CharacterUpdateSection.SKILLQUEUE,
-                method=mock_update_method,
-            )
-
-        # Expected Results: status object updated due to the exception
-        status_obj = CharacterUpdateStatus.objects.get(
-            character=self.skillfarm_audit,
+        # Test Action
+        result = self.skillfarm_audit.update_manager.perform_update_status(
             section=CharacterUpdateSection.SKILLQUEUE,
+            method=mock_update_method,
         )
-        self.assertFalse(status_obj.is_success)
-        self.assertFalse(status_obj.has_token_error)
+
+        # Expected Results
+        self.assertFalse(result.is_changed)
+        self.assertFalse(result.is_updated)
+        self.assertFalse(result.has_token_error)
+        self.assertIn("500", result.error_message)

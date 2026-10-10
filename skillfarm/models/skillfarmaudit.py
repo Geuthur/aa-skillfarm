@@ -30,7 +30,7 @@ from skillfarm.managers.skillqueue import SkillqueueManager
 from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
-    UpdateManager,
+    UpdateManagerMixin,
 )
 from skillfarm.providers import AppLogger
 
@@ -38,8 +38,11 @@ logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 # pylint: disable=too-many-public-methods
-class SkillFarmAudit(models.Model):
+class SkillFarmAudit(UpdateManagerMixin, models.Model):
     """Skillfarm Character Audit model"""
+
+    update_section_class = CharacterUpdateSection
+    update_status_model = "CharacterUpdateStatus"
 
     if TYPE_CHECKING:  # Give type hints for related names
         skillfarm_skillqueue: SkillqueueManager
@@ -226,7 +229,7 @@ class SkillFarmAudit(models.Model):
         self.save(update_fields=["queue_paused_acknowledged"])
 
     def __str__(self):
-        return f"{self.character.character_name} - Active: {self.active}"
+        return f"{self.character.character_name}"
 
     @classmethod
     def get_esi_scopes(cls) -> list[str]:
@@ -268,15 +271,6 @@ class SkillFarmAudit(models.Model):
             return self.character.character_ownership
         except ObjectDoesNotExist:
             return None
-
-    @property
-    def update_manager(self):
-        """Return the Update Manager helper for this owner."""
-        return UpdateManager(
-            character=self,
-            update_section=CharacterUpdateSection,
-            update_status=CharacterUpdateStatus,
-        )
 
     def _generate_notification(self, skill_names: list[str]) -> str:
         """Generate notification for the user."""
@@ -389,9 +383,22 @@ class CharacterUpdateStatus(models.Model):
 
     objects: UpdateStatusManager = UpdateStatusManager()
 
-    character = models.ForeignKey(
-        SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_update_status"
+    owner = models.ForeignKey(
+        SkillFarmAudit,
+        on_delete=models.CASCADE,
+        related_name="skillfarm_update_status",
+        db_column="character_id",
     )
+
+    @property
+    def character(self) -> SkillFarmAudit:
+        """Backward-compatible property for character."""
+        return self.owner
+
+    @character.setter
+    def character(self, value: SkillFarmAudit) -> None:
+        self.owner = value
+
     section = models.CharField(
         max_length=32, choices=CharacterUpdateSection.choices, db_index=True
     )
@@ -425,28 +432,27 @@ class CharacterUpdateStatus(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.character} - {self.section} - {self.is_success}"
+        return f"{self.owner} - {self.section}"
 
     def need_update(self) -> bool:
         """Check if the update is needed."""
-        if not self.is_success or not self.last_update_finished_at:
-            needs_update = True
-        else:
-            section_time_stale = app_settings.SKILLFARM_STALE_TYPES.get(
-                self.section, 60
-            )
-            stale = timezone.now() - timezone.timedelta(minutes=section_time_stale)
-            needs_update = self.last_run_finished_at <= stale
-
-        if needs_update and self.has_token_error:
+        if self.has_token_error:
             logger.info(
                 "%s: Ignoring update because of token error, section: %s",
-                self.character,
+                self.owner,
                 self.section,
             )
-            needs_update = False
+            return False
 
-        return needs_update
+        if not self.is_success or not self.last_run_finished_at:
+            return True
+
+        section_time_stale = app_settings.SKILLFARM_STALE_TYPES.get(self.section, 60)
+        stale = timezone.now() - timezone.timedelta(minutes=section_time_stale)
+        try:
+            return self.last_run_finished_at <= stale
+        except AttributeError:
+            return True
 
     def reset(self) -> None:
         """Reset this update status."""
@@ -456,3 +462,6 @@ class CharacterUpdateStatus(models.Model):
         self.last_run_at = timezone.now()
         self.last_run_finished_at = None
         self.save()
+
+
+SkillFarmAudit.update_status_model = CharacterUpdateStatus
