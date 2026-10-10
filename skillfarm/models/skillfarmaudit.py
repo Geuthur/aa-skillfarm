@@ -226,7 +226,7 @@ class SkillFarmAudit(models.Model):
         self.save(update_fields=["queue_paused_acknowledged"])
 
     def __str__(self):
-        return f"{self.character.character_name} - Active: {self.active}"
+        return f"{self.character.character_name}"
 
     @classmethod
     def get_esi_scopes(cls) -> list[str]:
@@ -425,7 +425,7 @@ class CharacterUpdateStatus(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.character} - {self.section} - {self.is_success}"
+        return f"{self.character} - {self.section}"
 
     def need_update(self) -> bool:
         """Check if the update is needed."""
