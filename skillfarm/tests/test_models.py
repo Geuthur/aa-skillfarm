@@ -35,7 +35,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         """
         self.assertEqual(
             str(self.skillfarm_audit),
-            f"{self.skillfarm_audit.character.character_name} - Active: True",
+            f"{self.skillfarm_audit.character.character_name}",
         )
 
     def test_should_return_esi_scopes(self):
@@ -82,7 +82,7 @@ class TestSkillfarmModel(SkillFarmTestCase):
         self.skillfarm_audit.update_manager.reset_has_token_error()
         # Expected Result
         update_status = CharacterUpdateStatus.objects.get(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
         )
         self.assertFalse(update_status.has_token_error)

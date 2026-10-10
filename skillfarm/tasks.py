@@ -1,9 +1,5 @@
 """App Tasks"""
 
-# Standard Library
-import inspect
-from collections.abc import Callable
-
 # Third Party
 import requests
 from celery import Task, shared_task
@@ -177,28 +173,14 @@ def update_character(
         "Processing Audit Updates for %s", format(character.character.character_name)
     )
 
-    if force_refresh:
-        # Reset Token Error if we are forcing a refresh
-        character.update_manager.reset_has_token_error()
+    sections = character.get_sections_to_update(force_refresh=force_refresh)
 
-    needs_update = character.update_manager.calc_update_needed()
-
-    if not needs_update and not force_refresh:
+    if not sections:
         logger.info("No updates needed for %s", character.character.character_name)
     else:
-        sections = CharacterUpdateSection.get_sections()
         runs = 0
 
         for section in sections:
-            # Skip sections that are not in the needs_update list
-            if not force_refresh and not needs_update.for_section(section):
-                logger.debug(
-                    "No updates needed for %s (%s)",
-                    character.character.character_name,
-                    section,
-                )
-                continue
-
             task_name = f"update_char_{section}"
             task = globals().get(task_name)
             if task:
@@ -268,25 +250,11 @@ def _update_character_section(character_pk: int, section: str, force_refresh: bo
         logger.warning("SkillFarmAudit with pk %s not found.", character_pk)
         return None
 
-    # Reset update status for the section
-    character.update_manager.reset_update_status(section)
-
     logger.debug(
         "Updating %s for %s", section.label, character.character.character_name
     )
 
-    # Get the method to call for the section
-    method: Callable = getattr(character, section.method_name)
-    method_signature = inspect.signature(method)
-
-    # Prepare kwargs based on whether force_refresh is accepted
-    if "force_refresh" in method_signature.parameters:
-        kwargs = {"force_refresh": force_refresh}
-    else:
-        kwargs = {}
-
-    result = character.update_manager.perform_update_status(section, method, **kwargs)
-    character.update_manager.update_section_log(section, result)
+    result = character.execute_section(section, force_refresh=force_refresh)
     try:
         character.update_training_and_extraction_state()
     except Exception as e:  # pylint: disable=broad-except

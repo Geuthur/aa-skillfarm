@@ -155,13 +155,20 @@ class CharacterUpdateStatusFactory(
 
     class Meta:
         model = CharacterUpdateStatus
-        django_get_or_create = ("character", "section")
+        django_get_or_create = ("owner", "section")
 
-    character = factory.SubFactory(SkillFarmAuditFactory)
+    owner = factory.SubFactory(SkillFarmAuditFactory)
     section = factory.fuzzy.FuzzyChoice(CharacterUpdateSection.values)
     is_success = factory.fuzzy.FuzzyChoice([True, False])
     error_message = factory.Faker("sentence")
     has_token_error = factory.fuzzy.FuzzyChoice([True, False])
+
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        if "character" in kwargs and "owner" not in kwargs:
+            kwargs["owner"] = kwargs.pop("character")
+        return super()._adjust_kwargs(**kwargs)
+
     last_run_at = factory.fuzzy.FuzzyDateTime(
         start_dt=timezone.make_aware(timezone.datetime(2020, 1, 1)),
         end_dt=timezone.make_aware(timezone.datetime(2024, 12, 31)),

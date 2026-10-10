@@ -30,7 +30,7 @@ from skillfarm.managers.skillqueue import SkillqueueManager
 from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
-    UpdateManager,
+    UpdateManagerMixin,
 )
 from skillfarm.providers import AppLogger
 
@@ -38,8 +38,11 @@ logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 # pylint: disable=too-many-public-methods
-class SkillFarmAudit(models.Model):
+class SkillFarmAudit(UpdateManagerMixin, models.Model):
     """Skillfarm Character Audit model"""
+
+    update_section_class = CharacterUpdateSection
+    update_status_model = "CharacterUpdateStatus"
 
     if TYPE_CHECKING:  # Give type hints for related names
         skillfarm_skillqueue: SkillqueueManager
@@ -269,15 +272,6 @@ class SkillFarmAudit(models.Model):
         except ObjectDoesNotExist:
             return None
 
-    @property
-    def update_manager(self):
-        """Return the Update Manager helper for this owner."""
-        return UpdateManager(
-            character=self,
-            update_section=CharacterUpdateSection,
-            update_status=CharacterUpdateStatus,
-        )
-
     def _generate_notification(self, skill_names: list[str]) -> str:
         """Generate notification for the user."""
         msg = format_lazy(
@@ -389,9 +383,22 @@ class CharacterUpdateStatus(models.Model):
 
     objects: UpdateStatusManager = UpdateStatusManager()
 
-    character = models.ForeignKey(
-        SkillFarmAudit, on_delete=models.CASCADE, related_name="skillfarm_update_status"
+    owner = models.ForeignKey(
+        SkillFarmAudit,
+        on_delete=models.CASCADE,
+        related_name="skillfarm_update_status",
+        db_column="character_id",
     )
+
+    @property
+    def character(self) -> SkillFarmAudit:
+        """Backward-compatible property for character."""
+        return self.owner
+
+    @character.setter
+    def character(self, value: SkillFarmAudit) -> None:
+        self.owner = value
+
     section = models.CharField(
         max_length=32, choices=CharacterUpdateSection.choices, db_index=True
     )
@@ -425,14 +432,14 @@ class CharacterUpdateStatus(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.character} - {self.section}"
+        return f"{self.owner} - {self.section}"
 
     def need_update(self) -> bool:
         """Check if the update is needed."""
         if self.has_token_error:
             logger.info(
                 "%s: Ignoring update because of token error, section: %s",
-                self.character,
+                self.owner,
                 self.section,
             )
             return False
@@ -455,3 +462,6 @@ class CharacterUpdateStatus(models.Model):
         self.last_run_at = timezone.now()
         self.last_run_finished_at = None
         self.save()
+
+
+SkillFarmAudit.update_status_model = CharacterUpdateStatus
