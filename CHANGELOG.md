@@ -26,7 +26,16 @@ Section Order:
 ### Removed
 -->
 
-<!-- Your changes go here -->
+### Added
+
+- **User-Grouped Character Updates**: Added `update_user_characters` task and updated `update_all_skillfarm` to group characters by user so mains and alts update consistently together.
+- **Alt Character Cascading**: Added `update_alts` support to `update_character` to synchronize other active characters of the same user.
+
+### Changed
+
+- **Direct Task Execution**: Executed character audit update sections sequentially and directly in-process instead of subtask chaining.
+- **Graceful ESI 304 & 5xx Handling**: Handled HTTP 304 Not Modified without raising errors and gracefully caught ESI 5xx/RequestError without flagging false token errors.
+- **Freshness Evaluation**: Evaluated `need_update` based on `last_run_finished_at` to prevent repeated polling when ESI responses are not modified.
 
 ## [4.0.0] - 2026-10-06
 

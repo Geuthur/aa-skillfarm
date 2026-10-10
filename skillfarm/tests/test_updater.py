@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 from django.test import override_settings
 
 # Alliance Auth
+from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # AA Skillfarm
@@ -335,32 +336,28 @@ class TestUpdateManager(SkillFarmTestCase):
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        status_obj = CharacterUpdateStatusFactory(
+        CharacterUpdateStatusFactory(
             character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
 
         def mock_update_method(character, force_refresh=False):
-            raise ValueError("Token error occurred.")
+            raise TokenError("Token error occurred.")
 
-        # Test Action: perform_update_status should persist an error and re-raise
-        with self.assertRaises(ValueError):
-            manager.perform_update_status(
-                section=CharacterUpdateSection.SKILLS,
-                method=mock_update_method,
-                character=self.audit,
-                force_refresh=False,
-            )
-
-        # Expected Results: status object updated due to the exception
-        status_obj = CharacterUpdateStatus.objects.get(
-            character=self.audit,
+        # Test Action
+        result = manager.perform_update_status(
             section=CharacterUpdateSection.SKILLS,
+            method=mock_update_method,
+            character=self.audit,
+            force_refresh=False,
         )
-        self.assertFalse(status_obj.is_success)
-        self.assertFalse(status_obj.has_token_error)
-        self.assertIn("ValueError: Token error occurred.", status_obj.error_message)
+
+        # Expected Results
+        self.assertFalse(result.is_changed)
+        self.assertFalse(result.is_updated)
+        self.assertTrue(result.has_token_error)
+        self.assertIn("TokenError: Token error occurred.", result.error_message)
 
     def test_perform_update_Status_httpserver_error(self):
         """
@@ -373,30 +370,27 @@ class TestUpdateManager(SkillFarmTestCase):
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
-        status_obj = CharacterUpdateStatusFactory(
+        CharacterUpdateStatusFactory(
             character=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
-            is_success=False,  # Ensure is_success is False to test the HTTPServerError scenario
-            has_token_error=False,  # Ensure has_token_error is False to test the HTTPServer
+            is_success=False,
+            has_token_error=False,
         )
 
         def mock_update_method(character, force_refresh=False):
             raise HTTPServerError(status_code=500, headers={}, data=None)
 
-        # Test Action: perform_update_status should persist an error and re-raise
-        with self.assertRaises(HTTPServerError):
-            manager.perform_update_status(
-                section=CharacterUpdateSection.SKILLS,
-                method=mock_update_method,
-                character=self.audit,
-                force_refresh=False,
-            )
-
-        # Expected Results: status object updated due to the exception
-        status_obj = CharacterUpdateStatus.objects.get(
-            character=self.audit,
+        # Test Action
+        result = manager.perform_update_status(
             section=CharacterUpdateSection.SKILLS,
+            method=mock_update_method,
+            character=self.audit,
+            force_refresh=False,
         )
-        self.assertFalse(status_obj.is_success)
-        self.assertFalse(status_obj.has_token_error)
+
+        # Expected Results
+        self.assertFalse(result.is_changed)
+        self.assertFalse(result.is_updated)
+        self.assertFalse(result.has_token_error)
+        self.assertIn("500", result.error_message)

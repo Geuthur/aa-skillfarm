@@ -17,6 +17,7 @@ from skillfarm.models.skillfarmaudit import (
     SkillFarmSetup,
 )
 from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterUpdateStatusFactory,
@@ -25,6 +26,7 @@ from skillfarm.tests.testdata.skillfarm import (
     SkillFarmSetupFactory,
     UserMainFactory,
 )
+from skillfarm.tests.testdata.utils import add_character_to_user
 
 TASK_PATH = "skillfarm.tasks"
 
@@ -43,28 +45,56 @@ class TestUpdateAllSkillfarm(SkillFarmTestCase):
 
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
-    def test_should_update_all_skillfarm(self, mock_update_all_skillfarm):
+    def test_should_update_all_skillfarm(self, mock_update_character):
         """
-            Test should start update_character for each SkillFarmAudit.
-        :return:
-        :rtype:
+        Test should start update_character for each SkillFarmAudit.
         """
-        # when
+        # Test Data
+        # setUpClass has initialized cls.skillfarm_audit
+
+        # Test Action
         tasks.update_all_skillfarm()
-        # then
-        self.assertTrue(mock_update_all_skillfarm.apply_async.called)
+
+        # Expected Result
+        self.assertTrue(mock_update_character.apply_async.called)
+
+    def test_update_all_skillfarm_should_group_by_user(self, mock_update_character):
+        """
+        Test should group characters by user and queue alts together.
+        """
+        # Test Data
+        user_1 = UserMainFactory()
+        main_1 = SkillFarmAuditFactory(user=user_1)
+        alt_1_char = EveCharacterFactory()
+        add_character_to_user(
+            user=user_1,
+            character=alt_1_char,
+            is_main=False,
+            scopes=SkillFarmAudit.get_esi_scopes(),
+        )
+        alt_1 = SkillFarmAuditFactory(user=user_1, character=alt_1_char)
+
+        # Test Action
+        tasks.update_all_skillfarm()
+
+        # Expected Result
+        queued_pks = [
+            call.kwargs["args"][0]
+            for call in mock_update_character.apply_async.call_args_list
+        ]
+        self.assertIn(main_1.pk, queued_pks)
+        self.assertIn(alt_1.pk, queued_pks)
 
 
 @override_settings(
     CELERY_ALWAYS_EAGER=True,
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
 )
-@patch(TASK_PATH + ".chain", spec=True)
 @patch(TASK_PATH + ".logger", spec=True)
 class TestUpdateCharacter(SkillFarmTestCase):
     """Test the update_character task."""
 
-    def test_update_character_should_no_updated(self, mock_logger, __):
+    def test_update_character_should_no_updated(self, mock_logger):
         """
         Test should not update character if no updates are needed.
         """
@@ -96,13 +126,18 @@ class TestUpdateCharacter(SkillFarmTestCase):
 
         # Test Action
         tasks.update_character(character_pk=audit.pk)
+
         # Expected Result
         mock_logger.info.assert_called_once_with(
             "No updates needed for %s",
             audit.character.character_name,
         )
 
-    def test_update_character_should_update(self, mock_logger, mock_chain):
+    @patch(TASK_PATH + ".update_char_skills")
+    @patch(TASK_PATH + ".update_char_skillqueue")
+    def test_update_character_should_update(
+        self, mock_skillqueue, mock_skills, mock_logger
+    ):
         """
         Test should update character if updates are needed.
         """
@@ -123,10 +158,11 @@ class TestUpdateCharacter(SkillFarmTestCase):
 
         # Test Action
         tasks.update_character(character_pk=audit.pk)
-        # Expected Result
-        mock_chain.assert_called_once()
 
-    def test_update_char_skills_should_call_section_update(self, mock_logger, __):
+        # Expected Result
+        mock_skills.assert_called_once_with(character_pk=audit.pk, force_refresh=False)
+
+    def test_update_char_skills_should_call_section_update(self, mock_logger):
         # Test Data
         user = UserMainFactory()
         audit = SkillFarmAuditFactory(user=user)
@@ -138,7 +174,7 @@ class TestUpdateCharacter(SkillFarmTestCase):
         # Expected Result
         mock_update_section.assert_called_once()
 
-    def test_update_char_skillqueue_should_call_section_update(self, mock_logger, __):
+    def test_update_char_skillqueue_should_call_section_update(self, mock_logger):
         # Test Data
         user = UserMainFactory()
         audit = SkillFarmAuditFactory(user=user)
@@ -149,6 +185,76 @@ class TestUpdateCharacter(SkillFarmTestCase):
 
         # Expected Result
         mock_update_section.assert_called_once()
+
+    @patch(TASK_PATH + ".update_character.apply_async")
+    def test_update_user_characters_should_queue_characters(
+        self, mock_apply_async, mock_logger
+    ):
+        """
+        Test that update_user_characters queues all active characters for the given user.
+        """
+        # Test Data
+        user = UserMainFactory()
+        main = SkillFarmAuditFactory(user=user)
+        alt_char = EveCharacterFactory()
+        add_character_to_user(
+            user=user,
+            character=alt_char,
+            is_main=False,
+            scopes=SkillFarmAudit.get_esi_scopes(),
+        )
+        alt = SkillFarmAuditFactory(user=user, character=alt_char, active=True)
+        inactive_char = EveCharacterFactory()
+        add_character_to_user(
+            user=user,
+            character=inactive_char,
+            is_main=False,
+            scopes=SkillFarmAudit.get_esi_scopes(),
+        )
+        SkillFarmAuditFactory(user=user, character=inactive_char, active=False)
+
+        # Test Action
+        tasks.update_user_characters(user_id=user.id, force_refresh=True)
+
+        # Expected Result
+        queued_pks = [
+            call.kwargs["args"][0] for call in mock_apply_async.call_args_list
+        ]
+        self.assertIn(main.pk, queued_pks)
+        self.assertIn(alt.pk, queued_pks)
+        self.assertEqual(len(queued_pks), 2)
+
+    @patch(TASK_PATH + ".update_char_skills")
+    @patch(TASK_PATH + ".update_character.apply_async")
+    def test_update_character_with_update_alts_should_queue_alts(
+        self, mock_apply_async, mock_update_skills, mock_logger
+    ):
+        """
+        Test that update_character queues active alts when update_alts=True.
+        """
+        # Test Data
+        user = UserMainFactory()
+        main = SkillFarmAuditFactory(user=user)
+        alt_char = EveCharacterFactory()
+        add_character_to_user(
+            user=user,
+            character=alt_char,
+            is_main=False,
+            scopes=SkillFarmAudit.get_esi_scopes(),
+        )
+        alt = SkillFarmAuditFactory(user=user, character=alt_char, active=True)
+
+        # Test Action
+        tasks.update_character(
+            character_pk=main.pk, force_refresh=True, update_alts=True
+        )
+
+        # Expected Result
+        mock_apply_async.assert_called_once_with(
+            args=[alt.pk],
+            kwargs={"force_refresh": True, "update_alts": False},
+            priority=7,
+        )
 
 
 @patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)

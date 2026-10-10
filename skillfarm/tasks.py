@@ -6,13 +6,14 @@ from collections.abc import Callable
 
 # Third Party
 import requests
-from celery import Task, chain, shared_task
+from celery import Task, shared_task
 
 # Django
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Min
 from django.db.utils import Error
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
@@ -24,10 +25,8 @@ from skillfarm import __title__, app_settings
 from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.models.skillfarmaudit import (
-    SkillFarmAudit,
-)
-from skillfarm.providers import AppLogger, retry_task_on_esi_error
+from skillfarm.models.skillfarmaudit import SkillFarmAudit
+from skillfarm.providers import AppLogger
 
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
@@ -45,6 +44,12 @@ TASK_DEFAULTS_BIND_ONCE = {**TASK_DEFAULTS, **{"bind": True, "base": QueueOnce}}
 # Default params for tasks that need run once only.
 TASK_DEFAULTS_ONCE = {**TASK_DEFAULTS, **{"base": QueueOnce}}
 
+# Default params for tasks that need run once only per user and are bound to the task instance.
+TASK_DEFAULTS_BIND_ONCE_USER = {
+    **TASK_DEFAULTS_BIND_ONCE,
+    **{"once": {"keys": ["user_id"], "graceful": True}},
+}
+
 # Default params for tasks that need run once only per character and are bound to the task instance.
 TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
     **TASK_DEFAULTS_BIND_ONCE,
@@ -52,41 +57,118 @@ TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
 }
 
 
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_USER)
+def update_user_characters(
+    self: Task, user_id: int, force_refresh: bool = False
+) -> int:
+    """Update all active skillfarm characters belonging to a specific user.
+
+    Args:
+        user_id (int): Django User ID whose characters should be updated
+        force_refresh (bool): Whether to force a refresh of all sections
+
+    Returns:
+        int: Number of character updates initiated
+    """
+    char_pks = list(
+        SkillFarmAudit.objects.filter(
+            character__character_ownership__user_id=user_id, active=True
+        ).values_list("pk", flat=True)
+    )
+    priority = (
+        self.request.delivery_info.get("priority", 7)
+        if hasattr(self, "request") and self.request and self.request.delivery_info
+        else 7
+    )
+    for pk in char_pks:
+        update_character.apply_async(
+            args=[pk],
+            kwargs={"force_refresh": force_refresh, "update_alts": False},
+            priority=priority,
+        )
+    logger.debug("Queued %s characters for user ID %s", len(char_pks), user_id)
+    return len(char_pks)
+
+
 @shared_task(**TASK_DEFAULTS_ONCE)
-def update_all_skillfarm(runs: int = 0, force_refresh=False):
-    """Update all skillfarm characters."""
+def update_all_skillfarm(force_refresh=False):
+    """Update all skillfarm characters, grouping by user."""
     # Disable characters with no owner
     SkillFarmAudit.objects.disable_characters_with_no_owner()
 
-    characters = SkillFarmAudit.objects.select_related("character").filter(active=True)
-    for character in characters:
-        update_character.apply_async(
-            args=[character.pk], kwargs={"force_refresh": force_refresh}
+    # Annotate users with the oldest `last_run_finished_at` across all active skillfarm update sections
+    users = (
+        User.objects.filter(
+            character_ownerships__character__skillfarm_character__active=True
         )
-        runs = runs + 1
+        .annotate(
+            oldest_update=Min(
+                "character_ownerships__character__skillfarm_character__skillfarm_update_status__last_run_finished_at"
+            )
+        )
+        .order_by("oldest_update")
+        .distinct()
+    )
 
-    logger.info("Queued %s Skillfarm Updates", runs)
+    queued_pks = set()
+    for user in users:
+        user_char_pks = list(
+            SkillFarmAudit.objects.filter(
+                character__character_ownership__user=user, active=True
+            )
+            .exclude(pk__in=queued_pks)
+            .values_list("pk", flat=True)
+        )
+        for pk in user_char_pks:
+            update_character.apply_async(
+                args=[pk],
+                kwargs={"force_refresh": force_refresh, "update_alts": False},
+            )
+            queued_pks.add(pk)
+
+    # If there are any characters not mapped to a user, pick up remaining by oldest update
+    other_chars = (
+        SkillFarmAudit.objects.filter(active=True)
+        .exclude(pk__in=queued_pks)
+        .annotate(oldest_update=Min("skillfarm_update_status__last_run_finished_at"))
+        .order_by("oldest_update")
+        .distinct()
+    )
+    for char in other_chars:
+        update_character.apply_async(
+            args=[char.pk],
+            kwargs={"force_refresh": force_refresh, "update_alts": False},
+        )
+        queued_pks.add(char.pk)
+
+    logger.info("Queued %s Skillfarm Updates", len(queued_pks))
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
 def update_character(
     self: Task,  # pylint: disable=unused-argument
     character_pk: int,
-    force_refresh=False,
+    force_refresh: bool = False,
+    update_alts: bool = False,
 ) -> bool:
     """
-    Update a SkillFarmAudit character by queuing necessary section updates.
+    Update a SkillFarmAudit character by running necessary section updates directly.
 
     Args:
         character_pk (int): Primary key of the SkillFarmAudit character to update.
         force_refresh (bool): If True, forces a refresh of all sections.
+        update_alts (bool): If True, also update other active characters of the same user.
 
     Returns:
-        bool: True if updates were queued, False otherwise.
+        bool: True if updates were executed, False otherwise.
     """
-    character = SkillFarmAudit.objects.prefetch_related("skillfarm_update_status").get(
-        pk=character_pk
-    )
+    try:
+        character = SkillFarmAudit.objects.prefetch_related(
+            "skillfarm_update_status"
+        ).get(pk=character_pk)
+    except SkillFarmAudit.DoesNotExist:
+        logger.warning("SkillFarmAudit with pk %s not found.", character_pk)
+        return False
 
     if character.is_orphan:
         logger.info(
@@ -94,9 +176,6 @@ def update_character(
             character,
         )
         return False
-
-    que = []
-    priority = 7
 
     logger.debug(
         "Processing Audit Updates for %s", format(character.character.character_name)
@@ -110,39 +189,75 @@ def update_character(
 
     if not needs_update and not force_refresh:
         logger.info("No updates needed for %s", character.character.character_name)
-        return False
+    else:
+        sections = CharacterUpdateSection.get_sections()
+        runs = 0
 
-    sections = CharacterUpdateSection.get_sections()
+        for section in sections:
+            # Skip sections that are not in the needs_update list
+            if not force_refresh and not needs_update.for_section(section):
+                logger.debug(
+                    "No updates needed for %s (%s)",
+                    character.character.character_name,
+                    section,
+                )
+                continue
 
-    for section in sections:
-        # Skip sections that are not in the needs_update list
-        if not force_refresh and not needs_update.for_section(section):
-            logger.debug(
-                "No updates needed for %s (%s)",
-                character.character.character_name,
-                section,
-            )
-            continue
+            task_name = f"update_char_{section}"
+            task = globals().get(task_name)
+            if task:
+                task(character_pk=character.pk, force_refresh=force_refresh)
+            else:
+                _update_character_section(
+                    character_pk=character.pk,
+                    section=section,
+                    force_refresh=force_refresh,
+                )
+            runs += 1
 
-        task_name = f"update_char_{section}"
-        task = globals().get(task_name)
-        que.append(
-            task.si(character.pk, force_refresh=force_refresh).set(priority=priority)
+        logger.debug(
+            "Executed %s Audit Updates for %s",
+            runs,
+            character.character.character_name,
         )
 
-    chain(que).apply_async()
-    logger.debug(
-        "Queued %s Audit Updates for %s",
-        len(que),
-        character.character.character_name,
-    )
+    if update_alts:
+        user = (
+            character.character.character_ownership.user
+            if hasattr(character.character, "character_ownership")
+            and character.character.character_ownership
+            else None
+        )
+        if user:
+            alts = (
+                SkillFarmAudit.objects.filter(
+                    character__character_ownership__user=user, active=True
+                )
+                .exclude(pk=character_pk)
+                .values_list("pk", flat=True)
+            )
+            priority = (
+                self.request.delivery_info.get("priority", 7)
+                if hasattr(self, "request")
+                and self.request
+                and self.request.delivery_info
+                else 7
+            )
+            for alt_pk in alts:
+                update_character.apply_async(
+                    args=[alt_pk],
+                    kwargs={"force_refresh": force_refresh, "update_alts": False},
+                    priority=priority,
+                )
+
     return True
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
-def update_char_skills(self: Task, character_pk: int, force_refresh: bool):
+def update_char_skills(
+    self: Task, character_pk: int, force_refresh: bool
+):  # pylint: disable=unused-argument
     return _update_character_section(
-        task=self,
         character_pk=character_pk,
         section=CharacterUpdateSection.SKILLS,
         force_refresh=force_refresh,
@@ -150,21 +265,25 @@ def update_char_skills(self: Task, character_pk: int, force_refresh: bool):
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
-def update_char_skillqueue(self: Task, character_pk: int, force_refresh: bool):
+def update_char_skillqueue(
+    self: Task, character_pk: int, force_refresh: bool
+):  # pylint: disable=unused-argument
     return _update_character_section(
-        task=self,
         character_pk=character_pk,
         section=CharacterUpdateSection.SKILLQUEUE,
         force_refresh=force_refresh,
     )
 
 
-def _update_character_section(
-    task: Task, character_pk: int, section: str, force_refresh: bool
-):
+def _update_character_section(character_pk: int, section: str, force_refresh: bool):
     """Update a specific section of the skillfarm audit."""
     section = CharacterUpdateSection(section)
-    character = SkillFarmAudit.objects.get(pk=character_pk)
+    try:
+        character = SkillFarmAudit.objects.get(pk=character_pk)
+    except SkillFarmAudit.DoesNotExist:
+        logger.warning("SkillFarmAudit with pk %s not found.", character_pk)
+        return None
+
     # Reset update status for the section
     character.update_manager.reset_update_status(section)
 
@@ -182,11 +301,7 @@ def _update_character_section(
     else:
         kwargs = {}
 
-    # Perform the update within the retry context manager
-    with retry_task_on_esi_error(task):
-        result = character.update_manager.perform_update_status(
-            section, method, **kwargs
-        )
+    result = character.update_manager.perform_update_status(section, method, **kwargs)
     character.update_manager.update_section_log(section, result)
     try:
         character.update_training_and_extraction_state()
@@ -196,6 +311,7 @@ def _update_character_section(
             character,
             e,
         )
+    return result
 
 
 # pylint: disable=too-many-locals, too-many-branches
@@ -256,8 +372,8 @@ def check_skillfarm_notifications(runs: int = 0):
                 main_character,
             )
             title = _("Skillfarm Notifications")
-            full_message = format_html(
-                "Following Skills have finished training: \n{}", notifiy_message
+            full_message = (
+                f"Following Skills have finished training: \n{notifiy_message}"
             )
 
             send_user_notification.delay(
