@@ -76,4 +76,24 @@ describe("AuthLeftMenu", () => {
     // Expected Result
     expect(container.querySelectorAll("li")).toHaveLength(0);
   });
+
+  it("should render pulsating error styling and badge when has_errors is true", () => {
+    // Test Data
+    const testData = [
+      { name: "Settings", link: "/settings/", has_errors: true, badge: 2 },
+    ];
+
+    // Test Action
+    render(
+      <MemoryRouter initialEntries={["/skillfarm/"]}>
+        <AuthLeftMenu data={testData} isLoading={false} error={false} />
+      </MemoryRouter>
+    );
+
+    // Expected Result
+    const settingsLink = screen.getByText("Settings");
+    expect(settingsLink).toBeDefined();
+    expect(screen.getByText("2")).toHaveClass("badge", "bg-danger");
+  });
 });
+

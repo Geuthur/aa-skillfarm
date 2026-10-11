@@ -28,6 +28,9 @@ Section Order:
 
 ### Added
 
+- **Character Update Status View in Settings**: Added character update status overview in the user Settings page with live status badges (`OK`, `Error`, `Token Error`, `Incomplete`, `Disabled`), pulsating error/warning glows, and sync timestamps for all characters owned by the user.
+- **Pulsating Settings Menu Indicator**: Highlighted the "Settings" navigation button with a pulsating warning/error animation, pinging dot indicator, and count badge whenever any of the user's characters has an ESI or token update error.
+- **User Character Status API**: Added `GET /skillfarm/api/user/characters/status/` endpoint to return section-by-section update statuses, timestamps, and error messages for the user's characters.
 - **`UpdateManagerMixin` & Dynamic Relation Detection**: Added `UpdateManagerMixin` to streamline model-level update management and dynamically resolve owner relations across status models.
 - **User-Grouped Character Updates**: Added `update_user_characters` task and updated `update_all_skillfarm` to group characters by user so mains and alts update consistently together.
 - **Alt Character Cascading**: Added `update_alts` support to `update_character` to synchronize other active characters of the same user.

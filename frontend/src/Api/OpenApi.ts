@@ -56,6 +56,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/skillfarm/api/user/characters/status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user's character update statuses for settings overview */
+        get: operations["skillfarm_api_general_get_user_character_statuses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/skillfarm/api/characters/": {
         parameters: {
             query?: never;
@@ -297,6 +314,13 @@ export interface components {
              * @default false
              */
             is_external: boolean;
+            /** Badge */
+            badge?: number | null;
+            /**
+             * Has Errors
+             * @default false
+             */
+            has_errors: boolean;
         };
         /**
          * MenuSchema
@@ -361,6 +385,68 @@ export interface components {
         UserSettingsUpdateRequest: {
             /** Disable Notifications */
             disable_notifications: boolean;
+        };
+        /**
+         * UserCharacterStatusSchema
+         * @description Status of a user's skillfarm character for settings update overview.
+         */
+        UserCharacterStatusSchema: {
+            /** Character Id */
+            character_id: number;
+            /** Character Name */
+            character_name: string;
+            /** Corporation Id */
+            corporation_id: number;
+            /** Corporation Name */
+            corporation_name: string;
+            /** Corporation Ticker */
+            corporation_ticker: string;
+            /** Portrait Url */
+            portrait_url: string;
+            /** Status */
+            status: string;
+            /**
+             * Has Error
+             * @default false
+             */
+            has_error: boolean;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+            /** Last Sync */
+            last_sync?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+            /**
+             * Sections
+             * @default []
+             */
+            sections: components["schemas"]["UserCharacterStatusSectionSchema"][];
+        };
+        /**
+         * UserCharacterStatusSectionSchema
+         * @description Status of an individual update section.
+         */
+        UserCharacterStatusSectionSchema: {
+            /** Section */
+            section: string;
+            /** Section Name */
+            section_name: string;
+            /** Is Success */
+            is_success?: boolean | null;
+            /**
+             * Has Token Error
+             * @default false
+             */
+            has_token_error: boolean;
+            /** Error Message */
+            error_message?: string | null;
+            /** Last Run At */
+            last_run_at?: string | null;
+            /** Last Run Finished At */
+            last_run_finished_at?: string | null;
         };
         /**
          * CharacterFilter
@@ -882,6 +968,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserSettingsSchema"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_general_get_user_character_statuses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserCharacterStatusSchema"][];
                 };
             };
             /** @description Forbidden */
