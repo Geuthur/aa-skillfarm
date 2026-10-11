@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-skillfarm/\n"
-"POT-Creation-Date: 2026-10-06 23:06+0200\n"
+"POT-Creation-Date: 2026-10-11 21:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,9 +27,10 @@ msgstr ""
 #: skillfarm/api/characters.py:331 skillfarm/api/characters.py:360
 #: skillfarm/api/characters.py:389 skillfarm/api/characters.py:420
 #: skillfarm/api/characters.py:463 skillfarm/api/characters.py:497
-#: skillfarm/api/characters.py:521 skillfarm/api/general.py:96
-#: skillfarm/api/general.py:139 skillfarm/api/general.py:159
-#: skillfarm/api/overview.py:93 skillfarm/api/overview.py:114
+#: skillfarm/api/characters.py:521 skillfarm/api/general.py:112
+#: skillfarm/api/general.py:155 skillfarm/api/general.py:175
+#: skillfarm/api/general.py:196 skillfarm/api/overview.py:93
+#: skillfarm/api/overview.py:114
 msgid "Permission Denied"
 msgstr ""
 
@@ -89,28 +90,28 @@ msgstr ""
 msgid "Successfully acknowledged extractions for %d characters"
 msgstr ""
 
-#: skillfarm/api/general.py:36
+#: skillfarm/api/general.py:39
 msgid "Characters"
 msgstr ""
 
-#: skillfarm/api/general.py:40
+#: skillfarm/api/general.py:43
 msgid "Calculator"
 msgstr ""
 
-#: skillfarm/api/general.py:47
+#: skillfarm/api/general.py:63
 msgid "Settings"
 msgstr ""
 
-#: skillfarm/api/general.py:57
+#: skillfarm/api/general.py:75
 msgid "Overview"
 msgstr ""
 
-#: skillfarm/api/general.py:67
-msgid "Administration"
+#: skillfarm/api/general.py:82
+msgid "Add Character"
 msgstr ""
 
-#: skillfarm/api/general.py:74
-msgid "Add Character"
+#: skillfarm/api/general.py:91
+msgid "Superuser"
 msgstr ""
 
 #: skillfarm/api/overview.py:122
@@ -173,7 +174,7 @@ msgstr ""
 msgid "Skillqueue"
 msgstr ""
 
-#: skillfarm/tasks.py:258
+#: skillfarm/tasks.py:326
 msgid "Skillfarm Notifications"
 msgstr ""
 
