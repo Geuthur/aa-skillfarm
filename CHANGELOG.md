@@ -26,14 +26,17 @@ Section Order:
 ### Removed
 -->
 
+## [4.0.1] - 2026-10-12
+
 ### Added
 
-- **Character Update Status View in Settings**: Added character update status overview in the user Settings page with live status badges (`OK`, `Error`, `Token Error`, `Incomplete`, `Disabled`), pulsating error/warning glows, and sync timestamps for all characters owned by the user.
-- **Pulsating Settings Menu Indicator**: Highlighted the "Settings" navigation button with a pulsating warning/error animation, pinging dot indicator, and count badge whenever any of the user's characters has an ESI or token update error.
-- **User Character Status API**: Added `GET /skillfarm/api/user/characters/status/` endpoint to return section-by-section update statuses, timestamps, and error messages for the user's characters.
 - **`UpdateManagerMixin` & Dynamic Relation Detection**: Added `UpdateManagerMixin` to streamline model-level update management and dynamically resolve owner relations across status models.
 - **User-Grouped Character Updates**: Added `update_user_characters` task and updated `update_all_skillfarm` to group characters by user so mains and alts update consistently together.
 - **Alt Character Cascading**: Added `update_alts` support to `update_character` to synchronize other active characters of the same user.
+
+### Fixed
+
+- **Token Error Handling**: Added `NOT_FOUND` (404) to token error checks, ensuring "Character not found" ESI responses correctly trigger token/permission updates.
 
 ### Changed
 
@@ -698,5 +701,6 @@ This will load all necessary prices
 [3.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v2.0.0...v2.0.1 "3.0.0"
 [3.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...v3.1.0 "3.1.0"
 [4.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...v4.0.0 "v4.0.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...HEAD "In Development"
+[4.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...v4.0.1 "v4.0.1"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
