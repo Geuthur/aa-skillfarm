@@ -143,7 +143,7 @@ class TestUpdateManager(SkillFarmTestCase):
             update_status=CharacterUpdateStatus,
         )
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             return {"key": "value"}
 
         # Test Action
@@ -174,7 +174,7 @@ class TestUpdateManager(SkillFarmTestCase):
         class MockHTTPClientError(HTTPClientError):
             status_code = 403
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             raise MockHTTPClientError(status_code=403, headers={}, data=None)
 
         # Test Action
@@ -203,7 +203,7 @@ class TestUpdateManager(SkillFarmTestCase):
             update_status=CharacterUpdateStatus,
         )
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             raise HTTPNotModified(status_code=304, headers={})
 
         # Test Action
