@@ -54,7 +54,6 @@ class TestUpdateManager(SkillFarmTestCase):
 
         # Expected Results
         self.assertEqual(manager.owner, mock_character)
-        self.assertEqual(manager.character, mock_character)
         self.assertEqual(manager.update_section, mock_update_section)
         self.assertEqual(manager.update_status, mock_update_status)
 
@@ -65,7 +64,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -87,7 +86,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -111,7 +110,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -139,7 +138,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -167,7 +166,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -199,7 +198,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -226,7 +225,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -260,7 +259,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -295,7 +294,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -333,7 +332,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -367,7 +366,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
