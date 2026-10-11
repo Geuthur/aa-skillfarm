@@ -109,14 +109,14 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         )
 
     def _fetch_esi_data(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
+        self, owner: "SkillFarmAudit", force_refresh: bool = False
     ) -> dict:
         """Fetch Skillqueue entries from ESI data."""
-        token = character.get_token()
+        token = owner.get_token()
 
         # Make the ESI request
         skillqueue_data = esi.client.Skills.GetCharactersCharacterIdSkillqueue(
-            character_id=character.character.character_id,
+            character_id=owner.character.character_id,
             token=token,
         )
         character_skillqueue_items = skillqueue_data.results(
@@ -124,13 +124,13 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
         )
 
         self._update_or_create_objs(
-            character=character, character_skillqueue_items=character_skillqueue_items
+            owner=owner, character_skillqueue_items=character_skillqueue_items
         )
 
     @transaction.atomic()
     def _update_or_create_objs(
         self,
-        character: "SkillFarmAudit",
+        owner: "SkillFarmAudit",
         character_skillqueue_items: list["CharactersSkillqueueSkill"],
     ) -> None:
         """Update or Create skill queue entries from objs data."""
@@ -148,8 +148,8 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
 
             entries.append(
                 self.model(
-                    name=character.name,
-                    character=character,
+                    name=owner.name,
+                    character=owner,
                     eve_type=eve_type_instance,
                     finish_date=entry.finish_date,
                     finished_level=entry.finished_level,
@@ -161,7 +161,7 @@ class SkillqueueManager(models.Manager["CharacterSkillqueueEntry"]):
                 )
             )
 
-        self.filter(character=character).delete()
+        self.filter(character=owner).delete()
 
         if len(entries) > 0:
             self.bulk_create(entries, batch_size=SKILLFARM_BULK_METHODS_BATCH_SIZE)

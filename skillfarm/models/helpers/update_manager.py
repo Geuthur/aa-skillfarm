@@ -106,13 +106,10 @@ class UpdateManager:
 
     def __init__(
         self,
-        owner: Any = None,
-        update_section: Any = None,
-        update_status: Any = None,
-        **kwargs: Any,
+        owner: Any,
+        update_section: Any,
+        update_status: Any,
     ):
-        if owner is None and "character" in kwargs:
-            owner = kwargs["character"]
         self.owner = owner
         self.update_section = update_section
         self.update_status = update_status
@@ -186,20 +183,8 @@ class UpdateManager:
             UpdateSectionResult: The result of the update operation.
         """
         section = self.update_section(section)
-        sig = inspect.signature(fetch_func)
-        fetch_kwargs: dict[str, Any] = {}
-        if "force_refresh" in sig.parameters:
-            fetch_kwargs["force_refresh"] = force_refresh
-
         try:
-            if "owner" in sig.parameters:
-                fetch_kwargs["owner"] = self.owner
-                data = fetch_func(**fetch_kwargs)
-            elif "character" in sig.parameters:
-                fetch_kwargs["character"] = self.owner
-                data = fetch_func(**fetch_kwargs)
-            else:
-                data = fetch_func(self.owner, **fetch_kwargs)
+            data = fetch_func(owner=self.owner, force_refresh=force_refresh)
 
             logger.debug(
                 "%s: Update has changed, section: %s", self.owner, section.label
@@ -209,7 +194,27 @@ class UpdateManager:
                 is_updated=True,
                 data=data,
             )
-        except HTTPNotModified:
+        except Exception as exc:  # pylint: disable=broad-exception-caught
+            return self._handle_update_exception(section, exc, catch_token_error=False)
+
+    def _handle_update_exception(
+        self,
+        section: models.TextChoices,
+        exc: Exception,
+        catch_token_error: bool = True,
+    ) -> UpdateSectionResult:
+        """
+        Handle and categorize exceptions occurred during section updates.
+
+        Args:
+            section (models.TextChoices): The section that was being updated.
+            exc (Exception): The exception that was raised.
+            catch_token_error (bool): Whether to catch TokenError or re-raise it.
+
+        Returns:
+            UpdateSectionResult: The structured result of the failed update operation.
+        """
+        if isinstance(exc, HTTPNotModified):
             logger.debug(
                 "%s: Update has not changed (HTTP 304), section: %s",
                 self.owner,
@@ -221,7 +226,8 @@ class UpdateManager:
                 has_token_error=False,
                 error_message="",
             )
-        except (HTTPServerError, RequestError) as exc:
+
+        if isinstance(exc, (HTTPServerError, RequestError)):
             error_message = f"{type(exc).__name__}: {str(exc)}"
             logger.debug(
                 "%s: %s: ESI server error / timeout: %s",
@@ -235,34 +241,65 @@ class UpdateManager:
                 has_token_error=False,
                 error_message=error_message,
             )
-        except HTTPClientError as exc:
-            error_message = f"{type(exc).__name__} ({exc.status_code}): {str(exc)}"
-            is_token_problem = exc.status_code in [
-                HTTPStatus.UNAUTHORIZED,
-                HTTPStatus.FORBIDDEN,
-            ]
-            if is_token_problem:
-                logger.warning(
-                    "%s: %s: Update has Token Error: %s %s",
-                    self.owner,
-                    section.label,
-                    error_message,
-                    exc.status_code,
-                )
-            else:
-                logger.debug(
-                    "%s: %s: Update has Client Error: %s %s",
-                    self.owner,
-                    section.label,
-                    error_message,
-                    exc.status_code,
-                )
+
+        if isinstance(exc, TokenError):
+            if not catch_token_error:
+                raise exc
+            error_message = f"{type(exc).__name__}: {str(exc)}"
+            logger.warning(
+                "%s: %s: Update has Token Error: %s",
+                self.owner,
+                section.label,
+                error_message,
+            )
             return UpdateSectionResult(
                 is_changed=False,
                 is_updated=False,
-                has_token_error=is_token_problem,
+                has_token_error=True,
                 error_message=error_message,
             )
+
+        error_message = (
+            f"{type(exc).__name__} ({exc.status_code}): {str(exc)}"
+            if isinstance(exc, HTTPClientError)
+            else f"{type(exc).__name__}: {str(exc)}"
+        )
+        is_token_problem = isinstance(exc, HTTPClientError) and exc.status_code in [
+            HTTPStatus.UNAUTHORIZED,
+            HTTPStatus.FORBIDDEN,
+        ]
+        if is_token_problem:
+            logger.warning(
+                (
+                    "%s: %s: Update has Token Error: %s %s"
+                    if isinstance(exc, HTTPClientError)
+                    else "%s: %s: Update has Token Error: %s"
+                ),
+                self.owner,
+                section.label,
+                error_message,
+                *([exc.status_code] if isinstance(exc, HTTPClientError) else []),
+            )
+        else:
+            log_fn = logger.debug if isinstance(exc, HTTPClientError) else logger.error
+            log_fn(
+                (
+                    "%s: %s: Update has Client Error: %s %s"
+                    if isinstance(exc, HTTPClientError)
+                    else "%s: %s: Error during update status: %s"
+                ),
+                self.owner,
+                section.label,
+                error_message,
+                *([exc.status_code] if isinstance(exc, HTTPClientError) else []),
+            )
+
+        return UpdateSectionResult(
+            is_changed=False,
+            is_updated=False,
+            has_token_error=is_token_problem,
+            error_message=error_message,
+        )
 
     def update_section_log(
         self, section: models.TextChoices, result: UpdateSectionResult
@@ -309,63 +346,9 @@ class UpdateManager:
             UpdateSectionResult: The result of the method call.
         """
         try:
-            result = method(*args, **kwargs)
-        except (HTTPServerError, RequestError) as exc:
-            error_message = f"{type(exc).__name__}: {str(exc)}"
-            logger.debug(
-                "%s: %s: ESI server error / timeout: %s",
-                self.owner,
-                section.label,
-                error_message,
-            )
-            return UpdateSectionResult(
-                is_changed=False,
-                is_updated=False,
-                has_token_error=False,
-                error_message=error_message,
-            )
-        except TokenError as exc:
-            error_message = f"{type(exc).__name__}: {str(exc)}"
-            logger.warning(
-                "%s: %s: Update has Token Error: %s",
-                self.owner,
-                section.label,
-                error_message,
-            )
-            return UpdateSectionResult(
-                is_changed=False,
-                is_updated=False,
-                has_token_error=True,
-                error_message=error_message,
-            )
+            return method(*args, **kwargs)
         except Exception as exc:  # pylint: disable=broad-exception-caught
-            error_message = f"{type(exc).__name__}: {str(exc)}"
-            # pylint: disable=no-member
-            is_token_problem = isinstance(exc, HTTPClientError) and exc.status_code in [
-                HTTPStatus.UNAUTHORIZED,
-                HTTPStatus.FORBIDDEN,
-            ]
-            if is_token_problem:
-                logger.warning(
-                    "%s: %s: Update has Token Error: %s",
-                    self.owner,
-                    section.label,
-                    error_message,
-                )
-            else:
-                logger.error(
-                    "%s: %s: Error during update status: %s",
-                    self.owner,
-                    section.label,
-                    error_message,
-                )
-            return UpdateSectionResult(
-                is_changed=False,
-                is_updated=False,
-                has_token_error=is_token_problem,
-                error_message=error_message,
-            )
-        return result
+            return self._handle_update_exception(section, exc)
 
     def get_sections_to_update(self, force_refresh: bool = False) -> list[str]:
         """
