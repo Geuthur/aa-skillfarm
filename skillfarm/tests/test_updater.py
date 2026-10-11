@@ -54,7 +54,6 @@ class TestUpdateManager(SkillFarmTestCase):
 
         # Expected Results
         self.assertEqual(manager.owner, mock_character)
-        self.assertEqual(manager.character, mock_character)
         self.assertEqual(manager.update_section, mock_update_section)
         self.assertEqual(manager.update_status, mock_update_status)
 
@@ -65,7 +64,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -87,7 +86,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -111,7 +110,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -139,12 +138,12 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             return {"key": "value"}
 
         # Test Action
@@ -167,7 +166,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -175,7 +174,7 @@ class TestUpdateManager(SkillFarmTestCase):
         class MockHTTPClientError(HTTPClientError):
             status_code = 403
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             raise MockHTTPClientError(status_code=403, headers={}, data=None)
 
         # Test Action
@@ -199,12 +198,12 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
 
-        def mock_fetch_func(character=None, force_refresh=False):
+        def mock_fetch_func(owner=None, force_refresh=False):
             raise HTTPNotModified(status_code=304, headers={})
 
         # Test Action
@@ -226,7 +225,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -260,7 +259,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -295,7 +294,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -333,7 +332,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )
@@ -367,7 +366,7 @@ class TestUpdateManager(SkillFarmTestCase):
         # Test Data
         self.audit = SkillFarmAuditFactory(user=self.user)
         manager = self.updater(
-            character=self.audit,
+            owner=self.audit,
             update_section=CharacterUpdateSection,
             update_status=CharacterUpdateStatus,
         )

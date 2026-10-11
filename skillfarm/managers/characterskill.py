@@ -75,25 +75,25 @@ class SkillManager(models.Manager["CharacterSkill"]):
         )
 
     def _fetch_esi_data(
-        self, character: "SkillFarmAudit", force_refresh: bool = False
+        self, owner: "SkillFarmAudit", force_refresh: bool = False
     ) -> dict:
-        token = character.get_token()
+        token = owner.get_token()
 
         # Make the ESI request
         character_skills = esi.client.Skills.GetCharactersCharacterIdSkills(
-            character_id=character.character.character_id,
+            character_id=owner.character.character_id,
             token=token,
         )
         character_skills_items = character_skills.results(force_refresh=force_refresh)
 
         self._update_or_create_objs(
-            character=character, character_skills_items=character_skills_items
+            owner=owner, character_skills_items=character_skills_items
         )
 
     @transaction.atomic()
     def _update_or_create_objs(
         self,
-        character: "SkillFarmAudit",
+        owner: "SkillFarmAudit",
         character_skills_items: list["CharactersSkills"],
     ) -> None:
         """Update or Create skill entries from objs data."""
@@ -102,24 +102,20 @@ class SkillManager(models.Manager["CharacterSkill"]):
             if len(skills_list) >= 1:
                 incoming_ids = set(skills_list)
                 existing_ids = set(
-                    self.filter(character=character).values_list(
-                        "eve_type_id", flat=True
-                    )
+                    self.filter(character=owner).values_list("eve_type_id", flat=True)
                 )
 
                 obsolete_ids = existing_ids.difference(incoming_ids)
                 if obsolete_ids:
                     logger.debug(
-                        "%s: Deleting %s obsolete skill/s", character, len(obsolete_ids)
+                        "%s: Deleting %s obsolete skill/s", owner, len(obsolete_ids)
                     )
-                    self.filter(
-                        character=character, eve_type_id__in=obsolete_ids
-                    ).delete()
+                    self.filter(character=owner, eve_type_id__in=obsolete_ids).delete()
 
                 create_ids = incoming_ids.difference(existing_ids)
                 if create_ids:
                     self._create_from_list(
-                        character=character,
+                        character=owner,
                         skills_list=character_skills.skills,
                         create_ids=create_ids,
                     )
@@ -127,7 +123,7 @@ class SkillManager(models.Manager["CharacterSkill"]):
                 update_ids = incoming_ids.intersection(existing_ids)
                 if update_ids:
                     self._update_from_list(
-                        character=character,
+                        character=owner,
                         skills_list=character_skills.skills,
                         update_ids=update_ids,
                     )
