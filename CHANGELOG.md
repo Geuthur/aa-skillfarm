@@ -26,7 +26,19 @@ Section Order:
 ### Removed
 -->
 
-<!-- Your changes go here -->
+### Added
+
+- **`UpdateManagerMixin` & Dynamic Relation Detection**: Added `UpdateManagerMixin` to streamline model-level update management and dynamically resolve owner relations across status models.
+- **User-Grouped Character Updates**: Added `update_user_characters` task and updated `update_all_skillfarm` to group characters by user so mains and alts update consistently together.
+- **Alt Character Cascading**: Added `update_alts` support to `update_character` to synchronize other active characters of the same user.
+
+### Changed
+
+- **Modular Update Manager**: Encapsulated section discovery (`get_sections_to_update`) and execution (`execute_section`) inside `UpdateManager`, removing boilerplate orchestration from tasks.
+- **Standardized Owner Field**: Standardized `CharacterUpdateStatus` foreign key to `owner` (with `db_column='character_id'` and compatibility property), eliminating dynamic reflection methods (`_get_owner_field_name`, `_owner_filter`).
+- **Direct Task Execution**: Executed character audit update sections sequentially and directly in-process instead of subtask chaining.
+- **Graceful ESI 304 & 5xx Handling**: Handled HTTP 304 Not Modified without raising errors and gracefully caught ESI 5xx/RequestError without flagging false token errors.
+- **Freshness Evaluation**: Evaluated `need_update` based on `last_run_finished_at` to prevent repeated polling when ESI responses are not modified.
 
 ## [4.0.0] - 2026-10-06
 

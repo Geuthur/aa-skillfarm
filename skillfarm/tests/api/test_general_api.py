@@ -35,10 +35,10 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertIn("Characters", left_names)
         self.assertIn("Calculator", left_names)
         self.assertIn("Settings", left_names)
-        self.assertNotIn("Administration", right_names)
+        self.assertNotIn("Superuser", right_names)
         self.assertNotIn("Overview", right_names)
 
-    def test_get_menu_as_superuser_should_include_administration(self):
+    def test_get_menu_as_superuser_should_include_superuser(self):
         # Test Data
         url = reverse(f"{API_URL}:get_menu")
         self.client.force_login(self.superuser)
@@ -50,24 +50,7 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
         right_names = [link["name"] for link in data["right_links"]]
-        self.assertIn("Administration", right_names)
-
-    def test_get_menu_as_admin_permission_user_should_include_administration(self):
-        # Test Data
-        admin_user = UserMainFactory(
-            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
-        )
-        url = reverse(f"{API_URL}:get_menu")
-        self.client.force_login(admin_user)
-
-        # Test Action
-        response = self.client.get(url)
-
-        # Expected Result
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        data = response.json()
-        right_names = [link["name"] for link in data["right_links"]]
-        self.assertIn("Administration", right_names)
+        self.assertIn("Superuser", right_names)
 
     def test_get_menu_as_corp_access_user_should_include_overview(self):
         # Test Data
@@ -84,7 +67,7 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         right_names = [link["name"] for link in response.json()["right_links"]]
         self.assertIn("Overview", right_names)
-        self.assertNotIn("Administration", right_names)
+        self.assertNotIn("Superuser", right_names)
 
     def test_get_user_with_permission_should_return_user_data(self):
         # Test Data
