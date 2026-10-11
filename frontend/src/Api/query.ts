@@ -1,6 +1,7 @@
 export const queryKeys = {
   User: ["user"] as const,
   UserSettings: ["userSettings"] as const,
+  UserCharacterStatuses: ["userCharacterStatuses"] as const,
   Menu: ["menu"] as const,
   CharactersRoot: ["characters"] as const,
   Characters: (filters?: unknown) => ["characters", filters] as const,

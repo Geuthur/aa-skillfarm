@@ -41,12 +41,43 @@ class UserSettingsUpdateRequest(Schema):
     disable_notifications: bool
 
 
+class UserCharacterStatusSectionSchema(Schema):
+    """Status of an individual update section."""
+
+    section: str
+    section_name: str
+    is_success: bool | None = None
+    has_token_error: bool = False
+    error_message: str | None = None
+    last_run_at: str | None = None
+    last_run_finished_at: str | None = None
+
+
+class UserCharacterStatusSchema(Schema):
+    """Status of a user's skillfarm character for settings update overview."""
+
+    character_id: int
+    character_name: str
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    portrait_url: str
+    status: str  # "ok", "error", "token_error", "disabled", "incomplete", "in_progress"
+    has_error: bool = False
+    is_active: bool = True
+    last_sync: str | None = None
+    error_message: str | None = None
+    sections: list[UserCharacterStatusSectionSchema] = []
+
+
 class MenuLink(Schema):
     """A single link item in the menu bar."""
 
     name: str
     link: str | None = None
     is_external: bool = False
+    badge: int | None = None
+    has_errors: bool = False
 
 
 class MenuSchema(Schema):

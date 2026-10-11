@@ -38,6 +38,42 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertNotIn("Superuser", right_names)
         self.assertNotIn("Overview", right_names)
 
+    def test_get_menu_with_character_error_should_set_has_errors_on_settings(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.models.helpers.update_manager import CharacterUpdateSection
+        from skillfarm.tests.testdata.skillfarm import (
+            CharacterUpdateStatusFactory,
+            SkillFarmAuditFactory,
+        )
+
+        audit = SkillFarmAuditFactory(
+            user=self.user,
+            character=self.user_character,
+            active=True,
+        )
+        CharacterUpdateStatusFactory(
+            owner=audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=False,
+            has_token_error=False,
+            error_message="ESI error",
+        )
+        url = reverse(f"{API_URL}:get_menu")
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        settings_link = next(
+            link for link in data["left_links"] if link["name"] == "Settings"
+        )
+        self.assertTrue(settings_link["has_errors"])
+        self.assertEqual(settings_link["badge"], 1)
+
     def test_get_menu_as_superuser_should_include_superuser(self):
         # Test Data
         url = reverse(f"{API_URL}:get_menu")
@@ -151,6 +187,114 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
             data='{"disable_notifications": true}',
             content_type="application/json",
         )
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_get_user_character_statuses_with_permission_should_return_character_statuses(
+        self,
+    ):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.models.helpers.update_manager import CharacterUpdateSection
+        from skillfarm.tests.testdata.skillfarm import (
+            CharacterUpdateStatusFactory,
+            SkillFarmAuditFactory,
+        )
+
+        audit = SkillFarmAuditFactory(
+            user=self.user,
+            character=self.user_character,
+            active=True,
+        )
+        CharacterUpdateStatusFactory(
+            owner=audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            has_token_error=False,
+            error_message="",
+        )
+        CharacterUpdateStatusFactory(
+            owner=audit,
+            section=CharacterUpdateSection.SKILLQUEUE,
+            is_success=True,
+            has_token_error=False,
+            error_message="",
+        )
+        url = reverse(f"{API_URL}:get_user_character_statuses")
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        char_status = data[0]
+        self.assertEqual(char_status["character_id"], self.user_character.character_id)
+        self.assertEqual(
+            char_status["character_name"], self.user_character.character_name
+        )
+        self.assertEqual(char_status["status"], "ok")
+        self.assertFalse(char_status["has_error"])
+        self.assertTrue(char_status["is_active"])
+        self.assertEqual(len(char_status["sections"]), 2)
+
+    def test_get_user_character_statuses_with_error_should_return_has_error_flag(
+        self,
+    ):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.models.helpers.update_manager import CharacterUpdateSection
+        from skillfarm.tests.testdata.skillfarm import (
+            CharacterUpdateStatusFactory,
+            SkillFarmAuditFactory,
+        )
+
+        audit = SkillFarmAuditFactory(
+            user=self.user,
+            character=self.user_character,
+            active=True,
+        )
+        CharacterUpdateStatusFactory(
+            owner=audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=False,
+            has_token_error=False,
+            error_message="ESI request timed out",
+        )
+        CharacterUpdateStatusFactory(
+            owner=audit,
+            section=CharacterUpdateSection.SKILLQUEUE,
+            is_success=True,
+            has_token_error=False,
+            error_message="",
+        )
+        url = reverse(f"{API_URL}:get_user_character_statuses")
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        char_status = data[0]
+        self.assertEqual(char_status["status"], "error")
+        self.assertTrue(char_status["has_error"])
+        self.assertEqual(char_status["error_message"], "ESI request timed out")
+
+    def test_get_user_character_statuses_without_permission_should_return_forbidden(
+        self,
+    ):
+        # Test Data
+        url = reverse(f"{API_URL}:get_user_character_statuses")
+        self.client.force_login(self.no_permission_user)
+
+        # Test Action
+        response = self.client.get(url)
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)

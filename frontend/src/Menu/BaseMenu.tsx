@@ -10,15 +10,15 @@ import type { components } from "@/Api/OpenApi";
 export type MenuLinkItem = components["schemas"]["MenuLink"];
 
 export interface MenuCategory {
-  name: string;
-  link?: string;
-  links?: MenuLinkItem[];
+    name: string;
+    link?: string;
+    links?: MenuLinkItem[];
 }
 
 export interface MenuProps {
-  isLoading: boolean;
-  data: Array<MenuCategory | MenuLinkItem>;
-  error: boolean;
+    isLoading: boolean;
+    data: Array<MenuCategory | MenuLinkItem>;
+    error: boolean;
 }
 
 export interface ToPath {
@@ -58,7 +58,16 @@ export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
                 key={link.name}
                 active={hit}
             >
+                {link.has_errors && (
+                    <span className="aa-pending-dot-container me-1" aria-hidden="true">
+                        <span className="aa-danger-dot-ping" />
+                        <span className="aa-danger-dot-core" />
+                    </span>
+                )}
                 {t(link.name)}
+                {link.badge ? (
+                    <span className="badge bg-danger ms-1">{link.badge}</span>
+                ) : null}
             </Nav.Link>
         </Nav.Item>
     );

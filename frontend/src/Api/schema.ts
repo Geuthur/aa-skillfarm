@@ -19,3 +19,5 @@ export type AdminStatsResponse = components["schemas"]["AdminStatsResponse"];
 export type OverviewUserSchema = components["schemas"]["OverviewUserSchema"];
 export type OverviewResponse = components["schemas"]["OverviewResponse"];
 export type OverviewUserCharactersResponse = components["schemas"]["OverviewUserCharactersResponse"];
+export type UserCharacterStatusSchema = components["schemas"]["UserCharacterStatusSchema"];
+export type UserCharacterStatusSectionSchema = components["schemas"]["UserCharacterStatusSectionSchema"];
