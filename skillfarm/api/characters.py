@@ -29,7 +29,7 @@ from skillfarm.providers import AppLogger
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, duplicate-code
 def _serialize_character_summary(
     audit: SkillFarmAudit,
 ) -> schema.CharacterSummarySchema:
