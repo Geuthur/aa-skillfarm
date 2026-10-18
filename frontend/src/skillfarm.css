@@ -215,9 +215,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    background-color: var(--aa-body);
+    background-color: var(--aa-panel-bg, var(--aa-body));
     border: var(--aa-border-solid);
-    border-color: var(--aa-border-light);
+    border-color: var(--aa-panel-border, var(--aa-border-light));
     border-radius: var(--aa-border-radius);
     padding: 14px 18px;
     margin-bottom: 20px;
@@ -225,9 +225,9 @@
 }
 
 .sf-search-input {
-    background-color: #27272a;
-    border: 1px solid #3f3f46;
-    color: #e4e4e7;
+    background-color: var(--aa-input-bg, #27272a);
+    border: 1px solid var(--aa-input-border, #3f3f46);
+    color: var(--aa-input-color, #e4e4e7);
     font-size: var(--aa-font-size-sm);
     border-radius: 6px;
     padding: 6px 12px;
@@ -241,9 +241,9 @@
 }
 
 .sf-select {
-    background-color: #27272a;
-    border: 1px solid #3f3f46;
-    color: #e4e4e7;
+    background-color: var(--aa-input-bg, #27272a);
+    border: 1px solid var(--aa-input-border, #3f3f46);
+    color: var(--aa-input-color, #e4e4e7);
     font-size: var(--aa-font-size-sm);
     border-radius: 6px;
     padding: 6px 12px;
@@ -317,8 +317,8 @@
     overflow-x: auto;
     border-radius: var(--aa-border-radius);
     border: var(--aa-border-solid);
-    border-color: var(--aa-border-light);
-    background-color: var(--aa-body);
+    border-color: var(--aa-panel-border, var(--aa-border-light));
+    background-color: var(--aa-table-shell-bg, var(--aa-body));
 }
 
 .sf-table {
@@ -329,7 +329,7 @@
 }
 
 .sf-table th {
-    background-color: var(--aa-bg-dark);
+    background-color: var(--aa-table-head-bg, var(--aa-bg-dark));
     color: var(--aa-text-secondary);
     font-weight: var(--aa-font-weight-bold);
     text-transform: uppercase;
@@ -337,17 +337,17 @@
     letter-spacing: .05em;
     padding: 12px 16px;
     text-align: left;
-    border-bottom: 2px solid var(--aa-border-light);
+    border-bottom: 2px solid var(--aa-panel-border, var(--aa-border-light));
 }
 
 .sf-table td {
     padding: 12px 16px;
-    border-bottom: 1px solid #27272a;
+    border-bottom: 1px solid var(--aa-table-row-border, #27272a);
     vertical-align: middle;
 }
 
 .sf-table tr:hover td {
-    background-color: rgba(39, 39, 42, 0.4);
+    background-color: var(--aa-table-row-hover, rgba(39, 39, 42, 0.4));
 }
 
 /* ═══ MODAL OVERLAY ════════════════════════════════════════════════════════ */
@@ -367,9 +367,9 @@
 }
 
 .sf-modal-content {
-    background-color: var(--aa-color-body);
+    background-color: var(--aa-panel-bg, var(--aa-color-body));
     border: var(--aa-border-solid);
-    border-color: var(--aa-border-light);
+    border-color: var(--aa-panel-border, var(--aa-border-light));
     border-radius: var(--aa-border-radius);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     max-width: 650px;
@@ -385,8 +385,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid var(--aa-border-light);
-    background-color: var(--aa-bg-dark);
+    border-bottom: 1px solid var(--aa-panel-border, var(--aa-border-light));
+    background-color: var(--aa-panel-header-bg, var(--aa-bg-dark));
 }
 
 .sf-modal-body {
@@ -401,6 +401,6 @@
     justify-content: flex-end;
     gap: 12px;
     padding: 14px 20px;
-    border-top: 1px solid var(--aa-border-light);
-    background-color: var(--aa-bg-dark);
+    border-top: 1px solid var(--aa-panel-border, var(--aa-border-light));
+    background-color: var(--aa-panel-header-bg, var(--aa-bg-dark));
 }
