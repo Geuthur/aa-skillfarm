@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-skillfarm/\n"
-"POT-Creation-Date: 2026-10-11 21:26+0200\n"
+"POT-Creation-Date: 2026-10-18 20:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,11 +178,11 @@ msgstr ""
 msgid "Skillfarm Notifications"
 msgstr ""
 
-#: skillfarm/templates/skillfarm/react_skillfarm.html:22
+#: skillfarm/templates/skillfarm/react_skillfarm.html:18
 msgid "Error loading Skillfarm frontend"
 msgstr ""
 
-#: skillfarm/templates/skillfarm/react_skillfarm.html:35
+#: skillfarm/templates/skillfarm/react_skillfarm.html:23
 msgid "Loading Skillfarm..."
 msgstr ""
 

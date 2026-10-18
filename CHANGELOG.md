@@ -30,6 +30,8 @@ Section Order:
 
 <!-- Your changes go here -->
 
+## [4.0.2] - 2026-10-18
+
 ### Changed
 
 - Replaced `<main>` and `<section>` layout elements with `react-bootstrap` `Card` and theme-compatible containers across all pages, headers, and settings components.
@@ -711,5 +713,6 @@ This will load all necessary prices
 [3.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.0.0...v3.1.0 "3.1.0"
 [4.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...v4.0.0 "v4.0.0"
 [4.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...v4.0.1 "v4.0.1"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...HEAD "In Development"
+[4.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...v4.0.2 "v4.0.2"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.2...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
