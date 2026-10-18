@@ -26,6 +26,15 @@ Section Order:
 ### Removed
 -->
 
+<!-- AI Changes -->
+
+<!-- Your changes go here -->
+
+### Changed
+
+- Replaced `<main>` and `<section>` layout elements with `react-bootstrap` `Card` and theme-compatible containers across all pages, headers, and settings components.
+- Added comprehensive CSS design tokens and theme overrides in `index.css` and `skillfarm.css` for full Flatly and Darkly Alliance Auth compatibility.
+
 ## [4.0.1] - 2026-10-12
 
 ### Added
