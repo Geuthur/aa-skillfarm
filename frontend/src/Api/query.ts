@@ -9,6 +9,9 @@ export const queryKeys = {
   SkillSetup: (characterId: number | null) => ["skillSetup", characterId] as const,
   Calculator: ["calculatorData"] as const,
   AdminStats: ["adminStats"] as const,
+  SuperuserAudits: ["superuserAudits"] as const,
+  SuperuserAuditInspect: (characterId: number | null) =>
+    ["superuserAuditInspect", characterId] as const,
   Overview: ["overview"] as const,
   OverviewUser: (userId: number | null, filters?: unknown) =>
     ["overview", "user", userId, filters] as const,

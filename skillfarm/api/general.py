@@ -89,7 +89,7 @@ class ApiEndpoints:
                 right_menu.append(
                     schema.MenuLink(
                         name=_("Superuser"),
-                        link="/admin/",
+                        link="/superuser/",
                     )
                 )
 

@@ -14,13 +14,13 @@ import "@/App.css";
 import "@/index.css";
 
 import { ErrorPage } from "@/Pages/404";
-import { AdminPage } from "@/Pages/AdminPage";
 import AuthPage from "@/Pages/Base";
 import { CalculatorPage } from "@/Pages/CalculatorPage";
 import { DashboardPage } from "@/Pages/Dashboard";
 import { OverviewPage } from "@/Pages/OverviewPage";
 import { OverviewUserPage } from "@/Pages/OverviewUserPage";
 import { SettingsPage } from "@/Pages/SettingsPage";
+import { SuperuserPage } from "@/Pages/SuperuserPage";
 
 export const AppName = "aa-skillfarm";
 export const ProjectName = "skillfarm";
@@ -66,7 +66,8 @@ function App() {
               <Route path={`/${ProjectName}/`} element={<AuthPage />}>
                 <Route index element={<DashboardPage />} />
                 <Route path="calculator/" element={<CalculatorPage />} />
-                <Route path="admin/" element={<AdminPage />} />
+                <Route path="superuser/" element={<SuperuserPage />} />
+                <Route path="admin/" element={<Navigate to={`/${ProjectName}/superuser/`} replace />} />
                 <Route path="overview/" element={<OverviewPage />} />
                 <Route path="overview/:userId/" element={<OverviewUserPage />} />
                 <Route path="settings/" element={<SettingsPage />} />

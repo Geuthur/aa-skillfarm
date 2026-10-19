@@ -28,6 +28,16 @@ Section Order:
 
 <!-- AI Changes -->
 
+### Added
+
+- [ADD] Superuser management endpoints and frontend interface with red navigation badge (`.aa-nav-danger`) and `ShieldAlert` icon.
+- [ADD] Comprehensive Superuser character audits table displaying all characters, owners, ESI status, SP, and ready extractions with individual inspect, update (normal/force), and delete actions.
+- [ADD] `nuqs`-synchronized character inspection view allowing deep-linking and browser navigation (`?inspect=<characterId>`).
+
+### Changed
+
+- [CHANGE] Updated Superuser navigation link to `/superuser/` and added redirect from `/admin/`.
+
 <!-- Your changes go here -->
 
 ## [4.0.2] - 2026-10-18

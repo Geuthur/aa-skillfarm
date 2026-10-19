@@ -793,3 +793,13 @@ html[data-bs-theme="dark"] {
         box-shadow: 0 0 10px 2px rgba(244, 63, 94, 0.5);
     }
 }
+
+.aa-nav-danger {
+    color: var(--aa-color-rose, #f43f5e) !important;
+    font-weight: 600;
+}
+
+.aa-nav-danger:hover {
+    color: var(--aa-color-rose-light, #fda4af) !important;
+    text-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+}

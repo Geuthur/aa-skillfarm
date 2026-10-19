@@ -21,3 +21,6 @@ export type OverviewResponse = components["schemas"]["OverviewResponse"];
 export type OverviewUserCharactersResponse = components["schemas"]["OverviewUserCharactersResponse"];
 export type UserCharacterStatusSchema = components["schemas"]["UserCharacterStatusSchema"];
 export type UserCharacterStatusSectionSchema = components["schemas"]["UserCharacterStatusSectionSchema"];
+export type SuperuserAuditSchema = components["schemas"]["SuperuserAuditSchema"];
+export type SuperuserAuditUpdateRequest = components["schemas"]["SuperuserAuditUpdateRequest"];
+

@@ -10,6 +10,7 @@ import type {
   OverviewResponse,
   OverviewUserCharactersResponse,
   SkillSetupSchema,
+  SuperuserAuditSchema,
   UserData,
   UserCharacterStatusSchema,
   UserSettingsSchema,
@@ -226,3 +227,57 @@ export async function triggerUpdatePrices(): Promise<ActionResponse> {
   }
   return data as ActionResponse;
 }
+
+export async function loadSuperuserAudits(): Promise<SuperuserAuditSchema[]> {
+  const { data, error } = await apiClient.GET(`${API_BASE}/superuser/audits/`, {});
+  if (error || !data) {
+    throw new Error("Failed to load superuser audits");
+  }
+  return data as SuperuserAuditSchema[];
+}
+
+export async function triggerSuperuserAuditUpdate(
+  characterId: number,
+  forceRefresh: boolean = false,
+): Promise<ActionResponse> {
+  const { data, error } = await apiClient.POST(
+    `${API_BASE}/superuser/audits/{character_id}/update/`,
+    {
+      params: { path: { character_id: characterId } },
+      body: { force_refresh: forceRefresh },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to trigger audit update");
+  }
+  return data as ActionResponse;
+}
+
+export async function deleteSuperuserAudit(characterId: number): Promise<ActionResponse> {
+  const { data, error } = await apiClient.DELETE(
+    `${API_BASE}/superuser/audits/{character_id}/`,
+    {
+      params: { path: { character_id: characterId } },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to delete character audit");
+  }
+  return data as ActionResponse;
+}
+
+export async function loadSuperuserAuditInspect(
+  characterId: number,
+): Promise<CharacterDetailResponse> {
+  const { data, error } = await apiClient.GET(
+    `${API_BASE}/superuser/audits/{character_id}/inspect/`,
+    {
+      params: { path: { character_id: characterId } },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to load character inspection details");
+  }
+  return data as CharacterDetailResponse;
+}
+

@@ -251,3 +251,32 @@ class CalculatorResponse(Schema):
     month_calc: float = 0.0
     month12_calc: float = 0.0
     month24_calc: float = 0.0
+
+
+class SuperuserAuditSchema(Schema):
+    """Schema for superuser character audit management."""
+
+    character_id: int
+    character_name: str
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    user_id: int | None = None
+    user_name: str | None = None
+    portrait_url: str | None = None
+    total_sp: int
+    is_training: bool
+    current_training_skill: str | None = None
+    training_finish_date: str | None = None
+    queue_finish_date: str | None = None
+    extractions_ready_count: int = 0
+    active: bool = True
+    status: str = "ok"  # "ok", "warning", "error", "token_error"
+    last_update: str | None = None
+    error_message: str | None = None
+
+
+class SuperuserAuditUpdateRequest(Schema):
+    """Request to trigger update for a specific audit."""
+
+    force_refresh: bool = False

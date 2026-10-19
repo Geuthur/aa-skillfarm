@@ -296,6 +296,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/skillfarm/api/superuser/audits/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all Skillfarm character audits across the system for superusers */
+        get: operations["skillfarm_api_superuser_list_all_audits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skillfarm/api/superuser/audits/{character_id}/update/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Trigger single character update task for superusers */
+        post: operations["skillfarm_api_superuser_trigger_audit_update"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skillfarm/api/superuser/audits/{character_id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a character audit permanently for superusers */
+        delete: operations["skillfarm_api_superuser_delete_audit"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skillfarm/api/superuser/audits/{character_id}/inspect/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get character detailed inspection view for superusers */
+        get: operations["skillfarm_api_superuser_inspect_audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -851,6 +919,68 @@ export interface components {
         };
         /** AdminUpdateRequest */
         AdminUpdateRequest: {
+            /**
+             * Force Refresh
+             * @default false
+             */
+            force_refresh: boolean;
+        };
+        /**
+         * SuperuserAuditSchema
+         * @description Schema for superuser character audit management.
+         */
+        SuperuserAuditSchema: {
+            /** Character Id */
+            character_id: number;
+            /** Character Name */
+            character_name: string;
+            /** Corporation Id */
+            corporation_id: number;
+            /** Corporation Name */
+            corporation_name: string;
+            /** Corporation Ticker */
+            corporation_ticker: string;
+            /** User Id */
+            user_id?: number | null;
+            /** User Name */
+            user_name?: string | null;
+            /** Portrait Url */
+            portrait_url?: string | null;
+            /** Total Sp */
+            total_sp: number;
+            /** Is Training */
+            is_training: boolean;
+            /** Current Training Skill */
+            current_training_skill?: string | null;
+            /** Training Finish Date */
+            training_finish_date?: string | null;
+            /** Queue Finish Date */
+            queue_finish_date?: string | null;
+            /**
+             * Extractions Ready Count
+             * @default 0
+             */
+            extractions_ready_count: number;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            /**
+             * Status
+             * @default ok
+             */
+            status: string;
+            /** Last Update */
+            last_update?: string | null;
+            /** Error Message */
+            error_message?: string | null;
+        };
+        /**
+         * SuperuserAuditUpdateRequest
+         * @description Request to trigger update for a specific audit.
+         */
+        SuperuserAuditUpdateRequest: {
             /**
              * Force Refresh
              * @default false
@@ -1602,6 +1732,173 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_superuser_list_all_audits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuperuserAuditSchema"][];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_superuser_trigger_audit_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                character_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SuperuserAuditUpdateRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_superuser_delete_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                character_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_superuser_inspect_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                character_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharacterDetailResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
