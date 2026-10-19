@@ -9,13 +9,13 @@ import { Eye, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./OverviewPage.module.css";
+import styles from "@/Styles/modules/OverviewPage.module.css";
 
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type { OverviewUserSchema } from "@/Api/schema";
 import { ProjectName } from "@/App";
-import { BaseTable } from "@/Components/Tables/BaseTable";
+import { BaseTable } from "@/Components/Base/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 

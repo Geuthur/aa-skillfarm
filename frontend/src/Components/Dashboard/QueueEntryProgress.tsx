@@ -2,7 +2,7 @@
 import React from "react";
 
 // Styles
-import styles from "./QueueEntryProgress.module.css";
+import styles from "@/Styles/modules/QueueEntryProgress.module.css";
 
 import { useLiveProgress } from "@/Utils/liveProgress";
 

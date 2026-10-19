@@ -9,7 +9,7 @@ import { Button, Card, CardBody, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./Superuser.module.css";
+import styles from "@/Styles/modules/Superuser.module.css";
 
 // AA Skillfarm
 import {

@@ -8,11 +8,11 @@ import {
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./BaseTablePages.module.css";
-import tableStyles from "@/Components/Tables/BaseTable/BaseTable.module.css";
+import tableStyles from "@/Styles/modules/BaseTable.module.css";
+import styles from "@/Styles/modules/BaseTablePages.module.css";
 
-import { BaseTableForm } from "@/Components/Tables/BaseTable/BaseTableForm";
-import { exportToCSV, renderTooltip } from "@/Components/Tables/BaseTable/tableHelper";
+import { BaseTableForm } from "@/Components/Base/BaseTable/BaseTableForm";
+import { exportToCSV, renderTooltip } from "@/Components/Base/BaseTable/tableHelper";
 
 export interface TablePagesProps<TData> {
   table: TanStackTable<TData>;

@@ -32,10 +32,10 @@ import { Button, Form, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Components/Tables/BaseTable/BaseTable.module.css";
+import styles from "@/Styles/modules/BaseTable.module.css";
 
-import BaseHeader from "@/Components/Tables/BaseTable/BaseTableHeader";
-import BasePages from "@/Components/Tables/BaseTable/BaseTablePages";
+import BaseHeader from "@/Components/Base/BaseTable/BaseTableHeader";
+import BasePages from "@/Components/Base/BaseTable/BaseTablePages";
 // Utils
 import { renderTooltip } from "@/Utils";
 

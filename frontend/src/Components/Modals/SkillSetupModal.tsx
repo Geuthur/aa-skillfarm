@@ -7,12 +7,12 @@ import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SkillSetupModal.module.css";
+import styles from "@/Styles/modules/SkillSetupModal.module.css";
 
 import { fetchSkillSetup, updateSkillSetup } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
-import type { ModalData } from "@/Components/Modals/BaseModal";
+import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
+import type { ModalData } from "@/Components/Base/BaseModal";
 
 interface SkillSetupModalProps {
   characterId: number | null;

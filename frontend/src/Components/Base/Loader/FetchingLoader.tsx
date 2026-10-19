@@ -2,7 +2,7 @@
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./FetchingLoader.module.css";
+import styles from "@/Styles/modules/FetchingLoader.module.css";
 
 interface LoaderProps {
   message?: string;

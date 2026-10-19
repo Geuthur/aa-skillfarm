@@ -6,7 +6,7 @@ import { CheckCheck, Search, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SkillfarmFilterBar.module.css";
+import styles from "@/Styles/modules/SkillfarmFilterBar.module.css";
 
 import type { CharacterFilterParams } from "@/Api/schema";
 // Utils

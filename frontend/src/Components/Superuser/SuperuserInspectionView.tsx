@@ -7,7 +7,7 @@ import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Nav, ProgressBar, Sp
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Pages/Superuser.module.css";
+import styles from "@/Styles/modules/Superuser.module.css";
 
 // AA Skillfarm
 import type { CharacterDetailResponse, SuperuserAuditSchema } from "@/Api/schema";

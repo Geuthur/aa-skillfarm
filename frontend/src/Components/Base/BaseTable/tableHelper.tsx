@@ -9,7 +9,7 @@ import { OverlayTrigger } from "react-bootstrap";
 import Tooltip from "react-bootstrap/esm/Tooltip";
 
 // Styles
-import styles from "./tableHelper.module.css";
+import styles from "@/Styles/modules/tableHelper.module.css";
 
 /**
  * Helper functions for formatting dates and rendering HTML safely in React components

@@ -8,7 +8,7 @@ import {
   itemImageUrl,
   getSecColor,
   formatNumber,
-} from "./eveOnline";
+} from "@/Utils/eveOnline";
 
 describe("eveOnline Utils", () => {
   it("should return valid image URLs", () => {

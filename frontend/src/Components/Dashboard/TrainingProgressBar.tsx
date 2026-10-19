@@ -6,7 +6,7 @@ import { PauseCircle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./TrainingProgressBar.module.css";
+import styles from "@/Styles/modules/TrainingProgressBar.module.css";
 
 import { useLiveProgress } from "@/Utils/liveProgress";
 

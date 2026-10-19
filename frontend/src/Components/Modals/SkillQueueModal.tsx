@@ -8,16 +8,16 @@ import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SkillQueueModal.module.css";
+import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
 import { fetchCharacterDetail } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type { SkillQueueEntrySchema } from "@/Api/schema";
+import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
+import type { ModalData } from "@/Components/Base/BaseModal";
+import { BaseTable } from "@/Components/Base/BaseTable";
 import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
-import type { ModalData } from "@/Components/Modals/BaseModal";
-import { BaseTable } from "@/Components/Tables/BaseTable";
 
 interface SkillQueueModalProps {
   characterId: number | null;

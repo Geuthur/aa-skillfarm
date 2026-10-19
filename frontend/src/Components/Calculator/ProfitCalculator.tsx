@@ -8,11 +8,11 @@ import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-rea
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./ProfitCalculator.module.css";
+import styles from "@/Styles/modules/ProfitCalculator.module.css";
 
 import { fetchCalculatorData } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import { BaseTable } from "@/Components/Tables/BaseTable";
+import { BaseTable } from "@/Components/Base/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 

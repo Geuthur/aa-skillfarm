@@ -4,7 +4,7 @@ import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./BaseTableForm.module.css";
+import styles from "@/Styles/modules/BaseTableForm.module.css";
 
 export function BaseTableForm<TData>({ table }: { table: TanStackTable<TData> }) {
     const { t } = useTranslation();

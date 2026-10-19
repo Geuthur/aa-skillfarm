@@ -7,7 +7,7 @@ import { withTranslation } from "react-i18next";
 import type { WithTranslation } from "react-i18next";
 
 // Styles
-import styles from "./ErrorBoundary.module.css";
+import styles from "@/Styles/modules/ErrorBoundary.module.css";
 
 import { ErrorLoader } from "./ErrorLoader";
 

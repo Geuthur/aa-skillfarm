@@ -7,12 +7,12 @@ import { Bell, BellOff, Check, Eye, PauseCircle, Settings, Trash2 } from "lucide
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./CharacterTable.module.css";
+import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
+import { BaseTable } from "@/Components/Base/BaseTable";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-import { BaseTable } from "@/Components/Tables/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 

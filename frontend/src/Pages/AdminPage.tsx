@@ -7,7 +7,7 @@ import { Shield, RefreshCw, Users, Coins, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./AdminPage.module.css";
+import styles from "@/Styles/modules/AdminPage.module.css";
 
 import { fetchAdminStats, triggerUpdateAll, triggerUpdatePrices } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";

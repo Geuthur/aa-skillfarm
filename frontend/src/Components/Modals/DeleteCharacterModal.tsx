@@ -5,11 +5,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./DeleteCharacterModal.module.css";
+import styles from "@/Styles/modules/DeleteCharacterModal.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
-import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
-import type { ModalData } from "@/Components/Modals/BaseModal";
+import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
+import type { ModalData } from "@/Components/Base/BaseModal";
 
 interface DeleteCharacterModalProps {
   character: CharacterSummarySchema | null;

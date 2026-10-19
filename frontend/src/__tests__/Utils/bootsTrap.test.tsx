@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { toolTipContainer, renderTooltip } from "./bootsTrap";
+import { toolTipContainer, renderTooltip } from "@/Utils/bootsTrap";
 
 describe("bootsTrap Utils", () => {
   it("should render toolTipContainer correctly", () => {

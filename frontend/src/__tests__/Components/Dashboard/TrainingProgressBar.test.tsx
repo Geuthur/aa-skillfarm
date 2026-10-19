@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { TrainingProgressBar } from "./TrainingProgressBar";
+import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 
 describe("TrainingProgressBar", () => {
   it("should render inactive badge with warning class when isTraining is false and not acknowledged", () => {

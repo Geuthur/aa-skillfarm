@@ -3,7 +3,7 @@ import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // AA Skillfarm
-import { ErrorLoader } from "@/Components/Loader";
+import { ErrorLoader } from "@/Components/Base/Loader";
 
 export function ErrorPage() {
   const { t } = useTranslation();

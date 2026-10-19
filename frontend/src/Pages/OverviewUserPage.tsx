@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./OverviewUserPage.module.css";
+import styles from "@/Styles/modules/OverviewUserPage.module.css";
 
 import { ProjectName } from "@/App";
 import { CharacterDashboard } from "@/Components/Sections/CharacterDashboard";

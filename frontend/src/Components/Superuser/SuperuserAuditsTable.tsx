@@ -9,11 +9,11 @@ import { Alert, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-boots
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Pages/Superuser.module.css";
+import styles from "@/Styles/modules/Superuser.module.css";
 
 // AA Skillfarm
 import type { SuperuserAuditSchema } from "@/Api/schema";
-import BaseTable from "@/Components/Tables/BaseTable/BaseTable";
+import BaseTable from "@/Components/Base/BaseTable/BaseTable";
 import { renderTooltip } from "@/Utils";
 
 interface SuperuserAuditsTableProps {

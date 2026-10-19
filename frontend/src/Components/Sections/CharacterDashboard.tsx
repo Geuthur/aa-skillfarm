@@ -7,7 +7,7 @@ import { useQueryState } from "nuqs";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./CharacterDashboard.module.css";
+import styles from "@/Styles/modules/CharacterDashboard.module.css";
 
 import {
   acknowledgeAllExtractions,

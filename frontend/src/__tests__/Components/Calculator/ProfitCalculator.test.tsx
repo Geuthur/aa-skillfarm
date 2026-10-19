@@ -7,10 +7,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { ProfitCalculator } from "./ProfitCalculator";
 // AA Skillfarm
 import * as ApiCalls from "@/Api/ApiCalls";
 import type { CalculatorResponse } from "@/Api/schema";
+import { ProfitCalculator } from "@/Components/Calculator/ProfitCalculator";
 
 vi.mock("@/Api/ApiCalls", () => ({
   fetchCalculatorData: vi.fn(),

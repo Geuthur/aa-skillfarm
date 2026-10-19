@@ -8,7 +8,7 @@ import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Pages/SettingsPage.module.css";
+import styles from "@/Styles/modules/SettingsPage.module.css";
 
 import { fetchUserCharacterStatuses, fetchUserSettings, updateUserSettings } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";

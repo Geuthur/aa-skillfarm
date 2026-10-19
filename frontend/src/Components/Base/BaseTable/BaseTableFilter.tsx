@@ -7,7 +7,7 @@ import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap
 import { useTranslation } from "react-i18next";
 
 // Styles
-import Styles from "@/Components/Tables/BaseTable/BaseTableFilter.module.css";
+import Styles from "@/Styles/modules/BaseTableFilter.module.css";
 
 // Lets a column supply a nicer label for its own SelectFilter options than
 // the raw underlying value (e.g. the wallet table's ref_type column, whose

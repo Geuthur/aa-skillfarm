@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { ExtractionBadge } from "./ExtractionBadge";
+import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 
 describe("ExtractionBadge", () => {
   it("should render none badge when ready count is 0", () => {

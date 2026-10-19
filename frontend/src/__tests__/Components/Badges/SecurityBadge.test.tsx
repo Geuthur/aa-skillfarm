@@ -2,7 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { SecurityBadge } from "./SecurityBadge";
+import { SecurityBadge } from "@/Components/Badges/SecurityBadge";
 
 describe("SecurityBadge", () => {
   it("should render security value and hisec badge class", () => {

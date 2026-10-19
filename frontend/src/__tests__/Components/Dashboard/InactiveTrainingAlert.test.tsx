@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { InactiveTrainingAlert } from "./InactiveTrainingAlert";
+import { InactiveTrainingAlert } from "@/Components/Dashboard/InactiveTrainingAlert";
 
 describe("InactiveTrainingAlert", () => {
   it("should not render when pausedCount is 0", () => {
