@@ -8,6 +8,9 @@ import { Eye, RefreshCw, Trash2, User } from "lucide-react";
 import { Alert, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Styles
+import styles from "@/Pages/Superuser.module.css";
+
 // AA Skillfarm
 import type { SuperuserAuditSchema } from "@/Api/schema";
 import BaseTable from "@/Components/Tables/BaseTable/BaseTable";
@@ -59,7 +62,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
               loading="lazy"
             />
           ) : (
-            <div className="p-1 bg-secondary rounded text-center" style={{ width: 32, height: 32 }}>
+            <div className={`p-1 bg-secondary rounded text-center ${styles.avatarFallback}`}>
               <User size={16} />
             </div>
           );
@@ -143,7 +146,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
             <div>
               <span className="badge bg-success mb-1">{t("Training")}</span>
               {audit.current_training_skill && (
-                <div className="small text-muted text-truncate" style={{ maxWidth: 180 }}>
+                <div className={`small text-muted text-truncate ${styles.skillTruncate}`}>
                   {audit.current_training_skill}
                 </div>
               )}
@@ -183,7 +186,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
                   variant="primary"
                   size="sm"
                   onClick={() => onInspect(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-primary"
+                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-primary aa-btn aa-btn-primary"
                 >
                   <Eye size={13} />
                   <span>{t("Inspect")}</span>
@@ -197,7 +200,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
                     size="sm"
                     onClick={() => onTriggerUpdate(audit.character_id, false)}
                     disabled={isUpdating}
-                    className="d-inline-flex align-items-center gap-1"
+                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
                   >
                     {isUpdating ? (
                       <Spinner size="sm" animation="border" />
@@ -215,12 +218,12 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isUpdating}
+                    className="aa-btn aa-btn-danger"
                   />
                 )}
                 <Dropdown.Menu
                   align="end"
-                  style={{ zIndex: 1060 }}
-                  className="shadow-lg"
+                  className={`shadow-lg ${styles.dropdownMenu}`}
                 >
                   <Dropdown.Item onClick={() => onTriggerUpdate(audit.character_id, false)}>
                     <RefreshCw size={14} className="me-2 text-primary" />
@@ -238,7 +241,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
                   variant="danger"
                   size="sm"
                   onClick={() => onDelete(audit)}
-                  className="d-inline-flex align-items-center gap-1"
+                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
                 >
                   <Trash2 size={13} />
                   <span>{t("Delete")}</span>

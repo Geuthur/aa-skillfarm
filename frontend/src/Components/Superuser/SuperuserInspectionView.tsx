@@ -6,6 +6,9 @@ import { ArrowLeft, Clock, RefreshCw } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Nav, ProgressBar, Spinner, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Styles
+import styles from "@/Pages/Superuser.module.css";
+
 // AA Skillfarm
 import type { CharacterDetailResponse, SuperuserAuditSchema } from "@/Api/schema";
 import { renderTooltip } from "@/Utils";
@@ -48,7 +51,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
               variant="secondary"
               size="sm"
               onClick={onBack}
-              className="d-flex align-items-center gap-1 sf-btn sf-btn-secondary"
+              className="d-flex align-items-center gap-1 sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
             >
               <ArrowLeft size={16} />
               <span>{t("Back to Superuser Overview")}</span>
@@ -87,7 +90,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
                   size="sm"
                   onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}
                   disabled={isUpdating}
-                  className="d-flex align-items-center gap-1"
+                  className="d-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
                 >
                   {isUpdating ? <Spinner size="sm" animation="border" /> : <RefreshCw size={14} />}
                   <span>{t("Update Character")}</span>
@@ -99,6 +102,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
                 variant="danger"
                 aria-label={t("More update options")}
                 disabled={isUpdating}
+                className="aa-btn aa-btn-danger"
               />
               <Dropdown.Menu align="end">
                 <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}>
@@ -238,7 +242,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
                         )}
                       </td>
                       <td>{entry.finished_level_roman}</td>
-                      <td style={{ minWidth: 120 }}>
+                      <td className={styles.progressCol}>
                         <ProgressBar
                           now={entry.progress_percent}
                           label={`${entry.progress_percent}%`}

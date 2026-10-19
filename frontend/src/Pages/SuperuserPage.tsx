@@ -9,7 +9,7 @@ import { Button, Card, CardBody, Modal } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./AdminPage.module.css";
+import styles from "./Superuser.module.css";
 
 // AA Skillfarm
 import {
@@ -245,7 +245,7 @@ export const SuperuserPage: React.FC = () => {
             <div className={styles["button-row"]}>
               <button
                 type="button"
-                className="sf-btn sf-btn-primary"
+                className="sf-btn sf-btn-primary aa-btn aa-btn-primary"
                 onClick={() => updateAllMutation.mutate(false)}
                 disabled={updateAllMutation.isPending}
               >
@@ -254,7 +254,7 @@ export const SuperuserPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                className="sf-btn sf-btn-secondary"
+                className="sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
                 onClick={() => updateAllMutation.mutate(true)}
                 disabled={updateAllMutation.isPending}
               >
@@ -275,7 +275,7 @@ export const SuperuserPage: React.FC = () => {
             </p>
             <button
               type="button"
-              className="sf-btn sf-btn-secondary"
+              className="sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
               onClick={() => updatePricesMutation.mutate()}
               disabled={updatePricesMutation.isPending}
             >
@@ -345,7 +345,7 @@ export const SuperuserPage: React.FC = () => {
               variant="secondary"
               onClick={() => setAuditToDelete(null)}
               disabled={deleteAuditMutation.isPending}
-              className="sf-btn sf-btn-secondary"
+              className="sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
             >
               {t("Cancel")}
             </Button>
@@ -353,7 +353,7 @@ export const SuperuserPage: React.FC = () => {
               variant="danger"
               onClick={handleConfirmDelete}
               disabled={deleteAuditMutation.isPending}
-              className="d-flex align-items-center gap-1"
+              className="d-flex align-items-center gap-1 aa-btn aa-btn-danger"
             >
               <Trash2 size={14} />
               <span>
