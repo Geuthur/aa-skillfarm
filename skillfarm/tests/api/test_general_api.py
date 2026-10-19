@@ -32,7 +32,8 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertIn("right_links", data)
         left_names = [link["name"] for link in data["left_links"]]
         right_names = [link["name"] for link in data["right_links"]]
-        self.assertIn("Characters", left_names)
+        self.assertIn("My Characters", left_names)
+        self.assertIn("Overview", left_names)
         self.assertIn("Calculator", left_names)
         self.assertIn("Settings", left_names)
         self.assertNotIn("Superuser", right_names)
@@ -101,8 +102,9 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        left_names = [link["name"] for link in response.json()["left_links"]]
         right_names = [link["name"] for link in response.json()["right_links"]]
-        self.assertIn("Overview", right_names)
+        self.assertIn("Overview", left_names)
         self.assertNotIn("Superuser", right_names)
 
     def test_get_user_with_permission_should_return_user_data(self):

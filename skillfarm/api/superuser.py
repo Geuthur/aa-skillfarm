@@ -27,20 +27,26 @@ from skillfarm.providers import AppLogger
 logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
+# pylint: disable=too-many-locals
 def _build_superuser_audit_schema(audit: SkillFarmAudit) -> schema.SuperuserAuditSchema:
     char = audit.character
-    corp = getattr(char, "corporation", None)
     corp_id = getattr(char, "corporation_id", 0)
-    corp_name = getattr(char, "corporation_name", "") or (
-        corp.corporation_name if corp else ""
-    )
-    corp_ticker = getattr(char, "corporation_ticker", "") or (
-        corp.corporation_ticker if corp else ""
-    )
+    corp_name = getattr(char, "corporation_name", "")
+    corp_ticker = getattr(char, "corporation_ticker", "")
 
     ownership = getattr(char, "character_ownership", None)
     user_id = ownership.user_id if ownership else None
-    user_name = ownership.user.username if ownership and ownership.user else None
+    user = ownership.user if ownership else None
+    user_name = user.username if user else None
+
+    main = getattr(getattr(user, "profile", None), "main_character", None)
+    main_char_id = getattr(main, "character_id", None)
+    main_char_name = (
+        getattr(main, "character_name", None) or user_name or char.character_name
+    )
+    main_portrait = (
+        get_character_portrait_url(main_char_id, size=64) if main_char_id else None
+    )
 
     update_status_obj = audit.skillfarm_update_status.order_by("-last_run_at").first()
     if update_status_obj:
@@ -82,6 +88,9 @@ def _build_superuser_audit_schema(audit: SkillFarmAudit) -> schema.SuperuserAudi
         corporation_ticker=corp_ticker,
         user_id=user_id,
         user_name=user_name,
+        main_character_id=main_char_id,
+        main_character_name=main_char_name,
+        main_portrait_url=main_portrait,
         portrait_url=get_character_portrait_url(char.character_id, size=64),
         total_sp=audit.total_sp,
         is_training=audit.is_training,
@@ -117,6 +126,7 @@ class ApiEndpoints:
                 SkillFarmAudit.objects.select_related(
                     "character",
                     "character__character_ownership__user",
+                    "character__character_ownership__user__profile__main_character",
                 )
                 .prefetch_related("skillfarm_update_status")
                 .all()

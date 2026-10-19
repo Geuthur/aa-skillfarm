@@ -28,6 +28,7 @@ const buildUser = (overrides: Partial<OverviewUserSchema> = {}): OverviewUserSch
   training_count: 2,
   paused_count: 1,
   pending_extractions_count: 1,
+  has_errors: false,
   ...overrides,
 });
 

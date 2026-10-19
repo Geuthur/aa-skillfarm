@@ -2415,6 +2415,11 @@
             "default": 0,
             "title": "Pending Extractions Count",
             "type": "integer"
+          },
+          "has_errors": {
+            "default": false,
+            "title": "Has Errors",
+            "type": "boolean"
           }
         },
         "required": [
@@ -2569,6 +2574,39 @@
               }
             ],
             "title": "User Name"
+          },
+          "main_character_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Character Id"
+          },
+          "main_character_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Character Name"
+          },
+          "main_portrait_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Portrait Url"
           },
           "portrait_url": {
             "anyOf": [

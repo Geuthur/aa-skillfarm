@@ -13,7 +13,6 @@ from django.utils.translation import gettext as _
 
 # AA Skillfarm
 from skillfarm.api import schema
-from skillfarm.api.helpers.core import can_view_overview
 from skillfarm.helpers.lazy import get_character_portrait_url
 from skillfarm.models.general import UserSettings
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
@@ -36,8 +35,12 @@ class ApiEndpoints:
         def get_menu(request: WSGIRequest):
             left_menu: list[schema.MenuLink] = [
                 schema.MenuLink(
-                    name=_("Characters"),
+                    name=_("Overview"),
                     link="/",
+                ),
+                schema.MenuLink(
+                    name=_("My Characters"),
+                    link="/characters/",
                 ),
                 schema.MenuLink(
                     name=_("Calculator"),
@@ -68,14 +71,6 @@ class ApiEndpoints:
             )
 
             right_menu: list[schema.MenuLink] = []
-
-            if can_view_overview(request.user):
-                right_menu.append(
-                    schema.MenuLink(
-                        name=_("Overview"),
-                        link="/overview/",
-                    )
-                )
 
             right_menu.append(
                 schema.MenuLink(

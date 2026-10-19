@@ -64,7 +64,8 @@ function App() {
           <NuqsAdapter>
             <Routes>
               <Route path={`/${ProjectName}/`} element={<AuthPage />}>
-                <Route index element={<DashboardPage />} />
+                <Route index element={<OverviewPage />} />
+                <Route path="characters/" element={<DashboardPage />} />
                 <Route path="calculator/" element={<CalculatorPage />} />
                 <Route path="superuser/" element={<SuperuserPage />} />
                 <Route path="admin/" element={<Navigate to={`/${ProjectName}/superuser/`} replace />} />

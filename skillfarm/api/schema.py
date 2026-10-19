@@ -163,6 +163,7 @@ class OverviewUserSchema(Schema):
     training_count: int = 0
     paused_count: int = 0
     pending_extractions_count: int = 0
+    has_errors: bool = False
 
 
 class OverviewResponse(Schema):
@@ -263,6 +264,9 @@ class SuperuserAuditSchema(Schema):
     corporation_ticker: str
     user_id: int | None = None
     user_name: str | None = None
+    main_character_id: int | None = None
+    main_character_name: str | None = None
+    main_portrait_url: str | None = None
     portrait_url: str | None = None
     total_sp: int
     is_training: bool

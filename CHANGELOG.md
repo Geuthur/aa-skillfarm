@@ -30,9 +30,15 @@ Section Order:
 
 ### Added
 
+- [ADD] Superuser View Unification: 4 top KPI metric cards (`bg-body border-secondary h-100 shadow-sm`) with dynamic "Sync Issues" indicator.
+- [ADD] Collapsible Global Task Administration panel with Force Refresh switch (`data-testid="toggle-task-panel"`).
+- [ADD] Refactored `SuperuserAuditsTable` from HTML table to TanStack `BaseTable<MainCharacterGroup>` with family group search matching and `X Alts` clickable badge.
+- [ADD] `SuperuserAltsModal` (`BaseModal` large) displaying all alts with portrait, corporation, training status, and individual actions (Inspect, Update split dropdown with force refresh, Delete with confirmation).
 - [ADD] Superuser management endpoints and frontend interface with red navigation badge (`.aa-nav-danger`) and `ShieldAlert` icon.
 - [ADD] Comprehensive Superuser character audits table displaying all characters, owners, ESI status, SP, and ready extractions with individual inspect, update (normal/force), and delete actions.
 - [ADD] `nuqs`-synchronized character inspection view allowing deep-linking and browser navigation (`?inspect=<characterId>`).
+- [ADD] Restored `Overview` to the left navigation menu accessible via `visible_to` for authorized users.
+- [ADD] Modernized `OverviewPage` using a responsive Card grid layout with search and user statistics.
 
 ### Changed
 

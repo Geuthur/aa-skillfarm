@@ -874,6 +874,11 @@ export interface components {
              * @default 0
              */
             pending_extractions_count: number;
+            /**
+             * Has Errors
+             * @default false
+             */
+            has_errors: boolean;
         };
         /**
          * OverviewUserCharactersResponse
@@ -944,6 +949,12 @@ export interface components {
             user_id?: number | null;
             /** User Name */
             user_name?: string | null;
+            /** Main Character Id */
+            main_character_id?: number | null;
+            /** Main Character Name */
+            main_character_name?: string | null;
+            /** Main Portrait Url */
+            main_portrait_url?: string | null;
             /** Portrait Url */
             portrait_url?: string | null;
             /** Total Sp */

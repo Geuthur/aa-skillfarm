@@ -56,6 +56,7 @@ describe("OverviewUserPage", () => {
         training_count: 0,
         paused_count: 0,
         pending_extractions_count: 0,
+        has_errors: false,
       },
     });
 

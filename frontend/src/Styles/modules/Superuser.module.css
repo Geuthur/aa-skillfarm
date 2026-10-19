@@ -87,3 +87,12 @@
 .progressCol {
     min-width: 120px;
 }
+
+.searchContainer {
+    max-width: 300px;
+    width: 100%;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}

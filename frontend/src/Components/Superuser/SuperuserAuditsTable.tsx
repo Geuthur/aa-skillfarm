@@ -1,11 +1,11 @@
 // React
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 // Third Party
 import { createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, RefreshCw, Trash2, User } from "lucide-react";
-import { Alert, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
+import { AlertTriangle, RefreshCw, Shield, User, Users } from "lucide-react";
+import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -13,8 +13,27 @@ import styles from "@/Styles/modules/Superuser.module.css";
 
 // AA Skillfarm
 import type { SuperuserAuditSchema } from "@/Api/schema";
-import BaseTable from "@/Components/Base/BaseTable/BaseTable";
+import { BaseTable } from "@/Components/Base/BaseTable";
+import { SuperuserAltsModal } from "@/Components/Superuser/SuperuserAltsModal";
+// Utils
 import { renderTooltip } from "@/Utils";
+
+export interface MainCharacterGroup {
+  id: string;
+  userId: number | null;
+  userName: string;
+  mainCharacterId: number | null;
+  mainCharacterName: string;
+  mainPortraitUrl: string | null;
+  corporationName: string;
+  corporationTicker: string;
+  alts: SuperuserAuditSchema[];
+  totalSp: number;
+  trainingCount: number;
+  pausedCount: number;
+  readyExtractionsCount: number;
+  issuesCount: number;
+}
 
 interface SuperuserAuditsTableProps {
   audits?: SuperuserAuditSchema[];
@@ -40,9 +59,56 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
   onDelete,
 }) => {
   const { t } = useTranslation();
+  const [selectedAltsGroup, setSelectedAltsGroup] = useState<MainCharacterGroup | null>(null);
 
-  const columns = useMemo<ColumnDef<SuperuserAuditSchema, unknown>[]>(() => {
-    const columnHelper = createColumnHelper<SuperuserAuditSchema>();
+  // Group audits by User / Main Character
+  const groupedData = useMemo<MainCharacterGroup[]>(() => {
+    if (!audits || audits.length === 0) return [];
+
+    const map = new Map<string, MainCharacterGroup>();
+
+    for (const audit of audits) {
+      const key = audit.user_id ? `user_${audit.user_id}` : `char_${audit.character_id}`;
+      let group = map.get(key);
+      if (!group) {
+        group = {
+          id: key,
+          userId: audit.user_id ?? null,
+          userName: audit.user_name || t("Unknown User"),
+          mainCharacterId: audit.main_character_id ?? audit.character_id,
+          mainCharacterName: audit.main_character_name || audit.character_name || audit.user_name,
+          mainPortraitUrl: audit.main_portrait_url || audit.portrait_url,
+          corporationName: audit.corporation_name || "",
+          corporationTicker: audit.corporation_ticker || "",
+          alts: [],
+          totalSp: 0,
+          trainingCount: 0,
+          pausedCount: 0,
+          readyExtractionsCount: 0,
+          issuesCount: 0,
+        };
+        map.set(key, group);
+      }
+      group.alts.push(audit);
+      group.totalSp += audit.total_sp ?? 0;
+      if (audit.is_training) {
+        group.trainingCount += 1;
+      } else {
+        group.pausedCount += 1;
+      }
+      group.readyExtractionsCount += audit.extractions_ready_count ?? 0;
+      if (audit.status !== "ok" || Boolean(audit.error_message)) {
+        group.issuesCount += 1;
+      }
+    }
+
+    return Array.from(map.values()).sort((a, b) =>
+      a.mainCharacterName.localeCompare(b.mainCharacterName),
+    );
+  }, [audits, t]);
+
+  const columns = useMemo<ColumnDef<MainCharacterGroup, unknown>[]>(() => {
+    const columnHelper = createColumnHelper<MainCharacterGroup>();
 
     return [
       columnHelper.display({
@@ -51,14 +117,14 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
         size: 48,
         enableSorting: false,
         cell: ({ row }) => {
-          const audit = row.original;
-          return audit.portrait_url ? (
+          const group = row.original;
+          return group.mainPortraitUrl ? (
             <img
-              src={audit.portrait_url}
+              src={group.mainPortraitUrl}
               alt=""
               width={32}
               height={32}
-              className="rounded"
+              className="rounded flex-shrink-0"
               loading="lazy"
             />
           ) : (
@@ -69,18 +135,33 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
         },
       }),
 
-      columnHelper.accessor("character_name", {
-        id: "character_name",
-        header: t("Character"),
+      columnHelper.accessor("mainCharacterName", {
+        id: "pilot",
+        header: t("Pilot / Main Character"),
         cell: ({ row }) => {
-          const audit = row.original;
+          const group = row.original;
+          const altCount = group.alts.length;
           return (
             <div>
-              <div className="fw-semibold">{audit.character_name}</div>
-              {audit.corporation_name && (
+              <div className="d-flex align-items-center flex-wrap gap-1">
+                <span className="fw-semibold">{group.mainCharacterName}</span>
+                {altCount > 0 && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="aa-btn aa-btn-secondary aa-btn-sm py-0 px-2 text-decoration-none"
+                    style={{ fontSize: "0.75rem", lineHeight: 1 }}
+                    onClick={() => setSelectedAltsGroup(group)}
+                    data-testid={`alts-btn-${group.id}`}
+                  >
+                    {altCount} {altCount === 1 ? t("Alt") : t("Alts")}
+                  </Button>
+                )}
+              </div>
+              {group.corporationName && (
                 <span className="text-muted small">
-                  {audit.corporation_name}{" "}
-                  {audit.corporation_ticker && `[${audit.corporation_ticker}]`}
+                  {group.corporationName}{" "}
+                  {group.corporationTicker && `[${group.corporationTicker}]`}
                 </span>
               )}
             </div>
@@ -88,84 +169,66 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
         },
       }),
 
-      columnHelper.accessor("user_name", {
-        id: "user_name",
-        header: t("Owner User"),
-        cell: ({ row }) => {
-          const audit = row.original;
-          return audit.user_name ? (
-            <span className="badge bg-secondary border border-secondary-subtle">
-              {audit.user_name}
-            </span>
-          ) : (
-            <span className="text-muted small">-</span>
-          );
-        },
-      }),
-
-      columnHelper.accessor("status", {
-        id: "status",
-        header: t("ESI Status"),
-        cell: ({ row }) => {
-          const audit = row.original;
-          return (
-            <span
-              className={`badge ${
-                audit.status === "ok"
-                  ? "bg-success"
-                  : audit.status === "token_error"
-                    ? "bg-warning text-dark"
-                    : "bg-danger"
-              }`}
-            >
-              {audit.status}
-            </span>
-          );
-        },
-      }),
-
-      columnHelper.accessor("total_sp", {
-        id: "total_sp",
-        header: t("Total SP"),
-        cell: ({ row }) => {
-          const audit = row.original;
-          return (
-            <span className="fw-semibold font-monospace">
-              {audit.total_sp?.toLocaleString() ?? "0"}
-            </span>
-          );
-        },
-      }),
-
-      columnHelper.accessor("is_training", {
-        id: "is_training",
+      columnHelper.accessor("trainingCount", {
+        id: "training_status",
         header: t("Training Status"),
         cell: ({ row }) => {
-          const audit = row.original;
-          return audit.is_training ? (
-            <div>
-              <span className="badge bg-success mb-1">{t("Training")}</span>
-              {audit.current_training_skill && (
-                <div className={`small text-muted text-truncate ${styles.skillTruncate}`}>
-                  {audit.current_training_skill}
-                </div>
+          const group = row.original;
+          return (
+            <div className="d-flex flex-wrap gap-1">
+              <Badge bg="success">
+                {group.trainingCount} {t("Training")}
+              </Badge>
+              {group.pausedCount > 0 && (
+                <Badge bg="warning" text="dark">
+                  {group.pausedCount} {t("Paused")}
+                </Badge>
               )}
             </div>
-          ) : (
-            <span className="badge bg-warning text-dark">{t("Paused")}</span>
           );
         },
       }),
 
-      columnHelper.accessor("extractions_ready_count", {
-        id: "extractions_ready_count",
+      columnHelper.accessor("totalSp", {
+        id: "total_sp",
+        header: t("Total SP"),
+        cell: ({ getValue }) => (
+          <span className="fw-semibold font-monospace">
+            {((getValue() as number) ?? 0).toLocaleString()}
+          </span>
+        ),
+      }),
+
+      columnHelper.accessor("readyExtractionsCount", {
+        id: "ready_extractions",
         header: t("Ready Extractions"),
-        cell: ({ row }) => {
-          const audit = row.original;
-          return audit.extractions_ready_count > 0 ? (
-            <span className="badge bg-info">{audit.extractions_ready_count}</span>
+        cell: ({ getValue }) => {
+          const count = (getValue() as number) ?? 0;
+          return count > 0 ? (
+            <Badge bg="info">{count}</Badge>
           ) : (
             <span className="text-muted small">0</span>
+          );
+        },
+      }),
+
+      columnHelper.accessor("issuesCount", {
+        id: "sync_status",
+        header: t("Sync Status"),
+        cell: ({ row }) => {
+          const group = row.original;
+          return group.issuesCount > 0 ? (
+            <Badge bg="danger" className="d-inline-flex align-items-center gap-1">
+              <AlertTriangle size={12} />
+              <span>
+                {group.issuesCount} {t("Issues")}
+              </span>
+            </Badge>
+          ) : (
+            <Badge bg="success" className="d-inline-flex align-items-center gap-1">
+              <Shield size={12} />
+              <span>{t("OK")}</span>
+            </Badge>
           );
         },
       }),
@@ -173,112 +236,139 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-end">{t("Actions")}</div>,
+        size: 180,
         enableSorting: false,
         cell: ({ row }) => {
-          const audit = row.original;
-          const isUpdating = updatingCharacterId === audit.character_id;
+          const group = row.original;
+          const isAnyUpdating = group.alts.some(
+            (a) => updatingCharacterId === a.character_id,
+          );
 
           return (
             <div className="d-flex align-items-center justify-content-end gap-2">
-              {renderTooltip(
-                t("Inspect Character Details"),
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => onInspect(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-primary aa-btn aa-btn-primary"
-                >
-                  <Eye size={13} />
-                  <span>{t("Inspect")}</span>
-                </Button>
-              )}
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() => setSelectedAltsGroup(group)}
+                className="d-inline-flex align-items-center gap-1 aa-btn"
+                data-testid={`view-alts-btn-${group.id}`}
+              >
+                <Users size={13} />
+                <span>{t("Alts")}</span>
+              </Button>
+
               <Dropdown as={ButtonGroup} size="sm">
                 {renderTooltip(
-                  t("Trigger character update task"),
+                  t("Trigger updates for all alts of this pilot"),
                   <Button
-                    variant="danger"
+                    variant="outline-danger"
                     size="sm"
-                    onClick={() => onTriggerUpdate(audit.character_id, false)}
-                    disabled={isUpdating}
+                    disabled={isAnyUpdating}
+                    onClick={() =>
+                      group.alts.forEach((a) => onTriggerUpdate(a.character_id, false))
+                    }
                     className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    data-testid={`update-all-alts-${group.id}`}
                   >
-                    {isUpdating ? (
+                    {isAnyUpdating ? (
                       <Spinner size="sm" animation="border" />
                     ) : (
                       <RefreshCw size={13} />
                     )}
-                    <span>{t("Update")}</span>
-                  </Button>
+                    <span>{t("Update All Alts")}</span>
+                  </Button>,
                 )}
                 {renderTooltip(
                   t("More update options"),
                   <Dropdown.Toggle
                     split
                     size="sm"
-                    variant="danger"
+                    variant="outline-danger"
                     aria-label={t("More update options")}
-                    disabled={isUpdating}
+                    disabled={isAnyUpdating}
                     className="aa-btn aa-btn-danger"
-                  />
+                  />,
                 )}
                 <Dropdown.Menu
                   align="end"
                   className={`shadow-lg ${styles.dropdownMenu}`}
                 >
-                  <Dropdown.Item onClick={() => onTriggerUpdate(audit.character_id, false)}>
+                  <Dropdown.Item
+                    onClick={() =>
+                      group.alts.forEach((a) => onTriggerUpdate(a.character_id, false))
+                    }
+                  >
                     <RefreshCw size={14} className="me-2 text-primary" />
                     {t("Normal Update")}
                   </Dropdown.Item>
-                  <Dropdown.Item onClick={() => onTriggerUpdate(audit.character_id, true)}>
+                  <Dropdown.Item
+                    onClick={() =>
+                      group.alts.forEach((a) => onTriggerUpdate(a.character_id, true))
+                    }
+                  >
                     <RefreshCw size={14} className="me-2 text-warning" />
                     {t("Force Refresh (Bypass Cache)")}
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-              {renderTooltip(
-                t("Delete Audit"),
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => onDelete(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
-                >
-                  <Trash2 size={13} />
-                  <span>{t("Delete")}</span>
-                </Button>
-              )}
             </div>
           );
         },
       }),
     ];
-  }, [t, updatingCharacterId, onInspect, onTriggerUpdate, onDelete]);
+  }, [t, updatingCharacterId, onTriggerUpdate]);
 
   return (
-    <Card className="bg-secondary text-light border-0 shadow-sm mt-3">
-      <Card.Header className="d-flex align-items-center justify-content-between bg-transparent py-3">
-        <h2 className="h5 mb-0 fw-semibold">{t("All Skillfarm Character Audits")}</h2>
-      </Card.Header>
-      <Card.Body>
-        {taskFeedback && (
-          <Alert
-            variant={taskFeedback.variant}
-            dismissible
-            onClose={onDismissFeedback}
-            className="mb-3"
-          >
-            {taskFeedback.message}
-          </Alert>
-        )}
+    <>
+      <Card className="bg-secondary text-light border-0 shadow-sm mt-3">
+        <Card.Header className="d-flex align-items-center justify-content-between bg-transparent py-3">
+          <div className="d-flex align-items-center gap-2">
+            <Users size={20} className="text-primary" />
+            <h2 className="h5 mb-0 fw-semibold">{t("All Skillfarm Character Audits")}</h2>
+          </div>
+        </Card.Header>
+        <Card.Body className="p-0">
+          {taskFeedback && (
+            <div className="p-3 pb-0">
+              <Alert
+                variant={taskFeedback.variant}
+                dismissible
+                onClose={onDismissFeedback}
+                className="mb-0"
+              >
+                {taskFeedback.message}
+              </Alert>
+            </div>
+          )}
 
-        <BaseTable
-          data={audits}
-          columns={columns}
-          isFetching={isLoading}
-          isError={isError}
-          emptyText={t("No Skillfarm characters found.")}
-        />
-      </Card.Body>
-    </Card>
+          {isLoading ? (
+            <div className="p-4 text-center text-muted">
+              <Spinner animation="border" size="sm" className="me-2" />
+              <span>{t("Loading Skillfarm characters...")}</span>
+            </div>
+          ) : isError ? (
+            <div className="p-4 text-center text-danger">
+              {t("Failed to load Skillfarm characters.")}
+            </div>
+          ) : (
+            <BaseTable
+              columns={columns}
+              data={groupedData}
+              emptyText={t("No Skillfarm characters found.")}
+              exportFileName="superuser_audits.csv"
+            />
+          )}
+        </Card.Body>
+      </Card>
+
+      <SuperuserAltsModal
+        group={selectedAltsGroup}
+        updatingCharacterId={updatingCharacterId}
+        onHide={() => setSelectedAltsGroup(null)}
+        onInspect={onInspect}
+        onTriggerUpdate={onTriggerUpdate}
+        onDelete={onDelete}
+      />
+    </>
   );
 };
