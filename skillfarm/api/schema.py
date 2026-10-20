@@ -14,6 +14,12 @@ class ActionResponse(Schema):
     message: str
 
 
+class ForceRefreshRequest(Schema):
+    """Payload to trigger an update with optional force refresh."""
+
+    force_refresh: bool = False
+
+
 class UserData(Schema):
     """User profile data including character identity and admin state."""
 
@@ -67,6 +73,7 @@ class UserCharacterStatusSchema(Schema):
     is_active: bool = True
     last_sync: str | None = None
     error_message: str | None = None
+    notification_enabled: bool = True
     sections: list[UserCharacterStatusSectionSchema] = []
 
 

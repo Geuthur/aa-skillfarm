@@ -287,6 +287,7 @@ class ApiEndpoints:
                         is_active=audit.active,
                         last_sync=last_sync,
                         error_message=latest_error_message,
+                        notification_enabled=audit.notification,
                         sections=section_list,
                     )
                 )

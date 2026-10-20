@@ -15,4 +15,5 @@ export const queryKeys = {
   Overview: ["overview"] as const,
   OverviewUser: (userId: number | null, filters?: unknown) =>
     ["overview", "user", userId, filters] as const,
+  CharacterUpdate: (characterId: number) => ["characterUpdate", characterId] as const,
 };

@@ -48,8 +48,6 @@ describe("CharacterTable", () => {
           onOpenSetup={vi.fn()}
           onAcknowledgeExtractions={vi.fn()}
           onAcknowledgePaused={vi.fn()}
-          onToggleNotification={vi.fn()}
-          onDeleteCharacter={vi.fn()}
         />
       </MemoryRouter>,
     );
@@ -74,8 +72,6 @@ describe("CharacterTable", () => {
           onOpenSetup={vi.fn()}
           onAcknowledgeExtractions={vi.fn()}
           onAcknowledgePaused={vi.fn()}
-          onToggleNotification={vi.fn()}
-          onDeleteCharacter={vi.fn()}
         />
       </MemoryRouter>,
     );
@@ -91,8 +87,6 @@ describe("CharacterTable", () => {
     const onOpenSetup = vi.fn();
     const onAcknowledgeExtractions = vi.fn();
     const onAcknowledgePaused = vi.fn();
-    const onToggleNotification = vi.fn();
-    const onDeleteCharacter = vi.fn();
 
     const char = buildCharacter({
       is_training: false,
@@ -110,8 +104,6 @@ describe("CharacterTable", () => {
           onOpenSetup={onOpenSetup}
           onAcknowledgeExtractions={onAcknowledgeExtractions}
           onAcknowledgePaused={onAcknowledgePaused}
-          onToggleNotification={onToggleNotification}
-          onDeleteCharacter={onDeleteCharacter}
         />
       </MemoryRouter>,
     );
@@ -129,5 +121,38 @@ describe("CharacterTable", () => {
     expect(onAcknowledgeExtractions).toHaveBeenCalledWith(1001);
     expect(onAcknowledgePaused).toHaveBeenCalledWith(1001);
     expect(onViewQueue).toHaveBeenCalledWith(1001);
+  });
+
+  it("should render status badges correctly for ok, error, and token_error", () => {
+    // Test Data
+    const okChar = buildCharacter({ character_id: 1, update_status: "ok" });
+    const errChar = buildCharacter({
+      character_id: 2,
+      character_name: "Error Pilot",
+      update_status: "error",
+    });
+    const tokenErrChar = buildCharacter({
+      character_id: 3,
+      character_name: "Token Error Pilot",
+      update_status: "token_error",
+    });
+
+    // Test Action
+    render(
+      <MemoryRouter>
+        <CharacterTable
+          characters={[okChar, errChar, tokenErrChar]}
+          onViewQueue={vi.fn()}
+          onOpenSetup={vi.fn()}
+          onAcknowledgeExtractions={vi.fn()}
+          onAcknowledgePaused={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    // Expected Result
+    expect(screen.getByText("OK")).toBeInTheDocument();
+    expect(screen.getByText("Sync Error")).toBeInTheDocument();
+    expect(screen.getByText("Token Error")).toBeInTheDocument();
   });
 });

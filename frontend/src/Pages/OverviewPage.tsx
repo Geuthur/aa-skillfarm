@@ -159,14 +159,8 @@ export const OverviewPage: React.FC = () => {
                   <div className="d-flex flex-wrap gap-2 pt-2 border-top border-secondary">
                     <Link
                       to={`/${ProjectName}/overview/${user.user_id}/`}
-                      className={`sf-btn sf-btn-sm ${user.has_errors ? "sf-btn-warning sf-btn-pulse" : "sf-btn-primary"} flex-fill d-flex align-items-center justify-content-center gap-1`}
+                      className="sf-btn sf-btn-sm sf-btn-primary flex-fill d-flex align-items-center justify-content-center gap-1"
                     >
-                      {user.has_errors && (
-                        <span className="aa-pending-dot-container me-1">
-                          <span className="aa-pending-dot-ping" />
-                          <span className="aa-pending-dot-core" />
-                        </span>
-                      )}
                       <Eye size={14} />
                       {t("Characters")}
                     </Link>

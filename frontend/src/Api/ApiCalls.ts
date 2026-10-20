@@ -186,6 +186,23 @@ export async function deleteCharacter(characterId: number): Promise<ActionRespon
   return data as ActionResponse;
 }
 
+export async function triggerCharacterUpdate(
+  characterId: number,
+  forceRefresh: boolean = false,
+): Promise<ActionResponse> {
+  const { data, error } = await apiClient.POST(
+    `${API_BASE}/characters/{character_id}/update/`,
+    {
+      params: { path: { character_id: characterId } },
+      body: { force_refresh: forceRefresh },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to trigger character update");
+  }
+  return data as ActionResponse;
+}
+
 export async function acknowledgeAllExtractions(): Promise<ActionResponse> {
   const { data, error } = await apiClient.POST(`${API_BASE}/acknowledge-all-extractions/`, {});
   if (error || !data) {

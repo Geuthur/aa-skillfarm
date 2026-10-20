@@ -18,6 +18,10 @@ vi.mock("@/Api/ApiCalls", async (importOriginal) => {
     fetchUserSettings: vi.fn(),
     updateUserSettings: vi.fn(),
     fetchUserCharacterStatuses: vi.fn(),
+    triggerUpdateAll: vi.fn(),
+    triggerCharacterUpdate: vi.fn(),
+    toggleNotification: vi.fn(),
+    deleteCharacter: vi.fn(),
   };
 });
 
@@ -99,6 +103,7 @@ describe("SettingsPage", () => {
         is_active: true,
         last_sync: "2026-10-11 18:00",
         error_message: null,
+        notification_enabled: true,
         sections: [
           {
             section: "skills",
@@ -123,6 +128,7 @@ describe("SettingsPage", () => {
         is_active: true,
         last_sync: "2026-10-10 12:00",
         error_message: "ESI connection timed out",
+        notification_enabled: false,
         sections: [
           {
             section: "skills",
@@ -146,5 +152,97 @@ describe("SettingsPage", () => {
     expect(screen.getByText("ESI connection timed out")).toBeInTheDocument();
     expect(screen.getAllByText("OK").length).toBeGreaterThan(0);
     expect(screen.getByText("Error")).toBeInTheDocument();
+  });
+
+  it("should trigger update all and individual character update with force_refresh false", async () => {
+    // Test Data
+    const user = userEvent.setup();
+    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
+      disable_notifications: false,
+    });
+    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue([
+      {
+        character_id: 1001,
+        character_name: "Farm Pilot Alpha",
+        corporation_id: 2001,
+        corporation_name: "Alpha Corp",
+        corporation_ticker: "AC",
+        portrait_url: "https://images.evetech.net/characters/1001/portrait?size=64",
+        status: "ok",
+        has_error: false,
+        is_active: true,
+        last_sync: "2026-10-11 18:00",
+        error_message: null,
+        notification_enabled: true,
+        sections: [],
+      },
+    ]);
+    vi.mocked(ApiCalls.triggerUpdateAll).mockResolvedValue({
+      success: true,
+      message: "Update all task queued.",
+    });
+    vi.mocked(ApiCalls.triggerCharacterUpdate).mockResolvedValue({
+      success: true,
+      message: "Character update task queued.",
+    });
+
+    // Test Action
+    renderPage();
+
+    const updateAllBtn = await screen.findByRole("button", { name: /Update All/i });
+    await user.click(updateAllBtn);
+
+    const updateCharBtn = screen.getByRole("button", { name: "Update character" });
+    await user.click(updateCharBtn);
+
+    // Expected Result
+    expect(ApiCalls.triggerUpdateAll).toHaveBeenCalledWith(false);
+    expect(ApiCalls.triggerCharacterUpdate).toHaveBeenCalledWith(1001, false);
+  });
+
+  it("should toggle character notifications and open delete modal", async () => {
+    // Test Data
+    const user = userEvent.setup();
+    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
+      disable_notifications: false,
+    });
+    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue([
+      {
+        character_id: 1001,
+        character_name: "Farm Pilot Alpha",
+        corporation_id: 2001,
+        corporation_name: "Alpha Corp",
+        corporation_ticker: "AC",
+        portrait_url: "https://images.evetech.net/characters/1001/portrait?size=64",
+        status: "ok",
+        has_error: false,
+        is_active: true,
+        last_sync: "2026-10-11 18:00",
+        error_message: null,
+        notification_enabled: true,
+        sections: [],
+      },
+    ]);
+    vi.mocked(ApiCalls.toggleNotification).mockResolvedValue({
+      success: true,
+      message: "Notification toggled",
+    });
+    vi.mocked(ApiCalls.deleteCharacter).mockResolvedValue({
+      success: true,
+      message: "Character deleted",
+    });
+
+    // Test Action
+    renderPage();
+
+    const notifBtn = await screen.findByRole("button", { name: "Disable notifications" });
+    await user.click(notifBtn);
+
+    const deleteBtn = screen.getByRole("button", { name: "Remove from Skillfarm" });
+    await user.click(deleteBtn);
+
+    // Expected Result
+    expect(ApiCalls.toggleNotification).toHaveBeenCalledWith(1001);
+    expect(screen.getAllByText("Delete Character").length).toBeGreaterThanOrEqual(1);
   });
 });

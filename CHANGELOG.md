@@ -30,6 +30,8 @@ Section Order:
 
 ### Added
 
+- [ADD] Character manual update endpoint `POST characters/{character_id}/update/` with Celery update task dispatch.
+- [ADD] Centralized character management into `SettingsPage`: global `Update All` button (with 60s cooldown, `force_refresh=false`), individual character update buttons (`force_refresh=false`), per-character notification toggle, and character deletion modal.
 - [ADD] Superuser View Unification: 4 top KPI metric cards (`bg-body border-secondary h-100 shadow-sm`) with dynamic "Sync Issues" indicator.
 - [ADD] Collapsible Global Task Administration panel with Force Refresh switch (`data-testid="toggle-task-panel"`).
 - [ADD] Refactored `SuperuserAuditsTable` from HTML table to TanStack `BaseTable<MainCharacterGroup>` with family group search matching and `X Alts` clickable badge.
@@ -42,6 +44,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Removed pulsing button and dot on Overview `OverviewPage` cards; pulse animation is exclusively retained on `Settings` in navigation menu when user characters have errors.
+- [CHANGE] Refactored `CharacterDashboard` and `CharacterTable`: removed global update button, row-level update button, notification toggle, and delete action from overview. Overview now strictly retains skill queue inspection, skillset configuration, and status acknowledgements.
 - [CHANGE] Updated Superuser navigation link to `/superuser/` and added redirect from `/admin/`.
 
 <!-- Your changes go here -->

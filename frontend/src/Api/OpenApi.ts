@@ -194,6 +194,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/skillfarm/api/characters/{character_id}/update/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Trigger an update for a specific skillfarm character */
+        post: operations["skillfarm_api_characters_trigger_character_update"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/skillfarm/api/calculator/": {
         parameters: {
             query?: never;
@@ -488,6 +505,11 @@ export interface components {
             /** Error Message */
             error_message?: string | null;
             /**
+             * Notification Enabled
+             * @default true
+             */
+            notification_enabled: boolean;
+            /**
              * Sections
              * @default []
              */
@@ -773,6 +795,17 @@ export interface components {
         SkillSetupUpdateRequest: {
             /** Selected Skills */
             selected_skills: string[];
+        };
+        /**
+         * ForceRefreshRequest
+         * @description Payload to trigger an update with optional force refresh.
+         */
+        ForceRefreshRequest: {
+            /**
+             * Force Refresh
+             * @default false
+             */
+            force_refresh: boolean;
         };
         /**
          * CalculatorItemSchema
@@ -1529,6 +1562,54 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    skillfarm_api_characters_trigger_character_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                character_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ForceRefreshRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

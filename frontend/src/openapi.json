@@ -801,6 +801,84 @@
         ]
       }
     },
+    "/skillfarm/api/characters/{character_id}/update/": {
+      "post": {
+        "operationId": "skillfarm_api_characters_trigger_character_update",
+        "summary": "Trigger an update for a specific skillfarm character",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Characters"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ForceRefreshRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": false
+        },
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
     "/skillfarm/api/calculator/": {
       "get": {
         "operationId": "skillfarm_api_calculator_get_calculator_data",
@@ -1645,6 +1723,11 @@
             ],
             "title": "Error Message"
           },
+          "notification_enabled": {
+            "default": true,
+            "title": "Notification Enabled",
+            "type": "boolean"
+          },
           "sections": {
             "default": [],
             "items": {
@@ -2222,6 +2305,18 @@
           "selected_skills"
         ],
         "title": "SkillSetupUpdateRequest",
+        "type": "object"
+      },
+      "ForceRefreshRequest": {
+        "description": "Payload to trigger an update with optional force refresh.",
+        "properties": {
+          "force_refresh": {
+            "default": false,
+            "title": "Force Refresh",
+            "type": "boolean"
+          }
+        },
+        "title": "ForceRefreshRequest",
         "type": "object"
       },
       "CalculatorItemSchema": {

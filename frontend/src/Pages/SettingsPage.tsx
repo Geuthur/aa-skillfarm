@@ -1,22 +1,73 @@
 // React
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Third Party
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, AlertTriangle, BellOff, CheckCircle2, Clock, Settings2, Users } from "lucide-react";
-import { Card } from "react-bootstrap";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bell,
+  BellOff,
+  CheckCircle2,
+  Clock,
+  RotateCw,
+  Settings2,
+  Trash2,
+  Users,
+} from "lucide-react";
+import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/SettingsPage.module.css";
 
-import { fetchUserCharacterStatuses, fetchUserSettings, updateUserSettings } from "@/Api/ApiCalls";
+import {
+  deleteCharacter,
+  fetchUserCharacterStatuses,
+  fetchUserSettings,
+  toggleNotification,
+  triggerCharacterUpdate,
+  triggerUpdateAll,
+  updateUserSettings,
+} from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type { UserCharacterStatusSchema, UserSettingsSchema } from "@/Api/schema";
+import { DeleteCharacterModal } from "@/Components/Modals/DeleteCharacterModal";
+import type { DeletableCharacter } from "@/Components/Modals/DeleteCharacterModal";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+
+  // Cooldown & Modal States
+  const [globalCooldown, setGlobalCooldown] = useState(0);
+  const [updatingCharacterId, setUpdatingCharacterId] = useState<number | null>(null);
+  const [characterCooldowns, setCharacterCooldowns] = useState<Record<number, number>>({});
+  const [characterToDelete, setCharacterToDelete] = useState<DeletableCharacter | null>(null);
+  const [feedbackMsg, setFeedbackMsg] = useState<{ variant: "success" | "danger"; text: string } | null>(null);
+
+  useEffect(() => {
+    if (globalCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setGlobalCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [globalCooldown]);
+
+  useEffect(() => {
+    const activeCooldowns = Object.values(characterCooldowns).some((v) => v > 0);
+    if (!activeCooldowns) return;
+    const timer = setInterval(() => {
+      setCharacterCooldowns((prev) => {
+        const next: Record<number, number> = {};
+        for (const [key, val] of Object.entries(prev)) {
+          if (val > 1) next[Number(key)] = val - 1;
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [characterCooldowns]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: queryKeys.UserSettings,
@@ -31,6 +82,12 @@ export const SettingsPage: React.FC = () => {
     queryKey: queryKeys.UserCharacterStatuses,
     queryFn: fetchUserCharacterStatuses,
   });
+
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.UserCharacterStatuses });
+    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
+    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
+  };
 
   const updateMutation = useMutation({
     mutationFn: updateUserSettings,
@@ -49,6 +106,85 @@ export const SettingsPage: React.FC = () => {
       queryClient.setQueryData(queryKeys.UserSettings, settings);
     },
   });
+
+  const updateAllMutation = useMutation({
+    mutationFn: () => triggerUpdateAll(false),
+    onSuccess: (res) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Update all task queued.") });
+      setGlobalCooldown(60);
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to queue update all task."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const updateCharacterMutation = useMutation({
+    mutationFn: (charId: number) => triggerCharacterUpdate(charId, false),
+    onSuccess: (res, charId) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Character update task queued.") });
+      setCharacterCooldowns((prev) => ({ ...prev, [charId]: 60 }));
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to trigger character update."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onSettled: () => {
+      setUpdatingCharacterId(null);
+    },
+  });
+
+  const handleTriggerCharacterUpdate = (charId: number) => {
+    setUpdatingCharacterId(charId);
+    updateCharacterMutation.mutate(charId);
+  };
+
+  const toggleNotifMutation = useMutation({
+    mutationFn: (charId: number) => toggleNotification(charId),
+    onSuccess: () => {
+      invalidateQueries();
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to toggle notification."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const deleteCharMutation = useMutation({
+    mutationFn: (charId: number) => deleteCharacter(charId),
+    onSuccess: (res) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Character removed successfully.") });
+      setCharacterToDelete(null);
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to delete character."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const handleConfirmDelete = async () => {
+    if (characterToDelete) {
+      await deleteCharMutation.mutateAsync(characterToDelete.character_id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -156,10 +292,10 @@ export const SettingsPage: React.FC = () => {
           </Card.Body>
         </Card>
 
-        {/* Character Update Status Section */}
+        {/* Character Update Status & Management Section */}
         <Card className={`${styles["section"]} border-0 shadow-sm`} aria-labelledby="char-status-heading">
           <Card.Body className="bg-secondary text-light">
-            <Card.Header className={`${styles["section-header"]} bg-secondary`}>
+            <Card.Header className={`${styles["section-header"]} bg-secondary d-flex justify-content-between align-items-center flex-wrap gap-2`}>
               <div className={styles["section-title-wrap"]}>
                 <Users size={20} aria-hidden="true" />
                 <h2 id="char-status-heading" className={styles["section-title"]}>
@@ -171,7 +307,43 @@ export const SettingsPage: React.FC = () => {
                   </span>
                 )}
               </div>
+
+              {characters && characters.length > 0 && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1"
+                  disabled={updateAllMutation.isPending || globalCooldown > 0}
+                  onClick={() => updateAllMutation.mutate()}
+                >
+                  {updateAllMutation.isPending ? (
+                    <span className="spinner-border spinner-border-sm" />
+                  ) : (
+                    <RotateCw size={14} />
+                  )}
+                  <span>
+                    {globalCooldown > 0
+                      ? t("Update All ({{seconds}}s)", { seconds: globalCooldown })
+                      : t("Update All")}
+                  </span>
+                </Button>
+              )}
             </Card.Header>
+
+            {feedbackMsg && (
+              <div
+                className={`alert alert-${feedbackMsg.variant} py-2 my-3 d-flex justify-content-between align-items-center`}
+                role="alert"
+              >
+                <span>{feedbackMsg.text}</span>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setFeedbackMsg(null)}
+                  aria-label="Close"
+                />
+              </div>
+            )}
 
             {isLoadingChars && (
               <div className="aa-loader-container">
@@ -207,6 +379,9 @@ export const SettingsPage: React.FC = () => {
                     : isTokenError
                       ? styles["char-card-warning"]
                       : "";
+
+                  const charCooldown = characterCooldowns[char.character_id] ?? 0;
+                  const isUpdating = updatingCharacterId === char.character_id;
 
                   return (
                     <Card
@@ -275,6 +450,65 @@ export const SettingsPage: React.FC = () => {
                           <span>{char.last_sync ? char.last_sync.slice(5) : t("Never")}</span>
                         </span>
                       </div>
+
+                      {/* Character Action Buttons: Notifications, Update, Delete */}
+                      <div className="d-flex align-items-center justify-content-between mt-3 pt-2 border-top border-secondary flex-wrap gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className={`aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1 ${
+                            char.notification_enabled ? "text-success" : "text-muted"
+                          }`}
+                          onClick={() => toggleNotifMutation.mutate(char.character_id)}
+                          disabled={toggleNotifMutation.isPending}
+                          title={
+                            char.notification_enabled
+                              ? t("Disable notifications")
+                              : t("Enable notifications")
+                          }
+                          aria-label={
+                            char.notification_enabled
+                              ? t("Disable notifications")
+                              : t("Enable notifications")
+                          }
+                        >
+                          {char.notification_enabled ? <Bell size={13} /> : <BellOff size={13} />}
+                          <span>{char.notification_enabled ? t("Notifications On") : t("Notifications Off")}</span>
+                        </Button>
+
+                        <div className="d-flex align-items-center gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1"
+                            disabled={isUpdating || charCooldown > 0}
+                            onClick={() => handleTriggerCharacterUpdate(char.character_id)}
+                            title={t("Update character")}
+                            aria-label={t("Update character")}
+                          >
+                            {isUpdating ? (
+                              <span className="spinner-border spinner-border-sm" />
+                            ) : (
+                              <RotateCw size={13} />
+                            )}
+                            <span>
+                              {charCooldown > 0 ? `${charCooldown}s` : t("Update")}
+                            </span>
+                          </Button>
+
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="aa-btn aa-btn-danger aa-btn-sm d-flex align-items-center gap-1"
+                            onClick={() => setCharacterToDelete(char)}
+                            title={t("Remove from Skillfarm")}
+                            aria-label={t("Remove from Skillfarm")}
+                          >
+                            <Trash2 size={13} />
+                            <span>{t("Delete")}</span>
+                          </Button>
+                        </div>
+                      </div>
                     </Card>
                   );
                 })}
@@ -283,6 +517,16 @@ export const SettingsPage: React.FC = () => {
           </Card.Body>
         </Card>
       </Card.Body>
+
+      <DeleteCharacterModal
+        character={characterToDelete}
+        showModal={Boolean(characterToDelete)}
+        setShowModal={(show) => {
+          if (!show) setCharacterToDelete(null);
+        }}
+        isPending={deleteCharMutation.isPending}
+        onConfirm={handleConfirmDelete}
+      />
     </Card>
   );
 };
