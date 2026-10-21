@@ -169,11 +169,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/UserCharacterStatusSchema"
-                  },
-                  "title": "Response",
-                  "type": "array"
+                  "$ref": "#/components/schemas/UserCharacterStatusResponse"
                 }
               }
             }
@@ -1658,6 +1654,68 @@
           "disable_notifications"
         ],
         "title": "UserSettingsUpdateRequest",
+        "type": "object"
+      },
+      "MissingCharacterSchema": {
+        "description": "Character owned by the user in Auth but not added to Skillfarm.",
+        "properties": {
+          "character_id": {
+            "title": "Character Id",
+            "type": "integer"
+          },
+          "character_name": {
+            "title": "Character Name",
+            "type": "string"
+          },
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "corporation_ticker": {
+            "title": "Corporation Ticker",
+            "type": "string"
+          },
+          "portrait_url": {
+            "title": "Portrait Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "character_id",
+          "character_name",
+          "corporation_id",
+          "corporation_name",
+          "corporation_ticker",
+          "portrait_url"
+        ],
+        "title": "MissingCharacterSchema",
+        "type": "object"
+      },
+      "UserCharacterStatusResponse": {
+        "description": "Response containing registered characters and missing characters for settings.",
+        "properties": {
+          "characters": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/UserCharacterStatusSchema"
+            },
+            "title": "Characters",
+            "type": "array"
+          },
+          "missing_characters": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MissingCharacterSchema"
+            },
+            "title": "Missing Characters",
+            "type": "array"
+          }
+        },
+        "title": "UserCharacterStatusResponse",
         "type": "object"
       },
       "UserCharacterStatusSchema": {

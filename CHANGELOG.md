@@ -30,6 +30,9 @@ Section Order:
 
 ### Added
 
+- [ADD] Modular `BaseOwnerSettingsSection` in `SettingsPage` displaying registered characters and missing characters (unregistered alts) with quick-add action link.
+- [ADD] Missing characters detection in `GET user/characters/status/` returning `UserCharacterStatusResponse` with `missing_characters`.
+- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) from Settings navigation item; only the red pulsing dot is displayed on ESI errors.
 - [ADD] Character manual update endpoint `POST characters/{character_id}/update/` with Celery update task dispatch.
 - [ADD] Centralized character management into `SettingsPage`: global `Update All` button (with 60s cooldown, `force_refresh=false`), individual character update buttons (`force_refresh=false`), per-character notification toggle, and character deletion modal.
 - [ADD] Superuser View Unification: 4 top KPI metric cards (`bg-body border-secondary h-100 shadow-sm`) with dynamic "Sync Issues" indicator.

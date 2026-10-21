@@ -77,6 +77,24 @@ class UserCharacterStatusSchema(Schema):
     sections: list[UserCharacterStatusSectionSchema] = []
 
 
+class MissingCharacterSchema(Schema):
+    """Character owned by the user in Auth but not added to Skillfarm."""
+
+    character_id: int
+    character_name: str
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    portrait_url: str
+
+
+class UserCharacterStatusResponse(Schema):
+    """Response containing registered characters and missing characters for settings."""
+
+    characters: list[UserCharacterStatusSchema] = []
+    missing_characters: list[MissingCharacterSchema] = []
+
+
 class MenuLink(Schema):
     """A single link item in the menu bar."""
 

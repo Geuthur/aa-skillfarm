@@ -12,7 +12,7 @@ import type {
   SkillSetupSchema,
   SuperuserAuditSchema,
   UserData,
-  UserCharacterStatusSchema,
+  UserCharacterStatusResponse,
   UserSettingsSchema,
   UserSettingsUpdateRequest,
 } from "@/Api/schema";
@@ -55,12 +55,12 @@ export async function updateUserSettings(
   return data;
 }
 
-export async function fetchUserCharacterStatuses(): Promise<UserCharacterStatusSchema[]> {
+export async function fetchUserCharacterStatuses(): Promise<UserCharacterStatusResponse> {
   const { data, error } = await apiClient.GET("/skillfarm/api/user/characters/status/", {});
   if (error || !data) {
     throw new Error("Failed to load character update statuses");
   }
-  return data as UserCharacterStatusSchema[];
+  return data as UserCharacterStatusResponse;
 }
 
 function buildFilterQuery(filters: CharacterFilterParams): Record<string, string | number> {

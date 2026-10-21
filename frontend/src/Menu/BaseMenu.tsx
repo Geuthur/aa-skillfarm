@@ -90,7 +90,6 @@ export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
                 id={link.name}
                 key={link.name}
                 active={hit}
-                className={link.has_errors ? "aa-order-nav-pulse" : ""}
             >
                 {link.has_errors && (
                     <span className="aa-pending-dot-container me-1" aria-hidden="true">

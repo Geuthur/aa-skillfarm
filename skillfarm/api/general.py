@@ -11,6 +11,10 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+# Alliance Auth
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import EveCharacter
+
 # AA Skillfarm
 from skillfarm.api import schema
 from skillfarm.helpers.lazy import get_character_portrait_url
@@ -179,7 +183,7 @@ class ApiEndpoints:
         @api.get(
             "user/characters/status/",
             response={
-                HTTPStatus.OK: list[schema.UserCharacterStatusSchema],
+                HTTPStatus.OK: schema.UserCharacterStatusResponse,
                 HTTPStatus.FORBIDDEN: dict,
             },
             tags=self.tags,
@@ -190,11 +194,24 @@ class ApiEndpoints:
             if not request.user.has_perm("skillfarm.basic_access"):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
+            user_char_ids = list(
+                CharacterOwnership.objects.filter(user=request.user).values_list(
+                    "character__character_id", flat=True
+                )
+            )
+
             audits = (
                 SkillFarmAudit.objects.owned_by(request.user)
                 .select_related("character")
                 .prefetch_related("skillfarm_update_status")
                 .order_by("character__character_name")
+            )
+            registered_char_ids = [audit.character.character_id for audit in audits]
+
+            missing_chars = (
+                EveCharacter.objects.filter(character_id__in=user_char_ids)
+                .exclude(character_id__in=registered_char_ids)
+                .order_by("character_name")
             )
 
             result: list[schema.UserCharacterStatusSchema] = []
@@ -292,4 +309,19 @@ class ApiEndpoints:
                     )
                 )
 
-            return result
+            missing_list = [
+                schema.MissingCharacterSchema(
+                    character_id=char.character_id,
+                    character_name=char.character_name,
+                    corporation_id=char.corporation_id,
+                    corporation_name=char.corporation_name,
+                    corporation_ticker=char.corporation_ticker or "",
+                    portrait_url=get_character_portrait_url(char.character_id, size=64),
+                )
+                for char in missing_chars
+            ]
+
+            return schema.UserCharacterStatusResponse(
+                characters=result,
+                missing_characters=missing_list,
+            )

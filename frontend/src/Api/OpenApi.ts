@@ -472,6 +472,40 @@ export interface components {
             disable_notifications: boolean;
         };
         /**
+         * MissingCharacterSchema
+         * @description Character owned by the user in Auth but not added to Skillfarm.
+         */
+        MissingCharacterSchema: {
+            /** Character Id */
+            character_id: number;
+            /** Character Name */
+            character_name: string;
+            /** Corporation Id */
+            corporation_id: number;
+            /** Corporation Name */
+            corporation_name: string;
+            /** Corporation Ticker */
+            corporation_ticker: string;
+            /** Portrait Url */
+            portrait_url: string;
+        };
+        /**
+         * UserCharacterStatusResponse
+         * @description Response containing registered characters and missing characters for settings.
+         */
+        UserCharacterStatusResponse: {
+            /**
+             * Characters
+             * @default []
+             */
+            characters: components["schemas"]["UserCharacterStatusSchema"][];
+            /**
+             * Missing Characters
+             * @default []
+             */
+            missing_characters: components["schemas"]["MissingCharacterSchema"][];
+        };
+        /**
          * UserCharacterStatusSchema
          * @description Status of a user's skillfarm character for settings update overview.
          */
@@ -1172,7 +1206,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserCharacterStatusSchema"][];
+                    "application/json": components["schemas"]["UserCharacterStatusResponse"];
                 };
             };
             /** @description Forbidden */
