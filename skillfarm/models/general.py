@@ -61,6 +61,56 @@ class General(models.Model):
             return False
         return any(user.has_perm(cls.get_perm(p)) for p in perms)
 
+    @classmethod
+    def has_basic_access(cls, user: Any) -> bool:
+        """Check if the user may access the app (basic_access)."""
+        return cls.has_perm(user, cls.Permission.BASIC_ACCESS)
+
+    @classmethod
+    def has_administration_access(cls, user: Any) -> bool:
+        """Check if the user has system-wide administration access (admin_access)."""
+        return cls.has_perm(user, cls.Permission.ADMIN_ACCESS)
+
+    @classmethod
+    def has_corporation_access(cls, user: Any) -> bool:
+        """Check if the user has access to the own corporation (corp_access)."""
+        return cls.has_perm(user, cls.Permission.CORP_ACCESS)
+
+    @classmethod
+    def has_management_access(cls, user: Any) -> bool:
+        """Check if the user has any management permission (admin_access or corp_access)."""
+        return cls.has_any_perm(
+            user, cls.Permission.ADMIN_ACCESS, cls.Permission.CORP_ACCESS
+        )
+
+    @classmethod
+    def is_superuser_only(cls, user: Any) -> bool:
+        """Check if the user is a superuser (for superuser-only actions)."""
+        return bool(user and getattr(user, "is_superuser", False))
+
+    @classmethod
+    def get_own_corporation_id(cls, user: Any) -> int | None:
+        """Return the corporation ID of the main character of the user."""
+        main_char = getattr(getattr(user, "profile", None), "main_character", None)
+        return getattr(main_char, "corporation_id", None)
+
+    @classmethod
+    def get_corporation_scope(cls, user: Any) -> tuple[bool, bool, int | None]:
+        """
+        Resolve which corporations the user may see in the Administration.
+
+        Returns:
+            Tuple of (has_access, sees_all, own_corporation_id).
+            `admin_access` sees all corporations, `corp_access` only the own one.
+        """
+        if not cls.has_basic_access(user):
+            return False, False, None
+        if cls.has_administration_access(user):
+            return True, True, None
+        if cls.has_corporation_access(user):
+            return True, False, cls.get_own_corporation_id(user)
+        return False, False, None
+
 
 class UserSettings(models.Model):
     class Meta:

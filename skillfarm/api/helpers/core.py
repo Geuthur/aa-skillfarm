@@ -17,7 +17,7 @@ def arabic_number_to_roman(value) -> str:
 
 def can_view_overview(user: User) -> bool:
     """Check if the user may view the overview of characters."""
-    return General.has_perm(user, General.Permission.BASIC_ACCESS)
+    return General.has_basic_access(user)
 
 
 def get_skillfarm_character(request, character_id, manage: bool = False):

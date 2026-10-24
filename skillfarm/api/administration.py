@@ -140,37 +140,6 @@ def _corporations_denied() -> dict:
     return {"error": _("Corporation access permission required.")}
 
 
-def _has_administration_access(request: WSGIRequest) -> bool:
-    """Administration is protected by the admin permission (superusers have it implicitly)."""
-    return General.has_perm(request.user, General.Permission.ADMIN_ACCESS)
-
-
-def _get_own_corporation_id(request: WSGIRequest) -> int | None:
-    """Return the corporation ID of the main character of the requesting user."""
-    main_char = getattr(getattr(request.user, "profile", None), "main_character", None)
-    return getattr(main_char, "corporation_id", None)
-
-
-def _get_visible_corporation_scope(
-    request: WSGIRequest,
-) -> tuple[bool, bool, int | None]:
-    """
-    Resolve which corporations the user may see in the Administration.
-
-    Returns:
-        Tuple of (has_access, sees_all, own_corporation_id).
-        `admin_access` sees all corporations, `corp_access` only the own one.
-    """
-    user = request.user
-    if not General.has_perm(user, General.Permission.BASIC_ACCESS):
-        return False, False, None
-    if General.has_perm(user, General.Permission.ADMIN_ACCESS):
-        return True, True, None
-    if General.has_perm(user, General.Permission.CORP_ACCESS):
-        return True, False, _get_own_corporation_id(request)
-    return False, False, None
-
-
 class ApiEndpoints:
     tags = ["Administration"]
 
@@ -186,7 +155,7 @@ class ApiEndpoints:
             summary="List all Skillfarm character audits across the system for administrators",
         )
         def list_all_audits(request: WSGIRequest):
-            if not _has_administration_access(request):
+            if not General.has_administration_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
             audits = (
@@ -216,7 +185,7 @@ class ApiEndpoints:
             character_id: int,
             payload: schema.AdministrationAuditUpdateRequest | None = None,
         ):
-            if not _has_administration_access(request):
+            if not General.has_administration_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
             audit = get_object_or_404(
@@ -225,7 +194,7 @@ class ApiEndpoints:
             )
 
             force = payload.force_refresh if payload else False
-            if force and not request.user.is_superuser:
+            if force and not General.is_superuser_only(request.user):
                 return HTTPStatus.FORBIDDEN, _superuser_denied()
 
             tasks.update_character.apply_async(
@@ -261,7 +230,7 @@ class ApiEndpoints:
             summary="Delete a character audit permanently (superusers only)",
         )
         def delete_audit(request: WSGIRequest, character_id: int):
-            if not request.user.is_superuser:
+            if not General.is_superuser_only(request.user):
                 return HTTPStatus.FORBIDDEN, _superuser_denied()
 
             audit = get_object_or_404(
@@ -297,7 +266,7 @@ class ApiEndpoints:
         )
         # pylint: disable=too-many-locals
         def inspect_audit(request: WSGIRequest, character_id: int):
-            if not _has_administration_access(request):
+            if not General.has_administration_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
             audit = get_object_or_404(
@@ -411,7 +380,7 @@ class ApiEndpoints:
             summary="Get administrative statistics for all Skillfarm characters",
         )
         def get_admin_stats(request):
-            if not _has_administration_access(request):
+            if not General.has_administration_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
             qs = SkillFarmAudit.objects.all()
@@ -450,7 +419,7 @@ class ApiEndpoints:
             summary="Queue full update task for all Skillfarm characters (superusers only)",
         )
         def trigger_update_all(request, payload: AdminUpdateRequest | None = None):
-            if not request.user.is_superuser:
+            if not General.is_superuser_only(request.user):
                 return HTTPStatus.FORBIDDEN, _superuser_denied()
 
             force = payload.force_refresh if payload else False
@@ -476,7 +445,7 @@ class ApiEndpoints:
             summary="Queue market prices update task (superusers only)",
         )
         def trigger_update_prices(request):
-            if not request.user.is_superuser:
+            if not General.is_superuser_only(request.user):
                 return HTTPStatus.FORBIDDEN, _superuser_denied()
 
             tasks.update_all_prices.apply_async()
@@ -496,7 +465,9 @@ class ApiEndpoints:
             summary="List corporations with registered and unregistered character counts",
         )
         def list_corporations(request: WSGIRequest):
-            has_access, sees_all, own_corp_id = _get_visible_corporation_scope(request)
+            has_access, sees_all, own_corp_id = General.get_corporation_scope(
+                request.user
+            )
             if not has_access:
                 return HTTPStatus.FORBIDDEN, _corporations_denied()
 
@@ -551,7 +522,9 @@ class ApiEndpoints:
             summary="List characters of a corporation that are not registered in Skillfarm",
         )
         def list_corporation_unregistered(request: WSGIRequest, corporation_id: int):
-            has_access, sees_all, own_corp_id = _get_visible_corporation_scope(request)
+            has_access, sees_all, own_corp_id = General.get_corporation_scope(
+                request.user
+            )
             if not has_access:
                 return HTTPStatus.FORBIDDEN, _corporations_denied()
 

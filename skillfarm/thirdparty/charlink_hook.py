@@ -63,9 +63,7 @@ app_import = AppImport(
             field_label=SKILLFARM_APP_NAME,
             add_character=_add_character_charaudit,
             scopes=SkillFarmAudit.get_esi_scopes(),
-            check_permissions=lambda user: General.has_perm(
-                user, General.Permission.BASIC_ACCESS
-            ),
+            check_permissions=General.has_basic_access,
             is_character_added=_is_character_added_charaudit,
             is_character_added_annotation=Exists(
                 SkillFarmAudit.objects.filter(character_id=OuterRef("pk"))

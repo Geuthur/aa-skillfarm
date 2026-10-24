@@ -23,7 +23,7 @@ class SkillfarmMenuItem(MenuItemHook):
         )
 
     def render(self, request):
-        if General.has_perm(request.user, General.Permission.BASIC_ACCESS):
+        if General.has_basic_access(request.user):
             return MenuItemHook.render(self, request)
         return ""
 

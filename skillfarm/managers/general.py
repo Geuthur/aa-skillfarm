@@ -34,7 +34,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def visible_to(self, user: User):
         """Get all objects visible to the user."""
-        if General.has_perm(user, General.Permission.ADMIN_ACCESS):
+        if General.has_administration_access(user):
             logger.debug("Returning all objects for admin user %s.", user)
             return self
 
@@ -43,7 +43,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if General.has_perm(user, General.Permission.CORP_ACCESS):
+            if General.has_corporation_access(user):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s visible.", len(queries), user)
@@ -58,7 +58,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def manage_to(self, user: User):
         """Get QuerySet of objects that the user can manage."""
-        if General.has_perm(user, General.Permission.ADMIN_ACCESS):
+        if General.has_administration_access(user):
             logger.debug("Returning all manageable queries for admin user %s.", user)
             return self
 
@@ -67,7 +67,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if General.has_perm(user, General.Permission.CORP_ACCESS):
+            if General.has_corporation_access(user):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s manageable.", len(queries), user)
