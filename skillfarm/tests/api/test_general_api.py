@@ -32,10 +32,11 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertIn("right_links", data)
         left_names = [link["name"] for link in data["left_links"]]
         right_names = [link["name"] for link in data["right_links"]]
-        self.assertIn("Characters", left_names)
+        self.assertIn("My Characters", left_names)
+        self.assertIn("Overview", left_names)
         self.assertIn("Calculator", left_names)
         self.assertIn("Settings", left_names)
-        self.assertNotIn("Superuser", right_names)
+        self.assertNotIn("Administration", right_names)
         self.assertNotIn("Overview", right_names)
 
     def test_get_menu_with_character_error_should_set_has_errors_on_settings(self):
@@ -74,7 +75,7 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertTrue(settings_link["has_errors"])
         self.assertEqual(settings_link["badge"], 1)
 
-    def test_get_menu_as_superuser_should_include_superuser(self):
+    def test_get_menu_as_superuser_should_include_administration(self):
         # Test Data
         url = reverse(f"{API_URL}:get_menu")
         self.client.force_login(self.superuser)
@@ -86,9 +87,57 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
         right_names = [link["name"] for link in data["right_links"]]
-        self.assertIn("Superuser", right_names)
+        self.assertIn("Administration", right_names)
 
-    def test_get_menu_as_corp_access_user_should_include_overview(self):
+    def test_get_menu_as_admin_access_user_should_include_administration(self):
+        # Test Data
+        admin_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        )
+        url = reverse(f"{API_URL}:get_menu")
+        self.client.force_login(admin_user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        right_links = response.json()["right_links"]
+        link = next(item for item in right_links if item["name"] == "Administration")
+        self.assertEqual(link["link"], "/administration/")
+
+    def test_get_user_as_admin_access_user_should_not_flag_superuser(self):
+        # Test Data
+        admin_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        )
+        url = reverse(f"{API_URL}:get_user")
+        self.client.force_login(admin_user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        data = response.json()
+        self.assertTrue(data["is_admin"])
+        self.assertFalse(data["is_superuser"])
+
+    def test_get_user_as_superuser_should_flag_superuser_and_admin(self):
+        # Test Data
+        url = reverse(f"{API_URL}:get_user")
+        self.client.force_login(self.superuser)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        data = response.json()
+        self.assertTrue(data["is_admin"])
+        self.assertTrue(data["is_superuser"])
+
+    def test_get_menu_as_corp_access_user_should_include_overview_and_administration(
+        self,
+    ):
         # Test Data
         corp_user = UserMainFactory(
             permissions__=["skillfarm.basic_access", "skillfarm.corp_access"]
@@ -101,9 +150,10 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        left_names = [link["name"] for link in response.json()["left_links"]]
         right_names = [link["name"] for link in response.json()["right_links"]]
-        self.assertIn("Overview", right_names)
-        self.assertNotIn("Superuser", right_names)
+        self.assertIn("Overview", left_names)
+        self.assertIn("Administration", right_names)
 
     def test_get_user_with_permission_should_return_user_data(self):
         # Test Data
@@ -230,8 +280,10 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
-        self.assertEqual(len(data), 1)
-        char_status = data[0]
+        self.assertIn("characters", data)
+        self.assertIn("missing_characters", data)
+        self.assertEqual(len(data["characters"]), 1)
+        char_status = data["characters"][0]
         self.assertEqual(char_status["character_id"], self.user_character.character_id)
         self.assertEqual(
             char_status["character_name"], self.user_character.character_name
@@ -280,11 +332,33 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
-        self.assertEqual(len(data), 1)
-        char_status = data[0]
+        self.assertEqual(len(data["characters"]), 1)
+        char_status = data["characters"][0]
         self.assertEqual(char_status["status"], "error")
         self.assertTrue(char_status["has_error"])
         self.assertEqual(char_status["error_message"], "ESI request timed out")
+
+    def test_get_user_character_statuses_should_return_missing_characters(self):
+        # Test Data
+        # AA Skillfarm
+        from skillfarm.tests.testdata.factory import EveCharacterFactory
+        from skillfarm.tests.testdata.utils import add_character_to_user
+
+        alt_char = EveCharacterFactory(character_name="Alt Unregistered")
+        add_character_to_user(user=self.user, character=alt_char, is_main=False)
+
+        url = reverse(f"{API_URL}:get_user_character_statuses")
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(url)
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        self.assertIn("missing_characters", data)
+        missing_ids = [c["character_id"] for c in data["missing_characters"]]
+        self.assertIn(alt_char.character_id, missing_ids)
 
     def test_get_user_character_statuses_without_permission_should_return_forbidden(
         self,

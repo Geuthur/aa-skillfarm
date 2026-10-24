@@ -16,10 +16,11 @@ from django.utils.translation import gettext as _
 from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
-from skillfarm import __title__
+from skillfarm import __title__, tasks
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import arabic_number_to_roman, get_skillfarm_character
 from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
@@ -185,7 +186,7 @@ class ApiEndpoints:
             request: WSGIRequest,
             filters: schema.CharacterFilter = Query(...),
         ):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             characters = SkillFarmAudit.objects.owned_by(request.user)
@@ -517,7 +518,7 @@ class ApiEndpoints:
             summary="Bulk acknowledge all pending ready extractions",
         )
         def acknowledge_all_extractions(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             audits = SkillFarmAudit.objects.owned_by(request.user).filter(
@@ -537,4 +538,42 @@ class ApiEndpoints:
                 success=True,
                 message=_("Successfully acknowledged extractions for %d characters")
                 % count,
+            )
+
+        @api.post(
+            "characters/{int:character_id}/update/",
+            response={
+                HTTPStatus.OK: schema.ActionResponse,
+                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.NOT_FOUND: dict,
+            },
+            tags=self.tags,
+            summary="Trigger an update for a specific skillfarm character",
+        )
+        def trigger_character_update(
+            request: WSGIRequest,
+            character_id: int,
+            payload: schema.ForceRefreshRequest | None = None,
+        ):
+            if not General.has_basic_access(request.user):
+                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
+
+            perms, audit = get_skillfarm_character(request, character_id, manage=True)
+            if audit is None:
+                return HTTPStatus.NOT_FOUND, {
+                    "error": _("Character not found or not accessible")
+                }
+            if perms is False:
+                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
+
+            force_refresh = payload.force_refresh if payload else False
+            tasks.update_character.apply_async(
+                args=[audit.pk],
+                kwargs={"force_refresh": force_refresh, "update_alts": False},
+                priority=7,
+            )
+            char_name = audit.character.character_name
+            return schema.ActionResponse(
+                success=True,
+                message=_("Update task queued for %s") % char_name,
             )

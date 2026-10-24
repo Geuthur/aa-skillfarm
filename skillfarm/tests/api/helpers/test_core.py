@@ -99,9 +99,9 @@ class TestCoreHelpers(SkillFarmTestCase):
         self.assertTrue(perm)
         self.assertEqual(audit, self.skillfarm_audit)
 
-    def test_can_view_overview_should_be_false_for_standard_user(self):
+    def test_can_view_overview_should_be_true_for_basic_access_user(self):
         # Test Action / Expected Result
-        self.assertFalse(core.can_view_overview(self.user))
+        self.assertTrue(core.can_view_overview(self.user))
 
     def test_can_view_overview_should_be_true_for_corp_and_admin_user(self):
         # Test Data
@@ -119,7 +119,7 @@ class TestCoreHelpers(SkillFarmTestCase):
 
     def test_can_view_overview_should_be_false_without_basic_access(self):
         # Test Data
-        user = UserMainFactory(permissions__=["skillfarm.corp_access"])
+        user = UserMainFactory(permissions__=[])
 
         # Test Action / Expected Result
         self.assertFalse(core.can_view_overview(user))

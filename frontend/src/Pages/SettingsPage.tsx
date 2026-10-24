@@ -1,22 +1,62 @@
 // React
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // Third Party
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, AlertTriangle, BellOff, CheckCircle2, Clock, Settings2, Users } from "lucide-react";
-import { Card } from "react-bootstrap";
+import { Bell, BellOff, Settings2, Users } from "lucide-react";
+import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Pages/SettingsPage.module.css";
+import styles from "@/Styles/modules/SettingsPage.module.css";
 
-import { fetchUserCharacterStatuses, fetchUserSettings, updateUserSettings } from "@/Api/ApiCalls";
+// AA Skillfarm
+import {
+  deleteCharacter,
+  fetchUserCharacterStatuses,
+  fetchUserSettings,
+  toggleNotification,
+  triggerCharacterUpdate,
+  triggerUpdateAll,
+  updateUserSettings,
+} from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import type { UserCharacterStatusSchema, UserSettingsSchema } from "@/Api/schema";
+import type { UserSettingsSchema } from "@/Api/schema";
+import { BaseOwnerSettingsSection } from "@/Components/Base/OwnerSettings";
+import type { BaseMissingOwner, BaseOwner } from "@/Components/Base/OwnerSettings/types";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+
+  // Cooldown & Feedback States
+  const [globalCooldown, setGlobalCooldown] = useState(0);
+  const [updatingCharacterId, setUpdatingCharacterId] = useState<number | null>(null);
+  const [characterCooldowns, setCharacterCooldowns] = useState<Record<number, number>>({});
+  const [feedbackMsg, setFeedbackMsg] = useState<{ variant: "success" | "danger"; text: string } | null>(null);
+
+  useEffect(() => {
+    if (globalCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setGlobalCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [globalCooldown]);
+
+  useEffect(() => {
+    const activeCooldowns = Object.values(characterCooldowns).some((v) => v > 0);
+    if (!activeCooldowns) return;
+    const timer = setInterval(() => {
+      setCharacterCooldowns((prev) => {
+        const next: Record<number, number> = {};
+        for (const [key, val] of Object.entries(prev)) {
+          if (val > 1) next[Number(key)] = val - 1;
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [characterCooldowns]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: queryKeys.UserSettings,
@@ -24,13 +64,19 @@ export const SettingsPage: React.FC = () => {
   });
 
   const {
-    data: characters,
+    data: charactersData,
     isLoading: isLoadingChars,
     isError: isErrorChars,
   } = useQuery({
     queryKey: queryKeys.UserCharacterStatuses,
     queryFn: fetchUserCharacterStatuses,
   });
+
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.UserCharacterStatuses });
+    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
+    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
+  };
 
   const updateMutation = useMutation({
     mutationFn: updateUserSettings,
@@ -50,11 +96,112 @@ export const SettingsPage: React.FC = () => {
     },
   });
 
+  const updateAllMutation = useMutation({
+    mutationFn: () => triggerUpdateAll(false),
+    onSuccess: (res) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Update all task queued.") });
+      setGlobalCooldown(60);
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to queue update all task."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const updateCharacterMutation = useMutation({
+    mutationFn: (charId: number) => triggerCharacterUpdate(charId, false),
+    onSuccess: (res, charId) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Character update task queued.") });
+      setCharacterCooldowns((prev) => ({ ...prev, [charId]: 60 }));
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to trigger character update."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onSettled: () => {
+      setUpdatingCharacterId(null);
+    },
+  });
+
+  const handleTriggerCharacterUpdate = (charId: number) => {
+    setUpdatingCharacterId(charId);
+    updateCharacterMutation.mutate(charId);
+  };
+
+  const toggleNotifMutation = useMutation({
+    mutationFn: (charId: number) => toggleNotification(charId),
+    onSuccess: () => {
+      invalidateQueries();
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to toggle notification."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const deleteCharMutation = useMutation({
+    mutationFn: (charId: number) => deleteCharacter(charId),
+    onSuccess: (res) => {
+      setFeedbackMsg({ variant: "success", text: res.message || t("Character removed successfully.") });
+      invalidateQueries();
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+    onError: (err: unknown) => {
+      setFeedbackMsg({
+        variant: "danger",
+        text: err instanceof Error ? err.message : t("Failed to delete character."),
+      });
+      setTimeout(() => setFeedbackMsg(null), 5000);
+    },
+  });
+
+  const characters = charactersData?.characters;
+  const missingCharacters = charactersData?.missing_characters;
+
+  const mappedOwners: BaseOwner[] = useMemo(() => {
+    if (!characters) return [];
+    return characters.map((char) => ({
+      id: char.character_id,
+      name: char.character_name,
+      owner_type: "character",
+      avatar_url: char.portrait_url,
+      subtitle: `[${char.corporation_ticker}]`,
+      status: char.status,
+      has_error: char.has_error,
+      error_message: char.error_message,
+      last_sync: char.last_sync,
+      sections: char.sections,
+    }));
+  }, [characters]);
+
+  const mappedMissing: BaseMissingOwner[] = useMemo(() => {
+    if (!missingCharacters) return [];
+    return missingCharacters.map((char) => ({
+      id: char.character_id,
+      name: char.character_name,
+      avatar_url: char.portrait_url,
+      subtitle: char.corporation_name,
+    }));
+  }, [missingCharacters]);
+
   if (isLoading) {
     return (
       <div className="aa-loader-container">
         <span className="spinner-border" />
-        <span>{t("Loading settings...")}</span>
+        <span>{t("Loading settings…")}</span>
       </div>
     );
   }
@@ -68,49 +215,6 @@ export const SettingsPage: React.FC = () => {
       </Card>
     );
   }
-
-  const renderStatusBadge = (char: UserCharacterStatusSchema) => {
-    const status = char.status.toLowerCase();
-    const isError = status === "error";
-    const isTokenError = status === "token_error";
-    const isOk = status === "ok";
-    const isDisabled = status === "disabled";
-
-    let badgeClass = styles["badge-incomplete"];
-    let label = t("Incomplete");
-    let Icon = AlertTriangle;
-
-    if (isOk) {
-      badgeClass = styles["badge-ok"];
-      label = t("OK");
-      Icon = CheckCircle2;
-    } else if (isError) {
-      badgeClass = styles["badge-error"];
-      label = t("Error");
-      Icon = AlertCircle;
-    } else if (isTokenError) {
-      badgeClass = styles["badge-token-error"];
-      label = t("Token Error");
-      Icon = AlertTriangle;
-    } else if (isDisabled) {
-      badgeClass = styles["badge-disabled"];
-      label = t("Disabled");
-      Icon = AlertCircle;
-    }
-
-    return (
-      <span className={`${styles["status-badge"]} ${badgeClass}`}>
-        {(isError || isTokenError) && (
-          <span className="aa-pending-dot-container me-1" aria-hidden="true">
-            <span className={isError ? "aa-danger-dot-ping" : "aa-pending-dot-ping"} />
-            <span className={isError ? "aa-danger-dot-core" : "aa-pending-dot-core"} />
-          </span>
-        )}
-        <Icon size={12} aria-hidden="true" />
-        <span>{label}</span>
-      </span>
-    );
-  };
 
   return (
     <Card className={`${styles["page"]} border-0`}>
@@ -139,7 +243,7 @@ export const SettingsPage: React.FC = () => {
                 </p>
               )}
               {updateMutation.isPending && (
-                <p className={styles["save-status"]} role="status">{t("Saving...")}</p>
+                <p className={styles["save-status"]} role="status">{t("Saving…")}</p>
               )}
             </div>
             <input
@@ -156,132 +260,69 @@ export const SettingsPage: React.FC = () => {
           </Card.Body>
         </Card>
 
-        {/* Character Update Status Section */}
-        <Card className={`${styles["section"]} border-0 shadow-sm`} aria-labelledby="char-status-heading">
-          <Card.Body className="bg-secondary text-light">
-            <Card.Header className={`${styles["section-header"]} bg-secondary`}>
-              <div className={styles["section-title-wrap"]}>
-                <Users size={20} aria-hidden="true" />
-                <h2 id="char-status-heading" className={styles["section-title"]}>
-                  {t("Character Update Status")}
-                </h2>
-                {characters && (
-                  <span className={styles["section-count"]}>
-                    ({characters.length})
-                  </span>
-                )}
-              </div>
-            </Card.Header>
-
-            {isLoadingChars && (
-              <div className="aa-loader-container">
-                <span className="spinner-border" />
-                <span>{t("Loading character statuses...")}</span>
-              </div>
-            )}
-
-            {isErrorChars && (
-              <Card className="bg-secondary text-light border-0 shadow-sm" role="alert">
-                <Card.Body className={styles["error"]}>
-                  {t("Failed to load character update status.")}
-                </Card.Body>
-              </Card>
-            )}
-
-            {!isLoadingChars && !isErrorChars && characters && characters.length === 0 && (
-              <Card className="bg-secondary text-light border-0 shadow-sm">
-                <Card.Body className={styles["empty-state"]}>
-                  {t("No Skillfarm characters found for your account.")}
-                </Card.Body>
-              </Card>
-            )}
-
-            {!isLoadingChars && !isErrorChars && characters && characters.length > 0 && (
-              <div className={styles["characters-grid"]}>
-                {characters.map((char) => {
-                  const status = char.status.toLowerCase();
-                  const isError = status === "error";
-                  const isTokenError = status === "token_error";
-                  const cardClass = isError
-                    ? styles["char-card-error"]
-                    : isTokenError
-                      ? styles["char-card-warning"]
-                      : "";
-
-                  return (
-                    <Card
-                      key={char.character_id}
-                      className={`aa-panel ${styles["char-card"]} ${cardClass}`}
-                    >
-                      <div className={styles["char-header"]}>
-                        <img
-                          src={char.portrait_url}
-                          alt={char.character_name}
-                          className={styles["portrait"]}
-                        />
-                        <div className={styles["char-info"]}>
-                          <h3 className={styles["char-name"]}>{char.character_name}</h3>
-                          <p className={styles["char-corp"]}>
-                            {char.corporation_name} [{char.corporation_ticker}]
-                          </p>
-                        </div>
-                      </div>
-
-                      {char.error_message && (
-                        <div className={styles["error-banner"]} role="alert">
-                          {char.error_message}
-                        </div>
-                      )}
-
-                      {char.sections && char.sections.length > 0 && (
-                        <div className={styles["sections-list"]}>
-                          {char.sections.map((sec) => {
-                            let dotClass = styles["dot-muted"];
-                            if (sec.is_success === true) dotClass = styles["dot-ok"];
-                            else if (sec.is_success === false) dotClass = styles["dot-error"];
-                            else if (sec.has_token_error) dotClass = styles["dot-warning"];
-
-                            return (
-                              <div key={sec.section} className={styles["section-item"]}>
-                                <span className="d-inline-flex align-items-center gap-2">
-                                  <span
-                                    className={`${styles["section-dot"]} ${dotClass}`}
-                                    aria-hidden="true"
-                                  />
-                                  <span>{sec.section_name}</span>
-                                </span>
-                                <span>
-                                  {sec.has_token_error
-                                    ? t("Token Error")
-                                    : sec.is_success === true
-                                      ? t("OK")
-                                      : sec.is_success === false
-                                        ? t("Failed")
-                                        : t("Pending")}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      <div className={styles["badge-row"]}>
-                        {renderStatusBadge(char)}
-                        <span
-                          className={styles["last-sync"]}
-                          title={char.last_sync ? `${t("Last sync")}: ${char.last_sync}` : undefined}
-                        >
-                          <Clock size={12} aria-hidden="true" />
-                          <span>{char.last_sync ? char.last_sync.slice(5) : t("Never")}</span>
-                        </span>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </Card.Body>
-        </Card>
+        {/* Modular BaseOwnerSettingsSection with Registered & Missing characters */}
+        <BaseOwnerSettingsSection<BaseOwner, BaseMissingOwner>
+          title={t("Character Update Status")}
+          description={t("ESI synchronization status of your linked characters.")}
+          icon={<Users size={20} aria-hidden="true" />}
+          owners={mappedOwners}
+          missingOwners={mappedMissing}
+          isLoading={isLoadingChars}
+          isError={isErrorChars}
+          errorMessage={t("Failed to load character update status.")}
+          emptyMessage={t("No Skillfarm characters found for your account.")}
+          appName="Skillfarm"
+          onUpdateAll={() => updateAllMutation.mutate()}
+          isUpdatingAll={updateAllMutation.isPending}
+          globalCooldown={globalCooldown}
+          feedbackMessage={feedbackMsg}
+          onDismissFeedback={() => setFeedbackMsg(null)}
+          onTriggerSingleUpdate={handleTriggerCharacterUpdate}
+          updatingOwnerId={updatingCharacterId}
+          ownerCooldowns={characterCooldowns}
+          onDeleteOwner={(owner) => deleteCharMutation.mutateAsync(owner.id)}
+          isDeleting={deleteCharMutation.isPending}
+          deleteModalTitle={t("Remove Character from Skillfarm")}
+          deleteModalDescription={(owner) =>
+            t(
+              "Are you sure you want to remove {{name}} from Skillfarm? All skill queues and audit records for this character will be permanently deleted.",
+              { name: owner.name },
+            )
+          }
+          renderCardActions={(owner) => {
+            const char = charactersData?.characters.find((c) => c.character_id === owner.id);
+            const notificationEnabled = char?.notification_enabled ?? false;
+            return (
+              <Button
+                variant="secondary"
+                size="sm"
+                className={`aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1 ${
+                  notificationEnabled ? "text-success" : "text-muted"
+                }`}
+                onClick={() => toggleNotifMutation.mutate(owner.id)}
+                disabled={toggleNotifMutation.isPending}
+                title={
+                  notificationEnabled
+                    ? t("Disable notifications")
+                    : t("Enable notifications")
+                }
+                aria-label={
+                  notificationEnabled
+                    ? t("Disable notifications")
+                    : t("Enable notifications")
+                }
+              >
+                {notificationEnabled ? <Bell size={13} /> : <BellOff size={13} />}
+                <span>
+                  {notificationEnabled ? t("Notifications On") : t("Notifications Off")}
+                </span>
+              </Button>
+            );
+          }}
+          missingSectionTitle={t("Characters not in Skillfarm")}
+          missingActionUrl="/skillfarm/characters/add/"
+          missingActionLabel={t("Add Character")}
+        />
       </Card.Body>
     </Card>
   );

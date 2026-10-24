@@ -8,7 +8,7 @@ from ninja.security import django_auth
 from django.conf import settings
 
 # AA Skillfarm
-from skillfarm.api import admin, calculator, characters, general, overview
+from skillfarm.api import administration, calculator, characters, general, overview
 
 api = NinjaAPI(
     title="AA Skillfarm API",
@@ -24,7 +24,7 @@ def setup(ninja_api: NinjaAPI):
     characters.ApiEndpoints(ninja_api)
     calculator.ApiEndpoints(ninja_api)
     overview.ApiEndpoints(ninja_api)
-    admin.ApiEndpoints(ninja_api)
+    administration.ApiEndpoints(ninja_api)
 
 
 # Initialize API endpoints

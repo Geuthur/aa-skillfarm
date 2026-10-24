@@ -1,6 +1,7 @@
 # Standard Library
 import json
 from http import HTTPStatus
+from unittest.mock import patch
 
 # Django
 from django.urls import reverse
@@ -365,3 +366,68 @@ class TestCharactersApiEndpoints(SkillFarmTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    @patch("skillfarm.tasks.update_character.apply_async")
+    def test_trigger_character_update_should_queue_task(self, mock_apply_async):
+        # Test Data
+        url = reverse(
+            f"{API_URL}:trigger_character_update",
+            kwargs={"character_id": self.user_character.character_id},
+        )
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.post(
+            url,
+            data=json.dumps({"force_refresh": True}),
+            content_type="application/json",
+        )
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        data = response.json()
+        self.assertTrue(data["success"])
+        mock_apply_async.assert_called_once_with(
+            args=[self.audit.pk],
+            kwargs={"force_refresh": True, "update_alts": False},
+            priority=7,
+        )
+
+    def test_trigger_character_update_without_permission_should_return_forbidden(self):
+        # Test Data
+        url = reverse(
+            f"{API_URL}:trigger_character_update",
+            kwargs={"character_id": self.user_character.character_id},
+        )
+        self.client.force_login(self.no_permission_user)
+
+        # Test Action
+        response = self.client.post(
+            url,
+            data={},
+            content_type="application/json",
+        )
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+    def test_trigger_character_update_on_foreign_character_should_return_forbidden(
+        self,
+    ):
+        # Test Data
+        foreign_audit = SkillFarmAuditFactory(user=UserMainFactory())
+        url = reverse(
+            f"{API_URL}:trigger_character_update",
+            kwargs={"character_id": foreign_audit.character.character_id},
+        )
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.post(
+            url,
+            data={},
+            content_type="application/json",
+        )
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)

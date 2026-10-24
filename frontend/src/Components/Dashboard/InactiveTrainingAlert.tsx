@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./InactiveTrainingAlert.module.css";
+import styles from "@/Styles/modules/InactiveTrainingAlert.module.css";
 
 interface InactiveTrainingAlertProps {
   pausedCount: number;

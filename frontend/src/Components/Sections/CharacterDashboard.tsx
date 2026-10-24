@@ -2,33 +2,29 @@
 import React, { useState } from "react";
 
 // Third Party
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./CharacterDashboard.module.css";
+import styles from "@/Styles/modules/CharacterDashboard.module.css";
 
 import {
   acknowledgeAllExtractions,
   acknowledgeExtractions,
   acknowledgePaused,
-  deleteCharacter,
   fetchCharacters,
   fetchOverviewUser,
-  toggleNotification,
 } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type {
   CharacterFilterParams,
   CharacterListResponse,
-  CharacterSummarySchema,
   OverviewUserSchema,
 } from "@/Api/schema";
 import { CharacterTable } from "@/Components/Dashboard/CharacterTable";
 import { InactiveTrainingAlert } from "@/Components/Dashboard/InactiveTrainingAlert";
 import { SkillfarmFilterBar } from "@/Components/Dashboard/SkillfarmFilterBar";
-import { DeleteCharacterModal } from "@/Components/Modals/DeleteCharacterModal";
 import { SkillQueueModal } from "@/Components/Modals/SkillQueueModal";
 import { SkillSetupModal } from "@/Components/Modals/SkillSetupModal";
 
@@ -58,7 +54,6 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
   // Modal state
   const [selectedQueueCharId, setSelectedQueueCharId] = useState<number | null>(null);
   const [selectedSetupCharId, setSelectedSetupCharId] = useState<number | null>(null);
-  const [characterToDelete, setCharacterToDelete] = useState<CharacterSummarySchema | null>(null);
 
   const filterParams: CharacterFilterParams = {
     search: search || undefined,
@@ -91,18 +86,8 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
     onSuccess: invalidateCharacters,
   });
 
-  const toggleNotifMutation = useMutation({
-    mutationFn: (charId: number) => toggleNotification(charId),
-    onSuccess: invalidateCharacters,
-  });
-
-  const deleteCharMutation = useMutation({
-    mutationFn: (charId: number) => deleteCharacter(charId),
-    onSuccess: invalidateCharacters,
-  });
-
   const bulkAckMutation = useMutation({
-    mutationFn: acknowledgeAllExtractions,
+    mutationFn:  acknowledgeAllExtractions,
     onSuccess: invalidateCharacters,
   });
 
@@ -113,16 +98,9 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
     if (newFilters.notification_status !== undefined) setNotificationStatus(newFilters.notification_status);
   };
 
-  const handleConfirmDelete = async () => {
-    if (characterToDelete) {
-      await deleteCharMutation.mutateAsync(characterToDelete.character_id);
-      setCharacterToDelete(null);
-    }
-  };
-
   return (
     <div>
-      {data?.user && renderHeader?.(data.user)}
+      {data?.user && renderHeader ? renderHeader(data.user) : null}
 
       {/* Noticeable Banner for characters with paused training */}
       <InactiveTrainingAlert
@@ -148,7 +126,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       {isLoading && (
         <div className="aa-loader-container">
           <span className={`spinner-border ${styles["loader-spinner"]}`} />
-          <span>{t("Loading characters...")}</span>
+          <span>{t("Loading characters…")}</span>
         </div>
       )}
 
@@ -165,8 +143,6 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
           onOpenSetup={(id) => setSelectedSetupCharId(id)}
           onAcknowledgeExtractions={(id) => ackExtractionMutation.mutate(id)}
           onAcknowledgePaused={(id) => ackPausedMutation.mutate(id)}
-          onToggleNotification={(id) => toggleNotifMutation.mutate(id)}
-          onDeleteCharacter={(char) => setCharacterToDelete(char)}
         />
       )}
 
@@ -174,16 +150,6 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       <SkillQueueModal characterId={selectedQueueCharId} onClose={() => setSelectedQueueCharId(null)} />
 
       <SkillSetupModal characterId={selectedSetupCharId} onClose={() => setSelectedSetupCharId(null)} />
-
-      <DeleteCharacterModal
-        character={characterToDelete}
-        showModal={Boolean(characterToDelete)}
-        setShowModal={(show) => {
-          if (!show) setCharacterToDelete(null);
-        }}
-        isPending={deleteCharMutation.isPending}
-        onConfirm={handleConfirmDelete}
-      />
     </div>
   );
 };
