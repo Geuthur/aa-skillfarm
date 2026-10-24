@@ -110,8 +110,24 @@ msgstr ""
 msgid "Add Character"
 msgstr ""
 
-#: skillfarm/api/general.py:91
-msgid "Superuser"
+#: skillfarm/api/general.py
+msgid "Administration"
+msgstr ""
+
+#: skillfarm/api/administration.py
+msgid "Administration permission required."
+msgstr ""
+
+#: skillfarm/api/administration.py
+msgid "Superuser permission required."
+msgstr ""
+
+#: skillfarm/api/administration.py
+msgid "Corporation access permission required."
+msgstr ""
+
+#: skillfarm/api/administration.py
+msgid "Corporation not found."
 msgstr ""
 
 #: skillfarm/api/overview.py:122

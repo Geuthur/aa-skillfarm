@@ -23,6 +23,8 @@ export type UserCharacterStatusSchema = components["schemas"]["UserCharacterStat
 export type UserCharacterStatusSectionSchema = components["schemas"]["UserCharacterStatusSectionSchema"];
 export type MissingCharacterSchema = components["schemas"]["MissingCharacterSchema"];
 export type UserCharacterStatusResponse = components["schemas"]["UserCharacterStatusResponse"];
-export type SuperuserAuditSchema = components["schemas"]["SuperuserAuditSchema"];
-export type SuperuserAuditUpdateRequest = components["schemas"]["SuperuserAuditUpdateRequest"];
-
+export type AdministrationAuditSchema = components["schemas"]["AdministrationAuditSchema"];
+export type AdministrationAuditUpdateRequest = components["schemas"]["AdministrationAuditUpdateRequest"];
+export type AdministrationCorporationSchema = components["schemas"]["AdministrationCorporationSchema"];
+export type AdministrationUnregisteredResponse = components["schemas"]["AdministrationUnregisteredResponse"];
+export type UnregisteredCharacterSchema = components["schemas"]["UnregisteredCharacterSchema"];

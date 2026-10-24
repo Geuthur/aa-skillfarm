@@ -1,5 +1,5 @@
 // React
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 // Third Party
 import { createColumnHelper } from "@tanstack/react-table";
@@ -9,37 +9,42 @@ import { Badge, Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Styles/modules/Superuser.module.css";
+import styles from "@/Styles/modules/Administration.module.css";
 
 // AA Skillfarm
-import type { SuperuserAuditSchema } from "@/Api/schema";
+import type { AdministrationAuditSchema } from "@/Api/schema";
+import type { MainCharacterGroup } from "@/Components/Administration/AdministrationAuditsTable";
+import { AdministrationErrorModal } from "@/Components/Administration/AdministrationErrorModal";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
-import type { MainCharacterGroup } from "@/Components/Superuser/SuperuserAuditsTable";
 import { renderTooltip } from "@/Utils";
 
-export interface SuperuserAltsModalProps {
+export interface AdministrationAltsModalProps {
   group: MainCharacterGroup | null;
   updatingCharacterId: number | null;
   onHide: () => void;
-  onInspect: (audit: SuperuserAuditSchema) => void;
+  onInspect: (audit: AdministrationAuditSchema) => void;
   onTriggerUpdate: (characterId: number, forceRefresh: boolean) => void;
-  onDelete: (audit: SuperuserAuditSchema) => void;
+  onDelete: (audit: AdministrationAuditSchema) => void;
+  isSuperuser?: boolean;
 }
 
-export const SuperuserAltsModal: React.FC<SuperuserAltsModalProps> = ({
+export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = ({
   group,
   updatingCharacterId,
   onHide,
   onInspect,
   onTriggerUpdate,
   onDelete,
+  isSuperuser = false,
 }) => {
   const { t } = useTranslation();
+  // Audit whose error details are shown in the stacked error modal
+  const [errorAudit, setErrorAudit] = useState<AdministrationAuditSchema | null>(null);
 
-  const columns = useMemo<ColumnDef<SuperuserAuditSchema, unknown>[]>(() => {
-    const columnHelper = createColumnHelper<SuperuserAuditSchema>();
+  const columns = useMemo<ColumnDef<AdministrationAuditSchema, unknown>[]>(() => {
+    const columnHelper = createColumnHelper<AdministrationAuditSchema>();
 
     return [
       columnHelper.display({
@@ -90,29 +95,37 @@ export const SuperuserAltsModal: React.FC<SuperuserAltsModalProps> = ({
         header: t("ESI Status"),
         cell: ({ row }) => {
           const audit = row.original;
+          const hasIssue =
+            Boolean(audit.error_message) || (audit.status && audit.status !== "ok");
+          const openDetails = () => setErrorAudit(audit);
           return (
-            <div>
-              <Badge
-                bg={
-                  audit.status === "ok"
-                    ? "success"
-                    : audit.status === "token_error"
-                      ? "warning"
-                      : "danger"
-                }
-                text={audit.status === "token_error" ? "dark" : undefined}
-              >
-                {audit.status}
-              </Badge>
-              {audit.error_message && (
-                <div
-                  className="small text-danger text-truncate"
-                  style={{ maxWidth: 160 }}
-                >
-                  {audit.error_message}
-                </div>
-              )}
-            </div>
+            <Badge
+              bg={
+                audit.status === "ok"
+                  ? "success"
+                  : audit.status === "token_error"
+                    ? "warning"
+                    : "danger"
+              }
+              text={audit.status === "token_error" ? "dark" : undefined}
+              {...(hasIssue && {
+                role: "button",
+                tabIndex: 0,
+                className: styles.statusBadgeButton,
+                "aria-label": t("Show error details for {{name}}", {
+                  name: audit.character_name,
+                }),
+                onClick: openDetails,
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openDetails();
+                  }
+                },
+              })}
+            >
+              {audit.status}
+            </Badge>
           );
         },
       }),
@@ -228,35 +241,38 @@ export const SuperuserAltsModal: React.FC<SuperuserAltsModalProps> = ({
                     <RefreshCw size={14} className="me-2 text-primary" />
                     {t("Normal Update")}
                   </Dropdown.Item>
-                  <Dropdown.Item
-                    onClick={() => onTriggerUpdate(audit.character_id, true)}
-                  >
-                    <RefreshCw size={14} className="me-2 text-warning" />
-                    {t("Force Refresh (Bypass Cache)")}
-                  </Dropdown.Item>
+                  {isSuperuser && (
+                    <Dropdown.Item
+                      onClick={() => onTriggerUpdate(audit.character_id, true)}
+                    >
+                      <RefreshCw size={14} className="me-2 text-warning" />
+                      {t("Force Refresh (Bypass Cache)")}
+                    </Dropdown.Item>
+                  )}
                 </Dropdown.Menu>
               </Dropdown>
-              {renderTooltip(
-                t("Delete Audit"),
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => onDelete(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
-                >
-                  <Trash2 size={13} />
-                  <span>{t("Delete")}</span>
-                </Button>,
-              )}
+              {isSuperuser &&
+                renderTooltip(
+                  t("Delete Audit"),
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => onDelete(audit)}
+                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                  >
+                    <Trash2 size={13} />
+                    <span>{t("Delete")}</span>
+                  </Button>,
+                )}
             </div>
           );
         },
       }),
     ];
-  }, [t, updatingCharacterId, onInspect, onTriggerUpdate, onDelete]);
+  }, [t, updatingCharacterId, onInspect, onTriggerUpdate, onDelete, isSuperuser]);
 
   const modalData: ModalData = {
-    modal_id: "superuser-alts-modal",
+    modal_id: "administration-alts-modal",
     title: group
       ? `${group.mainCharacterName} — ${group.alts.length} ${
           group.alts.length === 1 ? t("Alt") : t("Alts")
@@ -266,6 +282,7 @@ export const SuperuserAltsModal: React.FC<SuperuserAltsModalProps> = ({
   };
 
   return (
+    <>
     <BaseModal
       data={modalData}
       showModal={group !== null}
@@ -283,7 +300,16 @@ export const SuperuserAltsModal: React.FC<SuperuserAltsModalProps> = ({
         />
       </div>
     </BaseModal>
+    {/* Rendered after the alts modal so it stacks on top; the alts modal stays open */}
+    <AdministrationErrorModal
+      show={errorAudit !== null}
+      onHide={() => setErrorAudit(null)}
+      characterName={errorAudit?.character_name ?? ""}
+      status={errorAudit?.status ?? ""}
+      errorMessage={errorAudit?.error_message}
+    />
+    </>
   );
 };
 
-export default SuperuserAltsModal;
+export default AdministrationAltsModal;

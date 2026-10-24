@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next";
 
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import { ProjectName } from "@/App";
 import BaseSectionHeader from "@/Components/Base/BaseHeader";
+import { ProjectName } from "@/constants";
 
 export const OverviewPage: React.FC = () => {
   const { t } = useTranslation();

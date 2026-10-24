@@ -18,7 +18,7 @@ from allianceauth.eveonline.models import EveCharacter
 # AA Skillfarm
 from skillfarm.api import schema
 from skillfarm.helpers.lazy import get_character_portrait_url
-from skillfarm.models.general import UserSettings
+from skillfarm.models.general import General, UserSettings
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
@@ -84,11 +84,15 @@ class ApiEndpoints:
                 )
             )
 
-            if request.user.is_superuser:
+            if General.has_any_perm(
+                request.user,
+                General.Permission.ADMIN_ACCESS,
+                General.Permission.CORP_ACCESS,
+            ):
                 right_menu.append(
                     schema.MenuLink(
-                        name=_("Superuser"),
-                        link="/superuser/",
+                        name=_("Administration"),
+                        link="/administration/",
                     )
                 )
 
@@ -107,7 +111,7 @@ class ApiEndpoints:
             summary="Get current user data and permissions",
         )
         def get_user(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             main_char = getattr(
@@ -123,9 +127,7 @@ class ApiEndpoints:
 
             portrait = get_character_portrait_url(char_id, size=64) if char_id else None
 
-            is_admin = request.user.is_superuser or request.user.has_perm(
-                "skillfarm.admin_access"
-            )
+            is_admin = General.has_perm(request.user, General.Permission.ADMIN_ACCESS)
 
             return schema.UserData(
                 user_id=request.user.id,
@@ -137,7 +139,10 @@ class ApiEndpoints:
                 alliance_name=alliance_name,
                 portrait=portrait,
                 is_admin=is_admin,
-                has_corp_access=request.user.has_perm("skillfarm.corp_access"),
+                has_corp_access=General.has_perm(
+                    request.user, General.Permission.CORP_ACCESS
+                ),
+                is_superuser=request.user.is_superuser,
             )
 
         @api.get(
@@ -150,7 +155,7 @@ class ApiEndpoints:
             summary="Get current user's Skillfarm settings",
         )
         def get_user_settings(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -170,7 +175,7 @@ class ApiEndpoints:
         def update_user_settings(
             request: WSGIRequest, payload: schema.UserSettingsUpdateRequest
         ):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -191,7 +196,7 @@ class ApiEndpoints:
         )
         # pylint: disable=too-many-locals
         def get_user_character_statuses(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_char_ids = list(

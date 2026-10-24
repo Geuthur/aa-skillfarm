@@ -30,9 +30,12 @@ Section Order:
 
 ### Added
 
+- [ADD] Corporations section in the Administration showing a "{count} Unregistered" button per corporation that opens a searchable `UnregisteredModal` with all characters known to Alliance Auth that are not registered in Skillfarm. `corp_access` sees only the own corporation, `admin_access` sees all corporations. New endpoints `GET administration/corporations/` and `GET administration/corporations/{corporation_id}/unregistered/`.
+- [ADD] NPC corporations (ID below 10,000,000) are excluded from the Administration corporations list; the unregistered endpoint returns `404` for them.
+- [ADD] `General.Permission` (`TextChoices`) with `get_perm`, `has_perm` and `has_any_perm` helpers as central permission API; codenames are unchanged.
+- [ADD] `is_superuser` flag in the `GET user/` response so the frontend can show superuser-only actions.
 - [ADD] Modular `BaseOwnerSettingsSection` in `SettingsPage` displaying registered characters and missing characters (unregistered alts) with quick-add action link.
 - [ADD] Missing characters detection in `GET user/characters/status/` returning `UserCharacterStatusResponse` with `missing_characters`.
-- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) from Settings navigation item; only the red pulsing dot is displayed on ESI errors.
 - [ADD] Character manual update endpoint `POST characters/{character_id}/update/` with Celery update task dispatch.
 - [ADD] Centralized character management into `SettingsPage`: global `Update All` button (with 60s cooldown, `force_refresh=false`), individual character update buttons (`force_refresh=false`), per-character notification toggle, and character deletion modal.
 - [ADD] Superuser View Unification: 4 top KPI metric cards (`bg-body border-secondary h-100 shadow-sm`) with dynamic "Sync Issues" indicator.
@@ -47,9 +50,19 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] The Administration page shows a corporation specific description for users that only have `corp_access`.
+- [CHANGE] The "Administration" menu entry is now also visible for users with `corp_access`; they only see the Corporations section of their own corporation, all other Administration features stay restricted to `admin_access` / superusers.
+- [CHANGE] The "Add Character" button for missing characters in Settings is now a solid primary button (`btn btn-primary`) instead of an outline button.
+- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) from Settings navigation item; only the red pulsing dot is displayed on ESI errors.
 - [CHANGE] Removed pulsing button and dot on Overview `OverviewPage` cards; pulse animation is exclusively retained on `Settings` in navigation menu when user characters have errors.
 - [CHANGE] Refactored `CharacterDashboard` and `CharacterTable`: removed global update button, row-level update button, notification toggle, and delete action from overview. Overview now strictly retains skill queue inspection, skillset configuration, and status acknowledgements.
 - [CHANGE] Updated Superuser navigation link to `/superuser/` and added redirect from `/admin/`.
+- [CHANGE] Renamed the "Superuser" area to "Administration": API paths `superuser/...` and `admin/...` are now `administration/...`, `api/superuser.py` and `api/admin.py` are merged into `api/administration.py`, schemas `Superuser*` are now `Administration*`, and the frontend route is `/administration/` (`/superuser/` and `/admin/` redirect).
+- [CHANGE] Administration endpoints and the menu entry are protected by the `skillfarm.admin_access` permission instead of `is_superuser`. Only global update tasks (`administration/update-all/`, `administration/update-prices/`), `force_refresh` and deleting a character audit remain superuser-only; `force_refresh=true` from a non-superuser is rejected with 403.
+- [CHANGE] All permission checks use `General.has_perm` / `General.get_perm`; redundant `is_superuser` branches in the access managers were removed.
+- [CHANGE] Global Task Administration panel, Force Refresh options and Delete action in the Administration page are only shown to superusers.
+- [CHANGE] Aligned the frontend entry files with the other plugins: `main.tsx` is now `Main.tsx`, `App.tsx` is now `Routing.tsx`, `AppName`/`ProjectName` live in `constants.ts`, and the global styles (`index.css`, `skillfarm.css`, former `App.css`) moved to `Styles/`. Removed the unused `AdminPage` (replaced by `AdministrationPage`).
+- [CHANGE] ESI error messages in the Administration alts modal are no longer shown inline; the status badge of a character with an error now opens a new `AdministrationErrorModal` (stacked above the alts modal) with the full message.
 
 <!-- Your changes go here -->
 

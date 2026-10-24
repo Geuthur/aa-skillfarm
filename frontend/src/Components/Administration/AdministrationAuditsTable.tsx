@@ -9,12 +9,12 @@ import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "reac
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Styles/modules/Superuser.module.css";
+import styles from "@/Styles/modules/Administration.module.css";
 
 // AA Skillfarm
-import type { SuperuserAuditSchema } from "@/Api/schema";
+import type { AdministrationAuditSchema } from "@/Api/schema";
+import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
-import { SuperuserAltsModal } from "@/Components/Superuser/SuperuserAltsModal";
 // Utils
 import { renderTooltip } from "@/Utils";
 
@@ -27,7 +27,7 @@ export interface MainCharacterGroup {
   mainPortraitUrl: string | null;
   corporationName: string;
   corporationTicker: string;
-  alts: SuperuserAuditSchema[];
+  alts: AdministrationAuditSchema[];
   totalSp: number;
   trainingCount: number;
   pausedCount: number;
@@ -35,19 +35,20 @@ export interface MainCharacterGroup {
   issuesCount: number;
 }
 
-interface SuperuserAuditsTableProps {
-  audits?: SuperuserAuditSchema[];
+interface AdministrationAuditsTableProps {
+  audits?: AdministrationAuditSchema[];
   isLoading: boolean;
   isError: boolean;
   updatingCharacterId: number | null;
   taskFeedback: { variant: "success" | "danger"; message: string } | null;
   onDismissFeedback: () => void;
-  onInspect: (audit: SuperuserAuditSchema) => void;
+  onInspect: (audit: AdministrationAuditSchema) => void;
   onTriggerUpdate: (characterId: number, forceRefresh: boolean) => void;
-  onDelete: (audit: SuperuserAuditSchema) => void;
+  onDelete: (audit: AdministrationAuditSchema) => void;
+  isSuperuser?: boolean;
 }
 
-export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
+export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps> = ({
   audits,
   isLoading,
   isError,
@@ -57,6 +58,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
   onInspect,
   onTriggerUpdate,
   onDelete,
+  isSuperuser = false,
 }) => {
   const { t } = useTranslation();
   const [selectedAltsGroup, setSelectedAltsGroup] = useState<MainCharacterGroup | null>(null);
@@ -301,14 +303,16 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
                     <RefreshCw size={14} className="me-2 text-primary" />
                     {t("Normal Update")}
                   </Dropdown.Item>
-                  <Dropdown.Item
-                    onClick={() =>
-                      group.alts.forEach((a) => onTriggerUpdate(a.character_id, true))
-                    }
-                  >
-                    <RefreshCw size={14} className="me-2 text-warning" />
-                    {t("Force Refresh (Bypass Cache)")}
-                  </Dropdown.Item>
+                  {isSuperuser && (
+                    <Dropdown.Item
+                      onClick={() =>
+                        group.alts.forEach((a) => onTriggerUpdate(a.character_id, true))
+                      }
+                    >
+                      <RefreshCw size={14} className="me-2 text-warning" />
+                      {t("Force Refresh (Bypass Cache)")}
+                    </Dropdown.Item>
+                  )}
                 </Dropdown.Menu>
               </Dropdown>
             </div>
@@ -316,7 +320,7 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
         },
       }),
     ];
-  }, [t, updatingCharacterId, onTriggerUpdate]);
+  }, [t, updatingCharacterId, onTriggerUpdate, isSuperuser]);
 
   return (
     <>
@@ -355,19 +359,20 @@ export const SuperuserAuditsTable: React.FC<SuperuserAuditsTableProps> = ({
               columns={columns}
               data={groupedData}
               emptyText={t("No Skillfarm characters found.")}
-              exportFileName="superuser_audits.csv"
+              exportFileName="administration_audits.csv"
             />
           )}
         </Card.Body>
       </Card>
 
-      <SuperuserAltsModal
+      <AdministrationAltsModal
         group={selectedAltsGroup}
         updatingCharacterId={updatingCharacterId}
         onHide={() => setSelectedAltsGroup(null)}
         onInspect={onInspect}
         onTriggerUpdate={onTriggerUpdate}
         onDelete={onDelete}
+        isSuperuser={isSuperuser}
       />
     </>
   );

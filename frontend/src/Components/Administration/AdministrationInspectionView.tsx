@@ -7,14 +7,14 @@ import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Nav, ProgressBar, Sp
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Styles/modules/Superuser.module.css";
+import styles from "@/Styles/modules/Administration.module.css";
 
 // AA Skillfarm
-import type { CharacterDetailResponse, SuperuserAuditSchema } from "@/Api/schema";
+import type { CharacterDetailResponse, AdministrationAuditSchema } from "@/Api/schema";
 import { renderTooltip } from "@/Utils";
 
-interface SuperuserInspectionViewProps {
-  inspectingAudit: SuperuserAuditSchema;
+interface AdministrationInspectionViewProps {
+  inspectingAudit: AdministrationAuditSchema;
   detail?: CharacterDetailResponse;
   isLoading: boolean;
   isError: boolean;
@@ -24,9 +24,10 @@ interface SuperuserInspectionViewProps {
   onBack: () => void;
   onRefetch: () => void;
   onTriggerUpdate: (characterId: number, forceRefresh: boolean) => void;
+  isSuperuser?: boolean;
 }
 
-export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = ({
+export const AdministrationInspectionView: React.FC<AdministrationInspectionViewProps> = ({
   inspectingAudit,
   detail,
   isLoading,
@@ -36,6 +37,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
   onDismissFeedback,
   onBack,
   onTriggerUpdate,
+  isSuperuser = false,
 }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"queue" | "skills">("queue");
@@ -54,7 +56,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
               className="d-flex align-items-center gap-1 sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
             >
               <ArrowLeft size={16} />
-              <span>{t("Back to Superuser Overview")}</span>
+              <span>{t("Back to Administration Overview")}</span>
             </Button>
             {inspectingAudit.portrait_url && (
               <img
@@ -72,7 +74,7 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
                   <Badge bg="secondary">[{inspectingAudit.corporation_ticker}]</Badge>
                 )}
                 <Badge bg="warning" text="dark">
-                  {t("Superuser Inspection")}
+                  {t("Administration Inspection")}
                 </Badge>
               </div>
               <p className="text-muted small mb-0">
@@ -109,10 +111,12 @@ export const SuperuserInspectionView: React.FC<SuperuserInspectionViewProps> = (
                   <RefreshCw size={14} className="me-2 text-primary" />
                   {t("Normal Update")}
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, true)}>
-                  <RefreshCw size={14} className="me-2 text-warning" />
-                  {t("Force Refresh (Bypass Cache)")}
-                </Dropdown.Item>
+                {isSuperuser && (
+                  <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, true)}>
+                    <RefreshCw size={14} className="me-2 text-warning" />
+                    {t("Force Refresh (Bypass Cache)")}
+                  </Dropdown.Item>
+                )}
               </Dropdown.Menu>
             </Dropdown>
           </div>

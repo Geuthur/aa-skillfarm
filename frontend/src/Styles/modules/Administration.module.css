@@ -1,47 +1,3 @@
-.denied-panel {
-    max-width: 600px;
-    margin: 40px auto;
-    text-align: center;
-    padding: 32px;
-}
-
-.denied-icon {
-    color: var(--aa-color-rose-light);
-    margin-bottom: 16px;
-}
-
-.denied-title {
-    margin: 0 0 8px 0;
-}
-
-.denied-text {
-    color: var(--aa-text-secondary);
-    margin: 0;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.header-icon {
-    color: var(--aa-color-blue);
-}
-
-.title {
-    margin: 0;
-    font-size: var(--aa-font-size-xl);
-    font-weight: 700;
-}
-
-.subtitle {
-    margin: 4px 0 0 0;
-    color: var(--aa-text-secondary);
-    font-size: var(--aa-font-size-sm);
-}
-
 .feedback {
     border-color: var(--aa-border-emerald);
     color: var(--aa-text-emerald-light);
@@ -113,4 +69,40 @@
     margin: 4px 0 12px 0;
     color: var(--aa-text-secondary);
     font-size: var(--aa-font-size-sm);
+}
+
+.avatarFallback {
+    width: 32px;
+    height: 32px;
+}
+
+.dropdownMenu {
+    z-index: 1060;
+}
+
+.skillTruncate {
+    max-width: 180px;
+}
+
+.progressCol {
+    min-width: 120px;
+}
+
+.searchContainer {
+    max-width: 300px;
+    width: 100%;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+/* Status badge that opens the error details modal */
+.statusBadgeButton {
+    cursor: pointer;
+}
+
+.statusBadgeButton:focus-visible {
+    outline: 2px solid var(--aa-color-emerald-light);
+    outline-offset: 2px;
 }

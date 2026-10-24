@@ -1102,9 +1102,252 @@
         ]
       }
     },
-    "/skillfarm/api/admin/stats/": {
+    "/skillfarm/api/administration/audits/": {
       "get": {
-        "operationId": "skillfarm_api_admin_get_admin_stats",
+        "operationId": "skillfarm_api_administration_list_all_audits",
+        "summary": "List all Skillfarm character audits across the system for administrators",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AdministrationAuditSchema"
+                  },
+                  "title": "Response",
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/administration/audits/{character_id}/update/": {
+      "post": {
+        "operationId": "skillfarm_api_administration_trigger_audit_update",
+        "summary": "Trigger single character update task for administrators",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AdministrationAuditUpdateRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": false
+        },
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/administration/audits/{character_id}/": {
+      "delete": {
+        "operationId": "skillfarm_api_administration_delete_audit",
+        "summary": "Delete a character audit permanently (superusers only)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActionResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/administration/audits/{character_id}/inspect/": {
+      "get": {
+        "operationId": "skillfarm_api_administration_inspect_audit",
+        "summary": "Get character detailed inspection view for administrators",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "schema": {
+              "title": "Character Id",
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterDetailResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response",
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Administration"
+        ],
+        "security": [
+          {
+            "SessionAuth": []
+          }
+        ]
+      }
+    },
+    "/skillfarm/api/administration/stats/": {
+      "get": {
+        "operationId": "skillfarm_api_administration_get_admin_stats",
         "summary": "Get administrative statistics for all Skillfarm characters",
         "parameters": [],
         "responses": {
@@ -1141,10 +1384,10 @@
         ]
       }
     },
-    "/skillfarm/api/admin/update-all/": {
+    "/skillfarm/api/administration/update-all/": {
       "post": {
-        "operationId": "skillfarm_api_admin_trigger_update_all",
-        "summary": "Queue full update task for all Skillfarm characters",
+        "operationId": "skillfarm_api_administration_trigger_update_all",
+        "summary": "Queue full update task for all Skillfarm characters (superusers only)",
         "parameters": [],
         "responses": {
           "200": {
@@ -1197,10 +1440,10 @@
         ]
       }
     },
-    "/skillfarm/api/admin/update-prices/": {
+    "/skillfarm/api/administration/update-prices/": {
       "post": {
-        "operationId": "skillfarm_api_admin_trigger_update_prices",
-        "summary": "Queue market prices update task",
+        "operationId": "skillfarm_api_administration_trigger_update_prices",
+        "summary": "Queue market prices update task (superusers only)",
         "parameters": [],
         "responses": {
           "200": {
@@ -1236,10 +1479,10 @@
         ]
       }
     },
-    "/skillfarm/api/superuser/audits/": {
+    "/skillfarm/api/administration/corporations/": {
       "get": {
-        "operationId": "skillfarm_api_superuser_list_all_audits",
-        "summary": "List all Skillfarm character audits across the system for superusers",
+        "operationId": "skillfarm_api_administration_list_corporations",
+        "summary": "List corporations with registered and unregistered character counts",
         "parameters": [],
         "responses": {
           "200": {
@@ -1248,7 +1491,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/SuperuserAuditSchema"
+                    "$ref": "#/components/schemas/AdministrationCorporationSchema"
                   },
                   "title": "Response",
                   "type": "array"
@@ -1270,7 +1513,7 @@
           }
         },
         "tags": [
-          "Superuser"
+          "Administration"
         ],
         "security": [
           {
@@ -1279,155 +1522,16 @@
         ]
       }
     },
-    "/skillfarm/api/superuser/audits/{character_id}/update/": {
-      "post": {
-        "operationId": "skillfarm_api_superuser_trigger_audit_update",
-        "summary": "Trigger single character update task for superusers",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "character_id",
-            "schema": {
-              "title": "Character Id",
-              "type": "integer"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActionResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Superuser"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/SuperuserAuditUpdateRequest"
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            }
-          },
-          "required": false
-        },
-        "security": [
-          {
-            "SessionAuth": []
-          }
-        ]
-      }
-    },
-    "/skillfarm/api/superuser/audits/{character_id}/": {
-      "delete": {
-        "operationId": "skillfarm_api_superuser_delete_audit",
-        "summary": "Delete a character audit permanently for superusers",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "character_id",
-            "schema": {
-              "title": "Character Id",
-              "type": "integer"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ActionResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "title": "Response",
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Superuser"
-        ],
-        "security": [
-          {
-            "SessionAuth": []
-          }
-        ]
-      }
-    },
-    "/skillfarm/api/superuser/audits/{character_id}/inspect/": {
+    "/skillfarm/api/administration/corporations/{corporation_id}/unregistered/": {
       "get": {
-        "operationId": "skillfarm_api_superuser_inspect_audit",
-        "summary": "Get character detailed inspection view for superusers",
+        "operationId": "skillfarm_api_administration_list_corporation_unregistered",
+        "summary": "List characters of a corporation that are not registered in Skillfarm",
         "parameters": [
           {
             "in": "path",
-            "name": "character_id",
+            "name": "corporation_id",
             "schema": {
-              "title": "Character Id",
+              "title": "Corporation Id",
               "type": "integer"
             },
             "required": true
@@ -1439,7 +1543,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CharacterDetailResponse"
+                  "$ref": "#/components/schemas/AdministrationUnregisteredResponse"
                 }
               }
             }
@@ -1470,7 +1574,7 @@
           }
         },
         "tags": [
-          "Superuser"
+          "Administration"
         ],
         "security": [
           {
@@ -1610,6 +1714,11 @@
           "is_admin": {
             "default": false,
             "title": "Is Admin",
+            "type": "boolean"
+          },
+          "is_superuser": {
+            "default": false,
+            "title": "Is Superuser",
             "type": "boolean"
           },
           "has_corp_access": {
@@ -2634,57 +2743,8 @@
         "title": "OverviewUserCharactersResponse",
         "type": "object"
       },
-      "AdminStatsResponse": {
-        "properties": {
-          "total_characters": {
-            "title": "Total Characters",
-            "type": "integer"
-          },
-          "active_characters": {
-            "title": "Active Characters",
-            "type": "integer"
-          },
-          "in_training_count": {
-            "title": "In Training Count",
-            "type": "integer"
-          },
-          "paused_training_count": {
-            "title": "Paused Training Count",
-            "type": "integer"
-          },
-          "total_sp": {
-            "title": "Total Sp",
-            "type": "integer"
-          },
-          "total_pending_extractions": {
-            "title": "Total Pending Extractions",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "total_characters",
-          "active_characters",
-          "in_training_count",
-          "paused_training_count",
-          "total_sp",
-          "total_pending_extractions"
-        ],
-        "title": "AdminStatsResponse",
-        "type": "object"
-      },
-      "AdminUpdateRequest": {
-        "properties": {
-          "force_refresh": {
-            "default": false,
-            "title": "Force Refresh",
-            "type": "boolean"
-          }
-        },
-        "title": "AdminUpdateRequest",
-        "type": "object"
-      },
-      "SuperuserAuditSchema": {
-        "description": "Schema for superuser character audit management.",
+      "AdministrationAuditSchema": {
+        "description": "Schema for administration character audit management.",
         "properties": {
           "character_id": {
             "title": "Character Id",
@@ -2860,10 +2920,10 @@
           "total_sp",
           "is_training"
         ],
-        "title": "SuperuserAuditSchema",
+        "title": "AdministrationAuditSchema",
         "type": "object"
       },
-      "SuperuserAuditUpdateRequest": {
+      "AdministrationAuditUpdateRequest": {
         "description": "Request to trigger update for a specific audit.",
         "properties": {
           "force_refresh": {
@@ -2872,7 +2932,158 @@
             "type": "boolean"
           }
         },
-        "title": "SuperuserAuditUpdateRequest",
+        "title": "AdministrationAuditUpdateRequest",
+        "type": "object"
+      },
+      "AdminStatsResponse": {
+        "properties": {
+          "total_characters": {
+            "title": "Total Characters",
+            "type": "integer"
+          },
+          "active_characters": {
+            "title": "Active Characters",
+            "type": "integer"
+          },
+          "in_training_count": {
+            "title": "In Training Count",
+            "type": "integer"
+          },
+          "paused_training_count": {
+            "title": "Paused Training Count",
+            "type": "integer"
+          },
+          "total_sp": {
+            "title": "Total Sp",
+            "type": "integer"
+          },
+          "total_pending_extractions": {
+            "title": "Total Pending Extractions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_characters",
+          "active_characters",
+          "in_training_count",
+          "paused_training_count",
+          "total_sp",
+          "total_pending_extractions"
+        ],
+        "title": "AdminStatsResponse",
+        "type": "object"
+      },
+      "AdminUpdateRequest": {
+        "properties": {
+          "force_refresh": {
+            "default": false,
+            "title": "Force Refresh",
+            "type": "boolean"
+          }
+        },
+        "title": "AdminUpdateRequest",
+        "type": "object"
+      },
+      "AdministrationCorporationSchema": {
+        "description": "Corporation with registration statistics for the Administration.",
+        "properties": {
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "corporation_name": {
+            "title": "Corporation Name",
+            "type": "string"
+          },
+          "corporation_ticker": {
+            "title": "Corporation Ticker",
+            "type": "string"
+          },
+          "logo_url": {
+            "title": "Logo Url",
+            "type": "string"
+          },
+          "registered_count": {
+            "title": "Registered Count",
+            "type": "integer"
+          },
+          "unregistered_count": {
+            "title": "Unregistered Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "corporation_id",
+          "corporation_name",
+          "corporation_ticker",
+          "logo_url",
+          "registered_count",
+          "unregistered_count"
+        ],
+        "title": "AdministrationCorporationSchema",
+        "type": "object"
+      },
+      "AdministrationUnregisteredResponse": {
+        "description": "Characters of a corporation that are not registered in Skillfarm.",
+        "properties": {
+          "corporation_id": {
+            "title": "Corporation Id",
+            "type": "integer"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/UnregisteredCharacterSchema"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "corporation_id"
+        ],
+        "title": "AdministrationUnregisteredResponse",
+        "type": "object"
+      },
+      "UnregisteredCharacterSchema": {
+        "description": "Character of a corporation that is not registered in Skillfarm.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "UnregisteredCharacterSchema",
         "type": "object"
       }
     },

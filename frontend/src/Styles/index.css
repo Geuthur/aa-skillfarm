@@ -1,5 +1,3 @@
-@import "@/skillfarm.css";
-
 /*
  * AllianceAuth CSS not colliding with BS5
  */
@@ -1052,4 +1050,9 @@ html[data-bs-theme="dark"] {
 .aa-nav-danger:hover {
     color: var(--aa-color-rose-light, #fda4af) !important;
     text-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
+}
+/* Global typography and base overrides (formerly App.css) */
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--aa-text-primary);
 }

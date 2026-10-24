@@ -10,6 +10,7 @@ from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
 from skillfarm import __title__
+from skillfarm.models.general import General
 from skillfarm.providers import AppLogger
 
 logger = AppLogger(get_extension_logger(__name__), __title__)
@@ -33,15 +34,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def visible_to(self, user: User):
         """Get all objects visible to the user."""
-        # superusers get all visible
-        if user.is_superuser:
-            logger.debug(
-                "Returning all objects for superuser %s.",
-                user,
-            )
-            return self
-
-        if user.has_perm("skillfarm.admin_access"):
+        if General.has_perm(user, General.Permission.ADMIN_ACCESS):
             logger.debug("Returning all objects for admin user %s.", user)
             return self
 
@@ -50,7 +43,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if user.has_perm("skillfarm.corp_access"):
+            if General.has_perm(user, General.Permission.CORP_ACCESS):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s visible.", len(queries), user)
@@ -65,15 +58,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def manage_to(self, user: User):
         """Get QuerySet of objects that the user can manage."""
-        # superusers get all visible
-        if user.is_superuser:
-            logger.debug(
-                "Returning all manageable queries for superuser %s.",
-                user,
-            )
-            return self
-
-        if user.has_perm("skillfarm.admin_access"):
+        if General.has_perm(user, General.Permission.ADMIN_ACCESS):
             logger.debug("Returning all manageable queries for admin user %s.", user)
             return self
 
@@ -82,7 +67,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if user.has_perm("skillfarm.corp_access"):
+            if General.has_perm(user, General.Permission.CORP_ACCESS):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s manageable.", len(queries), user)

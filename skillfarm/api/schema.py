@@ -32,6 +32,7 @@ class UserData(Schema):
     alliance_name: str | None = None
     portrait: str | None = None
     is_admin: bool = False
+    is_superuser: bool = False
     has_corp_access: bool = False
 
 
@@ -279,8 +280,8 @@ class CalculatorResponse(Schema):
     month24_calc: float = 0.0
 
 
-class SuperuserAuditSchema(Schema):
-    """Schema for superuser character audit management."""
+class AdministrationAuditSchema(Schema):
+    """Schema for administration character audit management."""
 
     character_id: int
     character_name: str
@@ -305,7 +306,34 @@ class SuperuserAuditSchema(Schema):
     error_message: str | None = None
 
 
-class SuperuserAuditUpdateRequest(Schema):
+class AdministrationCorporationSchema(Schema):
+    """Corporation with registration statistics for the Administration."""
+
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    logo_url: str
+    registered_count: int
+    unregistered_count: int
+
+
+class UnregisteredCharacterSchema(Schema):
+    """Character of a corporation that is not registered in Skillfarm."""
+
+    id: int
+    name: str
+    avatar_url: str | None = None
+    subtitle: str | None = None
+
+
+class AdministrationUnregisteredResponse(Schema):
+    """Characters of a corporation that are not registered in Skillfarm."""
+
+    corporation_id: int
+    items: list[UnregisteredCharacterSchema] = []
+
+
+class AdministrationAuditUpdateRequest(Schema):
     """Request to trigger update for a specific audit."""
 
     force_refresh: bool = False

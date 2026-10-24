@@ -53,7 +53,7 @@ export const MissingOwnerCard: React.FC<MissingOwnerCardProps<BaseMissingOwner>>
         <div className="d-flex justify-content-end mt-auto pt-2 border-top border-secondary">
           <Button
             href={actionUrl}
-            variant="outline-primary"
+            variant="primary"
             size="sm"
             className="aa-btn aa-btn-sm d-flex align-items-center gap-1"
           >

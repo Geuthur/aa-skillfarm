@@ -11,6 +11,7 @@ from allianceauth.eveonline.models import EveCharacter
 # AA Skillfarm
 from skillfarm import __app_name__
 from skillfarm.app_settings import SKILLFARM_APP_NAME
+from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tasks import update_character
 
@@ -33,7 +34,9 @@ def _is_character_added_charaudit(character: EveCharacter):
 
 def _users_with_perms_charaudit():
     permission = Permission.objects.get(
-        content_type__app_label=__app_name__, codename="basic_access"
+        content_type__app_label=__app_name__,
+        # pylint: disable-next=no-member
+        codename=General.Permission.BASIC_ACCESS.value,
     )
     # Use Alliance Auth's User model to get users with the permission, including those in groups and superusers (Fix Issue with Proxy Model)
     user_model = permission.user_set.model
@@ -60,7 +63,9 @@ app_import = AppImport(
             field_label=SKILLFARM_APP_NAME,
             add_character=_add_character_charaudit,
             scopes=SkillFarmAudit.get_esi_scopes(),
-            check_permissions=lambda user: user.has_perm("skillfarm.basic_access"),
+            check_permissions=lambda user: General.has_perm(
+                user, General.Permission.BASIC_ACCESS
+            ),
             is_character_added=_is_character_added_charaudit,
             is_character_added_annotation=Exists(
                 SkillFarmAudit.objects.filter(character_id=OuterRef("pk"))

@@ -10,19 +10,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
 import * as ApiCalls from "@/Api/ApiCalls";
-import { SuperuserPage } from "@/Pages/SuperuserPage";
+import { AdministrationPage } from "@/Pages/AdministrationPage";
 
 vi.mock("@/Api/ApiCalls", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
   return {
     ...actual,
     fetchAdminStats: vi.fn(),
-    loadSuperuserAudits: vi.fn(),
-    triggerSuperuserAuditUpdate: vi.fn(),
-    deleteSuperuserAudit: vi.fn(),
-    loadSuperuserAuditInspect: vi.fn(),
+    loadUserData: vi.fn(),
+    loadAdministrationAudits: vi.fn(),
+    triggerAdministrationAuditUpdate: vi.fn(),
+    deleteAdministrationAudit: vi.fn(),
+    loadAdministrationAuditInspect: vi.fn(),
     triggerUpdateAll: vi.fn(),
     triggerUpdatePrices: vi.fn(),
+    loadAdministrationCorporations: vi.fn(),
+    loadAdministrationUnregistered: vi.fn(),
   };
 });
 
@@ -157,36 +160,93 @@ const mockDetail = {
   configured_skillset: ["Biology"],
 };
 
+const mockUserData = (isSuperuser: boolean, isAdmin = true) => ({
+  user: {
+    user_id: 1,
+    character_id: 95000001,
+    character_name: "Farmer Alpha",
+    corporation_id: 98000001,
+    corporation_name: "Farm Holdings",
+    is_admin: isAdmin,
+    is_superuser: isSuperuser,
+    has_corp_access: !isAdmin,
+  },
+});
+
 const renderPage = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={["/skillfarm/superuser/"]}>
+      <MemoryRouter initialEntries={["/skillfarm/administration/"]}>
         <NuqsTestingAdapter hasMemory>
-          <SuperuserPage />
+          <AdministrationPage />
         </NuqsTestingAdapter>
       </MemoryRouter>
     </QueryClientProvider>,
   );
 };
 
-describe("SuperuserPage", () => {
+describe("AdministrationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(true));
+    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([]);
   });
 
-  it("should render global admin metrics and list all audits", async () => {
+  it("should only show the corporations section for corp access users", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValueOnce(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValueOnce(mockAudits);
+    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false, false));
+    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
+      {
+        corporation_id: 98000001,
+        corporation_name: "Farm Holdings",
+        corporation_ticker: "FARM",
+        logo_url: "https://images.evetech.net/corporations/98000001/logo?size=64",
+        registered_count: 1,
+        unregistered_count: 3,
+      },
+    ]);
 
     // Test Action
     renderPage();
 
     // Expected Result
-    expect(await screen.findByText("Superuser Administration")).toBeInTheDocument();
+    expect(await screen.findByText("Farm Holdings")).toBeInTheDocument();
+    expect(screen.queryByText("Total Characters")).not.toBeInTheDocument();
+    expect(ApiCalls.loadAdministrationAudits).not.toHaveBeenCalled();
+    expect(ApiCalls.fetchAdminStats).not.toHaveBeenCalled();
+  });
+
+  it("should show the corporation description instead of the system-wide text for corp access users", async () => {
+    // Test Data
+    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false, false));
+
+    // Test Action
+    renderPage();
+
+    // Expected Result
+    expect(
+      await screen.findByText(
+        "Characters of your corporation that are not registered in Skillfarm yet.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/System-wide character synchronization/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("should render global admin metrics and list all audits", async () => {
+    // Test Data
+    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValueOnce(mockStats);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValueOnce(mockAudits);
+
+    // Test Action
+    renderPage();
+
+    // Expected Result
+    expect(await screen.findByText("Administration")).toBeInTheDocument();
     expect(await screen.findByText("Farmer Alpha")).toBeInTheDocument();
     expect(screen.queryByText("admin_user")).not.toBeInTheDocument();
     expect(screen.getByText("12,500,000")).toBeInTheDocument();
@@ -196,8 +256,8 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.triggerSuperuserAuditUpdate).mockResolvedValueOnce({
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(ApiCalls.triggerAdministrationAuditUpdate).mockResolvedValueOnce({
       success: true,
       message: "Queued update task for Farmer Alpha",
     });
@@ -215,7 +275,7 @@ describe("SuperuserPage", () => {
 
     // Expected Result
     await waitFor(() => {
-      expect(ApiCalls.triggerSuperuserAuditUpdate).toHaveBeenCalledWith(95000001, false);
+      expect(ApiCalls.triggerAdministrationAuditUpdate).toHaveBeenCalledWith(95000001, false);
     });
     expect(await screen.findByText("Queued update task for Farmer Alpha")).toBeInTheDocument();
   });
@@ -224,8 +284,8 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.loadSuperuserAuditInspect).mockResolvedValue(mockDetail);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(ApiCalls.loadAdministrationAuditInspect).mockResolvedValue(mockDetail);
 
     // Test Action
     renderPage();
@@ -238,12 +298,12 @@ describe("SuperuserPage", () => {
     await user.click(inspectBtn);
 
     // Expected Result
-    expect(await screen.findByText("Superuser Inspection")).toBeInTheDocument();
+    expect(await screen.findByText("Administration Inspection")).toBeInTheDocument();
     expect(screen.getByText("Skill Queue (1)")).toBeInTheDocument();
     expect(await screen.findByText("Biology")).toBeInTheDocument();
 
     // Test Action: navigate back
-    const backBtn = screen.getByRole("button", { name: "Back to Superuser Overview" });
+    const backBtn = screen.getByRole("button", { name: "Back to Administration Overview" });
     await user.click(backBtn);
 
     // Expected Result: back to overview table
@@ -254,8 +314,8 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.deleteSuperuserAudit).mockResolvedValueOnce({
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(ApiCalls.deleteAdministrationAudit).mockResolvedValueOnce({
       success: true,
       message: "Character audit deleted successfully.",
     });
@@ -267,7 +327,7 @@ describe("SuperuserPage", () => {
     const altsBtn = screen.getByTestId("alts-btn-user_1");
     await user.click(altsBtn);
 
-    const deleteBtn = screen.getByRole("button", { name: "Delete" });
+    const deleteBtn = await screen.findByRole("button", { name: "Delete" });
     await user.click(deleteBtn);
 
     // Expected Result
@@ -282,7 +342,7 @@ describe("SuperuserPage", () => {
     await user.click(confirmBtn);
 
     await waitFor(() => {
-      expect(ApiCalls.deleteSuperuserAudit).toHaveBeenCalledWith(95000001);
+      expect(ApiCalls.deleteAdministrationAudit).toHaveBeenCalledWith(95000001);
     });
   });
 
@@ -290,7 +350,7 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -309,7 +369,7 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -338,7 +398,7 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -365,7 +425,7 @@ describe("SuperuserPage", () => {
     // Test Data
     const user = userEvent.setup();
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadSuperuserAudits).mockResolvedValue(mockAudits);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
     vi.mocked(ApiCalls.triggerUpdateAll).mockResolvedValue({
       success: true,
       message: "Queued character update task.",
@@ -375,7 +435,7 @@ describe("SuperuserPage", () => {
     renderPage();
     expect(await screen.findByText("Farmer Alpha")).toBeInTheDocument();
     expect(screen.getByText("Sync Issues")).toBeInTheDocument();
-    expect(screen.getByText("Global Task Administration")).toBeInTheDocument();
+    expect(await screen.findByText("Global Task Administration")).toBeInTheDocument();
 
     // Expand collapsible panel
     const togglePanelBtn = screen.getByTestId("toggle-task-panel");
@@ -391,5 +451,27 @@ describe("SuperuserPage", () => {
     await waitFor(() => {
       expect(ApiCalls.triggerUpdateAll).toHaveBeenCalledWith(true);
     });
+  });
+
+  it("should hide global task panel, force refresh and delete for administrators without superuser", async () => {
+    // Test Data
+    const user = userEvent.setup();
+    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false));
+    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+
+    // Test Action
+    renderPage();
+    expect(await screen.findByText("Farmer Alpha")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(ApiCalls.loadUserData).toHaveBeenCalled();
+    });
+    await user.click(screen.getByTestId("alts-btn-user_1"));
+
+    // Expected Result
+    expect(await screen.findByRole("button", { name: "Update" })).toBeInTheDocument();
+    expect(screen.queryByText("Global Task Administration")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Delete" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Force Refresh (Bypass Cache)")).not.toBeInTheDocument();
   });
 });

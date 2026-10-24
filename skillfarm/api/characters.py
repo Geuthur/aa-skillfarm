@@ -20,6 +20,7 @@ from skillfarm import __title__, tasks
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import arabic_number_to_roman, get_skillfarm_character
 from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
@@ -185,7 +186,7 @@ class ApiEndpoints:
             request: WSGIRequest,
             filters: schema.CharacterFilter = Query(...),
         ):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             characters = SkillFarmAudit.objects.owned_by(request.user)
@@ -517,7 +518,7 @@ class ApiEndpoints:
             summary="Bulk acknowledge all pending ready extractions",
         )
         def acknowledge_all_extractions(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             audits = SkillFarmAudit.objects.owned_by(request.user).filter(
@@ -554,7 +555,7 @@ class ApiEndpoints:
             character_id: int,
             payload: schema.ForceRefreshRequest | None = None,
         ):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_perm(request.user, General.Permission.BASIC_ACCESS):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             perms, audit = get_skillfarm_character(request, character_id, manage=True)

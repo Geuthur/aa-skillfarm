@@ -32,24 +32,26 @@ import {
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "@/Styles/modules/Superuser.module.css";
+import styles from "@/Styles/modules/Administration.module.css";
 
 // AA Skillfarm
 import {
-  deleteSuperuserAudit,
+  deleteAdministrationAudit,
   fetchAdminStats,
-  loadSuperuserAuditInspect,
-  loadSuperuserAudits,
-  triggerSuperuserAuditUpdate,
+  loadAdministrationAuditInspect,
+  loadAdministrationAudits,
+  loadUserData,
+  triggerAdministrationAuditUpdate,
   triggerUpdateAll,
   triggerUpdatePrices,
 } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import type { SuperuserAuditSchema } from "@/Api/schema";
-import { SuperuserAuditsTable } from "@/Components/Superuser/SuperuserAuditsTable";
-import { SuperuserInspectionView } from "@/Components/Superuser/SuperuserInspectionView";
+import type { AdministrationAuditSchema } from "@/Api/schema";
+import { AdministrationAuditsTable } from "@/Components/Administration/AdministrationAuditsTable";
+import { AdministrationCorporationsTable } from "@/Components/Administration/AdministrationCorporationsTable";
+import { AdministrationInspectionView } from "@/Components/Administration/AdministrationInspectionView";
 
-export const SuperuserPage: React.FC = () => {
+export const AdministrationPage: React.FC = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
@@ -61,9 +63,19 @@ export const SuperuserPage: React.FC = () => {
   const [forceRefreshGlobal, setForceRefreshGlobal] = useState(false);
 
   // Queries
+  const { data: userData } = useQuery({
+    queryKey: queryKeys.User,
+    queryFn: loadUserData,
+  });
+  // Global update tasks, force refresh and audit deletion are reserved for superusers.
+  const isSuperuser = Boolean(userData?.user.is_superuser);
+  // Audits, statistics and tasks require admin access; corp access only sees the corporations section.
+  const isAdmin = Boolean(userData?.user.is_admin);
+
   const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: queryKeys.AdminStats,
     queryFn: fetchAdminStats,
+    enabled: isAdmin,
   });
 
   const {
@@ -71,8 +83,9 @@ export const SuperuserPage: React.FC = () => {
     isLoading: isLoadingAudits,
     isError: isErrorAudits,
   } = useQuery({
-    queryKey: queryKeys.SuperuserAudits,
-    queryFn: loadSuperuserAudits,
+    queryKey: queryKeys.AdministrationAudits,
+    queryFn: loadAdministrationAudits,
+    enabled: isAdmin,
   });
 
   // Global Sync Mutations
@@ -80,7 +93,7 @@ export const SuperuserPage: React.FC = () => {
     mutationFn: (force: boolean) => triggerUpdateAll(force),
     onSuccess: (res) => {
       setFeedbackMsg(res.message);
-      queryClient.invalidateQueries({ queryKey: queryKeys.SuperuserAudits });
+      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
       setTimeout(() => setFeedbackMsg(null), 5000);
     },
     onError: () => {
@@ -110,13 +123,13 @@ export const SuperuserPage: React.FC = () => {
 
   const auditUpdateMutation = useMutation({
     mutationFn: ({ characterId, forceRefresh }: { characterId: number; forceRefresh: boolean }) =>
-      triggerSuperuserAuditUpdate(characterId, forceRefresh),
+      triggerAdministrationAuditUpdate(characterId, forceRefresh),
     onSuccess: (res) => {
       setTaskFeedback({
         variant: "success",
         message: res.message || t("Update task queued successfully."),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.SuperuserAudits });
+      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
     },
     onError: (err: unknown) => {
       setTaskFeedback({
@@ -139,16 +152,16 @@ export const SuperuserPage: React.FC = () => {
   };
 
   // Audit Deletion Mutation
-  const [auditToDelete, setAuditToDelete] = useState<SuperuserAuditSchema | null>(null);
+  const [auditToDelete, setAuditToDelete] = useState<AdministrationAuditSchema | null>(null);
 
   const deleteAuditMutation = useMutation({
-    mutationFn: (characterId: number) => deleteSuperuserAudit(characterId),
+    mutationFn: (characterId: number) => deleteAdministrationAudit(characterId),
     onSuccess: (res) => {
       setTaskFeedback({
         variant: "success",
         message: res.message || t("Character audit deleted successfully."),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.SuperuserAudits });
+      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
       setAuditToDelete(null);
     },
     onError: (err: unknown) => {
@@ -238,18 +251,18 @@ export const SuperuserPage: React.FC = () => {
     refetch: refetchDetail,
   } = useQuery({
     queryKey: inspectingAudit
-      ? queryKeys.SuperuserAuditInspect(inspectingAudit.character_id)
+      ? queryKeys.AdministrationAuditInspect(inspectingAudit.character_id)
       : ["none"],
     queryFn: () =>
       inspectingAudit
-        ? loadSuperuserAuditInspect(inspectingAudit.character_id)
+        ? loadAdministrationAuditInspect(inspectingAudit.character_id)
         : Promise.reject(new Error("No audit")),
     enabled: Boolean(inspectingAudit),
   });
 
   if (inspectingAudit) {
     return (
-      <SuperuserInspectionView
+      <AdministrationInspectionView
         inspectingAudit={inspectingAudit}
         detail={auditDetail}
         isLoading={isLoadingDetail}
@@ -260,6 +273,7 @@ export const SuperuserPage: React.FC = () => {
         onBack={() => setInspectCharacterId(null)}
         onRefetch={() => refetchDetail()}
         onTriggerUpdate={handleTriggerAuditUpdate}
+        isSuperuser={isSuperuser}
       />
     );
   }
@@ -272,15 +286,21 @@ export const SuperuserPage: React.FC = () => {
             <ShieldAlert size={28} />
           </div>
           <div>
-            <h1 className="h3 mb-1 fw-bold">{t("Superuser Administration")}</h1>
+            <h1 className="h3 mb-1 fw-bold">{t("Administration")}</h1>
             <p className="mb-0 small text-muted">
-              {t(
-                "System-wide character synchronization, extraction readiness overview, and administrative maintenance.",
-              )}
+              {isAdmin
+                ? t(
+                    "System-wide character synchronization, extraction readiness overview, and administrative maintenance.",
+                  )
+                : t(
+                    "Characters of your corporation that are not registered in Skillfarm yet.",
+                  )}
             </p>
           </div>
         </header>
 
+        {isAdmin ? (
+          <>
         {feedbackMsg && (
           <div className={`aa-panel ${styles["feedback"]} mb-3`}>
             <Check size={18} />
@@ -361,106 +381,118 @@ export const SuperuserPage: React.FC = () => {
           </Col>
         </Row>
 
-        {/* Global Task Administration Panel (Collapsible) */}
-        <Card className="bg-dark border-secondary mb-4 shadow-sm">
-          <Card.Header
-            className={`border-secondary d-flex align-items-center justify-content-between py-2 ${styles.cursorPointer}`}
-            onClick={() => setShowTaskPanel((prev) => !prev)}
-          >
-            <div className="d-flex align-items-center gap-2">
-              <RefreshCw size={16} className="text-primary" />
-              <span className="fw-semibold text-light">{t("Global Task Administration")}</span>
-            </div>
-            <Button
-              variant="link"
-              size="sm"
-              className="p-0 text-muted"
-              aria-label={t("Toggle Task Administration")}
-              data-testid="toggle-task-panel"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowTaskPanel((prev) => !prev);
-              }}
+        {/* Global Task Administration Panel (Collapsible, superusers only) */}
+        {isSuperuser && (
+          <Card className="bg-dark border-secondary mb-4 shadow-sm">
+            <Card.Header
+              className={`border-secondary d-flex align-items-center justify-content-between py-2 ${styles.cursorPointer}`}
+              onClick={() => setShowTaskPanel((prev) => !prev)}
             >
-              {showTaskPanel ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-            </Button>
+              <div className="d-flex align-items-center gap-2">
+                <RefreshCw size={16} className="text-primary" />
+                <span className="fw-semibold text-light">{t("Global Task Administration")}</span>
+              </div>
+              <Button
+                variant="link"
+                size="sm"
+                className="p-0 text-muted"
+                aria-label={t("Toggle Task Administration")}
+                data-testid="toggle-task-panel"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowTaskPanel((prev) => !prev);
+                }}
+              >
+                {showTaskPanel ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              </Button>
+            </Card.Header>
+
+            {showTaskPanel && (
+              <Card.Body className="p-3">
+                <Form.Group className="mb-3">
+                  <Form.Check
+                    type="switch"
+                    id="global-force-refresh"
+                    label={<span className="small text-muted">{t("Force Refresh ESI")}</span>}
+                    checked={forceRefreshGlobal}
+                    onChange={(e) => setForceRefreshGlobal(e.target.checked)}
+                  />
+                </Form.Group>
+
+                <Row className="g-3">
+                  <Col md={6}>
+                    <Card className="bg-dark border-secondary h-100">
+                      <Card.Header className="border-secondary py-2">
+                        <h6 className="mb-0 text-light">{t("Characters")}</h6>
+                      </Card.Header>
+                      <Card.Body className="d-flex flex-column justify-content-between p-3">
+                        <p className="text-muted small">
+                          {t(
+                            "Queue background tasks to synchronize skill queues, extractions, and training status for all characters.",
+                          )}
+                        </p>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          disabled={updateAllMutation.isPending}
+                          onClick={() => updateAllMutation.mutate(forceRefreshGlobal)}
+                          className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-primary"
+                          data-testid="update-all-characters-btn"
+                        >
+                          {updateAllMutation.isPending ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : (
+                            <Users size={14} />
+                          )}
+                          {t("Update All Characters")}
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+
+                  <Col md={6}>
+                    <Card className="bg-dark border-secondary h-100">
+                      <Card.Header className="border-secondary py-2">
+                        <h6 className="mb-0 text-light">{t("Market Prices")}</h6>
+                      </Card.Header>
+                      <Card.Body className="d-flex flex-column justify-content-between p-3">
+                        <p className="text-muted small">
+                          {t(
+                            "Update market prices for skill injectors, extractors, and PLEX from EVE Online ESI.",
+                          )}
+                        </p>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={updatePricesMutation.isPending}
+                          onClick={() => updatePricesMutation.mutate()}
+                          className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-secondary"
+                          data-testid="update-market-prices-btn"
+                        >
+                          {updatePricesMutation.isPending ? (
+                            <Spinner size="sm" animation="border" />
+                          ) : (
+                            <Coins size={14} />
+                          )}
+                          {t("Update Market Prices")}
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+              </Card.Body>
+            )}
+          </Card>
+        )}
+
+        {/* Corporations */}
+        <Card className="bg-dark border-secondary mb-4 shadow-sm">
+          <Card.Header className="border-secondary py-2">
+            <span className="fw-semibold text-light">{t("Corporations")}</span>
           </Card.Header>
-
-          {showTaskPanel && (
-            <Card.Body className="p-3">
-              <Form.Group className="mb-3">
-                <Form.Check
-                  type="switch"
-                  id="global-force-refresh"
-                  label={<span className="small text-muted">{t("Force Refresh ESI")}</span>}
-                  checked={forceRefreshGlobal}
-                  onChange={(e) => setForceRefreshGlobal(e.target.checked)}
-                />
-              </Form.Group>
-
-              <Row className="g-3">
-                <Col md={6}>
-                  <Card className="bg-dark border-secondary h-100">
-                    <Card.Header className="border-secondary py-2">
-                      <h6 className="mb-0 text-light">{t("Characters")}</h6>
-                    </Card.Header>
-                    <Card.Body className="d-flex flex-column justify-content-between p-3">
-                      <p className="text-muted small">
-                        {t(
-                          "Queue background tasks to synchronize skill queues, extractions, and training status for all characters.",
-                        )}
-                      </p>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        disabled={updateAllMutation.isPending}
-                        onClick={() => updateAllMutation.mutate(forceRefreshGlobal)}
-                        className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-primary"
-                        data-testid="update-all-characters-btn"
-                      >
-                        {updateAllMutation.isPending ? (
-                          <Spinner size="sm" animation="border" />
-                        ) : (
-                          <Users size={14} />
-                        )}
-                        {t("Update All Characters")}
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                </Col>
-
-                <Col md={6}>
-                  <Card className="bg-dark border-secondary h-100">
-                    <Card.Header className="border-secondary py-2">
-                      <h6 className="mb-0 text-light">{t("Market Prices")}</h6>
-                    </Card.Header>
-                    <Card.Body className="d-flex flex-column justify-content-between p-3">
-                      <p className="text-muted small">
-                        {t(
-                          "Update market prices for skill injectors, extractors, and PLEX from EVE Online ESI.",
-                        )}
-                      </p>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={updatePricesMutation.isPending}
-                        onClick={() => updatePricesMutation.mutate()}
-                        className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-secondary"
-                        data-testid="update-market-prices-btn"
-                      >
-                        {updatePricesMutation.isPending ? (
-                          <Spinner size="sm" animation="border" />
-                        ) : (
-                          <Coins size={14} />
-                        )}
-                        {t("Update Market Prices")}
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-            </Card.Body>
-          )}
+          <Card.Body className="p-2">
+            <AdministrationCorporationsTable />
+          </Card.Body>
         </Card>
 
         {/* Filter and Search Bar */}
@@ -510,7 +542,7 @@ export const SuperuserPage: React.FC = () => {
         </div>
 
         {/* All Character Audits Table */}
-        <SuperuserAuditsTable
+        <AdministrationAuditsTable
           audits={filteredAudits}
           isLoading={isLoadingAudits}
           isError={isErrorAudits}
@@ -520,6 +552,7 @@ export const SuperuserPage: React.FC = () => {
           onInspect={(audit) => setInspectCharacterId(audit.character_id)}
           onTriggerUpdate={handleTriggerAuditUpdate}
           onDelete={(audit) => setAuditToDelete(audit)}
+          isSuperuser={isSuperuser}
         />
 
         {/* Delete Confirmation Modal */}
@@ -586,9 +619,20 @@ export const SuperuserPage: React.FC = () => {
             </Button>
           </Modal.Footer>
         </Modal>
+          </>
+        ) : (
+          <Card className="bg-dark border-secondary shadow-sm">
+            <Card.Header className="border-secondary py-2">
+              <span className="fw-semibold text-light">{t("Corporations")}</span>
+            </Card.Header>
+            <Card.Body className="p-2">
+              <AdministrationCorporationsTable />
+            </Card.Body>
+          </Card>
+        )}
       </CardBody>
     </Card>
   );
 };
 
-export default SuperuserPage;
+export default AdministrationPage;

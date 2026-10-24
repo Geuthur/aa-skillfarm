@@ -95,5 +95,20 @@ describe("AuthLeftMenu", () => {
     expect(settingsLink).toBeDefined();
     expect(screen.getByText("2")).toHaveClass("badge", "bg-danger");
   });
-});
 
+  it("should render the administration link with its dedicated navigation item", () => {
+    // Test Data
+    const testData = [{ name: "Administration", link: "/administration/" }];
+
+    // Test Action
+    render(
+      <MemoryRouter initialEntries={["/skillfarm/"]}>
+        <AuthLeftMenu data={testData} isLoading={false} error={false} />
+      </MemoryRouter>
+    );
+
+    // Expected Result
+    const navLink = screen.getByTestId("administration-nav-link");
+    expect(navLink.getAttribute("href")).toBe("/skillfarm/administration/");
+  });
+});
