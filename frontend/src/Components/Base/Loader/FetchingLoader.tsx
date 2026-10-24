@@ -17,7 +17,7 @@ export const FetchingLoader = ({ message, className = "" }: LoaderProps = {}) =>
         className={`spinner-border text-info ${styles["spinner-size"]}`}
         role="status"
       >
-        <span className="visually-hidden">{t("Loading...")}</span>
+        <span className="visually-hidden">{t("Loading…")}</span>
       </div>
       {message && (
         <span>

@@ -53,7 +53,7 @@ export const OverviewPage: React.FC = () => {
             </InputGroup.Text>
             <Form.Control
               type="text"
-              placeholder={t("Search users & corporations...")}
+              placeholder={t("Search users & corporations…")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="bg-dark text-light border-secondary"
@@ -64,7 +64,7 @@ export const OverviewPage: React.FC = () => {
         {isLoading && (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
-            <div className="mt-2 text-muted">{t("Loading overview...")}</div>
+            <div className="mt-2 text-muted">{t("Loading overview…")}</div>
           </div>
         )}
 

@@ -50,7 +50,7 @@ export function LiveStatusIndicator({
   const tooltipText = isError
     ? errorMessage
     : isBusy
-    ? t("Loading...")
+    ? t("Loading…")
     : dataUpdatedAt
     ? `${t("Last Fetch")}: ${formatLastFetch(dataUpdatedAt)}`
     : t("No Fetch");

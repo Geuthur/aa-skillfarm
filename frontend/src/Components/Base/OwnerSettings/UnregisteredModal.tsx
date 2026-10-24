@@ -63,7 +63,7 @@ function UnregisteredContent({
       {isLoading && (
         <div className="aa-loader-container">
           <span className="spinner-border" />
-          <span>{t("Loading...")}</span>
+          <span>{t("Loading…")}</span>
         </div>
       )}
 
@@ -86,7 +86,7 @@ function UnregisteredContent({
             <Form.Control
               type="search"
               value={search}
-              placeholder={t("Search characters...")}
+              placeholder={t("Search characters…")}
               aria-label={t("Search characters")}
               onChange={(e) => setSearch(e.target.value)}
             />

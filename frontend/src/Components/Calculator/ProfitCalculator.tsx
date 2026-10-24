@@ -164,7 +164,7 @@ export const ProfitCalculator: React.FC = () => {
     return (
       <div className={`aa-panel ${styles["state-panel"]}`}>
         <div className="spinner-border text-info mb-2" role="status" />
-        <div>{t("Fetching live market data...")}</div>
+        <div>{t("Fetching live market data…")}</div>
       </div>
     );
   }

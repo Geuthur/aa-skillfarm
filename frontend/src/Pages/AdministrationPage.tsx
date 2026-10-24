@@ -531,7 +531,7 @@ export const AdministrationPage: React.FC = () => {
           <div className={styles.searchContainer}>
             <Form.Control
               type="search"
-              placeholder={t("Search by character, user, or corp...")}
+              placeholder={t("Search by character, user, or corp…")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               size="sm"
@@ -614,7 +614,7 @@ export const AdministrationPage: React.FC = () => {
             >
               <Trash2 size={14} />
               <span>
-                {deleteAuditMutation.isPending ? t("Deleting...") : t("Confirm Delete")}
+                {deleteAuditMutation.isPending ? t("Deleting…") : t("Confirm Delete")}
               </span>
             </Button>
           </Modal.Footer>

@@ -126,7 +126,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       {isLoading && (
         <div className="aa-loader-container">
           <span className={`spinner-border ${styles["loader-spinner"]}`} />
-          <span>{t("Loading characters...")}</span>
+          <span>{t("Loading characters…")}</span>
         </div>
       )}
 

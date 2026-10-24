@@ -100,7 +100,7 @@ export function BaseModal({
             disabled={isPending}
             onClick={handleApprove}
           >
-            {isPending ? t("Loading...") : ModalData.buttonText || t("Confirm")}
+            {isPending ? t("Loading…") : ModalData.buttonText || t("Confirm")}
           </Button>
         )}
         <Button variant="secondary" onClick={handleClose}>

@@ -50,6 +50,7 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Use the typographic ellipsis (`…`) instead of three dots in loading texts and placeholders; the translation keys changed accordingly.
 - [CHANGE] The Administration page shows a corporation specific description for users that only have `corp_access`.
 - [CHANGE] The "Administration" menu entry is now also visible for users with `corp_access`; they only see the Corporations section of their own corporation, all other Administration features stay restricted to `admin_access` / superusers.
 - [CHANGE] The "Add Character" button for missing characters in Settings is now a solid primary button (`btn btn-primary`) instead of an outline button.

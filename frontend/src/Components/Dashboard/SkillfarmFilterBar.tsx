@@ -126,7 +126,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           <input
             type="text"
             className={`sf-search-input ${styles["search-input"]}`}
-            placeholder={t("Search characters or corps...")}
+            placeholder={t("Search characters or corps…")}
             value={filters.search || ""}
             onChange={(e) => onFilterChange({ search: e.target.value })}
           />

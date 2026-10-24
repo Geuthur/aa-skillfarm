@@ -128,7 +128,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
       <div>
         {isLoading && (
           <div className={styles["loading-state"]}>
-            {t("Loading queue details...")}
+            {t("Loading queue details…")}
           </div>
         )}
 

@@ -348,7 +348,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
           {isLoading ? (
             <div className="p-4 text-center text-muted">
               <Spinner animation="border" size="sm" className="me-2" />
-              <span>{t("Loading Skillfarm characters...")}</span>
+              <span>{t("Loading Skillfarm characters…")}</span>
             </div>
           ) : isError ? (
             <div className="p-4 text-center text-danger">

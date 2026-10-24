@@ -95,7 +95,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
 
         {isLoading && (
           <div className={styles["loading-state"]}>
-            {t("Loading skills...")}
+            {t("Loading skills…")}
           </div>
         )}
 
@@ -109,7 +109,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
               <input
                 type="text"
                 className={`sf-search-input ${styles["search-input"]}`}
-                placeholder={t("Filter available skills...")}
+                placeholder={t("Filter available skills…")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

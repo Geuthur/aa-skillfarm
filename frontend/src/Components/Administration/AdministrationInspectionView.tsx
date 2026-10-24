@@ -214,7 +214,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
         {isLoading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="light" />
-            <div className="mt-2 text-muted">{t("Loading character details...")}</div>
+            <div className="mt-2 text-muted">{t("Loading character details…")}</div>
           </div>
         ) : isError ? (
           <Alert variant="danger">
