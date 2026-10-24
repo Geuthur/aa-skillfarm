@@ -1,5 +1,5 @@
 // React
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 // Third Party
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -217,6 +217,40 @@ describe("AdministrationPage", () => {
     expect(screen.queryByText("Total Characters")).not.toBeInTheDocument();
     expect(ApiCalls.loadAdministrationAudits).not.toHaveBeenCalled();
     expect(ApiCalls.fetchAdminStats).not.toHaveBeenCalled();
+  });
+
+  it("should collapse the corporations card for administrators and expand it on toggle", async () => {
+    // Test Data
+    const user = userEvent.setup();
+    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false));
+    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
+      {
+        corporation_id: 98000001,
+        corporation_name: "Farm Holdings",
+        corporation_ticker: "FARM",
+        logo_url: "https://images.evetech.net/corporations/98000001/logo?size=64",
+        registered_count: 1,
+        unregistered_count: 3,
+      },
+    ]);
+
+    // Test Action
+    renderPage();
+    expect(await screen.findByText("Sync Issues")).toBeInTheDocument();
+    const toggle = screen.getByTestId("toggle-corporations-panel");
+
+    // Expected Result
+    expect(screen.queryByText("Farm Holdings")).not.toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(toggle);
+    expect(await screen.findByText("Farm Holdings")).toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(toggle);
+    expect(screen.queryByText("Farm Holdings")).not.toBeInTheDocument();
   });
 
   it("should show the corporation description instead of the system-wide text for corp access users", async () => {

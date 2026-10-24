@@ -248,7 +248,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
     <BaseTable
       data={characters}
       columns={columns}
-      variant="vowra"
+      variant="default"
       itemLabel={t("Characters")}
       pageSizeOptions={[10, 25, 50, 100]}
       initialState={{

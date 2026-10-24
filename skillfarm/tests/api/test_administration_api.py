@@ -545,7 +545,49 @@ class TestAdministrationCorporationsApi(SkillFarmTestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         ids = {c["corporation_id"] for c in response.json()}
         self.assertIn(self.corp.corporation_id, ids)
-        self.assertIn(self.other_corp.corporation_id, ids)
+
+    def test_list_corporations_should_exclude_corporations_without_registered_characters(
+        self,
+    ):
+        # Test Data
+        # other_corp only has an unregistered character, empty_corp has no character at all
+        empty_corp = EveCorporationInfoFactory(corporation_name="Empty Corporation")
+        self.client.force_login(self.admin_user)
+
+        # Test Action
+        response = self.client.get(self._list_url())
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {c["corporation_id"] for c in response.json()}
+        self.assertNotIn(self.other_corp.corporation_id, ids)
+        self.assertNotIn(empty_corp.corporation_id, ids)
+        self.assertIn(self.corp.corporation_id, ids)
+
+    def test_list_corporations_should_include_corporation_once_a_character_is_registered(
+        self,
+    ):
+        # Test Data
+        user = UserMainFactory(
+            main_character__character=EveCharacterFactory(
+                character_name="Other Registered", corporation=self.other_corp
+            )
+        )
+        SkillFarmAuditFactory(user=user)
+        self.client.force_login(self.admin_user)
+
+        # Test Action
+        response = self.client.get(self._list_url())
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        entry = next(
+            c
+            for c in response.json()
+            if c["corporation_id"] == self.other_corp.corporation_id
+        )
+        self.assertEqual(entry["registered_count"], 1)
+        self.assertEqual(entry["unregistered_count"], 1)
 
     def test_list_corporations_should_exclude_npc_corporations(self):
         # Test Data

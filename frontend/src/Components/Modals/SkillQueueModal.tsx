@@ -18,6 +18,7 @@ import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
 import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
+import { formatNumber } from "@/Utils/format";
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -240,7 +241,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                         <tr key={skill.skill_id}>
                           <td className={styles["skill-name"]}>{skill.skill_name}</td>
                           <td>{t("Level {{level}}", { level: skill.trained_level })}</td>
-                          <td>{skill.skillpoints.toLocaleString()} SP</td>
+                          <td>{formatNumber(skill.skillpoints)} SP</td>
                           <td>
                             {skill.is_extractable ? (
                               <span className="sf-badge-extraction-pending">

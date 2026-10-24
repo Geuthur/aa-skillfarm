@@ -48,13 +48,18 @@ Section Order:
 - [ADD] Restored `Overview` to the left navigation menu accessible via `visible_to` for authorized users.
 - [ADD] Modernized `OverviewPage` using a responsive Card grid layout with search and user statistics.
 
+### Fixed
+
+- [FIX] Fixed the `import-headings` ESLint rule duplicating comments above the first import on every `--fix` pass, which could grow a file exponentially; added a unit test (`eslint-rules/import-headings.test.mjs`).
+- [FIX] Administration corporations list only shows corporations with at least one registered character; corporations without characters in Alliance Auth or without registered characters are hidden.
+
 ### Changed
 
 - [CHANGE] Use the typographic ellipsis (`…`) instead of three dots in loading texts and placeholders; the translation keys changed accordingly.
 - [CHANGE] The Administration page shows a corporation specific description for users that only have `corp_access`.
 - [CHANGE] The "Administration" menu entry is now also visible for users with `corp_access`; they only see the Corporations section of their own corporation, all other Administration features stay restricted to `admin_access` / superusers.
 - [CHANGE] The "Add Character" button for missing characters in Settings is now a solid primary button (`btn btn-primary`) instead of an outline button.
-- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) from Settings navigation item; only the red pulsing dot is displayed on ESI errors.
+- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) and pulsing dot from the Settings navigation item; the red issue count badge pulses (`aa-menu-badge-pulse`) on ESI errors instead.
 - [CHANGE] Removed pulsing button and dot on Overview `OverviewPage` cards; pulse animation is exclusively retained on `Settings` in navigation menu when user characters have errors.
 - [CHANGE] Refactored `CharacterDashboard` and `CharacterTable`: removed global update button, row-level update button, notification toggle, and delete action from overview. Overview now strictly retains skill queue inspection, skillset configuration, and status acknowledgements.
 - [CHANGE] Renamed the "Superuser" area to "Administration": API paths `superuser/...` and `admin/...` are now `administration/...`, `api/superuser.py` and `api/admin.py` are merged into `api/administration.py`, schemas `Superuser*` are now `Administration*`, and the frontend route is `/administration/` (`/superuser/` and `/admin/` redirect).
@@ -64,6 +69,9 @@ Section Order:
 - [CHANGE] Global Task Administration panel, Force Refresh options and Delete action in the Administration page are only shown to superusers.
 - [CHANGE] Aligned the frontend entry files with the other plugins: `main.tsx` is now `Main.tsx`, `App.tsx` is now `Routing.tsx`, `AppName`/`ProjectName` live in `constants.ts`, and the global styles (`index.css`, `skillfarm.css`, former `App.css`) moved to `Styles/`. Removed the unused `AdminPage` (replaced by `AdministrationPage`).
 - [CHANGE] ESI error messages in the Administration alts modal are no longer shown inline; the status badge of a character with an error now opens a new `AdministrationErrorModal` (stacked above the alts modal) with the full message.
+- [CHANGE] Consolidated the frontend formatting helpers in `Utils/format.ts` (`formatNumber`, `formatCompactNumber`, `formatIsk`, `formatDate`, `formatRelativeTime`, `formatEta`) with a single `en` locale fallback; `renderTooltip` now lives only in `Utils/bootsTrap.tsx` and `renderHtml` in `Utils/general.tsx`. Skill point and ISK values use these helpers instead of ad-hoc `toLocaleString()` calls.
+- [CHANGE] Replaced `BaseTable` with the shared implementation from `aa-ledger` (new toolbar, `variant` is now `default` or `light`, table styles moved to `Styles/table.css`). Owner type badges in the settings use the `aa-ledger` colors (`primary` / `info`). Frontend imports use `react-router` instead of `react-router-dom`.
+- [CHANGE] The corporations card in the Administration is collapsible like the global task administration (collapsed by default for administrators, expanded for corporation managers).
 
 <!-- Your changes go here -->
 

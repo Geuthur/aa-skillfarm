@@ -462,7 +462,7 @@ class ApiEndpoints:
                 HTTPStatus.FORBIDDEN: dict,
             },
             tags=self.tags,
-            summary="List corporations with registered and unregistered character counts",
+            summary="List corporations with registered characters and their unregistered character counts",
         )
         def list_corporations(request: WSGIRequest):
             has_access, sees_all, own_corp_id = General.get_corporation_scope(
@@ -496,9 +496,10 @@ class ApiEndpoints:
             result = []
             for corp in corporations.order_by("corporation_name"):
                 total = known.get(corp.corporation_id, 0)
-                if total == 0:
-                    continue
                 reg = registered.get(corp.corporation_id, 0)
+                # Corporations without any registered character are not listed
+                if reg == 0:
+                    continue
                 result.append(
                     schema.AdministrationCorporationSchema(
                         corporation_id=corp.corporation_id,

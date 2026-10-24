@@ -6,8 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Check,
-  ChevronDown,
-  ChevronUp,
+  Building2,
   Clock,
   Coins,
   RefreshCw,
@@ -27,7 +26,6 @@ import {
   Form,
   Modal,
   Row,
-  Spinner,
 } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
@@ -48,8 +46,11 @@ import {
 import { queryKeys } from "@/Api/query";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAuditsTable } from "@/Components/Administration/AdministrationAuditsTable";
+import { AdministrationCollapsibleCard } from "@/Components/Administration/AdministrationCollapsibleCard";
 import { AdministrationCorporationsTable } from "@/Components/Administration/AdministrationCorporationsTable";
 import { AdministrationInspectionView } from "@/Components/Administration/AdministrationInspectionView";
+import { AdministrationTaskCard } from "@/Components/Administration/AdministrationTaskCard";
+import { formatNumber } from "@/Utils/format";
 
 export const AdministrationPage: React.FC = () => {
   const { t } = useTranslation();
@@ -59,7 +60,6 @@ export const AdministrationPage: React.FC = () => {
   // Filter and search states
   const [statusFilter, setStatusFilter] = useState<"all" | "training" | "paused" | "issues">("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showTaskPanel, setShowTaskPanel] = useState(false);
   const [forceRefreshGlobal, setForceRefreshGlobal] = useState(false);
 
   // Queries
@@ -383,117 +383,65 @@ export const AdministrationPage: React.FC = () => {
 
         {/* Global Task Administration Panel (Collapsible, superusers only) */}
         {isSuperuser && (
-          <Card className="bg-dark border-secondary mb-4 shadow-sm">
-            <Card.Header
-              className={`border-secondary d-flex align-items-center justify-content-between py-2 ${styles.cursorPointer}`}
-              onClick={() => setShowTaskPanel((prev) => !prev)}
-            >
-              <div className="d-flex align-items-center gap-2">
-                <RefreshCw size={16} className="text-primary" />
-                <span className="fw-semibold text-light">{t("Global Task Administration")}</span>
-              </div>
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 text-muted"
-                aria-label={t("Toggle Task Administration")}
-                data-testid="toggle-task-panel"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowTaskPanel((prev) => !prev);
-                }}
-              >
-                {showTaskPanel ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              </Button>
-            </Card.Header>
+          <AdministrationCollapsibleCard
+            title={t("Global Task Administration")}
+            icon={<RefreshCw size={16} className="text-primary" />}
+            toggleLabel={t("Toggle Task Administration")}
+            testId="toggle-task-panel"
+            bodyClassName="p-3"
+          >
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="switch"
+                id="global-force-refresh"
+                label={<span className="small text-muted">{t("Force Refresh ESI")}</span>}
+                checked={forceRefreshGlobal}
+                onChange={(e) => setForceRefreshGlobal(e.target.checked)}
+              />
+            </Form.Group>
 
-            {showTaskPanel && (
-              <Card.Body className="p-3">
-                <Form.Group className="mb-3">
-                  <Form.Check
-                    type="switch"
-                    id="global-force-refresh"
-                    label={<span className="small text-muted">{t("Force Refresh ESI")}</span>}
-                    checked={forceRefreshGlobal}
-                    onChange={(e) => setForceRefreshGlobal(e.target.checked)}
-                  />
-                </Form.Group>
-
-                <Row className="g-3">
-                  <Col md={6}>
-                    <Card className="bg-dark border-secondary h-100">
-                      <Card.Header className="border-secondary py-2">
-                        <h6 className="mb-0 text-light">{t("Characters")}</h6>
-                      </Card.Header>
-                      <Card.Body className="d-flex flex-column justify-content-between p-3">
-                        <p className="text-muted small">
-                          {t(
-                            "Queue background tasks to synchronize skill queues, extractions, and training status for all characters.",
-                          )}
-                        </p>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          disabled={updateAllMutation.isPending}
-                          onClick={() => updateAllMutation.mutate(forceRefreshGlobal)}
-                          className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-primary"
-                          data-testid="update-all-characters-btn"
-                        >
-                          {updateAllMutation.isPending ? (
-                            <Spinner size="sm" animation="border" />
-                          ) : (
-                            <Users size={14} />
-                          )}
-                          {t("Update All Characters")}
-                        </Button>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-
-                  <Col md={6}>
-                    <Card className="bg-dark border-secondary h-100">
-                      <Card.Header className="border-secondary py-2">
-                        <h6 className="mb-0 text-light">{t("Market Prices")}</h6>
-                      </Card.Header>
-                      <Card.Body className="d-flex flex-column justify-content-between p-3">
-                        <p className="text-muted small">
-                          {t(
-                            "Update market prices for skill injectors, extractors, and PLEX from EVE Online ESI.",
-                          )}
-                        </p>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          disabled={updatePricesMutation.isPending}
-                          onClick={() => updatePricesMutation.mutate()}
-                          className="w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-secondary"
-                          data-testid="update-market-prices-btn"
-                        >
-                          {updatePricesMutation.isPending ? (
-                            <Spinner size="sm" animation="border" />
-                          ) : (
-                            <Coins size={14} />
-                          )}
-                          {t("Update Market Prices")}
-                        </Button>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
-              </Card.Body>
-            )}
-          </Card>
+            <Row className="g-3">
+              <Col md={6}>
+                <AdministrationTaskCard
+                  title={t("Characters")}
+                  description={t(
+                    "Queue background tasks to synchronize skill queues, extractions, and training status for all characters.",
+                  )}
+                  buttonLabel={t("Update All Characters")}
+                  buttonVariant="primary"
+                  icon={<Users size={14} />}
+                  isPending={updateAllMutation.isPending}
+                  onClick={() => updateAllMutation.mutate(forceRefreshGlobal)}
+                  testId="update-all-characters-btn"
+                />
+              </Col>
+              <Col md={6}>
+                <AdministrationTaskCard
+                  title={t("Market Prices")}
+                  description={t(
+                    "Update market prices for skill injectors, extractors, and PLEX from EVE Online ESI.",
+                  )}
+                  buttonLabel={t("Update Market Prices")}
+                  buttonVariant="secondary"
+                  icon={<Coins size={14} />}
+                  isPending={updatePricesMutation.isPending}
+                  onClick={() => updatePricesMutation.mutate()}
+                  testId="update-market-prices-btn"
+                />
+              </Col>
+            </Row>
+          </AdministrationCollapsibleCard>
         )}
 
         {/* Corporations */}
-        <Card className="bg-dark border-secondary mb-4 shadow-sm">
-          <Card.Header className="border-secondary py-2">
-            <span className="fw-semibold text-light">{t("Corporations")}</span>
-          </Card.Header>
-          <Card.Body className="p-2">
-            <AdministrationCorporationsTable />
-          </Card.Body>
-        </Card>
+        <AdministrationCollapsibleCard
+          title={t("Corporations")}
+          icon={<Building2 size={16} className="text-primary" />}
+          toggleLabel={t("Toggle Corporations")}
+          testId="toggle-corporations-panel"
+        >
+          <AdministrationCorporationsTable />
+        </AdministrationCollapsibleCard>
 
         {/* Filter and Search Bar */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mt-4 mb-2">
@@ -590,7 +538,7 @@ export const AdministrationPage: React.FC = () => {
                       <strong>{t("Owner User:")}</strong> {auditToDelete.user_name || t("Unknown")}
                     </div>
                     <div>
-                      <strong>{t("Total SP:")}</strong> {auditToDelete.total_sp?.toLocaleString()}
+                      <strong>{t("Total SP:")}</strong> {formatNumber(auditToDelete.total_sp ?? 0)}
                     </div>
                   </div>
                 )}
@@ -621,14 +569,15 @@ export const AdministrationPage: React.FC = () => {
         </Modal>
           </>
         ) : (
-          <Card className="bg-dark border-secondary shadow-sm">
-            <Card.Header className="border-secondary py-2">
-              <span className="fw-semibold text-light">{t("Corporations")}</span>
-            </Card.Header>
-            <Card.Body className="p-2">
-              <AdministrationCorporationsTable />
-            </Card.Body>
-          </Card>
+          <AdministrationCollapsibleCard
+            title={t("Corporations")}
+            icon={<Building2 size={16} className="text-primary" />}
+            toggleLabel={t("Toggle Corporations")}
+            testId="toggle-corporations-panel"
+            defaultOpen
+          >
+            <AdministrationCorporationsTable />
+          </AdministrationCollapsibleCard>
         )}
       </CardBody>
     </Card>

@@ -366,5 +366,12 @@
   "{{count}} unregistered_other": "{{count}} unregistered",
   "No matching characters found.": "No matching characters found.",
   "Corporations": "Corporations",
-  "Characters of your corporation that are not registered in Skillfarm yet.": "Characters of your corporation that are not registered in Skillfarm yet."
+  "Characters of your corporation that are not registered in Skillfarm yet.": "Characters of your corporation that are not registered in Skillfarm yet.",
+  "Reset": "Reset",
+  "Done": "Done",
+  "Range…": "Range…",
+  "Clear": "Clear",
+  "Filter…": "Filter…",
+  "No matching options": "No matching options",
+  "Toggle Corporations": "Toggle Corporations"
 }

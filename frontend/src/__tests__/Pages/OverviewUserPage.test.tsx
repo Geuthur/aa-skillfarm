@@ -1,10 +1,10 @@
 // React
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 
 // Third Party
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
@@ -21,11 +21,11 @@ const renderPage = (path: string) => {
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[path]}>
-        <NuqsAdapter>
+        <NuqsTestingAdapter>
           <Routes>
             <Route path="/skillfarm/overview/:userId/" element={<OverviewUserPage />} />
           </Routes>
-        </NuqsAdapter>
+        </NuqsTestingAdapter>
       </MemoryRouter>
     </QueryClientProvider>,
   );

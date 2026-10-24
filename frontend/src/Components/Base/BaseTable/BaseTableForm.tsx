@@ -12,7 +12,7 @@ export function BaseTableForm<TData>({ table }: { table: TanStackTable<TData> })
         <div className="d-flex align-items-center ms-2">
           <Form.Label className="m-0 me-2 text-nowrap">{t("Page Size:")}</Form.Label>
           <Form.Select
-            className={styles["select-auto"]}
+            className={styles["page-size-select"]}
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
           >

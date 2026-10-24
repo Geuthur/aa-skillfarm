@@ -350,5 +350,12 @@
   "{{count}} unregistered_other": "{{count}} nicht registriert",
   "No matching characters found.": "Keine passenden Charaktere gefunden.",
   "Corporations": "Corporations",
-  "Characters of your corporation that are not registered in Skillfarm yet.": "Charaktere deiner Corporation, die noch nicht in Skillfarm registriert sind."
+  "Characters of your corporation that are not registered in Skillfarm yet.": "Charaktere deiner Corporation, die noch nicht in Skillfarm registriert sind.",
+  "Reset": "Zurücksetzen",
+  "Done": "Fertig",
+  "Range…": "Bereich…",
+  "Clear": "Leeren",
+  "Filter…": "Filter…",
+  "No matching options": "Keine passenden Optionen",
+  "Toggle Corporations": "Corporations ein-/ausklappen"
 }

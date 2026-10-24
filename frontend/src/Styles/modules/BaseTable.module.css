@@ -12,19 +12,18 @@
   animation: spin 2s infinite linear;
 }
 
-.cell,
 .cell-middle {
-    vertical-align: middle;
-}
-
-.page-size-select {
-    width: auto;
-}
-
-.cell-right {
-    text-align: right;
+  vertical-align: middle;
 }
 
 .cell-left {
-    text-align: left;
+  text-align: left;
+}
+
+.cell-right {
+  text-align: right;
+}
+
+.page-size-select {
+  width: auto;
 }

@@ -91,15 +91,11 @@ export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
                 key={link.name}
                 active={hit}
             >
-                {link.has_errors && (
-                    <span className="aa-pending-dot-container me-1" aria-hidden="true">
-                        <span className="aa-danger-dot-ping" />
-                        <span className="aa-danger-dot-core" />
-                    </span>
-                )}
                 {t(link.name)}
                 {link.badge ? (
-                    <span className="badge bg-danger ms-1">{link.badge}</span>
+                    <span className={`badge bg-danger ms-1 ${link.has_errors ? "aa-menu-badge-pulse" : ""}`}>
+                        {link.badge}
+                    </span>
                 ) : null}
             </Nav.Link>
         </Nav.Item>

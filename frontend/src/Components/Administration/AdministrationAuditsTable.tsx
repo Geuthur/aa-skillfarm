@@ -17,6 +17,7 @@ import { AdministrationAltsModal } from "@/Components/Administration/Administrat
 import { BaseTable } from "@/Components/Base/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
+import { formatNumber } from "@/Utils/format";
 
 export interface MainCharacterGroup {
   id: string;
@@ -196,7 +197,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
         header: t("Total SP"),
         cell: ({ getValue }) => (
           <span className="fw-semibold font-monospace">
-            {((getValue() as number) ?? 0).toLocaleString()}
+            {formatNumber((getValue() as number) ?? 0)}
           </span>
         ),
       }),

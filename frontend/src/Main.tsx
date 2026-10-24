@@ -10,6 +10,7 @@ import { initReactI18next } from "react-i18next";
 // Styles
 import "@/Styles/index.css";
 import "@/Styles/skillfarm.css";
+import "@/Styles/table.css";
 
 import { AppName, ProjectName } from "@/constants";
 import Routing from "@/Routing";

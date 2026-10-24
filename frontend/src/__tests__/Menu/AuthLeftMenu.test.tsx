@@ -1,5 +1,5 @@
 // React
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 // Third Party
 import { render, screen } from "@testing-library/react";
@@ -93,7 +93,8 @@ describe("AuthLeftMenu", () => {
     // Expected Result
     const settingsLink = screen.getByText("Settings");
     expect(settingsLink).toBeDefined();
-    expect(screen.getByText("2")).toHaveClass("badge", "bg-danger");
+    expect(screen.getByText("2")).toHaveClass("badge", "bg-danger", "aa-menu-badge-pulse");
+    expect(settingsLink.closest("a")?.querySelector(".aa-pending-dot-container")).toBeNull();
   });
 
   it("should render the administration link with its dedicated navigation item", () => {

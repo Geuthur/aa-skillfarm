@@ -12,6 +12,7 @@ import styles from "@/Styles/modules/Administration.module.css";
 // AA Skillfarm
 import type { CharacterDetailResponse, AdministrationAuditSchema } from "@/Api/schema";
 import { renderTooltip } from "@/Utils";
+import { formatNumber } from "@/Utils/format";
 
 interface AdministrationInspectionViewProps {
   inspectingAudit: AdministrationAuditSchema;
@@ -139,7 +140,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
             <div className="p-3 bg-dark rounded border border-secondary-subtle">
               <div className="text-muted small">{t("Total Skill Points")}</div>
               <div className="h4 mb-0 fw-bold font-monospace">
-                {inspectingAudit.total_sp?.toLocaleString() ?? "0"}
+                {formatNumber(inspectingAudit.total_sp ?? 0)}
               </div>
             </div>
           </div>
@@ -283,7 +284,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                     <tr key={skill.skill_id}>
                       <td className="fw-semibold">{skill.skill_name}</td>
                       <td>{skill.trained_level}</td>
-                      <td className="font-monospace">{skill.skillpoints.toLocaleString()}</td>
+                      <td className="font-monospace">{formatNumber(skill.skillpoints)}</td>
                       <td>
                         {skill.is_extractable ? (
                           <span className="badge bg-info">{t("Extractable (Level 5)")}</span>

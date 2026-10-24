@@ -1,6 +1,6 @@
 // React
 import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";

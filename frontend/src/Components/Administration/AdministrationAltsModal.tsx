@@ -19,6 +19,7 @@ import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
 import { renderTooltip } from "@/Utils";
+import { formatNumber } from "@/Utils/format";
 
 export interface AdministrationAltsModalProps {
   group: MainCharacterGroup | null;
@@ -135,7 +136,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
         header: t("Total SP"),
         cell: ({ getValue }) => (
           <span className="fw-semibold font-monospace">
-            {((getValue() as number) ?? 0).toLocaleString()}
+            {formatNumber((getValue() as number) ?? 0)}
           </span>
         ),
       }),

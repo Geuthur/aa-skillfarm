@@ -7,7 +7,6 @@ import {
   allianceImageUrl,
   itemImageUrl,
   getSecColor,
-  formatNumber,
 } from "@/Utils/eveOnline";
 
 describe("eveOnline Utils", () => {
@@ -38,12 +37,5 @@ describe("eveOnline Utils", () => {
     expect(getSecColor(1.0)).toBe("aa-badge-hisec");
     expect(getSecColor(0.4)).toBe("aa-badge-lowsec");
     expect(getSecColor(-0.1)).toBe("aa-badge-nullsec");
-  });
-
-  it("should format large numbers with suffixes", () => {
-    // Test Data & Test Action & Expected Result
-    expect(formatNumber(2_500_000_000, "ISK")).toBe("2.50B ISK");
-    expect(formatNumber(15_000_000, "ISK")).toBe("15.0M ISK");
-    expect(formatNumber(45_000, "ISK")).toBe("45.0K ISK");
   });
 });
