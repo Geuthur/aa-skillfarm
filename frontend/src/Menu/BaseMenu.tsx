@@ -1,5 +1,5 @@
 // React
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 
 // Third Party
 import { ShieldAlert } from "lucide-react";
