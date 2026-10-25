@@ -109,7 +109,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
       },
       {
         id: "last_sync",
-        header: t("Last Sync"),
+        header: t("Last sync"),
         accessorFn: (row) => row.last_update ?? "",
         cell: ({ row }) => {
           const char = row.original;

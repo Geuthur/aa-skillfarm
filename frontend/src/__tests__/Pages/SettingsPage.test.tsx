@@ -281,7 +281,7 @@ describe("SettingsPage", () => {
     // Test Action
     renderPage();
 
-    const notifBtn = await screen.findByRole("button", { name: "Disable notifications" });
+    const notifBtn = await screen.findByRole("button", { name: "Disable Notifications" });
     await user.click(notifBtn);
 
     const deleteBtn = screen.getByRole("button", { name: /Delete Owner|Delete/i });
