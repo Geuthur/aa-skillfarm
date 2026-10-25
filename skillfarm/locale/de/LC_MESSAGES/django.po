@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-"
 "skillfarm/\n"
-"POT-Creation-Date: 2026-10-18 20:21+0200\n"
+"POT-Creation-Date: 2026-10-25 14:27+0100\n"
 "PO-Revision-Date: 2026-10-25 10:29+0000\n"
 "Last-Translator: Geuthur <devgeuthur@gmail.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -23,15 +23,36 @@ msgstr ""
 msgid "last update run"
 msgstr "Letztes Update ausgeführt"
 
-msgid "Permission Denied"
-msgstr "Zugriff verweigert"
+msgid "Administration permission required."
+msgstr "Administrationsrecht erforderlich."
+
+msgid "Superuser permission required."
+msgstr "Superuser-Berechtigung erforderlich."
+
+msgid "Corporation access permission required."
+msgstr "Corporation-Zugriffsrecht erforderlich."
+
+#, python-format
+msgid "Queued update task for %(name)s (force_refresh=%(force)s)"
+msgstr ""
+
+#, python-format
+msgid "Successfully deleted %(name)s from Skillfarm"
+msgstr ""
 
 #, python-format
 msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
-msgstr "Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
+msgstr ""
+"Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
 
 msgid "Queued market price update task"
 msgstr "Task zur Aktualisierung der Marktpreise eingereiht"
+
+msgid "Corporation not found."
+msgstr "Corporation nicht gefunden."
+
+msgid "Permission Denied"
+msgstr "Zugriff verweigert"
 
 msgid ""
 "Market price data is currently not available. Please run market update tasks."
@@ -70,8 +91,15 @@ msgstr "%s erfolgreich aus Skillfarm entfernt"
 msgid "Successfully acknowledged extractions for %d characters"
 msgstr "Extraktionen für %d Charaktere erfolgreich bestätigt"
 
-msgid "Characters"
-msgstr "Charaktere"
+#, python-format
+msgid "Update task queued for %s"
+msgstr ""
+
+msgid "Overview"
+msgstr "Übersicht"
+
+msgid "My Characters"
+msgstr ""
 
 msgid "Calculator"
 msgstr "Rechner"
@@ -79,29 +107,23 @@ msgstr "Rechner"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Overview"
-msgstr "Übersicht"
-
 msgid "Add Character"
 msgstr "Charakter hinzufügen"
 
 msgid "Administration"
 msgstr "Verwaltung"
 
-msgid "Administration permission required."
-msgstr "Administrationsrecht erforderlich."
-
-msgid "Superuser permission required."
-msgstr "Superuser-Berechtigung erforderlich."
-
-msgid "Corporation access permission required."
-msgstr "Corporation-Zugriffsrecht erforderlich."
-
-msgid "Corporation not found."
-msgstr "Corporation nicht gefunden."
-
 msgid "User not found or not accessible"
 msgstr "Benutzer nicht gefunden oder nicht zugänglich"
+
+msgid "Can access this app, Skillfarm."
+msgstr ""
+
+msgid "Has access to all characters in the corporation."
+msgstr ""
+
+msgid "Has access to all characters."
+msgstr ""
 
 msgid "Disabled"
 msgstr "Deaktiviert"
@@ -159,6 +181,9 @@ msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 "{character_name} erfolgreich zum Skillfarm-System hinzugefügt oder "
 "aktualisiert"
+
+#~ msgid "Characters"
+#~ msgstr "Charaktere"
 
 #~ msgid "No Active Training"
 #~ msgstr "Kein aktives Training"
