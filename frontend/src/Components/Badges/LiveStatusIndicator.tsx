@@ -5,7 +5,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./LiveStatusIndicator.module.css";
+import styles from "@/Styles/modules/LiveStatusIndicator.module.css";
 
 // AA Skillfarm
 import { formatLastFetch, useLivePing } from "@/Components/Badges/liveStatusHelper";
@@ -50,7 +50,7 @@ export function LiveStatusIndicator({
   const tooltipText = isError
     ? errorMessage
     : isBusy
-    ? t("Loading...")
+    ? t("Loading…")
     : dataUpdatedAt
     ? `${t("Last Fetch")}: ${formatLastFetch(dataUpdatedAt)}`
     : t("No Fetch");

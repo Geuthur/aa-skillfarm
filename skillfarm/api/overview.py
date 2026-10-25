@@ -22,6 +22,7 @@ from skillfarm.helpers.lazy import get_character_portrait_url
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 
+# pylint: disable=too-many-locals
 def _serialize_overview_users(
     audits: QuerySet[SkillFarmAudit],
 ) -> list[schema.OverviewUserSchema]:
@@ -44,6 +45,17 @@ def _serialize_overview_users(
         entry["training" if is_training else "paused"] += 1
         if ready_count > 0 and not acknowledged:
             entry["pending"] += 1
+
+    users_with_errors = set()
+    for audit in (
+        audits.filter(active=True)
+        .select_related("character__character_ownership")
+        .prefetch_related("skillfarm_update_status")
+    ):
+        ownership = getattr(audit.character, "character_ownership", None)
+        u_id = getattr(ownership, "user_id", None)
+        if u_id and audit.get_status.value in ("error", "token_error"):
+            users_with_errors.add(u_id)
 
     users = User.objects.filter(id__in=stats.keys()).select_related(
         "profile__main_character"
@@ -69,6 +81,7 @@ def _serialize_overview_users(
                 training_count=entry["training"],
                 paused_count=entry["paused"],
                 pending_extractions_count=entry["pending"],
+                has_errors=user.id in users_with_errors,
             )
         )
 

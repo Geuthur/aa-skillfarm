@@ -6,7 +6,7 @@ import { CheckCheck, Search, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SkillfarmFilterBar.module.css";
+import styles from "@/Styles/modules/SkillfarmFilterBar.module.css";
 
 import type { CharacterFilterParams } from "@/Api/schema";
 // Utils
@@ -126,7 +126,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           <input
             type="text"
             className={`sf-search-input ${styles["search-input"]}`}
-            placeholder={t("Search characters or corps...")}
+            placeholder={t("Search characters or corps…")}
             value={filters.search || ""}
             onChange={(e) => onFilterChange({ search: e.target.value })}
           />

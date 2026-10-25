@@ -28,6 +28,52 @@ Section Order:
 
 <!-- AI Changes -->
 
+### Added
+
+- [ADD] Corporations section in the Administration showing a "{count} Unregistered" button per corporation that opens a searchable `UnregisteredModal` with all characters known to Alliance Auth that are not registered in Skillfarm. `corp_access` sees only the own corporation, `admin_access` sees all corporations. New endpoints `GET administration/corporations/` and `GET administration/corporations/{corporation_id}/unregistered/`.
+- [ADD] NPC corporations (ID below 10,000,000) are excluded from the Administration corporations list; the unregistered endpoint returns `404` for them.
+- [ADD] `General.Permission` (`TextChoices`) with `get_perm`, `has_perm` and `has_any_perm` helpers as central permission API; codenames are unchanged.
+- [ADD] `is_superuser` flag in the `GET user/` response so the frontend can show superuser-only actions.
+- [ADD] Modular `BaseOwnerSettingsSection` in `SettingsPage` displaying registered characters and missing characters (unregistered alts) with quick-add action link.
+- [ADD] Missing characters detection in `GET user/characters/status/` returning `UserCharacterStatusResponse` with `missing_characters`.
+- [ADD] Character manual update endpoint `POST characters/{character_id}/update/` with Celery update task dispatch.
+- [ADD] Centralized character management into `SettingsPage`: global `Update All` button (with 60s cooldown, `force_refresh=false`), individual character update buttons (`force_refresh=false`), per-character notification toggle, and character deletion modal.
+- [ADD] Administration View Unification: 4 top KPI metric cards (`bg-body border-secondary h-100 shadow-sm`) with dynamic "Sync Issues" indicator.
+- [ADD] Collapsible Global Task Administration panel with Force Refresh switch (`data-testid="toggle-task-panel"`).
+- [ADD] Refactored `AdministrationAuditsTable` from HTML table to TanStack `BaseTable<MainCharacterGroup>` with family group search matching and `X Alts` clickable badge.
+- [ADD] `AdministrationAltsModal` (`BaseModal` large) displaying all alts with portrait, corporation, training status, and individual actions (Inspect, Update split dropdown with force refresh, Delete with confirmation).
+- [ADD] Administration management endpoints and frontend interface with red navigation badge (`.aa-nav-danger`) and `ShieldAlert` icon.
+- [ADD] Comprehensive Administration character audits table displaying all characters, owners, ESI status, SP, and ready extractions with individual inspect, update (normal/force), and delete actions.
+- [ADD] `nuqs`-synchronized character inspection view allowing deep-linking and browser navigation (`?inspect=<characterId>`).
+- [ADD] Restored `Overview` to the left navigation menu accessible via `visible_to` for authorized users.
+- [ADD] Modernized `OverviewPage` using a responsive Card grid layout with search and user statistics.
+
+### Fixed
+
+- [FIX] Fixed the `import-headings` ESLint rule duplicating comments above the first import on every `--fix` pass, which could grow a file exponentially; added a unit test (`eslint-rules/import-headings.test.mjs`).
+- [FIX] Administration corporations list only shows corporations with at least one registered character; corporations without characters in Alliance Auth or without registered characters are hidden.
+
+### Changed
+
+- [CHANGE] Use the typographic ellipsis (`…`) instead of three dots in loading texts and placeholders; the translation keys changed accordingly.
+- [CHANGE] The Administration page shows a corporation specific description for users that only have `corp_access`.
+- [CHANGE] The "Administration" menu entry is now also visible for users with `corp_access`; they only see the Corporations section of their own corporation, all other Administration features stay restricted to `admin_access` / superusers.
+- [CHANGE] The "Add Character" button for missing characters in Settings is now a solid primary button (`btn btn-primary`) instead of an outline button.
+- [CHANGE] Removed pulse outline (`aa-order-nav-pulse`) and pulsing dot from the Settings navigation item; the red issue count badge pulses (`aa-menu-badge-pulse`) on ESI errors instead.
+- [CHANGE] Removed pulsing button and dot on Overview `OverviewPage` cards; pulse animation is exclusively retained on `Settings` in navigation menu when user characters have errors.
+- [CHANGE] Refactored `CharacterDashboard` and `CharacterTable`: removed global update button, row-level update button, notification toggle, and delete action from overview. Overview now strictly retains skill queue inspection, skillset configuration, and status acknowledgements.
+- [CHANGE] Renamed the "Superuser" area to "Administration": API paths `superuser/...` and `admin/...` are now `administration/...`, `api/superuser.py` and `api/admin.py` are merged into `api/administration.py`, schemas `Superuser*` are now `Administration*`, and the frontend route is `/administration/` (`/superuser/` and `/admin/` redirect).
+- [CHANGE] Administration endpoints and the menu entry are protected by the `skillfarm.admin_access` permission instead of `is_superuser`. Only global update tasks (`administration/update-all/`, `administration/update-prices/`), `force_refresh` and deleting a character audit remain superuser-only; `force_refresh=true` from a non-superuser is rejected with 403.
+- [CHANGE] All permission checks use `General.has_perm` / `General.get_perm`; redundant `is_superuser` branches in the access managers were removed.
+- [CHANGE] Centralized all permission and access logic in the `General` model (`has_basic_access`, `has_administration_access`, `has_corporation_access`, `has_management_access`, `is_superuser_only`, `get_own_corporation_id`, `get_corporation_scope`); API endpoints, menu, managers and helpers only call these methods. The private helpers in `api/administration.py` were removed, behavior is unchanged.
+- [CHANGE] Global Task Administration panel, Force Refresh options and Delete action in the Administration page are only shown to superusers.
+- [CHANGE] Aligned the frontend entry files with the other plugins: `main.tsx` is now `Main.tsx`, `App.tsx` is now `Routing.tsx`, `AppName`/`ProjectName` live in `constants.ts`, and the global styles (`index.css`, `skillfarm.css`, former `App.css`) moved to `Styles/`. Removed the unused `AdminPage` (replaced by `AdministrationPage`).
+- [CHANGE] ESI error messages in the Administration alts modal are no longer shown inline; the status badge of a character with an error now opens a new `AdministrationErrorModal` (stacked above the alts modal) with the full message.
+- [CHANGE] Consolidated the frontend formatting helpers in `Utils/format.ts` (`formatNumber`, `formatCompactNumber`, `formatIsk`, `formatDate`, `formatRelativeTime`, `formatEta`) with a single `en` locale fallback; `renderTooltip` now lives only in `Utils/bootsTrap.tsx` and `renderHtml` in `Utils/general.tsx`. Skill point and ISK values use these helpers instead of ad-hoc `toLocaleString()` calls.
+- [CHANGE] Replaced `BaseTable` with the shared implementation from `aa-ledger` (new toolbar, `variant` is now `default` or `light`, table styles moved to `Styles/table.css`). Owner type badges in the settings use the `aa-ledger` colors (`primary` / `info`).
+- [CHANGE] The corporations card in the Administration is collapsible like the global task administration (collapsed by default for administrators, expanded for corporation managers).
+- [CHANGE] Replaced `pook` with `pookx` in the test dependencies and removed the custom `httpx2` pook interceptor, which `pookx` now provides.
+
 <!-- Your changes go here -->
 
 ## [4.0.2] - 2026-10-18

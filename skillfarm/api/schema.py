@@ -14,6 +14,12 @@ class ActionResponse(Schema):
     message: str
 
 
+class ForceRefreshRequest(Schema):
+    """Payload to trigger an update with optional force refresh."""
+
+    force_refresh: bool = False
+
+
 class UserData(Schema):
     """User profile data including character identity and admin state."""
 
@@ -26,6 +32,7 @@ class UserData(Schema):
     alliance_name: str | None = None
     portrait: str | None = None
     is_admin: bool = False
+    is_superuser: bool = False
     has_corp_access: bool = False
 
 
@@ -67,7 +74,26 @@ class UserCharacterStatusSchema(Schema):
     is_active: bool = True
     last_sync: str | None = None
     error_message: str | None = None
+    notification_enabled: bool = True
     sections: list[UserCharacterStatusSectionSchema] = []
+
+
+class MissingCharacterSchema(Schema):
+    """Character owned by the user in Auth but not added to Skillfarm."""
+
+    character_id: int
+    character_name: str
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    portrait_url: str
+
+
+class UserCharacterStatusResponse(Schema):
+    """Response containing registered characters and missing characters for settings."""
+
+    characters: list[UserCharacterStatusSchema] = []
+    missing_characters: list[MissingCharacterSchema] = []
 
 
 class MenuLink(Schema):
@@ -163,6 +189,7 @@ class OverviewUserSchema(Schema):
     training_count: int = 0
     paused_count: int = 0
     pending_extractions_count: int = 0
+    has_errors: bool = False
 
 
 class OverviewResponse(Schema):
@@ -251,3 +278,62 @@ class CalculatorResponse(Schema):
     month_calc: float = 0.0
     month12_calc: float = 0.0
     month24_calc: float = 0.0
+
+
+class AdministrationAuditSchema(Schema):
+    """Schema for administration character audit management."""
+
+    character_id: int
+    character_name: str
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    user_id: int | None = None
+    user_name: str | None = None
+    main_character_id: int | None = None
+    main_character_name: str | None = None
+    main_portrait_url: str | None = None
+    portrait_url: str | None = None
+    total_sp: int
+    is_training: bool
+    current_training_skill: str | None = None
+    training_finish_date: str | None = None
+    queue_finish_date: str | None = None
+    extractions_ready_count: int = 0
+    active: bool = True
+    status: str = "ok"  # "ok", "warning", "error", "token_error"
+    last_update: str | None = None
+    error_message: str | None = None
+
+
+class AdministrationCorporationSchema(Schema):
+    """Corporation with registration statistics for the Administration."""
+
+    corporation_id: int
+    corporation_name: str
+    corporation_ticker: str
+    logo_url: str
+    registered_count: int
+    unregistered_count: int
+
+
+class UnregisteredCharacterSchema(Schema):
+    """Character of a corporation that is not registered in Skillfarm."""
+
+    id: int
+    name: str
+    avatar_url: str | None = None
+    subtitle: str | None = None
+
+
+class AdministrationUnregisteredResponse(Schema):
+    """Characters of a corporation that are not registered in Skillfarm."""
+
+    corporation_id: int
+    items: list[UnregisteredCharacterSchema] = []
+
+
+class AdministrationAuditUpdateRequest(Schema):
+    """Request to trigger update for a specific audit."""
+
+    force_refresh: bool = False

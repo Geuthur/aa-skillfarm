@@ -8,13 +8,13 @@ import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-rea
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./ProfitCalculator.module.css";
+import styles from "@/Styles/modules/ProfitCalculator.module.css";
 
 import { fetchCalculatorData } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import { BaseTable } from "@/Components/Tables/BaseTable";
+import { BaseTable } from "@/Components/Base/BaseTable";
 // Utils
-import { renderTooltip } from "@/Utils";
+import { formatIsk, renderTooltip } from "@/Utils";
 
 export const ProfitCalculator: React.FC = () => {
   const { t } = useTranslation();
@@ -48,10 +48,6 @@ export const ProfitCalculator: React.FC = () => {
 
   const handleSyncExtractors = () => {
     setExtractorAmount(injectorAmount);
-  };
-
-  const formatISK = (val: number) => {
-    return `${Math.round(val).toLocaleString()} ISK`;
   };
 
   const getProfitClass = (val: number) => (val >= 0 ? styles["profit-positive"] : styles["profit-negative"]);
@@ -126,33 +122,33 @@ export const ProfitCalculator: React.FC = () => {
         id: "gross-revenue",
         description: t("Gross Injector Revenue ({{amount}} × {{price}})", {
           amount: injAmt,
-          price: formatISK(injPrice),
+          price: formatIsk(injPrice),
         }),
-        amount: `+${formatISK(grossRevenue)}`,
+        amount: `+${formatIsk(grossRevenue)}`,
         amountClass: "text-success fw-bold",
       },
       {
         id: "extractor-cost",
         description: t("Extractor Cost ({{amount}} × {{price}})", {
           amount: extAmt,
-          price: formatISK(extPrice),
+          price: formatIsk(extPrice),
         }),
-        amount: `-${formatISK(extractorCost)}`,
+        amount: `-${formatIsk(extractorCost)}`,
         amountClass: "text-danger fw-bold",
       },
       {
         id: "plex-cost",
         description: t("PLEX Subscription Cost ({{amount}} PLEX × {{price}})", {
           amount: plexMultiplier,
-          price: formatISK(plxPrice),
+          price: formatIsk(plxPrice),
         }),
-        amount: `-${formatISK(totalPlexCost)}`,
+        amount: `-${formatIsk(totalPlexCost)}`,
         amountClass: "text-danger fw-bold",
       },
       {
         id: "net-profit",
         description: t("Total Net Profit / Loss"),
-        amount: formatISK(netProfit),
+        amount: formatIsk(netProfit),
         amountClass: `fw-bold ${getProfitClass(netProfit)}`,
         isTotal: true,
       },
@@ -164,7 +160,7 @@ export const ProfitCalculator: React.FC = () => {
     return (
       <div className={`aa-panel ${styles["state-panel"]}`}>
         <div className="spinner-border text-info mb-2" role="status" />
-        <div>{t("Fetching live market data...")}</div>
+        <div>{t("Fetching live market data…")}</div>
       </div>
     );
   }
@@ -238,7 +234,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["price-label"]}>
               {t("Skill Injector Price")}
             </span>
-            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.injector ? formatISK(data.injector.sell) : "-" })}</small>
+            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.injector ? formatIsk(data.injector.sell) : "-" })}</small>
           </div>
           <div className="input-group">
             <input
@@ -257,7 +253,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["price-label"]}>
               {t("Skill Extractor Price")}
             </span>
-            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.extractor ? formatISK(data.extractor.sell) : "-" })}</small>
+            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.extractor ? formatIsk(data.extractor.sell) : "-" })}</small>
           </div>
           <div className="input-group">
             <input
@@ -276,7 +272,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["price-label"]}>
               {t("PLEX Unit Price")}
             </span>
-            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.plex ? formatISK(data.plex.sell) : "-" })}</small>
+            <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.plex ? formatIsk(data.plex.sell) : "-" })}</small>
           </div>
           <div className="input-group">
             <input
@@ -389,7 +385,7 @@ export const ProfitCalculator: React.FC = () => {
                   {t("Calculated Net Result:")}
                 </span>
                 <span className={`${styles["net-profit"]} ${getProfitClass(netProfit)}`}>
-                  {formatISK(netProfit)}
+                  {formatIsk(netProfit)}
                 </span>
               </div>
 
@@ -427,7 +423,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["result-duration"]}>{t("500 PLEX/mo")}</span>
           </div>
           <div className={`${styles["result-value"]} ${getProfitClass(data?.month_calc ?? 0)}`}>
-            {data ? formatISK(data.month_calc) : "-"}
+            {data ? formatIsk(data.month_calc) : "-"}
           </div>
           <p className={styles["result-note"]}>
             {t("Standard monthly subscription rate with PLEX.")}
@@ -440,7 +436,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["result-duration"]}>{t("300 PLEX/mo")}</span>
           </div>
           <div className={`${styles["result-value"]} ${getProfitClass(data?.month12_calc ?? 0)}`}>
-            {data ? formatISK(data.month12_calc) : "-"}
+            {data ? formatIsk(data.month12_calc) : "-"}
           </div>
           <p className={styles["result-note"]}>
             {t("Annual package rate discount (~40% PLEX savings).")}
@@ -453,7 +449,7 @@ export const ProfitCalculator: React.FC = () => {
             <span className={styles["result-duration"]}>{t("275 PLEX/mo")}</span>
           </div>
           <div className={`${styles["result-value"]} ${getProfitClass(data?.month24_calc ?? 0)}`}>
-            {data ? formatISK(data.month24_calc) : "-"}
+            {data ? formatIsk(data.month24_calc) : "-"}
           </div>
           <p className={styles["result-note"]}>
             {t("Maximum 2-year package rate discount.")}

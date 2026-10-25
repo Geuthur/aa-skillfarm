@@ -161,11 +161,11 @@ python manage.py collectstatic --noinput
 
 With the Following IDs you can set up the permissions for the Skillfarm
 
-| ID             | Description                                      |                                                           |
-| :------------- | :----------------------------------------------- | :-------------------------------------------------------- |
-| `basic_access` | Can access the Skillfarm module                  | All Members with the Permission can access the Skillfarm. |
-| `corp_access`  | Has access to all characters in the corporation. | Can see all Skillfarm Characters from own Corporation.    |
-| `admin_access` | Has access to all characters                     | Can see all Skillfarm Characters.                         |
+| ID             | Description                                      |                                                                                                                                              |
+| :------------- | :----------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
+| `basic_access` | Can access the Skillfarm module                  | All Members with the Permission can access the Skillfarm.                                                                                    |
+| `corp_access`  | Has access to all characters in the corporation. | Can see all Skillfarm Characters from own Corporation.                                                                                       |
+| `admin_access` | Has access to all characters                     | Can see all Skillfarm Characters and use the Administration. Global update tasks, force refresh and deleting characters stay superuser-only. |
 
 ### Step 6 - (Optional) Setting up Compatibilies<a name="step-6---optional-setting-up-compatibilies"></a>
 

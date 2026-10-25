@@ -2,6 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 
 // Third Party
+import { ShieldAlert } from "lucide-react";
 import { Nav } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +25,29 @@ export interface MenuProps {
 export interface ToPath {
     toPath: (link: string) => string;
 }
+
+export const AdministrationMenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
+    const { t } = useTranslation();
+    const path = useLocation();
+    const hit = path.pathname.endsWith(link.link ?? "");
+
+    return (
+        <Nav.Item as="li">
+            <Nav.Link
+                as={Link}
+                to={{ pathname: toPath(link.link ?? ""), search: path.search }}
+                id={link.name}
+                key={link.name}
+                active={hit}
+                className="aa-nav-danger d-flex align-items-center gap-1"
+                data-testid="administration-nav-link"
+            >
+                <ShieldAlert size={15} className="text-danger flex-shrink-0" />
+                <span>{t(link.name)}</span>
+            </Nav.Link>
+        </Nav.Item>
+    );
+};
 
 export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
     const { t } = useTranslation();
@@ -49,6 +73,15 @@ export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
         );
     }
 
+    const isAdministrationLink = Boolean(
+        link.link?.replace(/^\/+|\/+$/g, "") === "administration" ||
+        link.name.toLowerCase() === "administration"
+    );
+
+    if (isAdministrationLink) {
+        return <AdministrationMenuItem link={link} toPath={toPath} />;
+    }
+
     return (
         <Nav.Item as="li">
             <Nav.Link
@@ -58,15 +91,11 @@ export const MenuItem = ({ link, toPath }: { link: MenuLinkItem } & ToPath) => {
                 key={link.name}
                 active={hit}
             >
-                {link.has_errors && (
-                    <span className="aa-pending-dot-container me-1" aria-hidden="true">
-                        <span className="aa-danger-dot-ping" />
-                        <span className="aa-danger-dot-core" />
-                    </span>
-                )}
                 {t(link.name)}
                 {link.badge ? (
-                    <span className="badge bg-danger ms-1">{link.badge}</span>
+                    <span className={`badge bg-danger ms-1 ${link.has_errors ? "aa-menu-badge-pulse" : ""}`}>
+                        {link.badge}
+                    </span>
                 ) : null}
             </Nav.Link>
         </Nav.Item>

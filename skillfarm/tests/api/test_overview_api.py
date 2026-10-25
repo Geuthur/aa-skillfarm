@@ -40,10 +40,11 @@ class TestOverviewApiEndpoints(SkillFarmTestCase):
             id__in=[self.audit.id, self.alt_audit.id, self.other_audit.id]
         ).delete()
 
-    def test_get_overview_as_standard_user_should_return_forbidden(self):
+    def test_get_overview_without_basic_access_should_return_forbidden(self):
         # Test Data
         url = reverse(f"{API_URL}:get_overview")
-        self.client.force_login(self.user)
+        user = UserMainFactory(permissions__=[])
+        self.client.force_login(user)
 
         # Test Action
         response = self.client.get(url)
@@ -128,10 +129,11 @@ class TestOverviewApiEndpoints(SkillFarmTestCase):
         )
         self.assertEqual(data["total_count"], 2)
 
-    def test_get_overview_user_as_standard_user_should_return_forbidden(self):
+    def test_get_overview_user_without_basic_access_should_return_forbidden(self):
         # Test Data
         url = reverse(f"{API_URL}:get_overview_user", kwargs={"user_id": self.user.id})
-        self.client.force_login(self.user)
+        user = UserMainFactory(permissions__=[])
+        self.client.force_login(user)
 
         # Test Action
         response = self.client.get(url)

@@ -1,3 +1,3 @@
-export { default as BaseHeader } from "@/Components/Sections/BaseHeader";
-export * from "@/Components/Sections/BaseHeader";
-export { default } from "@/Components/Sections/BaseHeader";
+export { default as CharacterDashboard } from "@/Components/Sections/CharacterDashboard";
+export * from "@/Components/Sections/CharacterDashboard";
+export { default } from "@/Components/Sections/CharacterDashboard";

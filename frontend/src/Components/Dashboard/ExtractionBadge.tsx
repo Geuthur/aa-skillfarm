@@ -6,7 +6,7 @@ import { CheckCircle2, Sparkles, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./ExtractionBadge.module.css";
+import styles from "@/Styles/modules/ExtractionBadge.module.css";
 
 // Utils
 import { renderTooltip } from "@/Utils/bootsTrap";

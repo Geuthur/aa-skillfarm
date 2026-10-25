@@ -11,11 +11,14 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+# Alliance Auth
+from allianceauth.authentication.models import CharacterOwnership
+from allianceauth.eveonline.models import EveCharacter
+
 # AA Skillfarm
 from skillfarm.api import schema
-from skillfarm.api.helpers.core import can_view_overview
 from skillfarm.helpers.lazy import get_character_portrait_url
-from skillfarm.models.general import UserSettings
+from skillfarm.models.general import General, UserSettings
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
@@ -36,8 +39,12 @@ class ApiEndpoints:
         def get_menu(request: WSGIRequest):
             left_menu: list[schema.MenuLink] = [
                 schema.MenuLink(
-                    name=_("Characters"),
+                    name=_("Overview"),
                     link="/",
+                ),
+                schema.MenuLink(
+                    name=_("My Characters"),
+                    link="/characters/",
                 ),
                 schema.MenuLink(
                     name=_("Calculator"),
@@ -69,14 +76,6 @@ class ApiEndpoints:
 
             right_menu: list[schema.MenuLink] = []
 
-            if can_view_overview(request.user):
-                right_menu.append(
-                    schema.MenuLink(
-                        name=_("Overview"),
-                        link="/overview/",
-                    )
-                )
-
             right_menu.append(
                 schema.MenuLink(
                     name=_("Add Character"),
@@ -85,11 +84,11 @@ class ApiEndpoints:
                 )
             )
 
-            if request.user.is_superuser:
+            if General.has_management_access(request.user):
                 right_menu.append(
                     schema.MenuLink(
-                        name=_("Superuser"),
-                        link="/admin/",
+                        name=_("Administration"),
+                        link="/administration/",
                     )
                 )
 
@@ -108,7 +107,7 @@ class ApiEndpoints:
             summary="Get current user data and permissions",
         )
         def get_user(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             main_char = getattr(
@@ -124,9 +123,7 @@ class ApiEndpoints:
 
             portrait = get_character_portrait_url(char_id, size=64) if char_id else None
 
-            is_admin = request.user.is_superuser or request.user.has_perm(
-                "skillfarm.admin_access"
-            )
+            is_admin = General.has_administration_access(request.user)
 
             return schema.UserData(
                 user_id=request.user.id,
@@ -138,7 +135,8 @@ class ApiEndpoints:
                 alliance_name=alliance_name,
                 portrait=portrait,
                 is_admin=is_admin,
-                has_corp_access=request.user.has_perm("skillfarm.corp_access"),
+                has_corp_access=General.has_corporation_access(request.user),
+                is_superuser=General.is_superuser_only(request.user),
             )
 
         @api.get(
@@ -151,7 +149,7 @@ class ApiEndpoints:
             summary="Get current user's Skillfarm settings",
         )
         def get_user_settings(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -171,7 +169,7 @@ class ApiEndpoints:
         def update_user_settings(
             request: WSGIRequest, payload: schema.UserSettingsUpdateRequest
         ):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -184,7 +182,7 @@ class ApiEndpoints:
         @api.get(
             "user/characters/status/",
             response={
-                HTTPStatus.OK: list[schema.UserCharacterStatusSchema],
+                HTTPStatus.OK: schema.UserCharacterStatusResponse,
                 HTTPStatus.FORBIDDEN: dict,
             },
             tags=self.tags,
@@ -192,14 +190,27 @@ class ApiEndpoints:
         )
         # pylint: disable=too-many-locals
         def get_user_character_statuses(request: WSGIRequest):
-            if not request.user.has_perm("skillfarm.basic_access"):
+            if not General.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
+
+            user_char_ids = list(
+                CharacterOwnership.objects.filter(user=request.user).values_list(
+                    "character__character_id", flat=True
+                )
+            )
 
             audits = (
                 SkillFarmAudit.objects.owned_by(request.user)
                 .select_related("character")
                 .prefetch_related("skillfarm_update_status")
                 .order_by("character__character_name")
+            )
+            registered_char_ids = [audit.character.character_id for audit in audits]
+
+            missing_chars = (
+                EveCharacter.objects.filter(character_id__in=user_char_ids)
+                .exclude(character_id__in=registered_char_ids)
+                .order_by("character_name")
             )
 
             result: list[schema.UserCharacterStatusSchema] = []
@@ -292,8 +303,24 @@ class ApiEndpoints:
                         is_active=audit.active,
                         last_sync=last_sync,
                         error_message=latest_error_message,
+                        notification_enabled=audit.notification,
                         sections=section_list,
                     )
                 )
 
-            return result
+            missing_list = [
+                schema.MissingCharacterSchema(
+                    character_id=char.character_id,
+                    character_name=char.character_name,
+                    corporation_id=char.corporation_id,
+                    corporation_name=char.corporation_name,
+                    corporation_ticker=char.corporation_ticker or "",
+                    portrait_url=get_character_portrait_url(char.character_id, size=64),
+                )
+                for char in missing_chars
+            ]
+
+            return schema.UserCharacterStatusResponse(
+                characters=result,
+                missing_characters=missing_list,
+            )

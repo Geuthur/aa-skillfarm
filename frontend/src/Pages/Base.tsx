@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 // Third Party
 import { Col } from "react-bootstrap";
 
-import { ErrorBoundary } from "@/Components/Loader";
+import { ErrorBoundary } from "@/Components/Base/Loader";
 import AuthLeftMenuAsync from "@/Menu/AuthLeftMenuAsync";
 import AuthRightMenuAsync from "@/Menu/AuthRightMenuAsync";
 

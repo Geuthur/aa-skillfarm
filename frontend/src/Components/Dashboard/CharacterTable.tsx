@@ -3,16 +3,16 @@ import React, { useMemo } from "react";
 
 // Third Party
 import type { ColumnDef } from "@tanstack/react-table";
-import { Bell, BellOff, Check, Eye, PauseCircle, Settings, Trash2 } from "lucide-react";
+import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./CharacterTable.module.css";
+import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
+import { BaseTable } from "@/Components/Base/BaseTable";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-import { BaseTable } from "@/Components/Tables/BaseTable";
 // Utils
 import { renderTooltip } from "@/Utils";
 
@@ -22,8 +22,6 @@ interface CharacterTableProps {
   onOpenSetup: (characterId: number) => void;
   onAcknowledgeExtractions: (characterId: number) => void;
   onAcknowledgePaused: (characterId: number) => void;
-  onToggleNotification: (characterId: number) => void;
-  onDeleteCharacter: (character: CharacterSummarySchema) => void;
 }
 
 export const CharacterTable: React.FC<CharacterTableProps> = ({
@@ -32,8 +30,6 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
   onOpenSetup,
   onAcknowledgeExtractions,
   onAcknowledgePaused,
-  onToggleNotification,
-  onDeleteCharacter,
 }) => {
   const { t } = useTranslation();
 
@@ -115,11 +111,46 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         id: "last_sync",
         header: t("Last Sync"),
         accessorFn: (row) => row.last_update ?? "",
-        cell: ({ row }) => (
-          <span className={styles["last-sync"]}>
-            {row.original.last_update ? row.original.last_update.slice(5) : t("Pending")}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const char = row.original;
+          const status = char.update_status;
+          const isError = status === "error";
+          const isTokenError = status === "token_error";
+          const isOk = status === "ok";
+
+          return (
+            <div className="d-flex flex-column gap-1">
+              <span className={styles["last-sync"]}>
+                {char.last_update ? char.last_update.slice(5) : t("Pending")}
+              </span>
+              <div>
+                {isError && (
+                  <span className="badge bg-danger d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                    <span className="aa-status-dot-pulse bg-danger" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
+                    {t("Sync Error")}
+                  </span>
+                )}
+                {isTokenError && (
+                  <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                    <span className="aa-status-dot-pulse bg-warning" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
+                    {t("Token Error")}
+                  </span>
+                )}
+                {isOk && (
+                  <span className="badge bg-success d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#fff", display: "inline-block" }} />
+                    {t("OK")}
+                  </span>
+                )}
+                {!status && (
+                  <span className="badge bg-secondary" style={{ fontSize: "0.7rem" }}>
+                    {t("Pending")}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        },
       },
       {
         id: "actions",
@@ -187,34 +218,6 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                     <Settings size={14} />
                   </button>,
                 )}
-
-                {/* Notifications Toggle */}
-                {renderTooltip(
-                  char.notification_enabled
-                    ? t("Disable Notifications")
-                    : t("Enable Notifications"),
-                  <button
-                    type="button"
-                    className={`sf-btn sf-btn-secondary sf-btn-sm ${
-                      char.notification_enabled ? styles["notification-on"] : ""
-                    }`}
-                    onClick={() => onToggleNotification(char.character_id)}
-                  >
-                    {char.notification_enabled ? <Bell size={14} /> : <BellOff size={14} />}
-                  </button>,
-                )}
-
-                {/* Delete */}
-                {renderTooltip(
-                  t("Remove from Skillfarm"),
-                  <button
-                    type="button"
-                    className="sf-btn sf-btn-danger sf-btn-sm"
-                    onClick={() => onDeleteCharacter(char)}
-                  >
-                    <Trash2 size={14} />
-                  </button>,
-                )}
               </div>
             </div>
           );
@@ -227,8 +230,6 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
       onOpenSetup,
       onAcknowledgeExtractions,
       onAcknowledgePaused,
-      onToggleNotification,
-      onDeleteCharacter,
     ],
   );
 
@@ -247,7 +248,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
     <BaseTable
       data={characters}
       columns={columns}
-      variant="vowra"
+      variant="default"
       itemLabel={t("Characters")}
       pageSizeOptions={[10, 25, 50, 100]}
       initialState={{

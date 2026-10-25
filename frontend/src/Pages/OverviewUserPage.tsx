@@ -7,10 +7,10 @@ import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./OverviewUserPage.module.css";
+import styles from "@/Styles/modules/OverviewUserPage.module.css";
 
-import { ProjectName } from "@/App";
 import { CharacterDashboard } from "@/Components/Sections/CharacterDashboard";
+import { ProjectName } from "@/constants";
 import { ErrorPage } from "@/Pages/404";
 // Utils
 import { renderTooltip } from "@/Utils";

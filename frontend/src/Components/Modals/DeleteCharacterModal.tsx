@@ -5,14 +5,21 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./DeleteCharacterModal.module.css";
+import styles from "@/Styles/modules/DeleteCharacterModal.module.css";
 
-import type { CharacterSummarySchema } from "@/Api/schema";
-import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
-import type { ModalData } from "@/Components/Modals/BaseModal";
+import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
+import type { ModalData } from "@/Components/Base/BaseModal";
+
+export interface DeletableCharacter {
+  character_id: number;
+  character_name: string;
+  corporation_name?: string;
+  corporation_ticker?: string;
+  portrait_url?: string;
+}
 
 interface DeleteCharacterModalProps {
-  character: CharacterSummarySchema | null;
+  character: DeletableCharacter | null;
   showModal: boolean;
   setShowModal: (show: boolean) => void;
   onConfirm: () => Promise<void> | void;

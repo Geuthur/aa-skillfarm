@@ -10,8 +10,11 @@ import type {
   OverviewResponse,
   OverviewUserCharactersResponse,
   SkillSetupSchema,
+  AdministrationAuditSchema,
+  AdministrationCorporationSchema,
+  AdministrationUnregisteredResponse,
   UserData,
-  UserCharacterStatusSchema,
+  UserCharacterStatusResponse,
   UserSettingsSchema,
   UserSettingsUpdateRequest,
 } from "@/Api/schema";
@@ -54,12 +57,12 @@ export async function updateUserSettings(
   return data;
 }
 
-export async function fetchUserCharacterStatuses(): Promise<UserCharacterStatusSchema[]> {
+export async function fetchUserCharacterStatuses(): Promise<UserCharacterStatusResponse> {
   const { data, error } = await apiClient.GET("/skillfarm/api/user/characters/status/", {});
   if (error || !data) {
     throw new Error("Failed to load character update statuses");
   }
-  return data as UserCharacterStatusSchema[];
+  return data as UserCharacterStatusResponse;
 }
 
 function buildFilterQuery(filters: CharacterFilterParams): Record<string, string | number> {
@@ -185,6 +188,23 @@ export async function deleteCharacter(characterId: number): Promise<ActionRespon
   return data as ActionResponse;
 }
 
+export async function triggerCharacterUpdate(
+  characterId: number,
+  forceRefresh: boolean = false,
+): Promise<ActionResponse> {
+  const { data, error } = await apiClient.POST(
+    `${API_BASE}/characters/{character_id}/update/`,
+    {
+      params: { path: { character_id: characterId } },
+      body: { force_refresh: forceRefresh },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to trigger character update");
+  }
+  return data as ActionResponse;
+}
+
 export async function acknowledgeAllExtractions(): Promise<ActionResponse> {
   const { data, error } = await apiClient.POST(`${API_BASE}/acknowledge-all-extractions/`, {});
   if (error || !data) {
@@ -202,7 +222,7 @@ export async function fetchCalculatorData(): Promise<CalculatorResponse> {
 }
 
 export async function fetchAdminStats(): Promise<AdminStatsResponse> {
-  const { data, error } = await apiClient.GET(`${API_BASE}/admin/stats/`, {});
+  const { data, error } = await apiClient.GET(`${API_BASE}/administration/stats/`, {});
   if (error || !data) {
     throw new Error("Failed to load admin stats");
   }
@@ -210,7 +230,7 @@ export async function fetchAdminStats(): Promise<AdminStatsResponse> {
 }
 
 export async function triggerUpdateAll(forceRefresh: boolean = false): Promise<ActionResponse> {
-  const { data, error } = await apiClient.POST(`${API_BASE}/admin/update-all/`, {
+  const { data, error } = await apiClient.POST(`${API_BASE}/administration/update-all/`, {
     body: { force_refresh: forceRefresh },
   });
   if (error || !data) {
@@ -220,9 +240,85 @@ export async function triggerUpdateAll(forceRefresh: boolean = false): Promise<A
 }
 
 export async function triggerUpdatePrices(): Promise<ActionResponse> {
-  const { data, error } = await apiClient.POST(`${API_BASE}/admin/update-prices/`, {});
+  const { data, error } = await apiClient.POST(`${API_BASE}/administration/update-prices/`, {});
   if (error || !data) {
     throw new Error("Failed to trigger price update");
   }
   return data as ActionResponse;
+}
+
+export async function loadAdministrationAudits(): Promise<AdministrationAuditSchema[]> {
+  const { data, error } = await apiClient.GET(`${API_BASE}/administration/audits/`, {});
+  if (error || !data) {
+    throw new Error("Failed to load administration audits");
+  }
+  return data as AdministrationAuditSchema[];
+}
+
+export async function triggerAdministrationAuditUpdate(
+  characterId: number,
+  forceRefresh: boolean = false,
+): Promise<ActionResponse> {
+  const { data, error } = await apiClient.POST(
+    `${API_BASE}/administration/audits/{character_id}/update/`,
+    {
+      params: { path: { character_id: characterId } },
+      body: { force_refresh: forceRefresh },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to trigger audit update");
+  }
+  return data as ActionResponse;
+}
+
+export async function deleteAdministrationAudit(characterId: number): Promise<ActionResponse> {
+  const { data, error } = await apiClient.DELETE(
+    `${API_BASE}/administration/audits/{character_id}/`,
+    {
+      params: { path: { character_id: characterId } },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to delete character audit");
+  }
+  return data as ActionResponse;
+}
+
+export async function loadAdministrationAuditInspect(
+  characterId: number,
+): Promise<CharacterDetailResponse> {
+  const { data, error } = await apiClient.GET(
+    `${API_BASE}/administration/audits/{character_id}/inspect/`,
+    {
+      params: { path: { character_id: characterId } },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to load character inspection details");
+  }
+  return data as CharacterDetailResponse;
+}
+
+export async function loadAdministrationCorporations(): Promise<AdministrationCorporationSchema[]> {
+  const { data, error } = await apiClient.GET(`${API_BASE}/administration/corporations/`, {});
+  if (error || !data) {
+    throw new Error("Failed to load administration corporations");
+  }
+  return data as AdministrationCorporationSchema[];
+}
+
+export async function loadAdministrationUnregistered(
+  corporationId: number,
+): Promise<AdministrationUnregisteredResponse> {
+  const { data, error } = await apiClient.GET(
+    `${API_BASE}/administration/corporations/{corporation_id}/unregistered/`,
+    {
+      params: { path: { corporation_id: corporationId } },
+    },
+  );
+  if (error || !data) {
+    throw new Error("Failed to load unregistered characters");
+  }
+  return data as AdministrationUnregisteredResponse;
 }

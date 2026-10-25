@@ -1,5 +1,4 @@
 // Third Party
-import i18n from "i18next";
 
 /**
  * Returns the URL for the image of a given ship type.
@@ -53,20 +52,3 @@ export const formatEveTime = (date: Date = new Date()): string => {
   return `${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())} EVE`;
 };
 
-/**
- * Helper function for localized number formatting
- */
-export function formatNumber(
-  value: number,
-  unit: string = "ISK",
-  locale?: string,
-  options?: Intl.NumberFormatOptions
-) {
-  const effectiveLocale = locale || i18n.language || "en";
-  const suffix = unit ? ` ${unit}` : "";
-  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B${suffix}`;
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M${suffix}`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K${suffix}`;
-  const formatted = new Intl.NumberFormat(effectiveLocale, options).format(value);
-  return unit ? `${formatted}${suffix}` : formatted;
-}

@@ -8,16 +8,17 @@ import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
-import styles from "./SkillQueueModal.module.css";
+import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
 import { fetchCharacterDetail } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type { SkillQueueEntrySchema } from "@/Api/schema";
+import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
+import type { ModalData } from "@/Components/Base/BaseModal";
+import { BaseTable } from "@/Components/Base/BaseTable";
 import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-import { BaseModal, ModalSize } from "@/Components/Modals/BaseModal";
-import type { ModalData } from "@/Components/Modals/BaseModal";
-import { BaseTable } from "@/Components/Tables/BaseTable";
+import { formatNumber } from "@/Utils/format";
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -128,7 +129,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
       <div>
         {isLoading && (
           <div className={styles["loading-state"]}>
-            {t("Loading queue details...")}
+            {t("Loading queue details…")}
           </div>
         )}
 
@@ -240,7 +241,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                         <tr key={skill.skill_id}>
                           <td className={styles["skill-name"]}>{skill.skill_name}</td>
                           <td>{t("Level {{level}}", { level: skill.trained_level })}</td>
-                          <td>{skill.skillpoints.toLocaleString()} SP</td>
+                          <td>{formatNumber(skill.skillpoints)} SP</td>
                           <td>
                             {skill.is_extractable ? (
                               <span className="sf-badge-extraction-pending">
