@@ -26,7 +26,9 @@ Section Order:
 ### Removed
 -->
 
-<!-- AI Changes -->
+<!-- Your changes go here -->
+
+## [4.1.0] - 2026-10-25
 
 ### Added
 
@@ -74,8 +76,6 @@ Section Order:
 - [CHANGE] Replaced `BaseTable` with the shared implementation from `aa-ledger` (new toolbar, `variant` is now `default` or `light`, table styles moved to `Styles/table.css`). Owner type badges in the settings use the `aa-ledger` colors (`primary` / `info`).
 - [CHANGE] The corporations card in the Administration is collapsible like the global task administration (collapsed by default for administrators, expanded for corporation managers).
 - [CHANGE] Replaced `pook` with `pookx` in the test dependencies and removed the custom `httpx2` pook interceptor, which `pookx` now provides.
-
-<!-- Your changes go here -->
 
 ## [4.0.2] - 2026-10-18
 
@@ -761,5 +761,6 @@ This will load all necessary prices
 [4.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v3.1.0...v4.0.0 "v4.0.0"
 [4.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...v4.0.1 "v4.0.1"
 [4.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...v4.0.2 "v4.0.2"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.2...HEAD "In Development"
+[4.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.2...v4.1.0 "v4.1.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.1.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
