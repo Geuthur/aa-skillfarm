@@ -357,5 +357,15 @@
   "Clear": "Leeren",
   "Filter…": "Filter…",
   "No matching options": "Keine passenden Optionen",
-  "Toggle Corporations": "Corporations ein-/ausklappen"
+  "Toggle Corporations": "Corporations ein-/ausklappen",
+  "Loading...": "Wird geladen...",
+  "Fetching live market data...": "Live-Marktdaten werden abgerufen...",
+  "Search characters or corps...": "Charaktere oder Corps suchen...",
+  "Loading queue details...": "Warteschlangendetails werden geladen...",
+  "Loading skills...": "Skills werden geladen...",
+  "Filter available skills...": "Verfügbare Skills filtern...",
+  "Loading characters...": "Charaktere werden geladen...",
+  "Loading overview...": "Übersicht wird geladen...",
+  "Loading settings...": "Einstellungen werden geladen...",
+  "Saving...": "Wird gespeichert..."
 }
