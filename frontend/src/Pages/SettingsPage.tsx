@@ -303,13 +303,13 @@ export const SettingsPage: React.FC = () => {
                 disabled={toggleNotifMutation.isPending}
                 title={
                   notificationEnabled
-                    ? t("Disable notifications")
-                    : t("Enable notifications")
+                    ? t("Disable Notifications")
+                    : t("Enable Notifications")
                 }
                 aria-label={
                   notificationEnabled
-                    ? t("Disable notifications")
-                    : t("Enable notifications")
+                    ? t("Disable Notifications")
+                    : t("Enable Notifications")
                 }
               >
                 {notificationEnabled ? <Bell size={13} /> : <BellOff size={13} />}

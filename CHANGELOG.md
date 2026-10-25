@@ -50,6 +50,7 @@ Section Order:
 
 ### Fixed
 
+- [FIX] Unified the capitalization of UI strings: "Disable Notifications", "Enable Notifications" and "Last sync".
 - [FIX] Fixed the `import-headings` ESLint rule duplicating comments above the first import on every `--fix` pass, which could grow a file exponentially; added a unit test (`eslint-rules/import-headings.test.mjs`).
 - [FIX] Administration corporations list only shows corporations with at least one registered character; corporations without characters in Alliance Auth or without registered characters are hidden.
 
