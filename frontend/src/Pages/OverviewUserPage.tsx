@@ -1,6 +1,6 @@
 // React
 import React from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams } from "react-router-dom";
 
 // Third Party
 import { ArrowLeft } from "lucide-react";
