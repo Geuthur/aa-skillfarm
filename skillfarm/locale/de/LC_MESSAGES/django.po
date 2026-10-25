@@ -9,8 +9,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-"
 "skillfarm/\n"
 "POT-Creation-Date: 2026-10-18 20:21+0200\n"
-"PO-Revision-Date: 2026-10-19 16:24+0000\n"
-"Last-Translator: Peter Pfeufer <info@ppfeufer.de>\n"
+"PO-Revision-Date: 2026-10-25 10:29+0000\n"
+"Last-Translator: Geuthur <devgeuthur@gmail.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
 "skillfarm/de/>\n"
 "Language: de\n"
@@ -28,51 +28,53 @@ msgstr "Zugriff verweigert"
 
 #, python-format
 msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
-msgstr ""
+msgstr "Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
 
 msgid "Queued market price update task"
-msgstr ""
+msgstr "Task zur Aktualisierung der Marktpreise eingereiht"
 
 msgid ""
 "Market price data is currently not available. Please run market update tasks."
 msgstr ""
+"Marktpreisdaten sind derzeit nicht verfügbar. Bitte führen Sie die Markt-"
+"Update-Tasks aus."
 
 msgid "Character not found or not accessible"
-msgstr ""
+msgstr "Charakter nicht gefunden oder nicht zugänglich"
 
 msgid "Extractions successfully marked as reviewed/acknowledged"
-msgstr ""
+msgstr "Extraktionen erfolgreich als geprüft/bestätigt markiert"
 
 msgid "Inactive training status acknowledged"
-msgstr ""
+msgstr "Inaktiver Trainingsstatus bestätigt"
 
 msgid "enabled"
-msgstr ""
+msgstr "aktiviert"
 
 msgid "disabled"
-msgstr ""
+msgstr "deaktiviert"
 
 #, python-format
 msgid "Notifications %s for %s"
-msgstr ""
+msgstr "Benachrichtigungen %s für %s"
 
 #, python-format
 msgid "Skillset successfully updated for %s"
-msgstr ""
+msgstr "Skillset für %s erfolgreich aktualisiert"
 
 #, python-format
 msgid "%s successfully removed from Skillfarm"
-msgstr ""
+msgstr "%s erfolgreich aus Skillfarm entfernt"
 
 #, python-format
 msgid "Successfully acknowledged extractions for %d characters"
-msgstr ""
+msgstr "Extraktionen für %d Charaktere erfolgreich bestätigt"
 
 msgid "Characters"
 msgstr "Charaktere"
 
 msgid "Calculator"
-msgstr ""
+msgstr "Rechner"
 
 msgid "Settings"
 msgstr "Einstellungen"
@@ -83,14 +85,26 @@ msgstr "Übersicht"
 msgid "Add Character"
 msgstr "Charakter hinzufügen"
 
-msgid "Superuser"
-msgstr ""
+msgid "Administration"
+msgstr "Verwaltung"
+
+msgid "Administration permission required."
+msgstr "Administrationsrecht erforderlich."
+
+msgid "Superuser permission required."
+msgstr "Superuser-Berechtigung erforderlich."
+
+msgid "Corporation access permission required."
+msgstr "Corporation-Zugriffsrecht erforderlich."
+
+msgid "Corporation not found."
+msgstr "Corporation nicht gefunden."
 
 msgid "User not found or not accessible"
-msgstr ""
+msgstr "Benutzer nicht gefunden oder nicht zugänglich"
 
 msgid "Disabled"
-msgstr "deaktiviert"
+msgstr "Deaktiviert"
 
 msgid "Token Error"
 msgstr "token Fehler"
@@ -135,19 +149,16 @@ msgid "Skillfarm Notifications"
 msgstr "Skillfarm Benachrichtigung"
 
 msgid "Error loading Skillfarm frontend"
-msgstr ""
+msgstr "Fehler beim Laden des Skillfarm-Frontends"
 
 msgid "Loading Skillfarm..."
-msgstr ""
+msgstr "Skillfarm wird geladen..."
 
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""
 "{character_name} erfolgreich zum Skillfarm-System hinzugefügt oder "
 "aktualisiert"
-
-#~ msgid "Administration"
-#~ msgstr "Verwaltung"
 
 #~ msgid "No Active Training"
 #~ msgstr "Kein aktives Training"
@@ -404,22 +415,6 @@ msgstr ""
 
 #~ msgid "No character found."
 #~ msgstr "Kein Charakter gefunden."
-
-#: skillfarm/api/administration.py
-msgid "Administration permission required."
-msgstr "Administrationsrecht erforderlich."
-
-#: skillfarm/api/administration.py
-msgid "Superuser permission required."
-msgstr "Superuser-Recht erforderlich."
-
-#: skillfarm/api/administration.py
-msgid "Corporation access permission required."
-msgstr "Corporation-Zugriffsrecht erforderlich."
-
-#: skillfarm/api/administration.py
-msgid "Corporation not found."
-msgstr "Corporation nicht gefunden."
 
 #~ msgid "ESI Skillqueue will only update on Character Login"
 #~ msgstr "ESI Skillqueue wird nur geupdated bei Charakter Login"
