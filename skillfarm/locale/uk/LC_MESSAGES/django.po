@@ -86,7 +86,19 @@ msgstr ""
 msgid "Add Character"
 msgstr ""
 
-msgid "Superuser"
+msgid "Administration"
+msgstr ""
+
+msgid "Administration permission required."
+msgstr ""
+
+msgid "Superuser permission required."
+msgstr ""
+
+msgid "Corporation access permission required."
+msgstr ""
+
+msgid "Corporation not found."
 msgstr ""
 
 msgid "User not found or not accessible"
