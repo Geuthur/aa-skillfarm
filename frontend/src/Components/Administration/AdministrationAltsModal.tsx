@@ -185,7 +185,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                   variant="primary"
                   size="sm"
                   onClick={() => onInspect(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-primary aa-btn aa-btn-primary"
+                  className="d-inline-flex align-items-center gap-1"
                 >
                   <Eye size={13} />
                   <span>{t("Inspect")}</span>
@@ -199,7 +199,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     size="sm"
                     onClick={() => onTriggerUpdate(audit.character_id, false)}
                     disabled={isUpdating}
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                   >
                     {isUpdating ? (
                       <Spinner size="sm" animation="border" />
@@ -217,7 +217,6 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isUpdating}
-                    className="aa-btn aa-btn-danger"
                   />,
                 )}
                 <Dropdown.Menu
@@ -247,7 +246,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     size="sm"
                     onClick={() => onDelete(audit)}
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                   >
                     <Trash2 size={13} />
                     <span>{t("Delete")}</span>

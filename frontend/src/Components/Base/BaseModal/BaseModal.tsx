@@ -80,6 +80,7 @@ export function BaseModal({
       onHide={handleClose}
       onEnter={handleEnter}
       centered={true}
+      contentClassName="aa-react"
       restoreFocus={false}
     >
       <Modal.Header closeButton>

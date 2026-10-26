@@ -3,6 +3,7 @@ import React from "react";
 
 // Third Party
 import { AlertTriangle, ArrowRight } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -45,14 +46,12 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
           </p>
         </div>
       </div>
-      <button
-        type="button"
-        className="sf-btn sf-btn-warning"
+      <Button variant="warning"
         onClick={onFilterInactive}
       >
         <span>{t("View Paused Characters ({{count}})", { count: pausedCount })}</span>
         <ArrowRight size={16} />
-      </button>
+      </Button>
     </div>
   );
 };

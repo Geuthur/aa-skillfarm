@@ -64,10 +64,6 @@
     gap: 6px;
 }
 
-.notification-on:global(.sf-btn) {
-    color: var(--aa-color-amber-light);
-}
-
 .status-badge {
     font-size: 0.7rem;
 }

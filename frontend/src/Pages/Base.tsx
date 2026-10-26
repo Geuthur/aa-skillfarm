@@ -17,7 +17,7 @@ export const BasePage = () => {
       <AuthLeftMenuAsync />
       <AuthRightMenuAsync />
       <Col>
-        <div className="aa-section mt-4">
+        <div className="aa-react aa-section mt-4">
           <ErrorBoundary>
             <Outlet />
           </ErrorBoundary>

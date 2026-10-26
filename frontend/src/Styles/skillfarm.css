@@ -240,67 +240,6 @@
     border-color: var(--aa-blue-focus);
 }
 
-/* ═══ BUTTONS ══════════════════════════════════════════════════════════════ */
-.sf-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: var(--aa-font-size-sm);
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.sf-btn-primary {
-    background-color: var(--aa-blue-active);
-    color: var(--aa-text-primary);
-}
-
-.sf-btn-primary:hover {
-    background-color: #1d4ed8;
-}
-
-.sf-btn-warning {
-    background-color: var(--aa-color-amber-dark);
-    color: #ffffff;
-    border: 1px solid var(--aa-border-amber);
-}
-
-.sf-btn-warning:hover {
-    background-color: var(--aa-color-amber);
-    color: #000000;
-}
-
-.sf-btn-secondary {
-    background-color: #27272a;
-    color: var(--aa-text-secondary);
-    border: 1px solid #3f3f46;
-}
-
-.sf-btn-secondary:hover {
-    background-color: #3f3f46;
-    color: #ffffff;
-}
-
-.sf-btn-danger {
-    background-color: var(--aa-color-rose-dark);
-    color: var(--aa-text-rose-light);
-    border: 1px solid var(--aa-border-rose);
-}
-
-.sf-btn-danger:hover {
-    background-color: var(--aa-color-red);
-    color: #ffffff;
-}
-
-.sf-btn-sm {
-    padding: 4px 10px;
-    font-size: var(--aa-font-size-xs);
-}
-
 /* ═══ TABLE ════════════════════════════════════════════════════════════════ */
 .sf-table-container {
     overflow-x: auto;

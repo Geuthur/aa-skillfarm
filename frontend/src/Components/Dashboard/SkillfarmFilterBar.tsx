@@ -3,6 +3,7 @@ import React from "react";
 
 // Third Party
 import { CheckCheck, Search, Sparkles } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -135,15 +136,13 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
         {pendingCount > 0 && onBulkAcknowledge && (
           renderTooltip(
             t("Mark all currently pending skill extractions as reviewed"),
-            <button
-              type="button"
-              className="sf-btn sf-btn-warning"
+            <Button variant="warning"
               onClick={onBulkAcknowledge}
               disabled={isBulkAcknowledging}
             >
               <CheckCheck size={16} />
               <span>{t("Acknowledge All ({{count}})", { count: pendingCount })}</span>
-            </button>
+            </Button>
           )
         )}
       </div>

@@ -37,7 +37,7 @@ export const AdministrationTaskCard = ({
         size="sm"
         disabled={isPending}
         onClick={onClick}
-        className={`w-100 d-flex align-items-center justify-content-center gap-1 aa-btn aa-btn-${buttonVariant}`}
+        className="w-100 d-flex align-items-center justify-content-center gap-1"
         data-testid={testId}
       >
         {isPending ? <Spinner size="sm" animation="border" /> : icon}

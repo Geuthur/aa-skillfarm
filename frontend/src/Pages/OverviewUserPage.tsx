@@ -32,7 +32,7 @@ export const OverviewUserPage: React.FC = () => {
         <div className={styles["header"]}>
           {renderTooltip(
             t("Back to overview"),
-            <Link to={`/${ProjectName}/overview/`} className="sf-btn">
+            <Link to={`/${ProjectName}/overview/`} className="btn btn-secondary">
               <ArrowLeft size={16} />
               <span>{t("Overview")}</span>
             </Link>

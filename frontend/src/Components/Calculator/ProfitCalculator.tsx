@@ -5,6 +5,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -173,15 +174,13 @@ export const ProfitCalculator: React.FC = () => {
         <p className={styles["error-text"]}>
           {data?.error_message || t("Could not retrieve price aggregates. Please ensure price sync tasks have run.")}
         </p>
-        <button
-          type="button"
-          className="sf-btn sf-btn-secondary"
+        <Button variant="secondary"
           onClick={() => refetch()}
           disabled={isFetching}
         >
           <RefreshCw size={14} className={isFetching ? "spin" : ""} />
           <span>{t("Try Again")}</span>
-        </button>
+        </Button>
       </div>
     );
   }
@@ -204,24 +203,20 @@ export const ProfitCalculator: React.FC = () => {
         <div className={styles["actions"]}>
           {renderTooltip(
             t("Reset prices to current market rates"),
-            <button
-              type="button"
-              className="sf-btn sf-btn-secondary"
+            <Button variant="secondary"
               onClick={handleResetPrices}
             >
               <RotateCcw size={14} />
               <span>{t("Reset Prices")}</span>
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
-            className="sf-btn sf-btn-secondary"
+          <Button variant="secondary"
             onClick={() => refetch()}
             disabled={isFetching}
           >
             <RefreshCw size={14} className={isFetching ? "spin" : ""} />
             <span>{t("Refresh Market")}</span>
-          </button>
+          </Button>
         </div>
       </div>
 

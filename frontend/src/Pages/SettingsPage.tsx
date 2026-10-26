@@ -296,7 +296,7 @@ export const SettingsPage: React.FC = () => {
               <Button
                 variant="secondary"
                 size="sm"
-                className={`aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1 ${
+                className={`d-flex align-items-center gap-1 ${
                   notificationEnabled ? "text-success" : "text-muted"
                 }`}
                 onClick={() => toggleNotifMutation.mutate(owner.id)}

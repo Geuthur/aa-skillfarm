@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 // Third Party
 import type { ColumnDef } from "@tanstack/react-table";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -11,8 +12,8 @@ import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { BaseTable } from "@/Components/Base/BaseTable";
-import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
+import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 // Utils
@@ -152,52 +153,44 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                 {hasPendingExtractions &&
                   renderTooltip(
                     t("Mark extractions as reviewed"),
-                    <button
-                      type="button"
-                      className="sf-btn sf-btn-warning sf-btn-sm"
+                    <Button variant="warning" size="sm"
                       onClick={() => onAcknowledgeExtractions(char.character_id)}
                     >
                       <Check size={14} />
                       <span>{t("Acknowledge")}</span>
-                    </button>,
+                    </Button>,
                   )}
 
                 {/* Acknowledge Paused queue */}
                 {hasUnacknowledgedPaused &&
                   renderTooltip(
                     t("Acknowledge paused training"),
-                    <button
-                      type="button"
-                      className="sf-btn sf-btn-secondary sf-btn-sm"
+                    <Button variant="secondary" size="sm"
                       onClick={() => onAcknowledgePaused(char.character_id)}
                     >
                       <PauseCircle size={14} />
                       <span>{t("Acknowledge Idle")}</span>
-                    </button>,
+                    </Button>,
                   )}
 
                 {/* View Queue */}
                 {renderTooltip(
                   t("Inspect Skill Queue"),
-                  <button
-                    type="button"
-                    className="sf-btn sf-btn-secondary sf-btn-sm"
+                  <Button variant="secondary" size="sm"
                     onClick={() => onViewQueue(char.character_id)}
                   >
                     <Eye size={14} />
-                  </button>,
+                  </Button>,
                 )}
 
                 {/* Skill Setup */}
                 {renderTooltip(
                   t("Configure Farm Skillset"),
-                  <button
-                    type="button"
-                    className="sf-btn sf-btn-secondary sf-btn-sm"
+                  <Button variant="secondary" size="sm"
                     onClick={() => onOpenSetup(char.character_id)}
                   >
                     <Settings size={14} />
-                  </button>,
+                  </Button>,
                 )}
               </div>
             </div>

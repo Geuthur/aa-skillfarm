@@ -48,7 +48,7 @@ export const MissingOwnerCard: React.FC<MissingOwnerCardProps<BaseMissingOwner>>
             href={actionUrl}
             variant="primary"
             size="sm"
-            className="aa-btn aa-btn-sm d-flex align-items-center gap-1"
+            className="d-flex align-items-center gap-1"
           >
             <Plus size={13} />
             <span>{actionLabel ?? t("Add to {{app}}", { app: appName })}</span>

@@ -149,7 +149,7 @@ export const OverviewPage: React.FC = () => {
                   <div className="d-flex flex-wrap gap-2 pt-2 border-top border-secondary">
                     <Link
                       to={`/${ProjectName}/overview/${user.user_id}/`}
-                      className="sf-btn sf-btn-sm sf-btn-primary flex-fill d-flex align-items-center justify-content-center gap-1"
+                      className="btn btn-primary btn-sm flex-fill d-flex align-items-center justify-content-center gap-1"
                     >
                       <Eye size={14} />
                       {t("Characters")}

@@ -140,7 +140,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="aa-btn aa-btn-secondary aa-btn-sm py-0 px-2 small lh-1 text-decoration-none"
+                    className="py-0 px-2 small lh-1 text-decoration-none"
                     onClick={() => setSelectedAltsGroup(group)}
                     data-testid={`alts-btn-${group.id}`}
                   >
@@ -240,7 +240,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                 variant="outline-secondary"
                 size="sm"
                 onClick={() => setSelectedAltsGroup(group)}
-                className="d-inline-flex align-items-center gap-1 aa-btn"
+                className="d-inline-flex align-items-center gap-1"
                 data-testid={`view-alts-btn-${group.id}`}
               >
                 <Users size={13} />
@@ -251,13 +251,13 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                 {renderTooltip(
                   t("Trigger updates for all alts of this pilot"),
                   <Button
-                    variant="outline-danger"
+                    variant="danger"
                     size="sm"
                     disabled={isAnyUpdating}
                     onClick={() =>
                       group.alts.forEach((a) => onTriggerUpdate(a.character_id, false))
                     }
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                     data-testid={`update-all-alts-${group.id}`}
                   >
                     {isAnyUpdating ? (
@@ -273,10 +273,9 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                   <Dropdown.Toggle
                     split
                     size="sm"
-                    variant="outline-danger"
+                    variant="danger"
                     aria-label={t("More update options")}
                     disabled={isAnyUpdating}
-                    className="aa-btn aa-btn-danger"
                   />,
                 )}
                 <Dropdown.Menu

@@ -449,28 +449,24 @@ export const AdministrationPage: React.FC = () => {
             <Button
               variant={statusFilter === "all" ? "primary" : "secondary"}
               onClick={() => setStatusFilter("all")}
-              className={`aa-btn ${statusFilter === "all" ? "aa-btn-primary" : "aa-btn-secondary"}`}
             >
               {t("All")} <Badge bg="secondary" className="ms-1">{totalCount}</Badge>
             </Button>
             <Button
               variant={statusFilter === "training" ? "primary" : "secondary"}
               onClick={() => setStatusFilter("training")}
-              className={`aa-btn ${statusFilter === "training" ? "aa-btn-primary" : "aa-btn-secondary"}`}
             >
               {t("In Training")} <Badge bg="secondary" className="ms-1">{trainingCount}</Badge>
             </Button>
             <Button
               variant={statusFilter === "paused" ? "primary" : "secondary"}
               onClick={() => setStatusFilter("paused")}
-              className={`aa-btn ${statusFilter === "paused" ? "aa-btn-primary" : "aa-btn-secondary"}`}
             >
               {t("Paused")} <Badge bg="secondary" className="ms-1">{pausedCount}</Badge>
             </Button>
             <Button
               variant={statusFilter === "issues" ? "primary" : "secondary"}
               onClick={() => setStatusFilter("issues")}
-              className={`aa-btn ${statusFilter === "issues" ? "aa-btn-primary" : "aa-btn-secondary"}`}
             >
               {t("Issues")} <Badge bg="secondary" className="ms-1">{issuesCount}</Badge>
             </Button>
@@ -550,7 +546,6 @@ export const AdministrationPage: React.FC = () => {
               variant="secondary"
               onClick={() => setAuditToDelete(null)}
               disabled={deleteAuditMutation.isPending}
-              className="sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
             >
               {t("Cancel")}
             </Button>
@@ -558,7 +553,7 @@ export const AdministrationPage: React.FC = () => {
               variant="danger"
               onClick={handleConfirmDelete}
               disabled={deleteAuditMutation.isPending}
-              className="d-flex align-items-center gap-1 aa-btn aa-btn-danger"
+              className="d-flex align-items-center gap-1"
             >
               <Trash2 size={14} />
               <span>

@@ -89,7 +89,7 @@ export function BaseOwnerSettingsSection<
             <Button
               variant="secondary"
               size="sm"
-              className="aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1"
+              className="d-flex align-items-center gap-1"
               disabled={isUpdatingAll || globalCooldown > 0}
               onClick={onUpdateAll}
             >
@@ -183,6 +183,7 @@ export function BaseOwnerSettingsSection<
             show={Boolean(ownerToDelete)}
             onHide={() => !isDeleting && setOwnerToDelete(null)}
             centered
+            contentClassName="aa-react"
           >
             <Modal.Header closeButton>
               <Modal.Title className="d-flex align-items-center gap-2 text-danger">
@@ -213,7 +214,6 @@ export function BaseOwnerSettingsSection<
                   variant="secondary"
                   onClick={() => setOwnerToDelete(null)}
                   disabled={isDeleting}
-                  className="aa-btn aa-btn-secondary"
                 >
                   {t("Cancel")}
                 </Button>
@@ -221,7 +221,7 @@ export function BaseOwnerSettingsSection<
                   variant="danger"
                   onClick={handleDeleteConfirm}
                   disabled={isDeleting}
-                  className="aa-btn aa-btn-danger d-flex align-items-center gap-1"
+                  className="d-flex align-items-center gap-1"
                 >
                   <Trash2 size={14} />
                   <span>{isDeleting ? t("Deleting…") : t("Confirm Delete")}</span>

@@ -55,7 +55,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
               variant="secondary"
               size="sm"
               onClick={onBack}
-              className="d-flex align-items-center gap-1 sf-btn sf-btn-secondary aa-btn aa-btn-secondary"
+              className="d-flex align-items-center gap-1"
             >
               <ArrowLeft size={16} />
               <span>{t("Back to Administration Overview")}</span>
@@ -88,7 +88,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                   size="sm"
                   onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}
                   disabled={isUpdating}
-                  className="d-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                  className="d-flex align-items-center gap-1"
                 >
                   {isUpdating ? <Spinner size="sm" animation="border" /> : <RefreshCw size={14} />}
                   <span>{t("Update Character")}</span>
@@ -100,7 +100,6 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                 variant="danger"
                 aria-label={t("More update options")}
                 disabled={isUpdating}
-                className="aa-btn aa-btn-danger"
               />
               <Dropdown.Menu align="end">
                 <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}>

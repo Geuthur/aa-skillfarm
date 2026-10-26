@@ -369,17 +369,8 @@ html[data-bs-theme="dark"] {
     border-color: var(--aa-panel-border, var(--aa-border-light));
 }
 
-/* ═══ Portrait ═══════════════════════════════════════════════════════════════ */
-
-.aa-portrait img {
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    object-fit: cover;
-}
-
-/* ═══ BUTTONS ══════════════════════════════════════════════════════════════ */
-.aa-btn {
+/* ═══ BUTTONS (Bootstrap 5.3 + Theme Overrides) ════════════════════════════════ */
+.aa-react .btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -393,46 +384,85 @@ html[data-bs-theme="dark"] {
     border: 1px solid transparent;
     transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
-    border-color: var(--aa-color-blue-light);
 
-.aa-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.aa-btn-primary {
+.aa-react .btn-primary {
     background-color: var(--aa-color-blue);
     color: var(--aa-color-white-light);
 }
 
-.aa-btn-primary:hover:not(:disabled) {
+.aa-react .btn-primary:hover:not(:disabled) {
     background-color: var(--aa-color-blue-light);
     color: var(--aa-color-white);
+    border-color: var(--aa-color-blue-light);
 }
 
-.aa-btn-secondary {
+.aa-react .btn-secondary {
     background-color: var(--aa-color-grey);
     color: var(--aa-color-white-light);
     border-color: var(--aa-border-light);
 }
 
-.aa-btn-secondary:hover:not(:disabled) {
+.aa-react .btn-secondary:hover:not(:disabled) {
     background-color: var(--aa-color-grey-light);
     color: var(--aa-color-white);
+    border-color: var(--aa-color-grey-light);
 }
 
-.aa-btn-danger {
+.aa-react .btn-success {
+    background-color: var(--aa-color-emerald-dark);
+    color: var(--aa-color-emerald-light);
+    border-color: var(--aa-color-emerald);
+}
+
+.aa-react .btn-success:hover:not(:disabled) {
+    background-color: var(--aa-color-emerald);
+    color: var(--aa-color-white);
+    border-color: var(--aa-color-emerald);
+}
+
+.aa-react .btn-warning {
+    background-color: var(--aa-color-amber-dark);
+    color: var(--aa-color-amber-light);
+    border-color: var(--aa-border-amber);
+}
+
+.aa-react .btn-warning:hover:not(:disabled) {
+    background-color: var(--aa-color-amber);
+    color: var(--aa-color-black);
+    border-color: var(--aa-color-amber);
+}
+
+.aa-react .btn-danger {
     background-color: var(--aa-color-rose-dark);
     color: var(--aa-color-rose-light);
     border-color: var(--aa-border-rose);
 }
 
-.aa-btn-danger:hover:not(:disabled) {
+.aa-react .btn-danger:hover:not(:disabled) {
     background-color: var(--aa-color-red);
     color: var(--aa-color-white);
+    border-color: var(--aa-color-red);
 }
 
-.aa-btn-sm {
+.aa-react .btn-info {
+    background-color: var(--aa-color-blue-dark);
+    color: var(--aa-color-white-light);
+    border-color: var(--aa-color-blue-light);
+}
+
+.aa-react .btn-info:hover:not(:disabled) {
+    background-color: var(--aa-color-blue-light);
+    color: var(--aa-color-white);
+    border-color: var(--aa-color-blue-light);
+}
+
+.aa-react .btn:disabled,
+.aa-react .btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.aa-react .btn-sm {
     padding: 4px 10px;
     font-size: var(--aa-font-size-xs);
 }
@@ -441,7 +471,6 @@ html[data-bs-theme="dark"] {
     position: relative;
     display: inline-flex;
     width: 8px;
-    border-color: var(--aa-color-red);
     height: 8px;
     flex-shrink: 0;
 }
