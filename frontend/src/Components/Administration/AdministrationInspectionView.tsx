@@ -49,8 +49,8 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
   return (
     <Card className="bg-dark text-light border-0 shadow-sm">
       <Card.Body className="bg-secondary rounded">
-        <Card.Header className="d-flex align-items-center justify-content-between mb-4 bg-dark rounded p-3">
-          <div className="d-flex align-items-center gap-3">
+        <Card.Header className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 bg-dark rounded p-3">
+          <div className="d-flex flex-wrap align-items-center gap-3">
             <Button
               variant="secondary"
               size="sm"
@@ -64,7 +64,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
               <OwnerPortrait src={inspectingAudit.portrait_url} size="md" shape="rounded" />
             )}
             <div>
-              <div className="d-flex align-items-center gap-2">
+              <div className="d-flex flex-wrap align-items-center gap-2">
                 <h1 className="h4 mb-0 fw-bold">{inspectingAudit.character_name}</h1>
                 {inspectingAudit.corporation_ticker && (
                   <Badge bg="secondary">[{inspectingAudit.corporation_ticker}]</Badge>
@@ -79,7 +79,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
             </div>
           </div>
 
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex flex-wrap align-items-center gap-2">
             <Dropdown as={ButtonGroup} size="sm">
               {renderTooltip(
                 t("Trigger character update task"),

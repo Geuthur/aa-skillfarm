@@ -322,32 +322,34 @@ export const AdministrationPage: React.FC = () => {
 
         {/* Filter and Search Bar */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mt-4 mb-2">
-          <ButtonGroup size="sm">
-            <Button
-              variant={statusFilter === "all" ? "primary" : "secondary"}
-              onClick={() => setStatusFilter("all")}
-            >
-              {t("All")} <Badge bg="secondary" className="ms-1">{totalCount}</Badge>
-            </Button>
-            <Button
-              variant={statusFilter === "training" ? "primary" : "secondary"}
-              onClick={() => setStatusFilter("training")}
-            >
-              {t("In Training")} <Badge bg="secondary" className="ms-1">{trainingCount}</Badge>
-            </Button>
-            <Button
-              variant={statusFilter === "paused" ? "primary" : "secondary"}
-              onClick={() => setStatusFilter("paused")}
-            >
-              {t("Paused")} <Badge bg="secondary" className="ms-1">{pausedCount}</Badge>
-            </Button>
-            <Button
-              variant={statusFilter === "issues" ? "primary" : "secondary"}
-              onClick={() => setStatusFilter("issues")}
-            >
-              {t("Issues")} <Badge bg="secondary" className="ms-1">{issuesCount}</Badge>
-            </Button>
-          </ButtonGroup>
+          <div className="mw-100 overflow-x-auto">
+            <ButtonGroup size="sm">
+              <Button
+                variant={statusFilter === "all" ? "primary" : "secondary"}
+                onClick={() => setStatusFilter("all")}
+              >
+                {t("All")} <Badge bg="secondary" className="ms-1">{totalCount}</Badge>
+              </Button>
+              <Button
+                variant={statusFilter === "training" ? "primary" : "secondary"}
+                onClick={() => setStatusFilter("training")}
+              >
+                {t("In Training")} <Badge bg="secondary" className="ms-1">{trainingCount}</Badge>
+              </Button>
+              <Button
+                variant={statusFilter === "paused" ? "primary" : "secondary"}
+                onClick={() => setStatusFilter("paused")}
+              >
+                {t("Paused")} <Badge bg="secondary" className="ms-1">{pausedCount}</Badge>
+              </Button>
+              <Button
+                variant={statusFilter === "issues" ? "primary" : "secondary"}
+                onClick={() => setStatusFilter("issues")}
+              >
+                {t("Issues")} <Badge bg="secondary" className="ms-1">{issuesCount}</Badge>
+              </Button>
+            </ButtonGroup>
+          </div>
 
           <div className={`${styles.searchContainer} w-100`}>
             <Form.Control

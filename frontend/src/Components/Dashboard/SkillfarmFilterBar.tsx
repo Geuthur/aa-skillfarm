@@ -70,10 +70,10 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
   return (
     <div className="sf-filter-bar">
       {/* Tab filter buttons matching AA CSS Framework */}
-      <div className="aa-tab-bar">
+      <div className="aa-tab-bar mw-100 overflow-x-auto">
         <button
           type="button"
-          className={`aa-tab-btn ${activeTab === "all" ? "active" : ""}`}
+          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "all" ? "active" : ""}`}
           onClick={() => handleTabClick("all")}
         >
           {t("All ({{count}})", { count: totalCount })}
@@ -81,7 +81,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn ${activeTab === "training" ? "active" : ""}`}
+          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "training" ? "active" : ""}`}
           onClick={() => handleTabClick("training")}
         >
           {t("Active Training ({{count}})", { count: activeCount })}
@@ -89,7 +89,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn ${activeTab === "paused" ? "active" : ""} ${pausedCount > 0 ? styles["tab-alert"] : ""}`}
+          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "paused" ? "active" : ""} ${pausedCount > 0 ? styles["tab-alert"] : ""}`}
           onClick={() => handleTabClick("paused")}
         >
           {t("Paused Training ({{count}})", { count: pausedCount })}
@@ -97,7 +97,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn ${activeTab === "pending" ? "active" : ""} ${pendingCount > 0 ? styles["tab-alert"] : ""}`}
+          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "pending" ? "active" : ""} ${pendingCount > 0 ? styles["tab-alert"] : ""}`}
           onClick={() => handleTabClick("pending")}
         >
           {pendingCount > 0 && (
@@ -110,7 +110,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn ${activeTab === "reviewed" ? "active" : ""}`}
+          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "reviewed" ? "active" : ""}`}
           onClick={() => handleTabClick("reviewed")}
         >
           {t("Reviewed ({{count}})", { count: reviewedCount })}
