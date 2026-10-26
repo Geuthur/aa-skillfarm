@@ -162,11 +162,6 @@
     box-shadow: none;
 }
 
-.aa-table-count {
-    color: var(--aa-text-secondary);
-    font-size: 11px;
-}
-
 .aa-table-page-button.btn {
     padding: 6px;
     border: 1px solid var(--aa-border-light);

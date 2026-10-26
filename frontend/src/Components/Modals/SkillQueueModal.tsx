@@ -16,8 +16,7 @@ import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
-import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
-import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
+import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { formatNumber } from "@/Utils/format";
 
 interface SkillQueueModalProps {

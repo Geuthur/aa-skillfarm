@@ -240,17 +240,6 @@
     border-color: var(--aa-blue-focus);
 }
 
-.sf-select {
-    background-color: var(--aa-input-bg, #27272a);
-    border: 1px solid var(--aa-input-border, #3f3f46);
-    color: var(--aa-input-color, #e4e4e7);
-    font-size: var(--aa-font-size-sm);
-    border-radius: 6px;
-    padding: 6px 12px;
-    outline: none;
-    cursor: pointer;
-}
-
 /* ═══ BUTTONS ══════════════════════════════════════════════════════════════ */
 .sf-btn {
     display: inline-flex;
@@ -348,59 +337,4 @@
 
 .sf-table tr:hover td {
     background-color: var(--aa-table-row-hover, rgba(39, 39, 42, 0.4));
-}
-
-/* ═══ MODAL OVERLAY ════════════════════════════════════════════════════════ */
-.sf-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1050;
-    backdrop-filter: blur(4px);
-    padding: 16px;
-}
-
-.sf-modal-content {
-    background-color: var(--aa-panel-bg, var(--aa-color-body));
-    border: var(--aa-border-solid);
-    border-color: var(--aa-panel-border, var(--aa-border-light));
-    border-radius: var(--aa-border-radius);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    max-width: 650px;
-    width: 100%;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.sf-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--aa-panel-border, var(--aa-border-light));
-    background-color: var(--aa-panel-header-bg, var(--aa-bg-dark));
-}
-
-.sf-modal-body {
-    padding: 20px;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.sf-modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 14px 20px;
-    border-top: 1px solid var(--aa-panel-border, var(--aa-border-light));
-    background-color: var(--aa-panel-header-bg, var(--aa-bg-dark));
 }

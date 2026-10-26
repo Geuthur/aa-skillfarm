@@ -22,11 +22,8 @@ import type {
   CharacterListResponse,
   OverviewUserSchema,
 } from "@/Api/schema";
-import { CharacterTable } from "@/Components/Dashboard/CharacterTable";
-import { InactiveTrainingAlert } from "@/Components/Dashboard/InactiveTrainingAlert";
-import { SkillfarmFilterBar } from "@/Components/Dashboard/SkillfarmFilterBar";
-import { SkillQueueModal } from "@/Components/Modals/SkillQueueModal";
-import { SkillSetupModal } from "@/Components/Modals/SkillSetupModal";
+import { CharacterTable, InactiveTrainingAlert, SkillfarmFilterBar } from "@/Components/Dashboard";
+import { SkillQueueModal, SkillSetupModal } from "@/Components/Modals";
 
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */
