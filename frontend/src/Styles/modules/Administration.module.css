@@ -71,11 +71,6 @@
     font-size: var(--aa-font-size-sm);
 }
 
-.avatarFallback {
-    width: 32px;
-    height: 32px;
-}
-
 .dropdownMenu {
     z-index: 1060;
 }

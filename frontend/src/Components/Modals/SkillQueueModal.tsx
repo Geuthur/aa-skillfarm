@@ -16,6 +16,7 @@ import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { formatNumber } from "@/Utils/format";
 
@@ -143,11 +144,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
             {/* Header info */}
             <div className="aa-panel d-flex align-items-center gap-3 mb-3">
               {data.character.portrait_url && (
-                <img
-                  src={data.character.portrait_url}
-                  alt={data.character.character_name}
-                  className={`rounded-circle ${styles["avatar"]}`}
-                />
+                <OwnerPortrait src={data.character.portrait_url} alt={data.character.character_name} />
               )}
               <div>
                 <h5 className="mb-0 text-white">{data.character.character_name}</h5>

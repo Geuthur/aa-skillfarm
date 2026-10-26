@@ -4,17 +4,18 @@ import React, { useMemo, useState } from "react";
 // Third Party
 import { createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { AlertTriangle, RefreshCw, Shield, User, Users } from "lucide-react";
+import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-// AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 // Utils
 import { renderTooltip } from "@/Utils";
 import { formatNumber } from "@/Utils/format";
@@ -121,20 +122,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
         enableSorting: false,
         cell: ({ row }) => {
           const group = row.original;
-          return group.mainPortraitUrl ? (
-            <img
-              src={group.mainPortraitUrl}
-              alt=""
-              width={32}
-              height={32}
-              className="rounded flex-shrink-0"
-              loading="lazy"
-            />
-          ) : (
-            <div className={`p-1 bg-secondary rounded text-center ${styles.avatarFallback}`}>
-              <User size={16} />
-            </div>
-          );
+          return <OwnerPortrait src={group.mainPortraitUrl} size="sm" shape="rounded" />;
         },
       }),
 

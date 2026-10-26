@@ -5,10 +5,6 @@
     margin-bottom: 16px;
 }
 
-.avatar {
-    border-radius: 50%;
-}
-
 .title {
     margin: 0;
     font-size: var(--aa-font-size-xl);

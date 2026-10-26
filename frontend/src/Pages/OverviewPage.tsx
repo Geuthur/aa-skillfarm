@@ -4,17 +4,18 @@ import { Link } from "react-router-dom";
 
 // Third Party
 import { useQuery } from "@tanstack/react-query";
-import { Eye, Search, Shield, User } from "lucide-react";
+import { Eye, Search, Shield } from "lucide-react";
 import { Badge, Card, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/OverviewPage.module.css";
 
-// AA Skillfarm
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import BaseSectionHeader from "@/Components/Base/BaseHeader";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { ProjectName } from "@/constants";
 
 export const OverviewPage: React.FC = () => {
@@ -99,21 +100,7 @@ export const OverviewPage: React.FC = () => {
                 <Card.Body className="d-flex flex-column justify-content-between p-3">
                   <div>
                     <div className="d-flex align-items-center gap-3 mb-3">
-                      {user.portrait_url ? (
-                        <img
-                          src={user.portrait_url}
-                          alt={user.main_character_name}
-                          width={48}
-                          height={48}
-                          className="rounded-circle border border-secondary"
-                        />
-                      ) : (
-                        <div
-                          className={`rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white ${styles["avatar-fallback"]}`}
-                        >
-                          <User size={24} />
-                        </div>
-                      )}
+                      <OwnerPortrait src={user.portrait_url} alt={user.main_character_name} bordered />
                       <div className="overflow-hidden">
                         <h5 className="mb-0 text-truncate text-light">
                           {user.main_character_name}

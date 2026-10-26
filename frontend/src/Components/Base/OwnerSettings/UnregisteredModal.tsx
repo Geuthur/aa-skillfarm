@@ -9,8 +9,9 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Components/Base/OwnerSettings/OwnerSettings.module.css";
 
-// AA Skillfarm
 import { BaseModal } from "@/Components/Base/BaseModal";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import type { BaseMissingOwner } from "@/Components/Base/OwnerSettings/types";
 
 export interface UnregisteredModalProps {
@@ -103,13 +104,7 @@ function UnregisteredContent({
               {filtered.map((item) => (
                 <li key={item.id} className="d-flex align-items-center gap-3">
                   {item.avatar_url && (
-                    <img
-                      src={item.avatar_url}
-                      alt={item.name}
-                      width={32}
-                      height={32}
-                      className={`${styles["portrait"]} ${styles["portrait-sm"]}`}
-                    />
+                    <OwnerPortrait src={item.avatar_url} alt={item.name} size="sm" bordered />
                   )}
                   <div className="min-w-0">
                     <div className="fw-semibold">{item.name}</div>

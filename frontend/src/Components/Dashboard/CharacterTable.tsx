@@ -12,6 +12,7 @@ import styles from "@/Styles/modules/CharacterTable.module.css";
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { BaseTable } from "@/Components/Base/BaseTable";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 // Utils
@@ -44,9 +45,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
           const char = row.original;
           return (
             <div className={styles["pilot-info"]}>
-              <div className="aa-portrait">
-                <img src={char.portrait_url} alt={char.character_name} />
-              </div>
+              <OwnerPortrait src={char.portrait_url} alt={char.character_name} />
               <div>
                 <div
                   className={styles["pilot-name"]}

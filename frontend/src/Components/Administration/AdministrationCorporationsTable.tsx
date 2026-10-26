@@ -9,12 +9,13 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-// AA Skillfarm
 import { loadAdministrationCorporations, loadAdministrationUnregistered } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import type { AdministrationCorporationSchema } from "@/Api/schema";
 import ErrorLoader from "@/Components/Base/Loader/ErrorLoader";
 import FetchingLoader from "@/Components/Base/Loader/FetchingLoader";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { UnregisteredModal } from "@/Components/Base/OwnerSettings/UnregisteredModal";
 
 /** Corporations (own corporation or all) with their registered and unregistered characters. */
@@ -59,7 +60,7 @@ export const AdministrationCorporationsTable = () => {
           {(corporations ?? []).map((corp) => (
             <tr key={corp.corporation_id}>
               <td>
-                <img src={corp.logo_url} alt="" width={32} height={32} className="rounded" />
+                <OwnerPortrait src={corp.logo_url} type="corporation" size="sm" shape="rounded" />
               </td>
               <td>
                 <span className="fw-semibold">{corp.corporation_name}</span>{" "}

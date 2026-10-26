@@ -393,6 +393,7 @@ html[data-bs-theme="dark"] {
     border: 1px solid transparent;
     transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
+    border-color: var(--aa-color-blue-light);
 
 .aa-btn:disabled {
     opacity: 0.5;
@@ -412,7 +413,7 @@ html[data-bs-theme="dark"] {
 .aa-btn-secondary {
     background-color: var(--aa-color-grey);
     color: var(--aa-color-white-light);
-    border-color: var(--aa-border);
+    border-color: var(--aa-border-light);
 }
 
 .aa-btn-secondary:hover:not(:disabled) {
@@ -440,6 +441,7 @@ html[data-bs-theme="dark"] {
     position: relative;
     display: inline-flex;
     width: 8px;
+    border-color: var(--aa-color-red);
     height: 8px;
     flex-shrink: 0;
 }

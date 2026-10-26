@@ -4,11 +4,9 @@ import React from "react";
 // Third Party
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/DeleteCharacterModal.module.css";
-
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 export interface DeletableCharacter {
   character_id: number;
@@ -58,11 +56,7 @@ export const DeleteCharacterModal: React.FC<DeleteCharacterModalProps> = ({
     >
       <div className="py-2 aa-panel">
         <div className="d-flex align-items-center gap-3 mb-3">
-          <img
-            src={character.portrait_url}
-            alt={character.character_name}
-            className={`rounded-circle border ${styles["avatar"]}`}
-          />
+          <OwnerPortrait src={character.portrait_url} alt={character.character_name} bordered />
           <div>
             <h5 className="mb-0 text-white">{character.character_name}</h5>
             <small className="text-secondary">

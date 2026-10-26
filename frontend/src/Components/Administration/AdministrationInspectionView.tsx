@@ -9,8 +9,9 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-// AA Skillfarm
 import type { CharacterDetailResponse, AdministrationAuditSchema } from "@/Api/schema";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { renderTooltip } from "@/Utils";
 import { formatNumber } from "@/Utils/format";
 
@@ -60,13 +61,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
               <span>{t("Back to Administration Overview")}</span>
             </Button>
             {inspectingAudit.portrait_url && (
-              <img
-                src={inspectingAudit.portrait_url}
-                alt=""
-                width={40}
-                height={40}
-                className="rounded"
-              />
+              <OwnerPortrait src={inspectingAudit.portrait_url} size="md" shape="rounded" />
             )}
             <div>
               <div className="d-flex align-items-center gap-2">
