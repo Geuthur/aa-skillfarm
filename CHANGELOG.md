@@ -26,6 +26,32 @@ Section Order:
 ### Removed
 -->
 
+### Added
+
+- [ADD] Reusable frontend components `OwnerPortrait` (character, corporation and alliance portraits with a fallback icon) and `SyncStatusBadge`, replacing several inline copies.
+
+- [ADD] Frontend hooks per area (`Components/<Area>/Hooks`, `Menu/Hooks`) that hold the queries and mutations of the Administration, Settings, Overview, Dashboard, Modals, Calculator and menu views, plus the shared hooks `useFeedback`, `useCooldown` and `useUserData`.
+
+### Fixed
+
+- [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
+
+### Changed
+
+- [CHANGE] Buttons use the Bootstrap 5 variants (`variant`, `size`) with the theme look defined as overrides under `.aa-react` (including `btn-primary` and `btn-sm`); the custom `aa-btn` and `sf-btn` classes were removed.
+
+- [CHANGE] Panels use the react-bootstrap `Card` with the theme look defined as override under `.aa-react .card`; the custom `aa-panel` classes were removed.
+
+- [CHANGE] Layout-only CSS in the CSS modules and global stylesheets was replaced by Bootstrap 5 utility classes, frontend inline styles were replaced by CSS classes (only runtime widths remain inline), and missing `index.ts` files were added.
+
+- [CHANGE] Both menus now share the same query options (5 minutes stale time, one retry, no refetch on window focus).
+
+- [CHANGE] The generated `static/**/manifest.json` is excluded from the end-of-file fixer in the pre-commit configuration.
+
+### Removed
+
+- [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
+
 <!-- Your changes go here -->
 
 ## [4.1.0] - 2026-10-25
