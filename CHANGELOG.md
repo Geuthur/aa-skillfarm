@@ -36,7 +36,7 @@ Section Order:
 
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
 
-- [FIX] Section headers, the administration inspection header and the status filter overflowing the container on small screens; the headers now wrap and the filter buttons scroll horizontally.
+- [FIX] Section headers, the administration inspection header, the status filter and the character tab filter (All, Active Training, …) overflowing the container on small screens; the headers now wrap and the filter buttons scroll horizontally.
 
 ### Changed
 
