@@ -36,6 +36,8 @@ Section Order:
 
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
 
+- [FIX] Section headers, the administration inspection header and the status filter overflowing the container on small screens; the headers now wrap and the filter buttons scroll horizontally.
+
 ### Changed
 
 - [CHANGE] Buttons use the Bootstrap 5 variants (`variant`, `size`) with the theme look defined as overrides under `.aa-react` (including `btn-primary` and `btn-sm`); the custom `aa-btn` and `sf-btn` classes were removed.

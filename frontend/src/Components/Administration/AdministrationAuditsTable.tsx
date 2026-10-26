@@ -312,7 +312,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
   return (
     <>
       <Card className="bg-secondary text-light border-0 shadow-sm mt-3">
-        <Card.Header className="d-flex align-items-center justify-content-between bg-transparent py-3">
+        <Card.Header className="d-flex flex-wrap align-items-center justify-content-between gap-2 bg-transparent py-3">
           <div className="d-flex align-items-center gap-2">
             <Users size={20} className="text-primary" />
             <h2 className="h5 mb-0 fw-semibold">{t("All Skillfarm Character Audits")}</h2>
