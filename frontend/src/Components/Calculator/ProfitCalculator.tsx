@@ -2,7 +2,6 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
 import { Button } from "react-bootstrap";
@@ -11,18 +10,14 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/ProfitCalculator.module.css";
 
-import { fetchCalculatorData } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import { useCalculatorData } from "@/Components/Calculator/Hooks";
 // Utils
 import { formatIsk, renderTooltip } from "@/Utils";
 
 export const ProfitCalculator: React.FC = () => {
   const { t } = useTranslation();
-  const { data, isLoading, error, refetch, isFetching } = useQuery({
-    queryKey: queryKeys.Calculator,
-    queryFn: fetchCalculatorData,
-  });
+  const { data, isLoading, error, refetch, isFetching } = useCalculatorData();
 
   // Inputs
   const [injectorAmount, setInjectorAmount] = useState<string>("3.5");
@@ -222,7 +217,7 @@ export const ProfitCalculator: React.FC = () => {
 
       {/* Editable Market Prices Cards */}
       <div
-        className={`${styles["price-panel"]} d-grid gap-3 mb-4`}
+        className={`${styles["price-panel"]} d-grid gap-3 mb-4 mt-4`}
       >
         <div className="aa-panel">
           <div className={`${styles["price-row"]} d-flex justify-content-between align-items-center`}>

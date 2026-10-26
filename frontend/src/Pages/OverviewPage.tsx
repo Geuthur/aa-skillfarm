@@ -3,7 +3,6 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import { Eye, Search, Shield } from "lucide-react";
 import { Badge, Card, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -11,21 +10,17 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/OverviewPage.module.css";
 
-import { fetchOverview } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import BaseSectionHeader from "@/Components/Base/BaseHeader";
 // AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
+import { useOverview } from "@/Components/Overview/Hooks";
 import { ProjectName } from "@/constants";
 
 export const OverviewPage: React.FC = () => {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.Overview,
-    queryFn: fetchOverview,
-  });
+  const { data, isLoading, isError } = useOverview();
 
   const filteredUsers = useMemo(() => {
     if (!data?.users) return [];

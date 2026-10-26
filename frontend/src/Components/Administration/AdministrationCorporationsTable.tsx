@@ -2,19 +2,20 @@
 import { useState } from "react";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-import { loadAdministrationCorporations, loadAdministrationUnregistered } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
+// AA Skillfarm
 import type { AdministrationCorporationSchema } from "@/Api/schema";
+import {
+  useAdministrationCorporations,
+  useAdministrationUnregistered,
+} from "@/Components/Administration/Hooks";
 import ErrorLoader from "@/Components/Base/Loader/ErrorLoader";
 import FetchingLoader from "@/Components/Base/Loader/FetchingLoader";
-// AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { UnregisteredModal } from "@/Components/Base/OwnerSettings/UnregisteredModal";
 
@@ -23,24 +24,12 @@ export const AdministrationCorporationsTable = () => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<AdministrationCorporationSchema | null>(null);
 
-  const {
-    data: corporations,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: queryKeys.AdministrationCorporations,
-    queryFn: loadAdministrationCorporations,
-  });
-
+  const { data: corporations, isLoading, isError } = useAdministrationCorporations();
   const {
     data: unregistered,
     isLoading: isLoadingUnregistered,
     isError: isErrorUnregistered,
-  } = useQuery({
-    queryKey: queryKeys.AdministrationUnregistered(selected?.corporation_id ?? null),
-    queryFn: () => loadAdministrationUnregistered(selected!.corporation_id),
-    enabled: Boolean(selected),
-  });
+  } = useAdministrationUnregistered(selected?.corporation_id ?? null);
 
   if (isLoading) return <FetchingLoader />;
   if (isError) return <ErrorLoader message={t("Failed to load corporations.")} />;

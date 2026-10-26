@@ -2,7 +2,6 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Check,
@@ -29,154 +28,49 @@ import {
 } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+import {
+  useAdministrationAccess,
+  useAdministrationAuditInspect,
+  useAdministrationAudits,
+  useAdministrationStats,
+  useAdministrationTasks,
+  useAuditActions,
+} from "@/Components/Administration/Hooks";
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
 // AA Skillfarm
-import {
-  deleteAdministrationAudit,
-  fetchAdminStats,
-  loadAdministrationAuditInspect,
-  loadAdministrationAudits,
-  loadUserData,
-  triggerAdministrationAuditUpdate,
-  triggerUpdateAll,
-  triggerUpdatePrices,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAuditsTable } from "@/Components/Administration/AdministrationAuditsTable";
 import { AdministrationCollapsibleCard } from "@/Components/Administration/AdministrationCollapsibleCard";
 import { AdministrationCorporationsTable } from "@/Components/Administration/AdministrationCorporationsTable";
 import { AdministrationInspectionView } from "@/Components/Administration/AdministrationInspectionView";
+  const [auditToDelete, setAuditToDelete] = useState<AdministrationAuditSchema | null>(null);
 import { AdministrationTaskCard } from "@/Components/Administration/AdministrationTaskCard";
 import { formatNumber } from "@/Utils/format";
 
 export const AdministrationPage: React.FC = () => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
 
   // Filter and search states
   const [statusFilter, setStatusFilter] = useState<"all" | "training" | "paused" | "issues">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [forceRefreshGlobal, setForceRefreshGlobal] = useState(false);
 
-  // Queries
-  const { data: userData } = useQuery({
-    queryKey: queryKeys.User,
-    queryFn: loadUserData,
-  });
-  // Global update tasks, force refresh and audit deletion are reserved for superusers.
-  const isSuperuser = Boolean(userData?.user.is_superuser);
-  // Audits, statistics and tasks require admin access; corp access only sees the corporations section.
-  const isAdmin = Boolean(userData?.user.is_admin);
-
-  const { data: stats, isLoading: isLoadingStats } = useQuery({
-    queryKey: queryKeys.AdminStats,
-    queryFn: fetchAdminStats,
-    enabled: isAdmin,
-  });
-
+  const { isSuperuser, isAdmin } = useAdministrationAccess();
+  const { data: stats, isLoading: isLoadingStats } = useAdministrationStats(isAdmin);
   const {
     data: audits,
     isLoading: isLoadingAudits,
     isError: isErrorAudits,
-  } = useQuery({
-    queryKey: queryKeys.AdministrationAudits,
-    queryFn: loadAdministrationAudits,
-    enabled: isAdmin,
-  });
-
-  // Global Sync Mutations
-  const updateAllMutation = useMutation({
-    mutationFn: (force: boolean) => triggerUpdateAll(force),
-    onSuccess: (res) => {
-      setFeedbackMsg(res.message);
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onError: () => {
-      setFeedbackMsg(t("Failed to queue character update task."));
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-  });
-
-  const updatePricesMutation = useMutation({
-    mutationFn: triggerUpdatePrices,
-    onSuccess: (res) => {
-      setFeedbackMsg(res.message);
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onError: () => {
-      setFeedbackMsg(t("Failed to queue price update task."));
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-  });
-
-  // Single Audit Update Mutation
-  const [updatingCharacterId, setUpdatingCharacterId] = useState<number | null>(null);
-  const [taskFeedback, setTaskFeedback] = useState<{
-    variant: "success" | "danger";
-    message: string;
-  } | null>(null);
-
-  const auditUpdateMutation = useMutation({
-    mutationFn: ({ characterId, forceRefresh }: { characterId: number; forceRefresh: boolean }) =>
-      triggerAdministrationAuditUpdate(characterId, forceRefresh),
-    onSuccess: (res) => {
-      setTaskFeedback({
-        variant: "success",
-        message: res.message || t("Update task queued successfully."),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
-    },
-    onError: (err: unknown) => {
-      setTaskFeedback({
-        variant: "danger",
-        message:
-          err instanceof Error
-            ? err.message
-            : t("Failed to trigger update task for character."),
-      });
-    },
-    onSettled: () => {
-      setUpdatingCharacterId(null);
-    },
-  });
-
-  const handleTriggerAuditUpdate = (characterId: number, forceRefresh: boolean) => {
-    setUpdatingCharacterId(characterId);
-    setTaskFeedback(null);
-    auditUpdateMutation.mutate({ characterId, forceRefresh });
-  };
-
-  // Audit Deletion Mutation
-  const [auditToDelete, setAuditToDelete] = useState<AdministrationAuditSchema | null>(null);
-
-  const deleteAuditMutation = useMutation({
-    mutationFn: (characterId: number) => deleteAdministrationAudit(characterId),
-    onSuccess: (res) => {
-      setTaskFeedback({
-        variant: "success",
-        message: res.message || t("Character audit deleted successfully."),
-      });
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
-      setAuditToDelete(null);
-    },
-    onError: (err: unknown) => {
-      setTaskFeedback({
-        variant: "danger",
-        message:
-          err instanceof Error ? err.message : t("Failed to delete character audit."),
-      });
-      setAuditToDelete(null);
-    },
-  });
+  } = useAdministrationAudits(isAdmin);
+  const { feedback, updateAll, updatePrices } = useAdministrationTasks();
+  const { updatingCharacterId, taskFeedback, dismissFeedback, triggerUpdate, deleteAudit } =
+    useAuditActions(() => setAuditToDelete(null));
 
   const handleConfirmDelete = () => {
     if (!auditToDelete) return;
-    deleteAuditMutation.mutate(auditToDelete.character_id);
+    deleteAudit.mutate(auditToDelete.character_id);
   };
 
   // Inspect state via nuqs URL parameter
@@ -249,16 +143,7 @@ export const AdministrationPage: React.FC = () => {
     isLoading: isLoadingDetail,
     isError: isErrorDetail,
     refetch: refetchDetail,
-  } = useQuery({
-    queryKey: inspectingAudit
-      ? queryKeys.AdministrationAuditInspect(inspectingAudit.character_id)
-      : ["none"],
-    queryFn: () =>
-      inspectingAudit
-        ? loadAdministrationAuditInspect(inspectingAudit.character_id)
-        : Promise.reject(new Error("No audit")),
-    enabled: Boolean(inspectingAudit),
-  });
+  } = useAdministrationAuditInspect(inspectingAudit?.character_id ?? null);
 
   if (inspectingAudit) {
     return (
@@ -269,10 +154,10 @@ export const AdministrationPage: React.FC = () => {
         isError={isErrorDetail}
         updatingCharacterId={updatingCharacterId}
         taskFeedback={taskFeedback}
-        onDismissFeedback={() => setTaskFeedback(null)}
+        onDismissFeedback={dismissFeedback}
         onBack={() => setInspectCharacterId(null)}
         onRefetch={() => refetchDetail()}
-        onTriggerUpdate={handleTriggerAuditUpdate}
+        onTriggerUpdate={triggerUpdate}
         isSuperuser={isSuperuser}
       />
     );
@@ -410,8 +295,8 @@ export const AdministrationPage: React.FC = () => {
                   buttonLabel={t("Update All Characters")}
                   buttonVariant="primary"
                   icon={<Users size={14} />}
-                  isPending={updateAllMutation.isPending}
-                  onClick={() => updateAllMutation.mutate(forceRefreshGlobal)}
+                  isPending={updateAll.isPending}
+                  onClick={() => updateAll.mutate(forceRefreshGlobal)}
                   testId="update-all-characters-btn"
                 />
               </Col>
@@ -424,8 +309,8 @@ export const AdministrationPage: React.FC = () => {
                   buttonLabel={t("Update Market Prices")}
                   buttonVariant="secondary"
                   icon={<Coins size={14} />}
-                  isPending={updatePricesMutation.isPending}
-                  onClick={() => updatePricesMutation.mutate()}
+                  isPending={updatePrices.isPending}
+                  onClick={() => updatePrices.mutate()}
                   testId="update-market-prices-btn"
                 />
               </Col>
@@ -492,9 +377,9 @@ export const AdministrationPage: React.FC = () => {
           isError={isErrorAudits}
           updatingCharacterId={updatingCharacterId}
           taskFeedback={taskFeedback}
-          onDismissFeedback={() => setTaskFeedback(null)}
+          onDismissFeedback={dismissFeedback}
           onInspect={(audit) => setInspectCharacterId(audit.character_id)}
-          onTriggerUpdate={handleTriggerAuditUpdate}
+          onTriggerUpdate={triggerUpdate}
           onDelete={(audit) => setAuditToDelete(audit)}
           isSuperuser={isSuperuser}
         />
@@ -502,7 +387,7 @@ export const AdministrationPage: React.FC = () => {
         {/* Delete Confirmation Modal */}
         <Modal
           show={Boolean(auditToDelete)}
-          onHide={() => !deleteAuditMutation.isPending && setAuditToDelete(null)}
+          onHide={() => !deleteAudit.isPending && setAuditToDelete(null)}
           centered
         >
           <Modal.Header closeButton className="border-secondary bg-dark text-light">
@@ -545,19 +430,19 @@ export const AdministrationPage: React.FC = () => {
             <Button
               variant="secondary"
               onClick={() => setAuditToDelete(null)}
-              disabled={deleteAuditMutation.isPending}
+              disabled={deleteAudit.isPending}
             >
               {t("Cancel")}
             </Button>
             <Button
               variant="danger"
               onClick={handleConfirmDelete}
-              disabled={deleteAuditMutation.isPending}
+              disabled={deleteAudit.isPending}
               className="d-flex align-items-center gap-1"
             >
               <Trash2 size={14} />
               <span>
-                {deleteAuditMutation.isPending ? t("Deleting…") : t("Confirm Delete")}
+                {deleteAudit.isPending ? t("Deleting…") : t("Confirm Delete")}
               </span>
             </Button>
           </Modal.Footer>

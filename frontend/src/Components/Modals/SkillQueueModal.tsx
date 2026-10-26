@@ -2,7 +2,6 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -10,8 +9,6 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
-import { fetchCharacterDetail } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
@@ -19,6 +16,7 @@ import { BaseTable } from "@/Components/Base/BaseTable";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { formatNumber } from "@/Utils/format";
+import { useCharacterDetail } from "@/Components/Modals/Hooks";
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -101,11 +99,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
     [t]
   );
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: queryKeys.CharacterDetail(characterId),
-    queryFn: () => (characterId ? fetchCharacterDetail(characterId) : Promise.reject("No ID")),
-    enabled: !!characterId,
-  });
+  const { data, isLoading, error } = useCharacterDetail(characterId);
 
   if (!characterId) return null;
 
@@ -198,7 +192,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
             </div>
 
             {/* Queue List */}
-            <h6 className={`${styles["section-title"]} text-uppercase`}>
+            <h6 className={`${styles["section-title"]} text-uppercase mt-4`}>
               {t("Active Training Queue ({{count}})", { count: data.skillqueue.length })}
             </h6>
 

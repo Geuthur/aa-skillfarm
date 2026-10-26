@@ -1,8 +1,7 @@
 // React
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 // Third Party
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, BellOff, Settings2, Users } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -11,162 +10,35 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/SettingsPage.module.css";
 
 // AA Skillfarm
-import {
-  deleteCharacter,
-  fetchUserCharacterStatuses,
-  fetchUserSettings,
-  toggleNotification,
-  triggerCharacterUpdate,
-  triggerUpdateAll,
-  updateUserSettings,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
-import type { UserSettingsSchema } from "@/Api/schema";
 import { BaseOwnerSettingsSection } from "@/Components/Base/OwnerSettings";
 import type { BaseMissingOwner, BaseOwner } from "@/Components/Base/OwnerSettings/types";
+import {
+  useCharacterActions,
+  useUpdateUserSettings,
+  useUserCharacterStatuses,
+  useUserSettings,
+} from "@/Components/Settings/Hooks";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-
-  // Cooldown & Feedback States
-  const [globalCooldown, setGlobalCooldown] = useState(0);
-  const [updatingCharacterId, setUpdatingCharacterId] = useState<number | null>(null);
-  const [characterCooldowns, setCharacterCooldowns] = useState<Record<number, number>>({});
-  const [feedbackMsg, setFeedbackMsg] = useState<{ variant: "success" | "danger"; text: string } | null>(null);
-
-  useEffect(() => {
-    if (globalCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setGlobalCooldown((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [globalCooldown]);
-
-  useEffect(() => {
-    const activeCooldowns = Object.values(characterCooldowns).some((v) => v > 0);
-    if (!activeCooldowns) return;
-    const timer = setInterval(() => {
-      setCharacterCooldowns((prev) => {
-        const next: Record<number, number> = {};
-        for (const [key, val] of Object.entries(prev)) {
-          if (val > 1) next[Number(key)] = val - 1;
-        }
-        return next;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [characterCooldowns]);
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: queryKeys.UserSettings,
-    queryFn: fetchUserSettings,
-  });
-
+  const { data, isLoading, isError } = useUserSettings();
   const {
     data: charactersData,
     isLoading: isLoadingChars,
     isError: isErrorChars,
-  } = useQuery({
-    queryKey: queryKeys.UserCharacterStatuses,
-    queryFn: fetchUserCharacterStatuses,
-  });
-
-  const invalidateQueries = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.UserCharacterStatuses });
-    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
-  };
-
-  const updateMutation = useMutation({
-    mutationFn: updateUserSettings,
-    onMutate: async (settings) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.UserSettings });
-      const previous = queryClient.getQueryData<UserSettingsSchema>(queryKeys.UserSettings);
-      queryClient.setQueryData<UserSettingsSchema>(queryKeys.UserSettings, settings);
-      return { previous };
-    },
-    onError: (_error, _settings, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKeys.UserSettings, context.previous);
-      }
-    },
-    onSuccess: (settings) => {
-      queryClient.setQueryData(queryKeys.UserSettings, settings);
-    },
-  });
-
-  const updateAllMutation = useMutation({
-    mutationFn: () => triggerUpdateAll(false),
-    onSuccess: (res) => {
-      setFeedbackMsg({ variant: "success", text: res.message || t("Update all task queued.") });
-      setGlobalCooldown(60);
-      invalidateQueries();
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onError: (err: unknown) => {
-      setFeedbackMsg({
-        variant: "danger",
-        text: err instanceof Error ? err.message : t("Failed to queue update all task."),
-      });
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-  });
-
-  const updateCharacterMutation = useMutation({
-    mutationFn: (charId: number) => triggerCharacterUpdate(charId, false),
-    onSuccess: (res, charId) => {
-      setFeedbackMsg({ variant: "success", text: res.message || t("Character update task queued.") });
-      setCharacterCooldowns((prev) => ({ ...prev, [charId]: 60 }));
-      invalidateQueries();
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onError: (err: unknown) => {
-      setFeedbackMsg({
-        variant: "danger",
-        text: err instanceof Error ? err.message : t("Failed to trigger character update."),
-      });
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onSettled: () => {
-      setUpdatingCharacterId(null);
-    },
-  });
-
-  const handleTriggerCharacterUpdate = (charId: number) => {
-    setUpdatingCharacterId(charId);
-    updateCharacterMutation.mutate(charId);
-  };
-
-  const toggleNotifMutation = useMutation({
-    mutationFn: (charId: number) => toggleNotification(charId),
-    onSuccess: () => {
-      invalidateQueries();
-    },
-    onError: (err: unknown) => {
-      setFeedbackMsg({
-        variant: "danger",
-        text: err instanceof Error ? err.message : t("Failed to toggle notification."),
-      });
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-  });
-
-  const deleteCharMutation = useMutation({
-    mutationFn: (charId: number) => deleteCharacter(charId),
-    onSuccess: (res) => {
-      setFeedbackMsg({ variant: "success", text: res.message || t("Character removed successfully.") });
-      invalidateQueries();
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-    onError: (err: unknown) => {
-      setFeedbackMsg({
-        variant: "danger",
-        text: err instanceof Error ? err.message : t("Failed to delete character."),
-      });
-      setTimeout(() => setFeedbackMsg(null), 5000);
-    },
-  });
+  } = useUserCharacterStatuses();
+  const updateMutation = useUpdateUserSettings();
+  const {
+    feedback,
+    clearFeedback,
+    globalCooldown,
+    characterCooldowns,
+    updatingCharacterId,
+    updateAll,
+    triggerCharacterUpdate,
+    toggleNotification,
+    deleteCharacter,
+  } = useCharacterActions();
 
   const characters = charactersData?.characters;
   const missingCharacters = charactersData?.missing_characters;
@@ -272,16 +144,16 @@ export const SettingsPage: React.FC = () => {
           errorMessage={t("Failed to load character update status.")}
           emptyMessage={t("No Skillfarm characters found for your account.")}
           appName="Skillfarm"
-          onUpdateAll={() => updateAllMutation.mutate()}
-          isUpdatingAll={updateAllMutation.isPending}
+          onUpdateAll={() => updateAll.mutate()}
+          isUpdatingAll={updateAll.isPending}
           globalCooldown={globalCooldown}
-          feedbackMessage={feedbackMsg}
-          onDismissFeedback={() => setFeedbackMsg(null)}
-          onTriggerSingleUpdate={handleTriggerCharacterUpdate}
+          feedbackMessage={feedback}
+          onDismissFeedback={clearFeedback}
+          onTriggerSingleUpdate={triggerCharacterUpdate}
           updatingOwnerId={updatingCharacterId}
           ownerCooldowns={characterCooldowns}
-          onDeleteOwner={(owner) => deleteCharMutation.mutateAsync(owner.id)}
-          isDeleting={deleteCharMutation.isPending}
+          onDeleteOwner={(owner) => deleteCharacter.mutateAsync(owner.id)}
+          isDeleting={deleteCharacter.isPending}
           deleteModalTitle={t("Remove Character from Skillfarm")}
           deleteModalDescription={(owner) =>
             t(
@@ -299,8 +171,8 @@ export const SettingsPage: React.FC = () => {
                 className={`d-flex align-items-center gap-1 ${
                   notificationEnabled ? "text-success" : "text-muted"
                 }`}
-                onClick={() => toggleNotifMutation.mutate(owner.id)}
-                disabled={toggleNotifMutation.isPending}
+                onClick={() => toggleNotification.mutate(owner.id)}
+                disabled={toggleNotification.isPending}
                 title={
                   notificationEnabled
                     ? t("Disable Notifications")

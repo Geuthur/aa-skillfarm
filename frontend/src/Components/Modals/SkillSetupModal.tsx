@@ -2,18 +2,16 @@
 import React, { useState } from "react";
 
 // Third Party
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/SkillSetupModal.module.css";
 
-import { fetchSkillSetup, updateSkillSetup } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 
+import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
 interface SkillSetupModalProps {
   characterId: number | null;
   onClose: () => void;
@@ -21,16 +19,11 @@ interface SkillSetupModalProps {
 
 export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, onClose }) => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   // null = untouched, the saved skillset is shown
   const [editedSkills, setEditedSkills] = useState<string[] | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: queryKeys.SkillSetup(characterId),
-    queryFn: () => (characterId ? fetchSkillSetup(characterId) : Promise.reject("No ID")),
-    enabled: !!characterId,
-  });
+  const { data, isLoading } = useSkillSetup(characterId);
 
   const selectedSkills = editedSkills ?? data?.skillset ?? [];
 
@@ -39,19 +32,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
     onClose();
   };
 
-  const mutation = useMutation({
-    mutationFn: () => {
-      if (!characterId) throw new Error("No character selected");
-      return updateSkillSetup(characterId, selectedSkills);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-      queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharacterDetail(characterId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.SkillSetup(characterId) });
-      handleClose();
-    },
-  });
+  const mutation = useSaveSkillSetup(characterId, handleClose);
 
   if (!characterId) return null;
 
@@ -85,7 +66,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
       isPending={mutation.isPending}
       size={ModalSize.large}
       onApprove={async () => {
-        await mutation.mutateAsync();
+        await mutation.mutateAsync(selectedSkills);
       }}
     >
       <div>
