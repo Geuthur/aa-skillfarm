@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 // Third Party
 import { useQueryState } from "nuqs";
+import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -14,8 +15,8 @@ import type {
 } from "@/Api/schema";
 import { CharacterTable, InactiveTrainingAlert, SkillfarmFilterBar } from "@/Components/Dashboard";
 import { SkillQueueModal, SkillSetupModal } from "@/Components/Modals";
-
 import { useCharacterAcknowledgements, useCharacters } from "@/Components/Sections/Hooks";
+
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */
   userId?: number;
@@ -94,9 +95,11 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       )}
 
       {error && (
-        <div className={`aa-panel ${styles["error-panel"]} p-4 text-center`}>
-          {t("Failed to load characters. Please try refreshing the page.")}
-        </div>
+        <Card>
+          <Card.Body className={`${styles["error-panel"]} p-4 text-center`}>
+            {t("Failed to load characters. Please try refreshing the page.")}
+          </Card.Body>
+        </Card>
       )}
 
       {data && (

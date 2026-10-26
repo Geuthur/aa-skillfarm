@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 // Third Party
 import { Search } from "lucide-react";
+import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -10,8 +11,8 @@ import styles from "@/Styles/modules/SkillSetupModal.module.css";
 
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
-
 import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
+
 interface SkillSetupModalProps {
   characterId: number | null;
   onClose: () => void;
@@ -70,9 +71,11 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
       }}
     >
       <div>
-        <p className="aa-panel text-secondary small mb-3">
-          {t("Select which skills trigger extraction readiness alerts when reaching Level 5.")}
-        </p>
+        <Card className="mb-3">
+          <Card.Body className="text-secondary small">
+            {t("Select which skills trigger extraction readiness alerts when reaching Level 5.")}
+          </Card.Body>
+        </Card>
 
         {isLoading && (
           <div className={`${styles["loading-state"]} text-center`}>

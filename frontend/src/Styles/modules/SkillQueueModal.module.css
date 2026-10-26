@@ -52,11 +52,6 @@
     min-width: 120px;
 }
 
-.training-panel {
-    padding: 12px 16px;
-    margin-bottom: 20px;
-}
-
 .date-cell {
     font-size: var(--aa-font-size-xs);
     color: var(--aa-text-secondary);

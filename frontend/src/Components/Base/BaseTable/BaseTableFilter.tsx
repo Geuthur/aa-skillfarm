@@ -65,7 +65,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
           </div>
           <div className="d-flex gap-2 mt-2">
             <Button
-              variant="outline-secondary"
+              variant="secondary"
               size="sm"
               className="w-50"
               onClick={() => {

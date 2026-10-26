@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 // Third Party
 import type { ColumnDef } from "@tanstack/react-table";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -209,12 +209,14 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
 
   if (characters.length === 0) {
     return (
-      <div className={`aa-panel ${styles["empty-state"]} text-center`}>
-        <h4 className={`${styles["empty-title"]} mb-2`}>{t("No characters found")}</h4>
-        <p className={`${styles["empty-text"]} m-0`}>
-          {t("Try clearing your filters or adding new characters to Skillfarm.")}
-        </p>
-      </div>
+      <Card>
+        <Card.Body className={`${styles["empty-state"]} text-center`}>
+          <h4 className={`${styles["empty-title"]} mb-2`}>{t("No characters found")}</h4>
+          <p className={`${styles["empty-text"]} m-0`}>
+            {t("Try clearing your filters or adding new characters to Skillfarm.")}
+          </p>
+        </Card.Body>
+      </Card>
     );
   }
 

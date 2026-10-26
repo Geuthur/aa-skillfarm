@@ -237,7 +237,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
           return (
             <div className="d-flex align-items-center justify-content-end gap-2">
               <Button
-                variant="outline-secondary"
+                variant="secondary"
                 size="sm"
                 onClick={() => setSelectedAltsGroup(group)}
                 className="d-inline-flex align-items-center gap-1"

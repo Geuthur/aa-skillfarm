@@ -15,27 +15,9 @@ import {
   Users,
 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import {
-  Badge,
-  Button,
-  ButtonGroup,
-  Card,
-  CardBody,
-  Col,
-  Form,
-  Modal,
-  Row,
-} from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, CardBody, Col, Form, Modal, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import {
-  useAdministrationAccess,
-  useAdministrationAuditInspect,
-  useAdministrationAudits,
-  useAdministrationStats,
-  useAdministrationTasks,
-  useAuditActions,
-} from "@/Components/Administration/Hooks";
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
@@ -45,8 +27,15 @@ import { AdministrationAuditsTable } from "@/Components/Administration/Administr
 import { AdministrationCollapsibleCard } from "@/Components/Administration/AdministrationCollapsibleCard";
 import { AdministrationCorporationsTable } from "@/Components/Administration/AdministrationCorporationsTable";
 import { AdministrationInspectionView } from "@/Components/Administration/AdministrationInspectionView";
-  const [auditToDelete, setAuditToDelete] = useState<AdministrationAuditSchema | null>(null);
 import { AdministrationTaskCard } from "@/Components/Administration/AdministrationTaskCard";
+import {
+  useAdministrationAccess,
+  useAdministrationAuditInspect,
+  useAdministrationAudits,
+  useAdministrationStats,
+  useAdministrationTasks,
+  useAuditActions,
+} from "@/Components/Administration/Hooks";
 import { formatNumber } from "@/Utils/format";
 
 export const AdministrationPage: React.FC = () => {
@@ -56,6 +45,7 @@ export const AdministrationPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | "training" | "paused" | "issues">("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [forceRefreshGlobal, setForceRefreshGlobal] = useState(false);
+  const [auditToDelete, setAuditToDelete] = useState<AdministrationAuditSchema | null>(null);
 
   const { isSuperuser, isAdmin } = useAdministrationAccess();
   const { data: stats, isLoading: isLoadingStats } = useAdministrationStats(isAdmin);
@@ -186,11 +176,13 @@ export const AdministrationPage: React.FC = () => {
 
         {isAdmin ? (
           <>
-        {feedbackMsg && (
-          <div className={`aa-panel ${styles["feedback"]} d-flex align-items-center gap-2 mb-3`}>
-            <Check size={18} />
-            <span>{feedbackMsg}</span>
-          </div>
+        {feedback && (
+          <Card className="mb-3">
+            <Card.Body className={`${styles["feedback"]} d-flex align-items-center gap-2`}>
+              <Check size={18} />
+              <span>{feedback.text}</span>
+            </Card.Body>
+          </Card>
         )}
 
         {/* Global Metrics */}

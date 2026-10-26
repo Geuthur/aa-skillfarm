@@ -295,35 +295,20 @@ html[data-bs-theme="dark"] {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* ═══ PANELS ═══════════════════════════════════════════════════════════════ */
+/* ═══ CARDS (Bootstrap 5.3 + Theme Overrides) ═════════════════════════════════ */
 
-.aa-panel {
-    border-radius: var(--aa-border-radius);
-    border: var(--aa-border-solid);
-    border-color: var(--aa-panel-border, var(--aa-border-light));
-    background-color: var(--aa-panel-bg, var(--aa-body));
-    color: var(--aa-text-primary);
-    padding: 16px;
+.aa-react .card {
+    --bs-card-bg: var(--aa-panel-bg, var(--aa-body));
+    --bs-card-border-color: var(--aa-panel-border, var(--aa-border-light));
+    --bs-card-border-radius: var(--aa-border-radius);
+    --bs-card-color: var(--aa-text-primary);
     box-shadow: var(--aa-shadow);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 
-.aa-panel-light {
-    border-radius: var(--aa-border-radius);
-    border: var(--aa-border-solid);
-    border-color: var(--aa-panel-border, var(--aa-border-light));
-    background-color: var(--aa-panel-header-bg, var(--aa-color-grey-light));
-    color: var(--aa-text-primary);
-    box-shadow: var(--aa-shadow);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-
-@media (min-width: 640px) {
-    .aa-panel-lg {
-        padding: 24px;
-    }
+.aa-react .card.card-light {
+    --bs-card-bg: var(--aa-panel-header-bg, var(--aa-color-grey-light));
 }
 
 /* ═══ TAB BAR ═══════════════════════════════════════════════════════════════ */

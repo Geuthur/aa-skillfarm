@@ -5,7 +5,7 @@ import React, { useMemo, useState } from "react";
 import { createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, RefreshCw, Trash2 } from "lucide-react";
-import { Badge, Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
+import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -279,14 +279,16 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
       }}
       size={ModalSize.extraLarge}
     >
-      <div className="aa-panel p-0">
-        <BaseTable
-          columns={columns}
-          data={group?.alts ?? []}
-          emptyText={t("No alt characters found.")}
-          exportFileName={`alts_${group?.mainCharacterName ?? "character"}.csv`}
-        />
-      </div>
+      <Card>
+        <Card.Body className="p-0">
+          <BaseTable
+            columns={columns}
+            data={group?.alts ?? []}
+            emptyText={t("No alt characters found.")}
+            exportFileName={`alts_${group?.mainCharacterName ?? "character"}.csv`}
+          />
+        </Card.Body>
+      </Card>
     </BaseModal>
     {/* Rendered after the alts modal so it stacks on top; the alts modal stays open */}
     <AdministrationErrorModal
