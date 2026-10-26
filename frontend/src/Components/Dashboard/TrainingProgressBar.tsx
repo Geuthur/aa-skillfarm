@@ -38,7 +38,7 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       : "sf-badge-idle";
 
     return (
-      <div className={styles["idle"]}>
+      <div className="d-flex flex-column gap-1">
         <span className={badgeClass}>
           <PauseCircle size={14} />
           <span>{t("Training Inactive")}</span>
@@ -56,17 +56,17 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
 
   return (
     <div className="sf-progress-container">
-      <div className={styles["progress-header"]}>
-        <span className={styles["skill-name"]}>
+      <div className="d-flex align-items-center justify-content-between mb-1">
+        <span className={`${styles["skill-name"]} fw-semibold`}>
           {currentSkill || t("In Training")}
         </span>
-        <span className={`sf-badge-training ${styles["level-badge"]}`}>
+        <span className={`sf-badge-training d-inline-flex align-items-center gap-1 ${styles["level-badge"]}`}>
           <Clock size={11} />
           <span>{t("Active ({{percent}}%)", { percent: displayPercent.toFixed(1) })}</span>
         </span>
       </div>
 
-      <div className="sf-progress-track">
+      <div className="sf-progress-track w-100 overflow-hidden">
         {/* Inline style: width is a runtime percentage */}
         <div
           className="sf-progress-fill"
@@ -74,7 +74,7 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
         />
       </div>
 
-      <div className="sf-progress-labels">
+      <div className="sf-progress-labels d-flex justify-content-between align-items-center mt-1">
         <span>{t("Skill Finishes: {{date}}", { date: trainingFinishDate ? trainingFinishDate.slice(5) : t("Unknown") })}</span>
         {queueFinishDate && <span>{t("Queue: {{date}}", { date: queueFinishDate.slice(5) })}</span>}
       </div>

@@ -302,7 +302,7 @@ export const AdministrationPage: React.FC = () => {
         {isAdmin ? (
           <>
         {feedbackMsg && (
-          <div className={`aa-panel ${styles["feedback"]} mb-3`}>
+          <div className={`aa-panel ${styles["feedback"]} d-flex align-items-center gap-2 mb-3`}>
             <Check size={18} />
             <span>{feedbackMsg}</span>
           </div>
@@ -472,7 +472,7 @@ export const AdministrationPage: React.FC = () => {
             </Button>
           </ButtonGroup>
 
-          <div className={styles.searchContainer}>
+          <div className={`${styles.searchContainer} w-100`}>
             <Form.Control
               type="search"
               placeholder={t("Search by character, user, or corp…")}

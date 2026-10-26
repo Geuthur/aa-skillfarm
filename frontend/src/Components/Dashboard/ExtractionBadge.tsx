@@ -29,7 +29,7 @@ export const ExtractionBadge: React.FC<ExtractionBadgeProps> = ({
   if (readyCount <= 0) {
     return renderTooltip(
       t("No extractions ready"),
-      <span className="sf-badge-none">
+      <span className="sf-badge-none d-inline-flex align-items-center gap-1">
         <Minus size={12} />
         <span>{t("0 Ready")}</span>
       </span>
@@ -40,7 +40,7 @@ export const ExtractionBadge: React.FC<ExtractionBadgeProps> = ({
   if (!isAcknowledged) {
     return renderTooltip(
       t("{{count}} skill extraction ready for extraction (Pending Review)", { count: readyCount }),
-      <span className="sf-badge-extraction-pending">
+      <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
         <span className="sf-extraction-pulsing" aria-hidden="true">
           <Sparkles size={size === "sm" ? 14 : 16} />
         </span>
@@ -55,7 +55,7 @@ export const ExtractionBadge: React.FC<ExtractionBadgeProps> = ({
       count: readyCount,
       at: acknowledgedAt ? ` ${acknowledgedAt}` : "",
     }),
-    <span className="sf-badge-extraction-reviewed">
+    <span className="sf-badge-extraction-reviewed d-inline-flex align-items-center gap-1">
       <CheckCircle2 size={size === "sm" ? 14 : 16} className={styles["icon-ready"]} />
       <span>{t("{{count}} Reviewed", { count: readyCount })}</span>
     </span>

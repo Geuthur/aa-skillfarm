@@ -45,11 +45,11 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         cell: ({ row }) => {
           const char = row.original;
           return (
-            <div className={styles["pilot-info"]}>
+            <div className="d-flex align-items-center gap-2">
               <OwnerPortrait src={char.portrait_url} alt={char.character_name} />
               <div>
                 <div
-                  className={styles["pilot-name"]}
+                  className={`${styles["pilot-name"]} fw-bold`}
                   onClick={() => onViewQueue(char.character_id)}
                 >
                   {char.character_name}
@@ -103,7 +103,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         header: t("Total SP"),
         accessorFn: (row) => row.total_sp,
         cell: ({ row }) => (
-          <span className={styles["total-sp"]}>
+          <span className={`${styles["total-sp"]} fw-semibold`}>
             {(row.original.total_sp / 1_000_000).toFixed(2)}M
           </span>
         ),
@@ -147,8 +147,8 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
             !char.is_training && !char.queue_paused_acknowledged;
 
           return (
-            <div className={styles["actions-cell"]}>
-              <div className={styles["actions-group"]}>
+            <div className="text-end">
+              <div className="d-inline-flex align-items-center gap-1">
                 {/* Acknowledge Extraction action */}
                 {hasPendingExtractions &&
                   renderTooltip(
@@ -209,9 +209,9 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
 
   if (characters.length === 0) {
     return (
-      <div className={`aa-panel ${styles["empty-state"]}`}>
-        <h4 className={styles["empty-title"]}>{t("No characters found")}</h4>
-        <p className={styles["empty-text"]}>
+      <div className={`aa-panel ${styles["empty-state"]} text-center`}>
+        <h4 className={`${styles["empty-title"]} mb-2`}>{t("No characters found")}</h4>
+        <p className={`${styles["empty-text"]} m-0`}>
           {t("Try clearing your filters or adding new characters to Skillfarm.")}
         </p>
       </div>

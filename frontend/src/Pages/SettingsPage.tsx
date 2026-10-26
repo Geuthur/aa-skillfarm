@@ -217,12 +217,12 @@ export const SettingsPage: React.FC = () => {
   }
 
   return (
-    <Card className={`${styles["page"]} border-0`}>
+    <Card className={`${styles["page"]} mx-auto m-0 border-0`}>
       <Card.Body className="bg-dark">
         <Card.Header className={styles["header"] + " bg-secondary"}>
           <Settings2 size={24} aria-hidden="true" />
           <div>
-            <h1 className={styles["title"]}>{t("Settings")}</h1>
+            <h1 className={`${styles["title"]} m-0 fw-bold`}>{t("Settings")}</h1>
             <p className={styles["description"]}>{t("Manage your Skillfarm preferences.")}</p>
           </div>
         </Card.Header>
@@ -230,7 +230,7 @@ export const SettingsPage: React.FC = () => {
         <Card className="bg-secondary text-light border-0 shadow-sm mb-4">
           <Card.Body className={styles["setting-row"]}>
             <div className={styles["setting-copy"]}>
-              <div className={styles["setting-title"]}>
+              <div className={`${styles["setting-title"]} d-flex align-items-center gap-2 fw-bold`}>
                 <BellOff size={18} aria-hidden="true" />
                 <label htmlFor="disable-notifications">{t("Disable all notifications")}</label>
               </div>

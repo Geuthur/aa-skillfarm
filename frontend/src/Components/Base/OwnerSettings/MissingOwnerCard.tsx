@@ -24,17 +24,17 @@ export const MissingOwnerCard: React.FC<MissingOwnerCardProps<BaseMissingOwner>>
 
   return (
     <article className={`${styles["char-card"]} ${styles["missing-card"]}`}>
-      <div className={styles["char-header"]}>
+      <div className="d-flex align-items-center gap-2">
         <OwnerPortrait src={missing.avatar_url} alt={missing.name} bordered />
-        <div className={styles["char-info"]}>
+        <div className={`${styles["char-info"]} flex-fill`}>
           <div className="d-flex align-items-center justify-content-between gap-2">
-            <h3 className={styles["char-name"]}>{missing.name}</h3>
-            <span className={`${styles["status-badge"]} ${styles["missing-badge"]}`}>
+            <h3 className={`${styles["char-name"]} m-0 fw-semibold text-nowrap overflow-hidden`}>{missing.name}</h3>
+            <span className={`${styles["status-badge"]} d-inline-flex align-items-center gap-1 fw-semibold ${styles["missing-badge"]}`}>
               <AlertCircle size={11} aria-hidden="true" />
               <span>{t("Not Registered")}</span>
             </span>
           </div>
-          {missing.subtitle && <p className={styles["char-corp"]}>{missing.subtitle}</p>}
+          {missing.subtitle && <p className={`${styles["char-corp"]} text-nowrap overflow-hidden`}>{missing.subtitle}</p>}
         </div>
       </div>
 

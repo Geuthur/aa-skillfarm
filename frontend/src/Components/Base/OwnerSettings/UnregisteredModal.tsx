@@ -75,7 +75,7 @@ function UnregisteredContent({
       )}
 
       {!isLoading && !isError && items.length === 0 && (
-        <div className={styles["empty-state"]}>{emptyMessage ?? t("Nothing to show.")}</div>
+        <div className={`${styles["empty-state"]} text-center`}>{emptyMessage ?? t("Nothing to show.")}</div>
       )}
 
       {!isLoading && !isError && items.length > 0 && (
@@ -98,7 +98,7 @@ function UnregisteredContent({
           </p>
 
           {filtered.length === 0 ? (
-            <div className={styles["empty-state"]}>{t("No matching characters found.")}</div>
+            <div className={`${styles["empty-state"]} text-center`}>{t("No matching characters found.")}</div>
           ) : (
             <ul className="list-unstyled d-flex flex-column gap-2 mb-0">
               {filtered.map((item) => (

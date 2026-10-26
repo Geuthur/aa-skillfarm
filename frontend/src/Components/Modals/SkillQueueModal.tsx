@@ -38,7 +38,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
       {
         accessorKey: "skill_name",
         header: t("Skill"),
-        cell: ({ row }) => <span className={styles["skill-name"]}>{row.original.skill_name}</span>,
+        cell: ({ row }) => <span className="fw-semibold">{row.original.skill_name}</span>,
       },
       {
         accessorKey: "finished_level_roman",
@@ -80,7 +80,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           const entry = row.original;
           if (entry.is_active) {
             return (
-              <span className="sf-badge-training">
+              <span className="sf-badge-training d-inline-flex align-items-center gap-1">
                 <Clock size={12} />
                 <span>{t("Training")}</span>
               </span>
@@ -88,7 +88,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           }
           if (entry.is_extractable) {
             return (
-              <span className="sf-badge-extraction-pending">
+              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
                 <Sparkles size={12} />
                 <span>{t("Ready")}</span>
               </span>
@@ -128,13 +128,13 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
     >
       <div>
         {isLoading && (
-          <div className={styles["loading-state"]}>
+          <div className={`${styles["loading-state"]} text-center`}>
             {t("Loading queue details…")}
           </div>
         )}
 
         {error && (
-          <div className={styles["error-state"]}>
+          <div className={`${styles["error-state"]} text-center`}>
             {t("Failed to load skill queue.")}
           </div>
         )}
@@ -156,18 +156,18 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
             {/* Summary Stats */}
             <div
-              className={styles["summary-grid"]}
+              className={`${styles["summary-grid"]} d-grid gap-2`}
             >
-              <div className={`aa-panel ${styles["summary-card"]}`}>
+              <div className={`aa-panel ${styles["summary-card"]} text-center`}>
                 <div className={styles["summary-label"]}>{t("Total SP")}</div>
-                <div className={styles["summary-value"]}>
+                <div className={`${styles["summary-value"]} fw-bold`}>
                   {(data.character.total_sp / 1_000_000).toFixed(2)}M
                 </div>
               </div>
 
-              <div className={`aa-panel ${styles["summary-card"]}`}>
+              <div className={`aa-panel ${styles["summary-card"]} text-center`}>
                 <div className={styles["summary-label"]}>{t("Queue State")}</div>
-                <div className={styles["summary-value-sm"]}>
+                <div className={`${styles["summary-value-sm"]} fw-bold`}>
                   {data.character.is_training ? (
                     <span className={styles["status-active"]}>{t("Active")}</span>
                   ) : (
@@ -176,9 +176,9 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                 </div>
               </div>
 
-              <div className={`aa-panel ${styles["summary-card"]}`}>
+              <div className={`aa-panel ${styles["summary-card"]} text-center`}>
                 <div className={styles["summary-label"]}>{t("Ready Extractions")}</div>
-                <div className={styles["summary-value-amber"]}>
+                <div className={`${styles["summary-value-amber"]} fw-bold`}>
                   {data.character.extractions_ready_count}
                 </div>
               </div>
@@ -198,12 +198,12 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
             </div>
 
             {/* Queue List */}
-            <h6 className={styles["section-title"]}>
+            <h6 className={`${styles["section-title"]} text-uppercase`}>
               {t("Active Training Queue ({{count}})", { count: data.skillqueue.length })}
             </h6>
 
             {data.skillqueue.length === 0 ? (
-              <div className={`aa-panel ${styles["empty-state"]}`}>
+              <div className={`aa-panel ${styles["empty-state"]} text-center p-4`}>
                 {t("No skills in queue. Training is inactive.")}
               </div>
             ) : (
@@ -218,8 +218,8 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
             {/* Farmed Skills in Setup */}
             {data.farmed_skills.length > 0 && (
-              <div className={styles["farmed-section"]}>
-                <h6 className={styles["section-title"]}>
+              <div className="mt-4">
+                <h6 className={`${styles["section-title"]} text-uppercase`}>
                   {t("Configured Farm Skills ({{count}})", { count: data.farmed_skills.length })}
                 </h6>
                 <div className="sf-table-container">
@@ -235,12 +235,12 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                     <tbody>
                       {data.farmed_skills.map((skill) => (
                         <tr key={skill.skill_id}>
-                          <td className={styles["skill-name"]}>{skill.skill_name}</td>
+                          <td className="fw-semibold">{skill.skill_name}</td>
                           <td>{t("Level {{level}}", { level: skill.trained_level })}</td>
                           <td>{formatNumber(skill.skillpoints)} SP</td>
                           <td>
                             {skill.is_extractable ? (
-                              <span className="sf-badge-extraction-pending">
+                              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
                                 <Sparkles size={12} />
                                 <span>{t("Extractable (Lvl 5)")}</span>
                               </span>

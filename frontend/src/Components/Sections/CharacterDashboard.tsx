@@ -128,7 +128,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       )}
 
       {error && (
-        <div className={`aa-panel ${styles["error-panel"]}`}>
+        <div className={`aa-panel ${styles["error-panel"]} p-4 text-center`}>
           {t("Failed to load characters. Please try refreshing the page.")}
         </div>
       )}

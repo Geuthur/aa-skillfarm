@@ -30,13 +30,13 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
   }
 
   return (
-    <div className="sf-inactive-banner" role="alert">
-      <div className="sf-inactive-banner-content">
+    <div className="sf-inactive-banner d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3" role="alert">
+      <div className="d-flex align-items-center gap-3">
         <span className={`text-warning fs-3 ${styles["alert-icon"]}`} aria-hidden="true">
           <AlertTriangle size={28} />
         </span>
         <div>
-          <h4 className="sf-inactive-banner-title">
+          <h4 className="sf-inactive-banner-title m-0">
             {pausedCount === 1
               ? t("1 Character has no active training queue!")
               : t("{{count}} Characters have no active training queue!", { count: pausedCount })}

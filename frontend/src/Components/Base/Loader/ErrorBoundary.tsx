@@ -49,7 +49,7 @@ export class ErrorBoundaryClass extends Component<Props, State> {
         <>
           <ErrorLoader title={this.state.title} message={this.state.message} />
           <h1>{t("Something went wrong.")}</h1>
-          <div className={`d-flex ${styles["error-wrapper"]}`}>
+          <div className="d-flex justify-content-center">
             <pre className={`border ${styles["error-details"]}`}>
               {this.state.trace}
             </pre>

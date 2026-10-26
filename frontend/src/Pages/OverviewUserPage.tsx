@@ -29,7 +29,7 @@ export const OverviewUserPage: React.FC = () => {
     <CharacterDashboard
       userId={parsedUserId}
       renderHeader={(user) => (
-        <div className={styles["header"]}>
+        <div className="d-flex align-items-center gap-2 mb-3">
           {renderTooltip(
             t("Back to overview"),
             <Link to={`/${ProjectName}/overview/`} className="btn btn-secondary">
@@ -40,7 +40,7 @@ export const OverviewUserPage: React.FC = () => {
           {user.portrait_url && (
             <OwnerPortrait src={user.portrait_url} alt={user.main_character_name} size="md" />
           )}
-          <h3 className={styles["title"]}>
+          <h3 className={`${styles["title"]} m-0 fw-bold`}>
             {user.main_character_name}
           </h3>
         </div>

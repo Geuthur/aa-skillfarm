@@ -66,18 +66,18 @@ export function LiveStatusIndicator({
       {renderTooltip(
         tooltipText,
         <span
-          className={`${className} ${styles["indicator"]}`}
+          className={`${className} d-inline-flex align-items-center gap-1`}
         >
           {/* Status Dot */}
           <span
-            className={styles["dot-wrapper"]}
+            className={`${styles["dot-wrapper"]} position-relative d-inline-flex flex-shrink-0`}
           >
             {pinging && !isBusy && !isError && (
               <span
-                className={styles["dot-ping"]}
+                className={`${styles["dot-ping"]} position-absolute rounded-circle`}
               />
             )}
-            <span className={`${styles["dot"]} ${getDotClass()}`} />
+            <span className={`${styles["dot"]} position-relative d-inline-block rounded-circle ${getDotClass()}`} />
           </span>
 
           {/* Optional Children */}

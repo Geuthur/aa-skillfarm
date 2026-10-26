@@ -101,7 +101,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           onClick={() => handleTabClick("pending")}
         >
           {pendingCount > 0 && (
-            <span className={`sf-extraction-pulsing ${styles["pulse-icon"]}`}>
+            <span className="sf-extraction-pulsing me-1">
               <Sparkles size={14} />
             </span>
           )}
@@ -118,11 +118,11 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
       </div>
 
       {/* Search & Actions */}
-      <div className={styles["actions"]}>
-        <div className={styles["search-wrapper"]}>
+      <div className="d-flex align-items-center gap-2 flex-wrap">
+        <div className="position-relative d-inline-flex align-items-center">
           <Search
             size={16}
-            className={styles["search-icon"]}
+            className={`${styles["search-icon"]} position-absolute`}
           />
           <input
             type="text"

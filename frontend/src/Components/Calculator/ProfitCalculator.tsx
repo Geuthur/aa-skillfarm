@@ -159,7 +159,7 @@ export const ProfitCalculator: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className={`aa-panel ${styles["state-panel"]}`}>
+      <div className={`aa-panel ${styles["state-panel"]} text-center`}>
         <div className="spinner-border text-info mb-2" role="status" />
         <div>{t("Fetching live market data…")}</div>
       </div>
@@ -168,7 +168,7 @@ export const ProfitCalculator: React.FC = () => {
 
   if (error || data?.error) {
     return (
-      <div className={`aa-panel ${styles["error-panel"]}`}>
+      <div className={`aa-panel ${styles["error-panel"]} p-4 text-center`}>
         <AlertCircle size={28} className={styles["error-icon"]} />
         <h4 className={styles["error-title"]}>{t("Market Data Unavailable")}</h4>
         <p className={styles["error-text"]}>
@@ -189,10 +189,10 @@ export const ProfitCalculator: React.FC = () => {
     <div>
       {/* Header */}
       <div
-        className={`aa-panel ${styles["header"]}`}
+        className={`aa-panel ${styles["header"]} d-flex justify-content-between align-items-center flex-wrap gap-2`}
       >
         <div>
-          <h3 className={styles["title"]}>
+          <h3 className={`${styles["title"]} m-0 fw-bold d-flex align-items-center gap-2`}>
             <Coins size={24} className={styles["title-icon"]} />
             <span>{t("Skillfarm Calculator")}</span>
           </h3>
@@ -200,7 +200,7 @@ export const ProfitCalculator: React.FC = () => {
             {t("Calculate extraction revenue, PLEX subscription costs, and net farm profits in real-time.")}
           </p>
         </div>
-        <div className={styles["actions"]}>
+        <div className="d-flex gap-2">
           {renderTooltip(
             t("Reset prices to current market rates"),
             <Button variant="secondary"
@@ -222,11 +222,11 @@ export const ProfitCalculator: React.FC = () => {
 
       {/* Editable Market Prices Cards */}
       <div
-        className={styles["price-panel"]}
+        className={`${styles["price-panel"]} d-grid gap-3 mb-4`}
       >
         <div className="aa-panel">
-          <div className={styles["price-row"]}>
-            <span className={styles["price-label"]}>
+          <div className={`${styles["price-row"]} d-flex justify-content-between align-items-center`}>
+            <span className={`${styles["price-label"]} fw-semibold`}>
               {t("Skill Injector Price")}
             </span>
             <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.injector ? formatIsk(data.injector.sell) : "-" })}</small>
@@ -244,8 +244,8 @@ export const ProfitCalculator: React.FC = () => {
         </div>
 
         <div className="aa-panel">
-          <div className={styles["price-row"]}>
-            <span className={styles["price-label"]}>
+          <div className={`${styles["price-row"]} d-flex justify-content-between align-items-center`}>
+            <span className={`${styles["price-label"]} fw-semibold`}>
               {t("Skill Extractor Price")}
             </span>
             <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.extractor ? formatIsk(data.extractor.sell) : "-" })}</small>
@@ -263,8 +263,8 @@ export const ProfitCalculator: React.FC = () => {
         </div>
 
         <div className="aa-panel">
-          <div className={styles["price-row"]}>
-            <span className={styles["price-label"]}>
+          <div className={`${styles["price-row"]} d-flex justify-content-between align-items-center`}>
+            <span className={`${styles["price-label"]} fw-semibold`}>
               {t("PLEX Unit Price")}
             </span>
             <small className={styles["price-hint"]}>{t("Jita Sell: {{price}}", { price: data?.plex ? formatIsk(data.plex.sell) : "-" })}</small>
@@ -284,7 +284,7 @@ export const ProfitCalculator: React.FC = () => {
 
       {/* Interactive Calculation Form */}
       <div className={`aa-panel mb-4 ${styles["settings-panel"]}`}>
-        <h4 className={styles["section-title"]}>
+        <h4 className={`${styles["section-title"]} fw-bold mb-3 d-flex align-items-center gap-2`}>
           <Calculator size={18} className={styles["section-icon"]} />
           <span>{t("Calculation Parameters")}</span>
         </h4>
@@ -374,12 +374,12 @@ export const ProfitCalculator: React.FC = () => {
               {t("Please enter an amount for Skill Injectors or Extractors to calculate profit.")}
             </div>
           ) : (
-            <div className="aa-panel-light">
+            <div className="aa-panel-light p-3">
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <span className={styles["summary-label"]}>
+                <span className={`${styles["summary-label"]} fw-bold`}>
                   {t("Calculated Net Result:")}
                 </span>
-                <span className={`${styles["net-profit"]} ${getProfitClass(netProfit)}`}>
+                <span className={`${styles["net-profit"]} fw-bold ${getProfitClass(netProfit)}`}>
                   {formatIsk(netProfit)}
                 </span>
               </div>
@@ -405,48 +405,48 @@ export const ProfitCalculator: React.FC = () => {
       </div>
 
       {/* Benchmark Monthly Projections (Standard 3.5 Injectors) */}
-      <h4 className={styles["results-title"]}>
+      <h4 className={`${styles["results-title"]} text-uppercase`}>
         {t("Monthly Reference Projections (3.5 Injectors / mo)")}
       </h4>
 
       <div
-        className={styles["results-grid"]}
+        className={`${styles["results-grid"]} d-grid gap-3`}
       >
         <div className={`aa-panel ${styles["result-card-blue"]}`}>
           <div className="d-flex justify-content-between align-items-center">
-            <span className={styles["result-name"]}>{t("1-Month Plan")}</span>
+            <span className={`${styles["result-name"]} fw-semibold`}>{t("1-Month Plan")}</span>
             <span className={styles["result-duration"]}>{t("500 PLEX/mo")}</span>
           </div>
-          <div className={`${styles["result-value"]} ${getProfitClass(data?.month_calc ?? 0)}`}>
+          <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month_calc ?? 0)}`}>
             {data ? formatIsk(data.month_calc) : "-"}
           </div>
-          <p className={styles["result-note"]}>
+          <p className={`${styles["result-note"]} m-0`}>
             {t("Standard monthly subscription rate with PLEX.")}
           </p>
         </div>
 
         <div className={`aa-panel ${styles["result-card-amber"]}`}>
           <div className="d-flex justify-content-between align-items-center">
-            <span className={styles["result-name"]}>{t("12-Month Plan")}</span>
+            <span className={`${styles["result-name"]} fw-semibold`}>{t("12-Month Plan")}</span>
             <span className={styles["result-duration"]}>{t("300 PLEX/mo")}</span>
           </div>
-          <div className={`${styles["result-value"]} ${getProfitClass(data?.month12_calc ?? 0)}`}>
+          <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month12_calc ?? 0)}`}>
             {data ? formatIsk(data.month12_calc) : "-"}
           </div>
-          <p className={styles["result-note"]}>
+          <p className={`${styles["result-note"]} m-0`}>
             {t("Annual package rate discount (~40% PLEX savings).")}
           </p>
         </div>
 
         <div className={`aa-panel ${styles["result-card-emerald"]}`}>
           <div className="d-flex justify-content-between align-items-center">
-            <span className={styles["result-name"]}>{t("24-Month Plan")}</span>
+            <span className={`${styles["result-name"]} fw-semibold`}>{t("24-Month Plan")}</span>
             <span className={styles["result-duration"]}>{t("275 PLEX/mo")}</span>
           </div>
-          <div className={`${styles["result-value"]} ${getProfitClass(data?.month24_calc ?? 0)}`}>
+          <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month24_calc ?? 0)}`}>
             {data ? formatIsk(data.month24_calc) : "-"}
           </div>
-          <p className={styles["result-note"]}>
+          <p className={`${styles["result-note"]} m-0`}>
             {t("Maximum 2-year package rate discount.")}
           </p>
         </div>

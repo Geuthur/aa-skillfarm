@@ -94,21 +94,21 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
         </p>
 
         {isLoading && (
-          <div className={styles["loading-state"]}>
+          <div className={`${styles["loading-state"]} text-center`}>
             {t("Loading skills…")}
           </div>
         )}
 
         {data && (
           <div>
-            <div className={`${styles["search-wrapper"]}`}>
+            <div className={`${styles["search-wrapper"]} position-relative`}>
               <Search
                 size={16}
-                className={styles["search-icon"]}
+                className={`${styles["search-icon"]} position-absolute`}
               />
               <input
                 type="text"
-                className={`sf-search-input ${styles["search-input"]}`}
+                className={`sf-search-input ${styles["search-input"]} w-100`}
                 placeholder={t("Filter available skills…")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -120,20 +120,20 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
             </div>
 
             <div
-              className={styles["skill-list"]}
+              className={`${styles["skill-list"]} p-2`}
             >
               {filteredSkills.length === 0 ? (
-                <div className={styles["empty-state"]}>
+                <div className={`${styles["empty-state"]} text-center`}>
                   {t("No matching skills found.")}
                 </div>
               ) : (
-                <div className={styles["skill-grid"]}>
+                <div className={`${styles["skill-grid"]} d-grid gap-1`}>
                   {filteredSkills.map((skill) => {
                     const isSelected = selectedSkills.includes(skill);
                     return (
                       <label
                         key={skill}
-                        className={`${styles["skill-option"]} ${isSelected ? styles["skill-option-selected"] : ""}`}
+                        className={`${styles["skill-option"]} d-flex align-items-center gap-2 ${isSelected ? styles["skill-option-selected"] : ""}`}
                       >
                         <input
                           type="checkbox"

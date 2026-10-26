@@ -32,7 +32,7 @@ export function renderTooltip(
       placement="auto"
       trigger={["hover", "focus"]}
       overlay={
-        <Tooltip id="sf-tooltip" className={`${styles["tooltip-top"]} ${styles["tooltip-fixed"]}`}>
+        <Tooltip id="sf-tooltip" className={`${styles["tooltip-top"]} position-fixed`}>
           {message}
         </Tooltip>
       }
