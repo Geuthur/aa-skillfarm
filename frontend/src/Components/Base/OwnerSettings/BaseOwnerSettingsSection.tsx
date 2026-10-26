@@ -119,7 +119,7 @@ export function BaseOwnerSettingsSection<
         )}
 
         {isLoading && (
-          <div className="aa-loader-container">
+          <div className="aa-loader-container d-flex align-items-center justify-content-center w-100">
             <span className="spinner-border" />
             <span>{t("Loading update statuses…")}</span>
           </div>

@@ -29,9 +29,6 @@ import {
 import { Button, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/BaseTable.module.css";
-
 import BaseHeader from "@/Components/Base/BaseTable/BaseTableHeader";
 import BasePages from "@/Components/Base/BaseTable/BaseTablePages";
 
@@ -121,11 +118,11 @@ const BaseTable = <TData, TValue = unknown>({
 
   return (
     <div
-      className={`aa-table-shell ${isLight ? "aa-table-shell-light aa-table-light" : ""} ${className ?? ""}`}
+      className={`aa-table-shell mt-2 ${isLight ? "aa-table-shell-light aa-table-light" : ""} ${className ?? ""}`}
     >
       <div className="aa-table-scroll">
         <table
-          className={`aa-table ${isLight ? "aa-table-light" : ""} ${tableClassName ?? ""}`}
+          className={`aa-table w-100 text-start ${isLight ? "aa-table-light" : ""} ${tableClassName ?? ""}`}
         >
           <thead className="aa-table-head">
             <BaseHeader table={table} enableFilters={enableFilters} />
@@ -135,7 +132,7 @@ const BaseTable = <TData, TValue = unknown>({
               <tr>
                 <td
                   colSpan={table.getVisibleLeafColumns().length}
-                  className="aa-table-message text-center"
+                  className="aa-table-message text-center py-5 px-3"
                 >
                   {t("Something went wrong.")}
                 </td>
@@ -144,7 +141,7 @@ const BaseTable = <TData, TValue = unknown>({
               <tr>
                 <td
                   colSpan={table.getVisibleLeafColumns().length}
-                  className="aa-table-message text-center"
+                  className="aa-table-message text-center py-5 px-3"
                 >
                   {emptyText ?? t("No Data Available")}
                 </td>
@@ -165,8 +162,7 @@ const BaseTable = <TData, TValue = unknown>({
                     return (
                       <td
                         key={cell.id}
-                        className={`aa-table-cell align-middle ${isRight ? styles["cell-right"] : ""
-                          }`}
+                        className={`aa-table-cell align-middle ${isRight ? "text-end" : ""}`}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
@@ -180,11 +176,11 @@ const BaseTable = <TData, TValue = unknown>({
       </div>
 
       {/* DataTable Footer Controls */}
-      <div className="aa-table-footer">
+      <div className="aa-table-footer d-flex flex-column align-items-center justify-content-between gap-3 p-3">
         {/* Page Size Selector, Count Indicator & Export / Status */}
         <div className="d-flex w-100 align-items-center justify-content-between gap-2">
           <div className="d-flex align-items-center gap-3">
-            <div className="aa-table-page-size">
+            <div className="d-flex align-items-center gap-2">
               <span>{t("Page Size:")}</span>
               <Form.Select
                 size="sm"
@@ -206,7 +202,7 @@ const BaseTable = <TData, TValue = unknown>({
         </div>
         {/* Pagination Buttons */}
         {pageCount > 1 && (
-          <div className="aa-table-pagination">
+          <div className="d-flex align-items-center gap-2">
             <Button
               size="sm"
               disabled={!table.getCanPreviousPage()}
@@ -226,7 +222,7 @@ const BaseTable = <TData, TValue = unknown>({
               <ChevronLeft className="aa-table-page-icon d-block" />
             </Button>
 
-            <span className="aa-table-page-number py-0 px-2">
+            <span className="aa-table-page-number py-0 px-2 fw-bold">
               {t("Page {{page}} of {{total}}", {
                 page: pageIndex + 1,
                 total: pageCount,

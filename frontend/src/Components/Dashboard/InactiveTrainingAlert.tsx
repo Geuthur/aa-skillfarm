@@ -30,7 +30,7 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
   }
 
   return (
-    <div className="sf-inactive-banner d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3" role="alert">
+    <div className="sf-inactive-banner px-4 py-3 mb-4 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3" role="alert">
       <div className="d-flex align-items-center gap-3">
         <span className={`text-warning fs-3 ${styles["alert-icon"]}`} aria-hidden="true">
           <AlertTriangle size={28} />
@@ -41,7 +41,7 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
               ? t("1 Character has no active training queue!")
               : t("{{count}} Characters have no active training queue!", { count: pausedCount })}
           </h4>
-          <p className="sf-inactive-banner-subtitle">
+          <p className="sf-inactive-banner-subtitle mt-1 mb-0">
             {t("Training time is currently being lost. Review these characters to resume their skill queues.")}
           </p>
         </div>

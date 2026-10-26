@@ -68,12 +68,12 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
   const activeTab = currentTab();
 
   return (
-    <div className="sf-filter-bar">
+    <div className="sf-filter-bar d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 mb-4">
       {/* Tab filter buttons matching AA CSS Framework */}
-      <div className="aa-tab-bar mw-100 overflow-x-auto">
+      <div className="aa-tab-bar d-flex align-items-center gap-2 p-1 mw-100 overflow-x-auto">
         <button
           type="button"
-          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "all" ? "active" : ""}`}
+          className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "all" ? "active" : ""}`}
           onClick={() => handleTabClick("all")}
         >
           {t("All ({{count}})", { count: totalCount })}
@@ -81,7 +81,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "training" ? "active" : ""}`}
+          className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "training" ? "active" : ""}`}
           onClick={() => handleTabClick("training")}
         >
           {t("Active Training ({{count}})", { count: activeCount })}
@@ -89,7 +89,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "paused" ? "active" : ""} ${pausedCount > 0 ? styles["tab-alert"] : ""}`}
+          className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "paused" ? "active" : ""} ${pausedCount > 0 ? styles["tab-alert"] : ""}`}
           onClick={() => handleTabClick("paused")}
         >
           {t("Paused Training ({{count}})", { count: pausedCount })}
@@ -97,11 +97,11 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "pending" ? "active" : ""} ${pendingCount > 0 ? styles["tab-alert"] : ""}`}
+          className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "pending" ? "active" : ""} ${pendingCount > 0 ? styles["tab-alert"] : ""}`}
           onClick={() => handleTabClick("pending")}
         >
           {pendingCount > 0 && (
-            <span className="sf-extraction-pulsing me-1">
+            <span className="sf-extraction-pulsing d-inline-flex align-items-center justify-content-center me-1">
               <Sparkles size={14} />
             </span>
           )}
@@ -110,7 +110,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
 
         <button
           type="button"
-          className={`aa-tab-btn text-nowrap flex-shrink-0 ${activeTab === "reviewed" ? "active" : ""}`}
+          className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "reviewed" ? "active" : ""}`}
           onClick={() => handleTabClick("reviewed")}
         >
           {t("Reviewed ({{count}})", { count: reviewedCount })}

@@ -55,12 +55,12 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   const displayPercent = Math.min(100, Math.max(0, currentProgress));
 
   return (
-    <div className="sf-progress-container">
+    <div className="sf-progress-container w-100">
       <div className="d-flex align-items-center justify-content-between mb-1">
         <span className={`${styles["skill-name"]} fw-semibold`}>
           {currentSkill || t("In Training")}
         </span>
-        <span className={`sf-badge-training d-inline-flex align-items-center gap-1 ${styles["level-badge"]}`}>
+        <span className={`sf-badge-training d-inline-flex align-items-center gap-1 rounded-1 fw-bold ${styles["level-badge"]}`}>
           <Clock size={11} />
           <span>{t("Active ({{percent}}%)", { percent: displayPercent.toFixed(1) })}</span>
         </span>

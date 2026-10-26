@@ -1,8 +1,6 @@
 .feedback {
     border-color: var(--aa-border-emerald);
     color: var(--aa-text-emerald-light);
-    padding: 12px;
-    margin-bottom: 20px;
 }
 
 .dropdownMenu {
@@ -25,11 +23,7 @@
     cursor: pointer;
 }
 
-/* Status badge that opens the error details modal */
-.statusBadgeButton {
-    cursor: pointer;
-}
-
+/* Status badge that opens the error details modal (role="button" already gets cursor: pointer) */
 .statusBadgeButton:focus-visible {
     outline: 2px solid var(--aa-color-emerald-light);
     outline-offset: 2px;

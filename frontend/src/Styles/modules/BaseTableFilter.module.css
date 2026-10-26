@@ -1,7 +1,4 @@
-
-
 .searchinput {
-  width: 100%;
   padding: 4px 24px 4px 8px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -29,26 +26,7 @@
   cursor: pointer;
 }
 
-.searchicon {
-    right: 7px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 12px;
-    color: var(--aa-text-muted);
-    pointer-events: none;
-}
-
 .clearbutton {
-  all: unset;
-  cursor: pointer;
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 14px;
   height: 14px;
   color: var(--aa-text-muted);
@@ -63,7 +41,6 @@
 
 .dropdown {
   max-height: 250px;
-  overflow-y: auto;
   background-color: var(--aa-color-body);
   color: var(--aa-text-primary);
   border: 1px solid var(--aa-border-light);
@@ -80,7 +57,6 @@
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 11px;
-  cursor: pointer;
   transition: background-color 100ms ease, color 100ms ease;
 }
 
@@ -94,10 +70,6 @@
 .dropdown :global(.dropdown-item:active) {
   background-color: var(--aa-color-emerald);
   color: var(--aa-color-body-dark);
-}
-
-.capitalisewords {
-  text-transform: capitalize;
 }
 
 .popover {

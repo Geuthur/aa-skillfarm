@@ -79,7 +79,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           const entry = row.original;
           if (entry.is_active) {
             return (
-              <span className="sf-badge-training d-inline-flex align-items-center gap-1">
+              <span className="sf-badge-training d-inline-flex align-items-center gap-1 px-2 py-1 rounded-1 fw-bold">
                 <Clock size={12} />
                 <span>{t("Training")}</span>
               </span>
@@ -87,7 +87,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           }
           if (entry.is_extractable) {
             return (
-              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
+              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2 fw-bold">
                 <Sparkles size={12} />
                 <span>{t("Ready")}</span>
               </span>
@@ -229,8 +229,8 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                 <h6 className={`${styles["section-title"]} text-uppercase`}>
                   {t("Configured Farm Skills ({{count}})", { count: data.farmed_skills.length })}
                 </h6>
-                <div className="sf-table-container">
-                  <table className="sf-table">
+                <div className="sf-table-container overflow-x-auto">
+                  <table className="sf-table w-100">
                     <thead>
                       <tr>
                         <th>{t("Skill")}</th>
@@ -247,7 +247,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                           <td>{formatNumber(skill.skillpoints)} SP</td>
                           <td>
                             {skill.is_extractable ? (
-                              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
+                              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1 px-2 py-1 rounded-2 fw-bold">
                                 <Sparkles size={12} />
                                 <span>{t("Extractable (Lvl 5)")}</span>
                               </span>
