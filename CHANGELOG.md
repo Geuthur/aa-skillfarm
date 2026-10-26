@@ -50,9 +50,13 @@ Section Order:
 
 - [CHANGE] The generated `static/**/manifest.json` is excluded from the end-of-file fixer in the pre-commit configuration.
 
+- [CHANGE] The remaining layout CSS of the tables, table filters, character tab bar, filter bar, badges, settings page and loaders was replaced by Bootstrap 5 utility classes; `cursor: pointer` and `!important` were dropped where Bootstrap already covers them, and the table filter fields share a single `ClearButton` component.
+
 ### Removed
 
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
+
+- [REMOVED] Unused theme variables (`--aa-*`), the unused classes `aa-badge` and `aa-status-dot` and the unused `BaseModalQuery` mutation hooks (`useApproveMutation`, `useFormApproveMutation`).
 
 <!-- Your changes go here -->
 

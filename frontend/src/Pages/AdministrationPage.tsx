@@ -178,7 +178,7 @@ export const AdministrationPage: React.FC = () => {
           <>
         {feedback && (
           <Card className="mb-3">
-            <Card.Body className={`${styles["feedback"]} d-flex align-items-center gap-2`}>
+            <Card.Body className={`${styles["feedback"]} d-flex align-items-center gap-2 p-3 mb-4`}>
               <Check size={18} />
               <span>{feedback.text}</span>
             </Card.Body>

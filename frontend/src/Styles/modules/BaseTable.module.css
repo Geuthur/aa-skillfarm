@@ -11,7 +11,3 @@
 .refreshanimate {
   animation: spin 2s infinite linear;
 }
-
-.cell-right {
-  text-align: right;
-}

@@ -88,7 +88,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       />
 
       {isLoading && (
-        <div className="aa-loader-container">
+        <div className="aa-loader-container d-flex align-items-center justify-content-center w-100">
           <span className={`spinner-border ${styles["loader-spinner"]}`} />
           <span>{t("Loading characters…")}</span>
         </div>
