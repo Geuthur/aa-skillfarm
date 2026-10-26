@@ -1,9 +1,4 @@
-.flex-container-loader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+
 
 .spinner-size {
     width: 2.5rem;

@@ -1,16 +1,13 @@
 .loading-state {
     padding: 30px;
-    text-align: center;
     color: var(--aa-text-secondary);
 }
 
 .search-wrapper {
-    position: relative;
     margin-bottom: 14px;
 }
 
 .search-icon {
-    position: absolute;
     left: 10px;
     top: 10px;
     color: var(--aa-text-muted);
@@ -18,7 +15,6 @@
 }
 
 .search-input {
-    width: 100%;
     padding-left: 34px;
 }
 
@@ -37,26 +33,19 @@
     overflow-y: auto;
     border: 1px solid var(--aa-border-light);
     border-radius: 6px;
-    padding: 8px;
     background-color: var(--aa-body);
 }
 
 .empty-state {
     padding: 20px;
-    text-align: center;
     color: var(--aa-text-muted);
 }
 
 .skill-grid {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 4px;
 }
 
 .skill-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     padding: 6px 10px;
     border-radius: 4px;
     cursor: pointer;

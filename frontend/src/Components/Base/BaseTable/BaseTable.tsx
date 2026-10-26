@@ -135,7 +135,7 @@ const BaseTable = <TData, TValue = unknown>({
               <tr>
                 <td
                   colSpan={table.getVisibleLeafColumns().length}
-                  className="aa-table-message"
+                  className="aa-table-message text-center"
                 >
                   {t("Something went wrong.")}
                 </td>
@@ -144,7 +144,7 @@ const BaseTable = <TData, TValue = unknown>({
               <tr>
                 <td
                   colSpan={table.getVisibleLeafColumns().length}
-                  className="aa-table-message"
+                  className="aa-table-message text-center"
                 >
                   {emptyText ?? t("No Data Available")}
                 </td>
@@ -165,7 +165,7 @@ const BaseTable = <TData, TValue = unknown>({
                     return (
                       <td
                         key={cell.id}
-                        className={`aa-table-cell ${styles["cell-middle"]} ${isRight ? styles["cell-right"] : ""
+                        className={`aa-table-cell align-middle ${isRight ? styles["cell-right"] : ""
                           }`}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -182,7 +182,7 @@ const BaseTable = <TData, TValue = unknown>({
       {/* DataTable Footer Controls */}
       <div className="aa-table-footer">
         {/* Page Size Selector, Count Indicator & Export / Status */}
-        <div className="aa-table-controls">
+        <div className="d-flex w-100 align-items-center justify-content-between gap-2">
           <div className="d-flex align-items-center gap-3">
             <div className="aa-table-page-size">
               <span>{t("Page Size:")}</span>
@@ -190,7 +190,7 @@ const BaseTable = <TData, TValue = unknown>({
                 size="sm"
                 value={pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
-                className={`aa-table-select ${styles["page-size-select"]}`}
+                className="aa-table-select w-auto"
               >
                 {pageSizeOptions.map((size) => (
                   <option key={size} value={size}>
@@ -214,7 +214,7 @@ const BaseTable = <TData, TValue = unknown>({
               className="aa-table-page-button"
               title={t("First Page")}
             >
-              <ChevronFirst className="aa-table-page-icon" />
+              <ChevronFirst className="aa-table-page-icon d-block" />
             </Button>
             <Button
               size="sm"
@@ -223,10 +223,10 @@ const BaseTable = <TData, TValue = unknown>({
               className="aa-table-page-button"
               title={t("Previous Page")}
             >
-              <ChevronLeft className="aa-table-page-icon" />
+              <ChevronLeft className="aa-table-page-icon d-block" />
             </Button>
 
-            <span className="aa-table-page-number">
+            <span className="aa-table-page-number py-0 px-2">
               {t("Page {{page}} of {{total}}", {
                 page: pageIndex + 1,
                 total: pageCount,
@@ -240,7 +240,7 @@ const BaseTable = <TData, TValue = unknown>({
               className="aa-table-page-button"
               title={t("Next Page")}
             >
-              <ChevronRight className="aa-table-page-icon" />
+              <ChevronRight className="aa-table-page-icon d-block" />
             </Button>
             <Button
               size="sm"
@@ -249,7 +249,7 @@ const BaseTable = <TData, TValue = unknown>({
               className="aa-table-page-button"
               title={t("Last Page")}
             >
-              <ChevronLast className="aa-table-page-icon" />
+              <ChevronLast className="aa-table-page-icon d-block" />
             </Button>
           </div>
         )}

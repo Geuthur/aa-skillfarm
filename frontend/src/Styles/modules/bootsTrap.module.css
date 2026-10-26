@@ -15,10 +15,6 @@
     pointer-events: none;
 }
 
-.tooltip-fixed {
-    position: fixed !important;
-}
-
 .tooltip span {
     white-space: nowrap;
 }

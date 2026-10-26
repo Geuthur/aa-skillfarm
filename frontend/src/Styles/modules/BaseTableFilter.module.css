@@ -1,7 +1,4 @@
-.searchwrapper {
-  position: relative;
-  width: 100%;
-}
+
 
 .searchinput {
   width: 100%;
@@ -33,14 +30,13 @@
 }
 
 .searchicon {
-  position: absolute;
-  right: 7px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  color: var(--aa-text-muted);
-  pointer-events: none;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    color: var(--aa-text-muted);
+    pointer-events: none;
 }
 
 .clearbutton {
@@ -66,7 +62,7 @@
 }
 
 .dropdown {
-  max-height: 250px !important;
+  max-height: 250px;
   overflow-y: auto;
   background-color: var(--aa-color-body);
   color: var(--aa-text-primary);

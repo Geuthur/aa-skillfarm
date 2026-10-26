@@ -9,8 +9,9 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Components/Base/OwnerSettings/OwnerSettings.module.css";
 
-// AA Skillfarm
 import { BaseModal } from "@/Components/Base/BaseModal";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import type { BaseMissingOwner } from "@/Components/Base/OwnerSettings/types";
 
 export interface UnregisteredModalProps {
@@ -74,7 +75,7 @@ function UnregisteredContent({
       )}
 
       {!isLoading && !isError && items.length === 0 && (
-        <div className={styles["empty-state"]}>{emptyMessage ?? t("Nothing to show.")}</div>
+        <div className={`${styles["empty-state"]} text-center`}>{emptyMessage ?? t("Nothing to show.")}</div>
       )}
 
       {!isLoading && !isError && items.length > 0 && (
@@ -97,20 +98,13 @@ function UnregisteredContent({
           </p>
 
           {filtered.length === 0 ? (
-            <div className={styles["empty-state"]}>{t("No matching characters found.")}</div>
+            <div className={`${styles["empty-state"]} text-center`}>{t("No matching characters found.")}</div>
           ) : (
             <ul className="list-unstyled d-flex flex-column gap-2 mb-0">
               {filtered.map((item) => (
                 <li key={item.id} className="d-flex align-items-center gap-3">
                   {item.avatar_url && (
-                    <img
-                      src={item.avatar_url}
-                      alt={item.name}
-                      width={32}
-                      height={32}
-                      className={styles["portrait"]}
-                      style={{ width: 32, height: 32 }}
-                    />
+                    <OwnerPortrait src={item.avatar_url} alt={item.name} size="sm" bordered />
                   )}
                   <div className="min-w-0">
                     <div className="fw-semibold">{item.name}</div>

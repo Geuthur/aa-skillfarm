@@ -1,21 +1,12 @@
-.indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
+
 
 .dot-wrapper {
-    position: relative;
-    display: inline-flex;
     width: 8px;
     height: 8px;
-    flex-shrink: 0;
 }
 
 .dot-ping {
-    position: absolute;
     inset: 0;
-    border-radius: 50%;
     background-color: var(--aa-color-emerald-light, #34d399);
     opacity: 0.75;
 }
@@ -27,11 +18,8 @@
 }
 
 .dot {
-    position: relative;
-    display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
 }
 
 .dot-ok {

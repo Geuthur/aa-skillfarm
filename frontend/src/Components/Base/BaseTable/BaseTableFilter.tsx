@@ -65,7 +65,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
           </div>
           <div className="d-flex gap-2 mt-2">
             <Button
-              variant="outline-secondary"
+              variant="secondary"
               size="sm"
               className="w-50"
               onClick={() => {
@@ -91,7 +91,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
 
   return (
     <OverlayTrigger trigger="click" placement="bottom" rootClose={true} overlay={popoverNumber}>
-      <div className={Styles.searchwrapper}>
+      <div className="position-relative w-100">
         <Form.Control
           size="sm"
           className={Styles.searchinput}
@@ -117,7 +117,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
             <X size={12} />
           </button>
         ) : (
-          <SlidersHorizontal size={12} className={Styles.searchicon} />
+          <SlidersHorizontal size={12} className={`${Styles.searchicon} position-absolute`} />
         )}
       </div>
     </OverlayTrigger>
@@ -166,7 +166,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
         </Dropdown>
       }
     >
-      <div className={Styles.searchwrapper}>
+      <div className="position-relative w-100">
         <Form.Control
           size="sm"
           className={Styles.searchinput}
@@ -188,7 +188,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
             <X size={12} />
           </button>
         ) : (
-          <ChevronDown size={12} className={Styles.searchicon} />
+          <ChevronDown size={12} className={`${Styles.searchicon} position-absolute`} />
         )}
       </div>
     </OverlayTrigger>
@@ -199,7 +199,7 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
   const { t } = useTranslation();
   const value = (column.getFilterValue() as string) ?? "";
   return (
-    <div className={Styles.searchwrapper}>
+    <div className="position-relative w-100">
       <Form.Control
         size="sm"
         className={Styles.searchinput}
@@ -220,7 +220,7 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
           <X size={12} />
         </button>
       ) : (
-        <Search size={12} className={Styles.searchicon} />
+        <Search size={12} className={`${Styles.searchicon} position-absolute`} />
       )}
     </div>
   );
@@ -284,7 +284,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
         </Dropdown>
       }
     >
-      <div className={Styles.searchwrapper}>
+      <div className="position-relative w-100">
         <Form.Control
           size="sm"
           className={Styles.searchinput}
@@ -320,7 +320,7 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
             <X size={12} />
           </button>
         ) : (
-          <ChevronDown size={12} className={Styles.searchicon} />
+          <ChevronDown size={12} className={`${Styles.searchicon} position-absolute`} />
         )}
       </div>
     </OverlayTrigger>

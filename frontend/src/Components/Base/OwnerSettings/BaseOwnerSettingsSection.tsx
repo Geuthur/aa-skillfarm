@@ -69,18 +69,18 @@ export function BaseOwnerSettingsSection<
   };
 
   return (
-    <Card className={`${styles["section"]} border-0`}>
+    <Card className="mt-4 border-0">
       <Card.Body className="bg-secondary text-light">
         <Card.Header
-          className={`${styles["section-header"]} bg-secondary d-flex justify-content-between align-items-center flex-wrap gap-2`}
+          className="d-flex align-items-center justify-content-between gap-2 mb-3 flex-wrap bg-secondary d-flex justify-content-between align-items-center flex-wrap gap-2"
         >
           <div>
-            <div className={styles["section-title-wrap"]}>
+            <div className={`${styles["section-title-wrap"]} d-flex align-items-center gap-2`}>
               {icon ?? <Users size={20} aria-hidden="true" />}
-              <h2 className={styles["section-title"]}>{title ?? t("Owner Status")}</h2>
+              <h2 className={`${styles["section-title"]} m-0 fw-bold`}>{title ?? t("Owner Status")}</h2>
               {owners && <span className={styles["section-count"]}>({owners.length})</span>}
             </div>
-            <p className={styles["section-description"]}>
+            <p className={`${styles["section-description"]} w-100`}>
               {description ?? t("ESI synchronization status of your linked owners.")}
             </p>
           </div>
@@ -89,7 +89,7 @@ export function BaseOwnerSettingsSection<
             <Button
               variant="secondary"
               size="sm"
-              className="aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1"
+              className="d-flex align-items-center gap-1"
               disabled={isUpdatingAll || globalCooldown > 0}
               onClick={onUpdateAll}
             >
@@ -135,14 +135,14 @@ export function BaseOwnerSettingsSection<
 
         {!isLoading && !isError && !hasOwners && !hasMissing && (
           <Card className="bg-secondary text-light border-0 shadow-sm">
-            <Card.Body className={styles["empty-state"]}>
+            <Card.Body className={`${styles["empty-state"]} text-center`}>
               {emptyMessage ?? t("Nothing to show.")}
             </Card.Body>
           </Card>
         )}
 
         {!isLoading && !isError && hasOwners && (
-          <div className={styles["characters-grid"]}>
+          <div className={`${styles["characters-grid"]} d-grid gap-3`}>
             {owners?.map((owner) => (
               <BaseOwnerCard<T>
                 key={owner.id}
@@ -164,7 +164,7 @@ export function BaseOwnerSettingsSection<
               {missingSectionTitle ?? t("Not registered in {{app}}", { app: appName })} (
               {missingOwners?.length})
             </h3>
-            <div className={styles["characters-grid"]}>
+            <div className={`${styles["characters-grid"]} d-grid gap-3`}>
               {missingOwners?.map((missing) => (
                 <MissingOwnerCard
                   key={missing.id}
@@ -183,6 +183,7 @@ export function BaseOwnerSettingsSection<
             show={Boolean(ownerToDelete)}
             onHide={() => !isDeleting && setOwnerToDelete(null)}
             centered
+            contentClassName="aa-react"
           >
             <Modal.Header closeButton>
               <Modal.Title className="d-flex align-items-center gap-2 text-danger">
@@ -213,7 +214,6 @@ export function BaseOwnerSettingsSection<
                   variant="secondary"
                   onClick={() => setOwnerToDelete(null)}
                   disabled={isDeleting}
-                  className="aa-btn aa-btn-secondary"
                 >
                   {t("Cancel")}
                 </Button>
@@ -221,7 +221,7 @@ export function BaseOwnerSettingsSection<
                   variant="danger"
                   onClick={handleDeleteConfirm}
                   disabled={isDeleting}
-                  className="aa-btn aa-btn-danger d-flex align-items-center gap-1"
+                  className="d-flex align-items-center gap-1"
                 >
                   <Trash2 size={14} />
                   <span>{isDeleting ? t("Deleting…") : t("Confirm Delete")}</span>

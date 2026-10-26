@@ -3,6 +3,7 @@ import React from "react";
 
 // Third Party
 import { CheckCheck, Search, Sparkles } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -100,7 +101,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           onClick={() => handleTabClick("pending")}
         >
           {pendingCount > 0 && (
-            <span className={`sf-extraction-pulsing ${styles["pulse-icon"]}`}>
+            <span className="sf-extraction-pulsing me-1">
               <Sparkles size={14} />
             </span>
           )}
@@ -117,11 +118,11 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
       </div>
 
       {/* Search & Actions */}
-      <div className={styles["actions"]}>
-        <div className={styles["search-wrapper"]}>
+      <div className="d-flex align-items-center gap-2 flex-wrap">
+        <div className="position-relative d-inline-flex align-items-center">
           <Search
             size={16}
-            className={styles["search-icon"]}
+            className={`${styles["search-icon"]} position-absolute`}
           />
           <input
             type="text"
@@ -135,15 +136,13 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
         {pendingCount > 0 && onBulkAcknowledge && (
           renderTooltip(
             t("Mark all currently pending skill extractions as reviewed"),
-            <button
-              type="button"
-              className="sf-btn sf-btn-warning"
+            <Button variant="warning"
               onClick={onBulkAcknowledge}
               disabled={isBulkAcknowledging}
             >
               <CheckCheck size={16} />
               <span>{t("Acknowledge All ({{count}})", { count: pendingCount })}</span>
-            </button>
+            </Button>
           )
         )}
       </div>

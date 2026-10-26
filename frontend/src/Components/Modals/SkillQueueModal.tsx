@@ -2,22 +2,21 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, Sparkles } from "lucide-react";
+import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
-import { fetchCharacterDetail } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
-import { QueueEntryProgress } from "@/Components/Dashboard/QueueEntryProgress";
-import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
+import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
+import { useCharacterDetail } from "@/Components/Modals/Hooks";
 import { formatNumber } from "@/Utils/format";
 
 interface SkillQueueModalProps {
@@ -38,7 +37,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
       {
         accessorKey: "skill_name",
         header: t("Skill"),
-        cell: ({ row }) => <span className={styles["skill-name"]}>{row.original.skill_name}</span>,
+        cell: ({ row }) => <span className="fw-semibold">{row.original.skill_name}</span>,
       },
       {
         accessorKey: "finished_level_roman",
@@ -80,7 +79,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           const entry = row.original;
           if (entry.is_active) {
             return (
-              <span className="sf-badge-training">
+              <span className="sf-badge-training d-inline-flex align-items-center gap-1">
                 <Clock size={12} />
                 <span>{t("Training")}</span>
               </span>
@@ -88,7 +87,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
           }
           if (entry.is_extractable) {
             return (
-              <span className="sf-badge-extraction-pending">
+              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
                 <Sparkles size={12} />
                 <span>{t("Ready")}</span>
               </span>
@@ -101,11 +100,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
     [t]
   );
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: queryKeys.CharacterDetail(characterId),
-    queryFn: () => (characterId ? fetchCharacterDetail(characterId) : Promise.reject("No ID")),
-    enabled: !!characterId,
-  });
+  const { data, isLoading, error } = useCharacterDetail(characterId);
 
   if (!characterId) return null;
 
@@ -128,13 +123,13 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
     >
       <div>
         {isLoading && (
-          <div className={styles["loading-state"]}>
+          <div className={`${styles["loading-state"]} text-center`}>
             {t("Loading queue details…")}
           </div>
         )}
 
         {error && (
-          <div className={styles["error-state"]}>
+          <div className={`${styles["error-state"]} text-center`}>
             {t("Failed to load skill queue.")}
           </div>
         )}
@@ -142,74 +137,82 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
         {data && (
           <div>
             {/* Header info */}
-            <div className="aa-panel d-flex align-items-center gap-3 mb-3">
-              {data.character.portrait_url && (
-                <img
-                  src={data.character.portrait_url}
-                  alt={data.character.character_name}
-                  className={`rounded-circle ${styles["avatar"]}`}
-                />
-              )}
-              <div>
-                <h5 className="mb-0 text-white">{data.character.character_name}</h5>
-                <small className="text-secondary">
-                  {data.character.corporation_name} [{data.character.corporation_ticker}]
-                </small>
-              </div>
-            </div>
+            <Card className="mb-3">
+              <Card.Body className="d-flex align-items-center gap-3">
+                {data.character.portrait_url && (
+                  <OwnerPortrait src={data.character.portrait_url} alt={data.character.character_name} />
+                )}
+                <div>
+                  <h5 className="mb-0 text-white">{data.character.character_name}</h5>
+                  <small className="text-secondary">
+                    {data.character.corporation_name} [{data.character.corporation_ticker}]
+                  </small>
+                </div>
+              </Card.Body>
+            </Card>
 
             {/* Summary Stats */}
             <div
-              className={styles["summary-grid"]}
+              className={`${styles["summary-grid"]} d-grid gap-2`}
             >
-              <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>{t("Total SP")}</div>
-                <div className={styles["summary-value"]}>
-                  {(data.character.total_sp / 1_000_000).toFixed(2)}M
-                </div>
-              </div>
+              <Card>
+                <Card.Body className={`${styles["summary-card"]} text-center`}>
+                  <div className={styles["summary-label"]}>{t("Total SP")}</div>
+                  <div className={`${styles["summary-value"]} fw-bold`}>
+                    {(data.character.total_sp / 1_000_000).toFixed(2)}M
+                  </div>
+                </Card.Body>
+              </Card>
 
-              <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>{t("Queue State")}</div>
-                <div className={styles["summary-value-sm"]}>
-                  {data.character.is_training ? (
-                    <span className={styles["status-active"]}>{t("Active")}</span>
-                  ) : (
-                    <span className={styles["status-paused"]}>{t("Paused / Empty")}</span>
-                  )}
-                </div>
-              </div>
+              <Card>
+                <Card.Body className={`${styles["summary-card"]} text-center`}>
+                  <div className={styles["summary-label"]}>{t("Queue State")}</div>
+                  <div className={`${styles["summary-value-sm"]} fw-bold`}>
+                    {data.character.is_training ? (
+                      <span className={styles["status-active"]}>{t("Active")}</span>
+                    ) : (
+                      <span className={styles["status-paused"]}>{t("Paused / Empty")}</span>
+                    )}
+                  </div>
+                </Card.Body>
+              </Card>
 
-              <div className={`aa-panel ${styles["summary-card"]}`}>
-                <div className={styles["summary-label"]}>{t("Ready Extractions")}</div>
-                <div className={styles["summary-value-amber"]}>
-                  {data.character.extractions_ready_count}
-                </div>
-              </div>
+              <Card>
+                <Card.Body className={`${styles["summary-card"]} text-center`}>
+                  <div className={styles["summary-label"]}>{t("Ready Extractions")}</div>
+                  <div className={`${styles["summary-value-amber"]} fw-bold`}>
+                    {data.character.extractions_ready_count}
+                  </div>
+                </Card.Body>
+              </Card>
             </div>
 
             {/* Current training progress */}
-            <div className={`aa-panel ${styles["training-panel"]}`}>
-              <TrainingProgressBar
-                isTraining={data.character.is_training}
-                currentSkill={data.character.current_training_skill}
-                trainingStartDate={data.character.training_start_date}
-                trainingFinishDate={data.character.training_finish_date}
-                queueFinishDate={data.character.queue_finish_date}
-                queuePausedAcknowledged={data.character.queue_paused_acknowledged}
-                progressPercent={data.character.progress_percent}
-              />
-            </div>
+            <Card>
+              <Card.Body>
+                <TrainingProgressBar
+                  isTraining={data.character.is_training}
+                  currentSkill={data.character.current_training_skill}
+                  trainingStartDate={data.character.training_start_date}
+                  trainingFinishDate={data.character.training_finish_date}
+                  queueFinishDate={data.character.queue_finish_date}
+                  queuePausedAcknowledged={data.character.queue_paused_acknowledged}
+                  progressPercent={data.character.progress_percent}
+                />
+              </Card.Body>
+            </Card>
 
             {/* Queue List */}
-            <h6 className={styles["section-title"]}>
+            <h6 className={`${styles["section-title"]} text-uppercase mt-4`}>
               {t("Active Training Queue ({{count}})", { count: data.skillqueue.length })}
             </h6>
 
             {data.skillqueue.length === 0 ? (
-              <div className={`aa-panel ${styles["empty-state"]}`}>
-                {t("No skills in queue. Training is inactive.")}
-              </div>
+              <Card>
+                <Card.Body className={`${styles["empty-state"]} text-center p-4`}>
+                  {t("No skills in queue. Training is inactive.")}
+                </Card.Body>
+              </Card>
             ) : (
               <BaseTable
                 data={data.skillqueue}
@@ -222,8 +225,8 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
             {/* Farmed Skills in Setup */}
             {data.farmed_skills.length > 0 && (
-              <div className={styles["farmed-section"]}>
-                <h6 className={styles["section-title"]}>
+              <div className="mt-4">
+                <h6 className={`${styles["section-title"]} text-uppercase`}>
                   {t("Configured Farm Skills ({{count}})", { count: data.farmed_skills.length })}
                 </h6>
                 <div className="sf-table-container">
@@ -239,12 +242,12 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
                     <tbody>
                       {data.farmed_skills.map((skill) => (
                         <tr key={skill.skill_id}>
-                          <td className={styles["skill-name"]}>{skill.skill_name}</td>
+                          <td className="fw-semibold">{skill.skill_name}</td>
                           <td>{t("Level {{level}}", { level: skill.trained_level })}</td>
                           <td>{formatNumber(skill.skillpoints)} SP</td>
                           <td>
                             {skill.is_extractable ? (
-                              <span className="sf-badge-extraction-pending">
+                              <span className="sf-badge-extraction-pending d-inline-flex align-items-center gap-1">
                                 <Sparkles size={12} />
                                 <span>{t("Extractable (Lvl 5)")}</span>
                               </span>

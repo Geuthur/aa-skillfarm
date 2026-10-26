@@ -4,17 +4,18 @@ import React, { useMemo, useState } from "react";
 // Third Party
 import { createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { AlertTriangle, RefreshCw, Shield, User, Users } from "lucide-react";
+import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-// AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 // Utils
 import { renderTooltip } from "@/Utils";
 import { formatNumber } from "@/Utils/format";
@@ -121,20 +122,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
         enableSorting: false,
         cell: ({ row }) => {
           const group = row.original;
-          return group.mainPortraitUrl ? (
-            <img
-              src={group.mainPortraitUrl}
-              alt=""
-              width={32}
-              height={32}
-              className="rounded flex-shrink-0"
-              loading="lazy"
-            />
-          ) : (
-            <div className={`p-1 bg-secondary rounded text-center ${styles.avatarFallback}`}>
-              <User size={16} />
-            </div>
-          );
+          return <OwnerPortrait src={group.mainPortraitUrl} size="sm" shape="rounded" />;
         },
       }),
 
@@ -152,8 +140,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="aa-btn aa-btn-secondary aa-btn-sm py-0 px-2 text-decoration-none"
-                    style={{ fontSize: "0.75rem", lineHeight: 1 }}
+                    className="py-0 px-2 small lh-1 text-decoration-none"
                     onClick={() => setSelectedAltsGroup(group)}
                     data-testid={`alts-btn-${group.id}`}
                   >
@@ -250,10 +237,10 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
           return (
             <div className="d-flex align-items-center justify-content-end gap-2">
               <Button
-                variant="outline-secondary"
+                variant="secondary"
                 size="sm"
                 onClick={() => setSelectedAltsGroup(group)}
-                className="d-inline-flex align-items-center gap-1 aa-btn"
+                className="d-inline-flex align-items-center gap-1"
                 data-testid={`view-alts-btn-${group.id}`}
               >
                 <Users size={13} />
@@ -264,13 +251,13 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                 {renderTooltip(
                   t("Trigger updates for all alts of this pilot"),
                   <Button
-                    variant="outline-danger"
+                    variant="danger"
                     size="sm"
                     disabled={isAnyUpdating}
                     onClick={() =>
                       group.alts.forEach((a) => onTriggerUpdate(a.character_id, false))
                     }
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                     data-testid={`update-all-alts-${group.id}`}
                   >
                     {isAnyUpdating ? (
@@ -286,10 +273,9 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                   <Dropdown.Toggle
                     split
                     size="sm"
-                    variant="outline-danger"
+                    variant="danger"
                     aria-label={t("More update options")}
                     disabled={isAnyUpdating}
-                    className="aa-btn aa-btn-danger"
                   />,
                 )}
                 <Dropdown.Menu

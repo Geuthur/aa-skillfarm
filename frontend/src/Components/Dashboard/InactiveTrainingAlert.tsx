@@ -3,6 +3,7 @@ import React from "react";
 
 // Third Party
 import { AlertTriangle, ArrowRight } from "lucide-react";
+import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -29,13 +30,13 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
   }
 
   return (
-    <div className="sf-inactive-banner" role="alert">
-      <div className="sf-inactive-banner-content">
+    <div className="sf-inactive-banner d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3" role="alert">
+      <div className="d-flex align-items-center gap-3">
         <span className={`text-warning fs-3 ${styles["alert-icon"]}`} aria-hidden="true">
           <AlertTriangle size={28} />
         </span>
         <div>
-          <h4 className="sf-inactive-banner-title">
+          <h4 className="sf-inactive-banner-title m-0">
             {pausedCount === 1
               ? t("1 Character has no active training queue!")
               : t("{{count}} Characters have no active training queue!", { count: pausedCount })}
@@ -45,14 +46,12 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
           </p>
         </div>
       </div>
-      <button
-        type="button"
-        className="sf-btn sf-btn-warning"
+      <Button variant="warning"
         onClick={onFilterInactive}
       >
         <span>{t("View Paused Characters ({{count}})", { count: pausedCount })}</span>
         <ArrowRight size={16} />
-      </button>
+      </Button>
     </div>
   );
 };

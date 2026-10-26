@@ -4,6 +4,7 @@ import React, { useMemo } from "react";
 // Third Party
 import type { ColumnDef } from "@tanstack/react-table";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
+import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -11,7 +12,9 @@ import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
+import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 // Utils
 import { renderTooltip } from "@/Utils";
@@ -42,13 +45,11 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         cell: ({ row }) => {
           const char = row.original;
           return (
-            <div className={styles["pilot-info"]}>
-              <div className="aa-portrait">
-                <img src={char.portrait_url} alt={char.character_name} />
-              </div>
+            <div className="d-flex align-items-center gap-2">
+              <OwnerPortrait src={char.portrait_url} alt={char.character_name} />
               <div>
                 <div
-                  className={styles["pilot-name"]}
+                  className={`${styles["pilot-name"]} fw-bold`}
                   onClick={() => onViewQueue(char.character_id)}
                 >
                   {char.character_name}
@@ -102,7 +103,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         header: t("Total SP"),
         accessorFn: (row) => row.total_sp,
         cell: ({ row }) => (
-          <span className={styles["total-sp"]}>
+          <span className={`${styles["total-sp"]} fw-semibold`}>
             {(row.original.total_sp / 1_000_000).toFixed(2)}M
           </span>
         ),
@@ -124,29 +125,10 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                 {char.last_update ? char.last_update.slice(5) : t("Pending")}
               </span>
               <div>
-                {isError && (
-                  <span className="badge bg-danger d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span className="aa-status-dot-pulse bg-danger" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
-                    {t("Sync Error")}
-                  </span>
-                )}
-                {isTokenError && (
-                  <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span className="aa-status-dot-pulse bg-warning" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
-                    {t("Token Error")}
-                  </span>
-                )}
-                {isOk && (
-                  <span className="badge bg-success d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#fff", display: "inline-block" }} />
-                    {t("OK")}
-                  </span>
-                )}
-                {!status && (
-                  <span className="badge bg-secondary" style={{ fontSize: "0.7rem" }}>
-                    {t("Pending")}
-                  </span>
-                )}
+                {isError && <SyncStatusBadge variant="danger" label={t("Sync Error")} pulse />}
+                {isTokenError && <SyncStatusBadge variant="warning" label={t("Token Error")} pulse />}
+                {isOk && <SyncStatusBadge variant="success" label={t("OK")} />}
+                {!status && <SyncStatusBadge variant="secondary" label={t("Pending")} dot={false} />}
               </div>
             </div>
           );
@@ -165,58 +147,50 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
             !char.is_training && !char.queue_paused_acknowledged;
 
           return (
-            <div className={styles["actions-cell"]}>
-              <div className={styles["actions-group"]}>
+            <div className="text-end">
+              <div className="d-inline-flex align-items-center gap-1">
                 {/* Acknowledge Extraction action */}
                 {hasPendingExtractions &&
                   renderTooltip(
                     t("Mark extractions as reviewed"),
-                    <button
-                      type="button"
-                      className="sf-btn sf-btn-warning sf-btn-sm"
+                    <Button variant="warning" size="sm"
                       onClick={() => onAcknowledgeExtractions(char.character_id)}
                     >
                       <Check size={14} />
                       <span>{t("Acknowledge")}</span>
-                    </button>,
+                    </Button>,
                   )}
 
                 {/* Acknowledge Paused queue */}
                 {hasUnacknowledgedPaused &&
                   renderTooltip(
                     t("Acknowledge paused training"),
-                    <button
-                      type="button"
-                      className="sf-btn sf-btn-secondary sf-btn-sm"
+                    <Button variant="secondary" size="sm"
                       onClick={() => onAcknowledgePaused(char.character_id)}
                     >
                       <PauseCircle size={14} />
                       <span>{t("Acknowledge Idle")}</span>
-                    </button>,
+                    </Button>,
                   )}
 
                 {/* View Queue */}
                 {renderTooltip(
                   t("Inspect Skill Queue"),
-                  <button
-                    type="button"
-                    className="sf-btn sf-btn-secondary sf-btn-sm"
+                  <Button variant="secondary" size="sm"
                     onClick={() => onViewQueue(char.character_id)}
                   >
                     <Eye size={14} />
-                  </button>,
+                  </Button>,
                 )}
 
                 {/* Skill Setup */}
                 {renderTooltip(
                   t("Configure Farm Skillset"),
-                  <button
-                    type="button"
-                    className="sf-btn sf-btn-secondary sf-btn-sm"
+                  <Button variant="secondary" size="sm"
                     onClick={() => onOpenSetup(char.character_id)}
                   >
                     <Settings size={14} />
-                  </button>,
+                  </Button>,
                 )}
               </div>
             </div>
@@ -235,12 +209,14 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
 
   if (characters.length === 0) {
     return (
-      <div className={`aa-panel ${styles["empty-state"]}`}>
-        <h4 className={styles["empty-title"]}>{t("No characters found")}</h4>
-        <p className={styles["empty-text"]}>
-          {t("Try clearing your filters or adding new characters to Skillfarm.")}
-        </p>
-      </div>
+      <Card>
+        <Card.Body className={`${styles["empty-state"]} text-center`}>
+          <h4 className={`${styles["empty-title"]} mb-2`}>{t("No characters found")}</h4>
+          <p className={`${styles["empty-text"]} m-0`}>
+            {t("Try clearing your filters or adding new characters to Skillfarm.")}
+          </p>
+        </Card.Body>
+      </Card>
     );
   }
 

@@ -2,31 +2,20 @@
 import React, { useState } from "react";
 
 // Third Party
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/CharacterDashboard.module.css";
 
-import {
-  acknowledgeAllExtractions,
-  acknowledgeExtractions,
-  acknowledgePaused,
-  fetchCharacters,
-  fetchOverviewUser,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import type {
   CharacterFilterParams,
-  CharacterListResponse,
   OverviewUserSchema,
 } from "@/Api/schema";
-import { CharacterTable } from "@/Components/Dashboard/CharacterTable";
-import { InactiveTrainingAlert } from "@/Components/Dashboard/InactiveTrainingAlert";
-import { SkillfarmFilterBar } from "@/Components/Dashboard/SkillfarmFilterBar";
-import { SkillQueueModal } from "@/Components/Modals/SkillQueueModal";
-import { SkillSetupModal } from "@/Components/Modals/SkillSetupModal";
+import { CharacterTable, InactiveTrainingAlert, SkillfarmFilterBar } from "@/Components/Dashboard";
+import { SkillQueueModal, SkillSetupModal } from "@/Components/Modals";
+import { useCharacterAcknowledgements, useCharacters } from "@/Components/Sections/Hooks";
 
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */
@@ -36,7 +25,6 @@ interface CharacterDashboardProps {
 
 export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, renderHeader }) => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const isForeignUser = userId !== undefined;
 
   // URL state via nuqs for filterable, bookmarkable, and shareable URLs
@@ -63,33 +51,9 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       (notificationStatus as CharacterFilterParams["notification_status"]) || "all",
   };
 
-  const { data, isLoading, error } = useQuery<CharacterListResponse & { user?: OverviewUserSchema }>({
-    queryKey: isForeignUser
-      ? queryKeys.OverviewUser(userId, filterParams)
-      : queryKeys.Characters(filterParams),
-    queryFn: () => (isForeignUser ? fetchOverviewUser(userId, filterParams) : fetchCharacters(filterParams)),
-  });
-
-  const invalidateCharacters = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
-  };
-
-  // Mutations
-  const ackExtractionMutation = useMutation({
-    mutationFn: (charId: number) => acknowledgeExtractions(charId),
-    onSuccess: invalidateCharacters,
-  });
-
-  const ackPausedMutation = useMutation({
-    mutationFn: (charId: number) => acknowledgePaused(charId),
-    onSuccess: invalidateCharacters,
-  });
-
-  const bulkAckMutation = useMutation({
-    mutationFn:  acknowledgeAllExtractions,
-    onSuccess: invalidateCharacters,
-  });
+  const { data, isLoading, error } = useCharacters(filterParams, userId);
+  const { acknowledgeExtraction, acknowledgePausedTraining, acknowledgeAll } =
+    useCharacterAcknowledgements();
 
   const handleFilterChange = (newFilters: Partial<CharacterFilterParams>) => {
     if (newFilters.search !== undefined) setSearch(newFilters.search || null);
@@ -119,8 +83,8 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
         pausedCount={data?.paused_training_count ?? 0}
         pendingCount={data?.pending_extractions_count ?? 0}
         reviewedCount={data?.acknowledged_extractions_count ?? 0}
-        onBulkAcknowledge={isForeignUser ? undefined : () => bulkAckMutation.mutate()}
-        isBulkAcknowledging={bulkAckMutation.isPending}
+        onBulkAcknowledge={isForeignUser ? undefined : () => acknowledgeAll.mutate()}
+        isBulkAcknowledging={acknowledgeAll.isPending}
       />
 
       {isLoading && (
@@ -131,9 +95,11 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
       )}
 
       {error && (
-        <div className={`aa-panel ${styles["error-panel"]}`}>
-          {t("Failed to load characters. Please try refreshing the page.")}
-        </div>
+        <Card>
+          <Card.Body className={`${styles["error-panel"]} p-4 text-center`}>
+            {t("Failed to load characters. Please try refreshing the page.")}
+          </Card.Body>
+        </Card>
       )}
 
       {data && (
@@ -141,8 +107,8 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
           characters={data.characters}
           onViewQueue={(id) => setSelectedQueueCharId(id)}
           onOpenSetup={(id) => setSelectedSetupCharId(id)}
-          onAcknowledgeExtractions={(id) => ackExtractionMutation.mutate(id)}
-          onAcknowledgePaused={(id) => ackPausedMutation.mutate(id)}
+          onAcknowledgeExtractions={(id) => acknowledgeExtraction.mutate(id)}
+          onAcknowledgePaused={(id) => acknowledgePausedTraining.mutate(id)}
         />
       )}
 

@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 // AA Base
 import styles from "@/Components/Base/OwnerSettings/OwnerSettings.module.css";
 
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import type { BaseOwner, BaseOwnerCardProps } from "@/Components/Base/OwnerSettings/types";
 
 /** Card of a registered owner: status badge, update sections and action buttons. */
@@ -64,11 +65,11 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
     }
 
     return (
-      <span className={`${styles["status-badge"]} ${badgeClass}`}>
+      <span className={`${styles["status-badge"]} d-inline-flex align-items-center gap-1 fw-semibold ${badgeClass}`}>
         {(isError || isTokenError) && (
-          <span className="aa-pending-dot-container me-1" aria-hidden="true">
-            <span className={isTokenError ? "aa-danger-dot-ping" : "aa-pending-dot-ping"} />
-            <span className={isTokenError ? "aa-danger-dot-core" : "aa-pending-dot-core"} />
+          <span className="aa-pending-dot-container position-relative d-inline-flex align-items-center justify-content-center me-1" aria-hidden="true">
+            <span className={isTokenError ? "aa-danger-dot-ping position-absolute w-100 h-100 rounded-circle" : "aa-pending-dot-ping position-absolute w-100 h-100 rounded-circle"} />
+            <span className={isTokenError ? "aa-danger-dot-core position-relative rounded-circle" : "aa-pending-dot-core position-relative rounded-circle"} />
           </span>
         )}
         <Icon size={12} aria-hidden="true" />
@@ -88,23 +89,17 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
 
   return (
     <article className={`bg-dark ${styles["char-card"]} ${cardClass}`}>
-      <div className={styles["char-header"]}>
-        {owner.avatar_url ? (
-          <img
-            src={owner.avatar_url}
-            alt={owner.name}
-            className={`${styles["portrait"]} ${type === "corporation" ? styles["portrait-corp"] : ""}`}
-          />
-        ) : (
-          <div
-            className={`${styles["portrait"]} d-flex align-items-center justify-content-center bg-secondary text-light`}
-          >
-            <TypeIcon size={24} />
-          </div>
-        )}
-        <div className={styles["char-info"]}>
+      <div className="d-flex align-items-center gap-2">
+        <OwnerPortrait
+          src={owner.avatar_url}
+          alt={owner.name}
+          type={type}
+          shape={type === "corporation" ? "rounded" : "circle"}
+          bordered
+        />
+        <div className={`${styles["char-info"]} flex-fill`}>
           <div className="d-flex align-items-center justify-content-between gap-2">
-            <h3 className={styles["char-name"]} title={owner.name}>
+            <h3 className={`${styles["char-name"]} m-0 fw-semibold text-nowrap overflow-hidden`} title={owner.name}>
               {owner.name}
             </h3>
             <span
@@ -114,7 +109,7 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
               {typeLabel}
             </span>
           </div>
-          {owner.subtitle && <p className={styles["char-corp"]}>{owner.subtitle}</p>}
+          {owner.subtitle && <p className={`${styles["char-corp"]} text-nowrap overflow-hidden`}>{owner.subtitle}</p>}
         </div>
       </div>
 
@@ -125,7 +120,7 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
       )}
 
       {owner.sections && owner.sections.length > 0 && (
-        <div className={styles["sections-list"]}>
+        <div className={`${styles["sections-list"]} d-flex flex-column gap-1 p-2`}>
           {owner.sections.map((sec) => {
             let dotClass = styles["dot-muted"];
             if (sec.is_success === true) dotClass = styles["dot-ok"];
@@ -133,9 +128,9 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
             else if (sec.has_token_error) dotClass = styles["dot-error"];
 
             return (
-              <div key={sec.section} className={styles["section-item"]}>
+              <div key={sec.section} className={`${styles["section-item"]} d-flex align-items-center justify-content-between`}>
                 <span className="d-inline-flex align-items-center gap-2">
-                  <span className={`${styles["section-dot"]} ${dotClass}`} aria-hidden="true" />
+                  <span className={`${styles["section-dot"]} rounded-circle flex-shrink-0 ${dotClass}`} aria-hidden="true" />
                   <span>{sec.section_name}</span>
                 </span>
                 <span>
@@ -155,10 +150,10 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
 
       {renderCustomContent?.(owner)}
 
-      <div className={styles["badge-row"]}>
+      <div className={`${styles["badge-row"]} d-flex align-items-center justify-content-between gap-2 pt-2`}>
         {renderStatusBadge()}
         <span
-          className={styles["last-sync"]}
+          className={`${styles["last-sync"]} d-inline-flex align-items-center gap-1`}
           title={owner.last_sync ? `${t("Last sync")}: ${owner.last_sync}` : undefined}
         >
           <Clock size={12} aria-hidden="true" />
@@ -174,7 +169,7 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
               <Button
                 variant="secondary"
                 size="sm"
-                className="aa-btn aa-btn-secondary aa-btn-sm d-flex align-items-center gap-1"
+                className="d-flex align-items-center gap-1"
                 disabled={isUpdating || cooldown > 0}
                 onClick={() => onTriggerUpdate(owner.id)}
                 aria-label={t("Update Owner")}
@@ -191,7 +186,7 @@ export function BaseOwnerCard<T extends BaseOwner = BaseOwner>({
               <Button
                 variant="danger"
                 size="sm"
-                className="aa-btn aa-btn-danger aa-btn-sm d-flex align-items-center gap-1"
+                className="d-flex align-items-center gap-1"
                 onClick={() => onDeleteClick(owner)}
                 aria-label={t("Delete Owner")}
               >

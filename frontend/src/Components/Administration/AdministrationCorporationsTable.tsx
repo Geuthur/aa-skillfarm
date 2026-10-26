@@ -2,16 +2,21 @@
 import { useState } from "react";
 
 // Third Party
-import { useQuery } from "@tanstack/react-query";
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
+
 // AA Skillfarm
-import { loadAdministrationCorporations, loadAdministrationUnregistered } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import type { AdministrationCorporationSchema } from "@/Api/schema";
+import {
+  useAdministrationCorporations,
+  useAdministrationUnregistered,
+} from "@/Components/Administration/Hooks";
 import ErrorLoader from "@/Components/Base/Loader/ErrorLoader";
 import FetchingLoader from "@/Components/Base/Loader/FetchingLoader";
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { UnregisteredModal } from "@/Components/Base/OwnerSettings/UnregisteredModal";
 
 /** Corporations (own corporation or all) with their registered and unregistered characters. */
@@ -19,24 +24,12 @@ export const AdministrationCorporationsTable = () => {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<AdministrationCorporationSchema | null>(null);
 
-  const {
-    data: corporations,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: queryKeys.AdministrationCorporations,
-    queryFn: loadAdministrationCorporations,
-  });
-
+  const { data: corporations, isLoading, isError } = useAdministrationCorporations();
   const {
     data: unregistered,
     isLoading: isLoadingUnregistered,
     isError: isErrorUnregistered,
-  } = useQuery({
-    queryKey: queryKeys.AdministrationUnregistered(selected?.corporation_id ?? null),
-    queryFn: () => loadAdministrationUnregistered(selected!.corporation_id),
-    enabled: Boolean(selected),
-  });
+  } = useAdministrationUnregistered(selected?.corporation_id ?? null);
 
   if (isLoading) return <FetchingLoader />;
   if (isError) return <ErrorLoader message={t("Failed to load corporations.")} />;
@@ -46,7 +39,7 @@ export const AdministrationCorporationsTable = () => {
       <Table responsive hover size="sm" className="align-middle mb-0" data-testid="corporations-table">
         <thead>
           <tr>
-            <th aria-label={t("Logo")} style={{ width: 48 }} />
+            <th aria-label={t("Logo")} className={styles["logo-col"]} />
             <th>{t("Corporation")}</th>
             <th className="text-end">{t("Registered")}</th>
             <th className="text-end">{t("Unregistered")}</th>
@@ -56,7 +49,7 @@ export const AdministrationCorporationsTable = () => {
           {(corporations ?? []).map((corp) => (
             <tr key={corp.corporation_id}>
               <td>
-                <img src={corp.logo_url} alt="" width={32} height={32} className="rounded" />
+                <OwnerPortrait src={corp.logo_url} type="corporation" size="sm" shape="rounded" />
               </td>
               <td>
                 <span className="fw-semibold">{corp.corporation_name}</span>{" "}

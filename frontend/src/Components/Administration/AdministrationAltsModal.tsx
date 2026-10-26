@@ -4,20 +4,21 @@ import React, { useMemo, useState } from "react";
 // Third Party
 import { createColumnHelper } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Eye, RefreshCw, Trash2, User } from "lucide-react";
-import { Badge, Button, ButtonGroup, Dropdown, Spinner } from "react-bootstrap";
+import { Eye, RefreshCw, Trash2 } from "lucide-react";
+import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/Administration.module.css";
 
-// AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import type { MainCharacterGroup } from "@/Components/Administration/AdministrationAuditsTable";
 import { AdministrationErrorModal } from "@/Components/Administration/AdministrationErrorModal";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+// AA Skillfarm
+import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { renderTooltip } from "@/Utils";
 import { formatNumber } from "@/Utils/format";
 
@@ -55,20 +56,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
         enableSorting: false,
         cell: ({ row }) => {
           const audit = row.original;
-          return audit.portrait_url ? (
-            <img
-              src={audit.portrait_url}
-              alt=""
-              width={28}
-              height={28}
-              className="rounded flex-shrink-0"
-              loading="lazy"
-            />
-          ) : (
-            <div className={`p-1 bg-secondary rounded text-center ${styles.avatarFallback}`}>
-              <User size={14} />
-            </div>
-          );
+          return <OwnerPortrait src={audit.portrait_url} size="sm" shape="rounded" />;
         },
       }),
 
@@ -197,7 +185,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                   variant="primary"
                   size="sm"
                   onClick={() => onInspect(audit)}
-                  className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-primary aa-btn aa-btn-primary"
+                  className="d-inline-flex align-items-center gap-1"
                 >
                   <Eye size={13} />
                   <span>{t("Inspect")}</span>
@@ -211,7 +199,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     size="sm"
                     onClick={() => onTriggerUpdate(audit.character_id, false)}
                     disabled={isUpdating}
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                   >
                     {isUpdating ? (
                       <Spinner size="sm" animation="border" />
@@ -229,7 +217,6 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isUpdating}
-                    className="aa-btn aa-btn-danger"
                   />,
                 )}
                 <Dropdown.Menu
@@ -259,7 +246,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     size="sm"
                     onClick={() => onDelete(audit)}
-                    className="d-inline-flex align-items-center gap-1 sf-btn sf-btn-danger aa-btn aa-btn-danger"
+                    className="d-inline-flex align-items-center gap-1"
                   >
                     <Trash2 size={13} />
                     <span>{t("Delete")}</span>
@@ -292,14 +279,16 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
       }}
       size={ModalSize.extraLarge}
     >
-      <div className="aa-panel p-0">
-        <BaseTable
-          columns={columns}
-          data={group?.alts ?? []}
-          emptyText={t("No alt characters found.")}
-          exportFileName={`alts_${group?.mainCharacterName ?? "character"}.csv`}
-        />
-      </div>
+      <Card>
+        <Card.Body className="p-0">
+          <BaseTable
+            columns={columns}
+            data={group?.alts ?? []}
+            emptyText={t("No alt characters found.")}
+            exportFileName={`alts_${group?.mainCharacterName ?? "character"}.csv`}
+          />
+        </Card.Body>
+      </Card>
     </BaseModal>
     {/* Rendered after the alts modal so it stacks on top; the alts modal stays open */}
     <AdministrationErrorModal

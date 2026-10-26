@@ -2,17 +2,16 @@
 import React, { useState } from "react";
 
 // Third Party
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
+import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/SkillSetupModal.module.css";
 
-import { fetchSkillSetup, updateSkillSetup } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
+import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
 
 interface SkillSetupModalProps {
   characterId: number | null;
@@ -21,16 +20,11 @@ interface SkillSetupModalProps {
 
 export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, onClose }) => {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   // null = untouched, the saved skillset is shown
   const [editedSkills, setEditedSkills] = useState<string[] | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: queryKeys.SkillSetup(characterId),
-    queryFn: () => (characterId ? fetchSkillSetup(characterId) : Promise.reject("No ID")),
-    enabled: !!characterId,
-  });
+  const { data, isLoading } = useSkillSetup(characterId);
 
   const selectedSkills = editedSkills ?? data?.skillset ?? [];
 
@@ -39,19 +33,7 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
     onClose();
   };
 
-  const mutation = useMutation({
-    mutationFn: () => {
-      if (!characterId) throw new Error("No character selected");
-      return updateSkillSetup(characterId, selectedSkills);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-      queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharacterDetail(characterId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.SkillSetup(characterId) });
-      handleClose();
-    },
-  });
+  const mutation = useSaveSkillSetup(characterId, handleClose);
 
   if (!characterId) return null;
 
@@ -85,30 +67,32 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
       isPending={mutation.isPending}
       size={ModalSize.large}
       onApprove={async () => {
-        await mutation.mutateAsync();
+        await mutation.mutateAsync(selectedSkills);
       }}
     >
       <div>
-        <p className="aa-panel text-secondary small mb-3">
-          {t("Select which skills trigger extraction readiness alerts when reaching Level 5.")}
-        </p>
+        <Card className="mb-3">
+          <Card.Body className="text-secondary small">
+            {t("Select which skills trigger extraction readiness alerts when reaching Level 5.")}
+          </Card.Body>
+        </Card>
 
         {isLoading && (
-          <div className={styles["loading-state"]}>
+          <div className={`${styles["loading-state"]} text-center`}>
             {t("Loading skills…")}
           </div>
         )}
 
         {data && (
           <div>
-            <div className={`${styles["search-wrapper"]}`}>
+            <div className={`${styles["search-wrapper"]} position-relative`}>
               <Search
                 size={16}
-                className={styles["search-icon"]}
+                className={`${styles["search-icon"]} position-absolute`}
               />
               <input
                 type="text"
-                className={`sf-search-input ${styles["search-input"]}`}
+                className={`sf-search-input ${styles["search-input"]} w-100`}
                 placeholder={t("Filter available skills…")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -120,20 +104,20 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
             </div>
 
             <div
-              className={styles["skill-list"]}
+              className={`${styles["skill-list"]} p-2`}
             >
               {filteredSkills.length === 0 ? (
-                <div className={styles["empty-state"]}>
+                <div className={`${styles["empty-state"]} text-center`}>
                   {t("No matching skills found.")}
                 </div>
               ) : (
-                <div className={styles["skill-grid"]}>
+                <div className={`${styles["skill-grid"]} d-grid gap-1`}>
                   {filteredSkills.map((skill) => {
                     const isSelected = selectedSkills.includes(skill);
                     return (
                       <label
                         key={skill}
-                        className={`${styles["skill-option"]} ${isSelected ? styles["skill-option-selected"] : ""}`}
+                        className={`${styles["skill-option"]} d-flex align-items-center gap-2 ${isSelected ? styles["skill-option-selected"] : ""}`}
                       >
                         <input
                           type="checkbox"
