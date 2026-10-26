@@ -12,6 +12,7 @@ import styles from "@/Styles/modules/CharacterTable.module.css";
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { BaseTable } from "@/Components/Base/BaseTable";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
+import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
 // Utils
 import { renderTooltip } from "@/Utils";
@@ -124,29 +125,10 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                 {char.last_update ? char.last_update.slice(5) : t("Pending")}
               </span>
               <div>
-                {isError && (
-                  <span className="badge bg-danger d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span className="aa-status-dot-pulse bg-danger" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
-                    {t("Sync Error")}
-                  </span>
-                )}
-                {isTokenError && (
-                  <span className="badge bg-warning text-dark d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span className="aa-status-dot-pulse bg-warning" style={{ width: 6, height: 6, borderRadius: "50%", display: "inline-block" }} />
-                    {t("Token Error")}
-                  </span>
-                )}
-                {isOk && (
-                  <span className="badge bg-success d-inline-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                    <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: "#fff", display: "inline-block" }} />
-                    {t("OK")}
-                  </span>
-                )}
-                {!status && (
-                  <span className="badge bg-secondary" style={{ fontSize: "0.7rem" }}>
-                    {t("Pending")}
-                  </span>
-                )}
+                {isError && <SyncStatusBadge variant="danger" label={t("Sync Error")} pulse />}
+                {isTokenError && <SyncStatusBadge variant="warning" label={t("Token Error")} pulse />}
+                {isOk && <SyncStatusBadge variant="success" label={t("OK")} />}
+                {!status && <SyncStatusBadge variant="secondary" label={t("Pending")} dot={false} />}
               </div>
             </div>
           );

@@ -8,6 +8,10 @@ import { Eye, Search, Shield, User } from "lucide-react";
 import { Badge, Card, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Styles
+import styles from "@/Styles/modules/OverviewPage.module.css";
+
+// AA Skillfarm
 import { fetchOverview } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
 import BaseSectionHeader from "@/Components/Base/BaseHeader";
@@ -47,7 +51,7 @@ export const OverviewPage: React.FC = () => {
 
       <div className="mt-3 p-3 aa-panel rounded">
         <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
-          <InputGroup style={{ maxWidth: 360 }}>
+          <InputGroup className={styles["search-group"]}>
             <InputGroup.Text className="bg-dark border-secondary text-secondary">
               <Search size={16} />
             </InputGroup.Text>
@@ -105,8 +109,7 @@ export const OverviewPage: React.FC = () => {
                         />
                       ) : (
                         <div
-                          className="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white"
-                          style={{ width: 48, height: 48 }}
+                          className={`rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white ${styles["avatar-fallback"]}`}
                         >
                           <User size={24} />
                         </div>

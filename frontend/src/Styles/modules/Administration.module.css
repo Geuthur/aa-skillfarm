@@ -106,3 +106,7 @@
     outline: 2px solid var(--aa-color-emerald-light);
     outline-offset: 2px;
 }
+
+.logo-col {
+    width: 48px;
+}

@@ -88,6 +88,11 @@
     border: 2px solid var(--aa-border, #334155);
 }
 
+.portrait-sm {
+  width: 32px;
+  height: 32px;
+}
+
 .portrait-corp {
     border-radius: 8px;
 }

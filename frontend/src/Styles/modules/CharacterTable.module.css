@@ -67,3 +67,12 @@
 .notification-on:global(.sf-btn) {
     color: var(--aa-color-amber-light);
 }
+
+.status-badge {
+    font-size: 0.7rem;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+}

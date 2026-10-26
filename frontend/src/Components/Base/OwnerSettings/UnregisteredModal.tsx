@@ -108,8 +108,7 @@ function UnregisteredContent({
                       alt={item.name}
                       width={32}
                       height={32}
-                      className={styles["portrait"]}
-                      style={{ width: 32, height: 32 }}
+                      className={`${styles["portrait"]} ${styles["portrait-sm"]}`}
                     />
                   )}
                   <div className="min-w-0">

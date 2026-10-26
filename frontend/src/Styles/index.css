@@ -450,13 +450,8 @@ html[data-bs-theme="dark"] {
     }
 }
 
-@keyframes aa-status-ping {
-
-    75%,
-    100% {
-        transform: scale(2);
-        opacity: 0;
-    }
+.aa-status-dot-pulse {
+    animation: aa-status-pulse 1.5s ease-in-out infinite;
 }
 
 .aa-pending-dot-container {

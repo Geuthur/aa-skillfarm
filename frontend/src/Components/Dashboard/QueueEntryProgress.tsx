@@ -22,6 +22,7 @@ export const QueueEntryProgress: React.FC<QueueEntryProgressProps> = ({
   return (
     <div>
       <div className={`sf-progress-track ${styles["track"]}`}>
+        {/* Inline style: width is a runtime percentage */}
         <div className="sf-progress-fill" style={{ width: `${percent.toFixed(1)}%` }} />
       </div>
       <span className={styles["meta"]}>{percent.toFixed(1)}%</span>

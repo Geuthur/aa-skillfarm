@@ -6,6 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
+
 // AA Skillfarm
 import { loadAdministrationCorporations, loadAdministrationUnregistered } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
@@ -46,7 +49,7 @@ export const AdministrationCorporationsTable = () => {
       <Table responsive hover size="sm" className="align-middle mb-0" data-testid="corporations-table">
         <thead>
           <tr>
-            <th aria-label={t("Logo")} style={{ width: 48 }} />
+            <th aria-label={t("Logo")} className={styles["logo-col"]} />
             <th>{t("Corporation")}</th>
             <th className="text-end">{t("Registered")}</th>
             <th className="text-end">{t("Unregistered")}</th>

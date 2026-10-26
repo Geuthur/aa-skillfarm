@@ -152,8 +152,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="aa-btn aa-btn-secondary aa-btn-sm py-0 px-2 text-decoration-none"
-                    style={{ fontSize: "0.75rem", lineHeight: 1 }}
+                    className="aa-btn aa-btn-secondary aa-btn-sm py-0 px-2 small lh-1 text-decoration-none"
                     onClick={() => setSelectedAltsGroup(group)}
                     data-testid={`alts-btn-${group.id}`}
                   >

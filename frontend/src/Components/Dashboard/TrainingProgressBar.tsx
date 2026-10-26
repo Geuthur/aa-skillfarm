@@ -67,6 +67,7 @@ export const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       </div>
 
       <div className="sf-progress-track">
+        {/* Inline style: width is a runtime percentage */}
         <div
           className="sf-progress-fill"
           style={{ width: `${displayPercent.toFixed(1)}%` }}
