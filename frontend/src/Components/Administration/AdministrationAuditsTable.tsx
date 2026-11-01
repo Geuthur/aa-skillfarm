@@ -2,8 +2,6 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { createColumnHelper } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
 import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -14,6 +12,8 @@ import styles from "@/Styles/modules/Administration.module.css";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import { createBaseColumnHelper } from "@/Components/Base/BaseTable/tableFeatures";
+import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 // AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 // Utils
@@ -111,8 +111,8 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
     );
   }, [audits, t]);
 
-  const columns = useMemo<ColumnDef<MainCharacterGroup, unknown>[]>(() => {
-    const columnHelper = createColumnHelper<MainCharacterGroup>();
+  const columns = useMemo<BaseColumnDef<MainCharacterGroup, unknown>[]>(() => {
+    const columnHelper = createBaseColumnHelper<MainCharacterGroup>();
 
     return [
       columnHelper.display({

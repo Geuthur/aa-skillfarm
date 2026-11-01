@@ -2,7 +2,6 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import type { ColumnDef } from "@tanstack/react-table";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -12,6 +11,7 @@ import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
@@ -36,7 +36,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const columns = useMemo<ColumnDef<CharacterSummarySchema>[]>(
+  const columns = useMemo<BaseColumnDef<CharacterSummarySchema>[]>(
     () => [
       {
         id: "pilot",
