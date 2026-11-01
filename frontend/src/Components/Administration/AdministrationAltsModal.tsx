@@ -2,8 +2,6 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { createColumnHelper } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
 import { Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -17,6 +15,8 @@ import { AdministrationErrorModal } from "@/Components/Administration/Administra
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import { createBaseColumnHelper } from "@/Components/Base/BaseTable/tableFeatures";
+import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 // AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { renderTooltip } from "@/Utils";
@@ -45,8 +45,8 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
   // Audit whose error details are shown in the stacked error modal
   const [errorAudit, setErrorAudit] = useState<AdministrationAuditSchema | null>(null);
 
-  const columns = useMemo<ColumnDef<AdministrationAuditSchema, unknown>[]>(() => {
-    const columnHelper = createColumnHelper<AdministrationAuditSchema>();
+  const columns = useMemo<BaseColumnDef<AdministrationAuditSchema, unknown>[]>(() => {
+    const columnHelper = createBaseColumnHelper<AdministrationAuditSchema>();
 
     return [
       columnHelper.display({

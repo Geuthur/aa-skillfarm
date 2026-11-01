@@ -2,7 +2,6 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import type { ColumnDef } from "@tanstack/react-table";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/ProfitCalculator.module.css";
 
 import { BaseTable } from "@/Components/Base/BaseTable";
+import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 import { useCalculatorData } from "@/Components/Calculator/Hooks";
 // Utils
 import { formatIsk, renderTooltip } from "@/Utils";
@@ -82,7 +82,7 @@ export const ProfitCalculator: React.FC = () => {
     isTotal?: boolean;
   }
 
-  const breakdownColumns = useMemo<ColumnDef<FinancialBreakdownItem>[]>(
+  const breakdownColumns = useMemo<BaseColumnDef<FinancialBreakdownItem>[]>(
     () => [
       {
         accessorKey: "description",

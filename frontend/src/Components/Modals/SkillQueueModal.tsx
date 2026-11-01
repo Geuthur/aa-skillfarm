@@ -2,7 +2,6 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import type { ColumnDef } from "@tanstack/react-table";
 import { Clock, Sparkles } from "lucide-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -14,6 +13,7 @@ import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
 import type { ModalData } from "@/Components/Base/BaseModal";
 import { BaseTable } from "@/Components/Base/BaseTable";
+import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { useCharacterDetail } from "@/Components/Modals/Hooks";
@@ -27,7 +27,7 @@ interface SkillQueueModalProps {
 export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, onClose }) => {
   const { t } = useTranslation();
 
-  const queueColumns = useMemo<ColumnDef<SkillQueueEntrySchema>[]>(
+  const queueColumns = useMemo<BaseColumnDef<SkillQueueEntrySchema>[]>(
     () => [
       {
         id: "position",

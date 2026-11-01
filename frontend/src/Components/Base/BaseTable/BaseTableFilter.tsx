@@ -3,13 +3,15 @@ import { useState } from "react";
 import type { MouseEventHandler } from "react";
 
 // Third Party
-import type { Column, Table as ReactTable } from "@tanstack/react-table";
+import type { CellData, Column, RowData, Table as ReactTable, TableFeatures } from "@tanstack/react-table";
 import { ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button, Dropdown, Form, OverlayTrigger, Popover } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import Styles from "@/Styles/modules/BaseTableFilter.module.css";
+
+import type { BaseTableFeatures } from "@/Components/Base/BaseTable/tableFeatures";
 
 // Lets a column supply a nicer label for its own SelectFilter options than
 // the raw underlying value (e.g. the wallet table's ref_type column, whose
@@ -18,7 +20,7 @@ import Styles from "@/Styles/modules/BaseTableFilter.module.css";
 // every other column's filter is unaffected.
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- must match the original interface's arity, not just what this augmentation itself uses
-  interface ColumnMeta<TData, TValue> {
+  interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue extends CellData = CellData> {
     filterOptionLabel?: (value: string) => string;
     align?: "left" | "right" | "center";
   }
@@ -44,7 +46,7 @@ const ClearButton = ({ onClick }: { onClick: MouseEventHandler<HTMLButtonElement
   );
 };
 
-export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+export const NumberFilter = <TData extends RowData,>({ column }: { column: Column<BaseTableFeatures, TData, unknown> }) => {
   const { t } = useTranslation();
   const columnFilterValue = column.getFilterValue();
   const fromToNumber = columnFilterValue as [string, string];
@@ -136,7 +138,7 @@ export const NumberFilter = <TData,>({ column }: { column: Column<TData, unknown
   );
 };
 
-export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+export const BoolFilter = <TData extends RowData,>({ column }: { column: Column<BaseTableFeatures, TData, unknown> }) => {
   const { t } = useTranslation();
   const passFail = column.getFilterValue();
   const hasValue = typeof passFail !== "undefined";
@@ -200,7 +202,7 @@ export const BoolFilter = <TData,>({ column }: { column: Column<TData, unknown> 
   );
 };
 
-export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+export const TextFilter = <TData extends RowData,>({ column }: { column: Column<BaseTableFeatures, TData, unknown> }) => {
   const { t } = useTranslation();
   const value = (column.getFilterValue() as string) ?? "";
   return (
@@ -224,7 +226,7 @@ export const TextFilter = <TData,>({ column }: { column: Column<TData, unknown> 
   );
 };
 
-export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown> }) => {
+export const SelectFilter = <TData extends RowData,>({ column }: { column: Column<BaseTableFeatures, TData, unknown> }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const sortedUniqueValues = Array.from(column.getFacetedUniqueValues().keys())
@@ -318,12 +320,12 @@ export const SelectFilter = <TData,>({ column }: { column: Column<TData, unknown
   );
 };
 
-export const Filter = <TData,>({
+export const Filter = <TData extends RowData,>({
   column,
   table,
 }: {
-  column: Column<TData, unknown>;
-  table: ReactTable<TData>;
+  column: Column<BaseTableFeatures, TData, unknown>;
+  table: ReactTable<BaseTableFeatures, TData>;
 }) => {
   const firstValue: unknown = table.getPreFilteredRowModel().flatRows[0]?.getValue(column.id);
   if (typeof firstValue === "number") {
