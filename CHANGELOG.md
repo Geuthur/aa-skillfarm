@@ -52,6 +52,8 @@ Section Order:
 
 - [CHANGE] The remaining layout CSS of the tables, table filters, character tab bar, filter bar, badges, settings page and loaders was replaced by Bootstrap 5 utility classes; `cursor: pointer` and `!important` were dropped where Bootstrap already covers them, and the table filter fields share a single `ClearButton` component.
 
+- [CHANGE] ESI compatibility date updated to `2026-08-18`; the OpenAPI spec file was refreshed to match, its name in `providers.py` now follows the date, and `.make/conf.d/eve-esi.mk` was added for `make update-compatibility-date`.
+
 ### Removed
 
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
