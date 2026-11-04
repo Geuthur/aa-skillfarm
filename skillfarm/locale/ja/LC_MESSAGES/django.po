@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-"
 "skillfarm/\n"
-"POT-Creation-Date: 2026-10-18 20:21+0200\n"
+"POT-Creation-Date: 2026-10-25 14:27+0100\n"
 "PO-Revision-Date: 2026-01-10 15:38+0000\n"
 "Last-Translator: Geuthur <geuthur@users.noreply.github.com>\n"
 "Language-Team: Japanese <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -23,7 +23,21 @@ msgstr ""
 msgid "last update run"
 msgstr ""
 
-msgid "Permission Denied"
+msgid "Administration permission required."
+msgstr ""
+
+msgid "Superuser permission required."
+msgstr ""
+
+msgid "Corporation access permission required."
+msgstr ""
+
+#, python-format
+msgid "Queued update task for %(name)s (force_refresh=%(force)s)"
+msgstr ""
+
+#, python-format
+msgid "Successfully deleted %(name)s from Skillfarm"
 msgstr ""
 
 #, python-format
@@ -31,6 +45,12 @@ msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
 msgstr ""
 
 msgid "Queued market price update task"
+msgstr ""
+
+msgid "Corporation not found."
+msgstr ""
+
+msgid "Permission Denied"
 msgstr ""
 
 msgid ""
@@ -68,7 +88,14 @@ msgstr ""
 msgid "Successfully acknowledged extractions for %d characters"
 msgstr ""
 
-msgid "Characters"
+#, python-format
+msgid "Update task queued for %s"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "My Characters"
 msgstr ""
 
 msgid "Calculator"
@@ -77,28 +104,22 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-msgid "Overview"
-msgstr ""
-
 msgid "Add Character"
 msgstr ""
 
 msgid "Administration"
 msgstr ""
 
-msgid "Administration permission required."
-msgstr ""
-
-msgid "Superuser permission required."
-msgstr ""
-
-msgid "Corporation access permission required."
-msgstr ""
-
-msgid "Corporation not found."
-msgstr ""
-
 msgid "User not found or not accessible"
+msgstr ""
+
+msgid "Can access this app, Skillfarm."
+msgstr ""
+
+msgid "Has access to all characters in the corporation."
+msgstr ""
+
+msgid "Has access to all characters."
 msgstr ""
 
 msgid "Disabled"
