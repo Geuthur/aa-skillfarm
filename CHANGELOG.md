@@ -38,6 +38,8 @@ Section Order:
 
 - [FIX] Section headers, the administration inspection header, the status filter and the character tab filter (All, Active Training, …) overflowing the container on small screens; the headers now wrap and the filter buttons scroll horizontally.
 
+- Fixed `make coverage` exiting with 0 when tests failed. The reports are still created, and the target now exits with the status of the test run, or with the status of `coverage report` if the tests passed.
+
 ### Changed
 
 - [CHANGE] Buttons use the Bootstrap 5 variants (`variant`, `size`) with the theme look defined as overrides under `.aa-react` (including `btn-primary` and `btn-sm`); the custom `aa-btn` and `sf-btn` classes were removed.
