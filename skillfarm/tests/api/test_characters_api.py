@@ -3,13 +3,15 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+# Third Party
+from evesde_factory.allianceauth import EveCharacterFactory
+
 # Django
 from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillqueueEntryFactory,
     SkillFarmAuditFactory,

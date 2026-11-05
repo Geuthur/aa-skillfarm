@@ -1,11 +1,13 @@
 # Standard Library
 import socket
 
+# Third Party
+from evesde_factory.allianceauth import EveCorporationInfoFactory
+
 # Django
 from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
-from skillfarm.tests.testdata.factory import EveCorporationInfoFactory
 from skillfarm.tests.testdata.skillfarm import UserMainFactory
 
 
