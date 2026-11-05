@@ -14,7 +14,7 @@ from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
 )
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
@@ -23,7 +23,7 @@ from skillfarm.tests.testdata.skillfarm import (
 MODULE_PATH = "skillfarm.models.skillfarmaudit"
 
 
-class TestSkillfarmModel(SkillFarmTestCase):
+class TestSkillfarmModel(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

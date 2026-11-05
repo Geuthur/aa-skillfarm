@@ -1,10 +1,11 @@
 # Standard Library
 import socket
-
-# Third Party
-from evesde_factory.allianceauth import EveCorporationInfoFactory
+from unittest.mock import Mock
 
 # Django
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.handlers.wsgi import WSGIRequest
 from django.test import RequestFactory, TestCase
 
 # AA Skillfarm
@@ -16,16 +17,7 @@ class SocketAccessError(Exception):
 
 
 class NoSocketsTestCase(TestCase):
-    """Variation of Django's TestCase class that prevents any network use.
-
-    Example:
-
-        .. code-block:: python
-
-            class TestMyStuff(BaseTestCase):
-                def test_should_do_what_i_need(self): ...
-
-    """
+    """Variation of Django's TestCase class that prevents any network use."""
 
     @classmethod
     def setUpClass(cls):
@@ -43,49 +35,37 @@ class NoSocketsTestCase(TestCase):
         raise SocketAccessError("Attempted to access network")
 
 
-class SkillFarmTestCase(NoSocketsTestCase):
+class AuthTestCase(NoSocketsTestCase):
     """
-    Preloaded Testcase class for SkillFarm tests without Network access.
+    Preloaded Testcase class for AllianceAuth tests without Network access.
 
     Available Request Factory:
         `self.factory`
-
-    Available test users:
-        * `user` User with standard Skillfarm access.
-            * 'skillfarm.basic_access' Permission
-        * `no_permission_user` User without any Skillfarm permissions.
-            * No Permissions
-        * `superuser` Superuser.
-            * Access to whole Application
-
-    Example:
-        .. code-block:: python
-
-            class TestMySkillFarmStuff(SkillFarmTestCase):
-                def test_should_do_what_i_need(self):
-                    user = self.user
+    Available Django Users:
+        `self.user`
+        `self.superuser`
+    Available methods:
+        `_middleware_process_request(request)`
     """
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.corp = EveCorporationInfoFactory(
-            corporation_id=98_000_000, corporation_name="Test Corporation"
-        )
 
         # Request Factory
         cls.factory = RequestFactory()
 
         # User with Standard Access
-        cls.user = UserMainFactory(main_character__corporation=cls.corp)
-        cls.user_character = cls.user.profile.main_character
+        cls.user = UserMainFactory()
 
         # User with Superuser Access
         cls.superuser = UserMainFactory()
         cls.superuser.is_superuser = True
         cls.superuser.save()
-        cls.superuser_character = cls.superuser.profile.main_character
 
-        # User without Access to Skillfarm
-        cls.no_permission_user = UserMainFactory(permissions__=[])
-        cls.no_perm_character = cls.no_permission_user.profile.main_character
+    def _middleware_process_request(self, request: WSGIRequest):
+        """Helper method to process middleware for a request."""
+        session_middleware = SessionMiddleware(Mock())
+        session_middleware.process_request(request)
+        message_middleware = MessageMiddleware(Mock())
+        message_middleware.process_request(request)

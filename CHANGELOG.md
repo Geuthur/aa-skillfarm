@@ -44,6 +44,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] The test base class `SkillFarmTestCase` was replaced by `AuthTestCase` with the same structure as in the other AA repos (`NoSocketsTestCase`, `AuthTestCase` with `factory`, `user`, `superuser` and `_middleware_process_request`). The extra attributes `corp`, `user_character`, `superuser_character`, `no_permission_user` and `no_perm_character` are now set up in the tests that use them.
+
 - [CHANGE] The test `UserFactory` now comes from `aa-evesde-factory` instead of a local copy, so generated usernames are unique and can no longer match an existing user such as the superuser of a test class.
 
 - [CHANGE] The test factories (`EveCharacterFactory`, `EveCorporationInfoFactory`, `EveAllianceInfoFactory`, `ItemTypeFactory`, `BaseMetaFactory`, ...) and `add_character_to_user` now come from `aa-evesde-factory`; the duplicated local copies (`testdata/factory.py` and most of `testdata/utils.py`) were removed.

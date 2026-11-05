@@ -12,7 +12,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.views import add_char
 
 MODULE_PATH = "skillfarm.views"
@@ -21,7 +21,7 @@ MODULE_PATH = "skillfarm.views"
 @patch(MODULE_PATH + ".messages")
 @patch(MODULE_PATH + ".tasks")
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
-class TestAddCharView(SkillFarmTestCase):
+class TestAddCharView(AuthTestCase):
     """Test Add Character View."""
 
     @classmethod

@@ -3,14 +3,14 @@ from unittest.mock import patch
 
 # AA Skillfarm
 from skillfarm.helpers.discord import send_user_notification
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     UserMainFactory,
     UserSettingsFactory,
 )
 
 
-class TestUserNotificationSettings(SkillFarmTestCase):
+class TestUserNotificationSettings(AuthTestCase):
     def test_send_user_notification_should_skip_delivery_when_disabled(self):
         # Test Data
         user = UserMainFactory()

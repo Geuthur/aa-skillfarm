@@ -3,13 +3,13 @@ import pook
 from evesde_factory.eve_sde import ItemTypeFactory
 
 # AA Skillfarm
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.skillqueue"
 
 
-class TestSkillQueueManager(SkillFarmTestCase):
+class TestSkillQueueManager(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

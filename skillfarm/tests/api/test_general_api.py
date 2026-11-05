@@ -6,13 +6,19 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.general import UserSettings
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import UserMainFactory
 
 API_URL = "skillfarm:api"
 
 
-class TestGeneralApiEndpoints(SkillFarmTestCase):
+class TestGeneralApiEndpoints(AuthTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.no_permission_user = UserMainFactory(permissions__=[])
+        cls.user_character = cls.user.profile.main_character
+
     def setUp(self):
         super().setUp()
         UserSettings.objects.filter(user=self.user).delete()

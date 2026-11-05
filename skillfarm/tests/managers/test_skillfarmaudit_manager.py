@@ -1,5 +1,5 @@
 # Third Party
-from evesde_factory.allianceauth import EveCharacterFactory
+from evesde_factory.allianceauth import EveCharacterFactory, EveCorporationInfoFactory
 
 # Django
 from django.utils import timezone
@@ -7,7 +7,7 @@ from django.utils import timezone
 # AA Skillfarm
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
@@ -18,7 +18,7 @@ from skillfarm.tests.testdata.utils import add_alt_character_to_user
 MODULE_PATH = "skillfarm.managers.skillfarmaudit"
 
 
-class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
+class TestCharacterAnnotateTotalUpdateStatus(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -132,7 +132,7 @@ class TestCharacterAnnotateTotalUpdateStatus(SkillFarmTestCase):
         )
 
 
-class TestSkillfarmAuditVisibleTo(SkillFarmTestCase):
+class TestSkillfarmAuditVisibleTo(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -181,7 +181,7 @@ class TestSkillfarmAuditVisibleTo(SkillFarmTestCase):
         self.assertEqual(list(qs), [character, character2])
 
 
-class TestSkillfarmAuditOwnedBy(SkillFarmTestCase):
+class TestSkillfarmAuditOwnedBy(AuthTestCase):
     def test_should_return_only_own_audits(self):
         # Test Data
         own_audit = SkillFarmAuditFactory(user=self.user)
@@ -221,7 +221,14 @@ class TestSkillfarmAuditOwnedBy(SkillFarmTestCase):
         self.assertEqual(list(qs), [admin_audit])
 
 
-class TestSkillfarmAuditCorpAccess(SkillFarmTestCase):
+class TestSkillfarmAuditCorpAccess(AuthTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.corp = EveCorporationInfoFactory(
+            corporation_id=98_000_000, corporation_name="Test Corporation"
+        )
+
     def test_visible_to_with_corp_access_should_return_audits_of_same_corporation(
         self,
     ):
@@ -243,7 +250,7 @@ class TestSkillfarmAuditCorpAccess(SkillFarmTestCase):
         self.assertEqual(list(qs), [colleague_audit])
 
 
-class TestSkillfarmFilterMethods(SkillFarmTestCase):
+class TestSkillfarmFilterMethods(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
