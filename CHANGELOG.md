@@ -44,6 +44,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] The test `UserFactory` now comes from `aa-evesde-factory` instead of a local copy, so generated usernames are unique and can no longer match an existing user such as the superuser of a test class.
+
 - [CHANGE] Buttons use the Bootstrap 5 variants (`variant`, `size`) with the theme look defined as overrides under `.aa-react` (including `btn-primary` and `btn-sm`); the custom `aa-btn` and `sf-btn` classes were removed.
 
 - [CHANGE] Panels use the react-bootstrap `Card` with the theme look defined as override under `.aa-react .card`; the custom `aa-panel` classes were removed.

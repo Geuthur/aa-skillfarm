@@ -2,6 +2,9 @@
 import factory
 import factory.fuzzy
 
+# AA EVE SDE Factory
+from evesde_factory.allianceauth import UserFactory
+
 # Django
 from django.utils import timezone
 
@@ -21,7 +24,6 @@ from skillfarm.tests.testdata.factory import (
     BaseMetaFactory,
     EveCharacterFactory,
     ItemTypeFactory,
-    UserFactory,
 )
 from skillfarm.tests.testdata.utils import add_character_to_user
 
