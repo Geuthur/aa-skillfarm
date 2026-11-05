@@ -2,6 +2,9 @@
 from io import StringIO
 from unittest.mock import patch
 
+# Third Party
+from evesde_factory.eve_sde import ItemTypeFactory
+
 # Django
 from django.core.management import call_command
 from django.db import transaction
@@ -13,7 +16,6 @@ from eve_sde.models.types import ItemType as EveType
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import ItemTypeFactory
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 

@@ -340,9 +340,9 @@ class TestGeneralApiEndpoints(SkillFarmTestCase):
 
     def test_get_user_character_statuses_should_return_missing_characters(self):
         # Test Data
-        # AA Skillfarm
-        from skillfarm.tests.testdata.factory import EveCharacterFactory
-        from skillfarm.tests.testdata.utils import add_character_to_user
+        # Third Party
+        from evesde_factory.allianceauth import EveCharacterFactory
+        from evesde_factory.utils import add_character_to_user
 
         alt_char = EveCharacterFactory(character_name="Alt Unregistered")
         add_character_to_user(user=self.user, character=alt_char, is_main=False)

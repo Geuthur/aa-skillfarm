@@ -1,3 +1,6 @@
+# Third Party
+from evesde_factory.allianceauth import EveCharacterFactory
+
 # Django
 from django.utils import timezone
 
@@ -5,17 +8,12 @@ from django.utils import timezone
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
-    EveCharacterFactory,
-)
 from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
     UserMainFactory,
 )
-from skillfarm.tests.testdata.utils import (
-    add_alt_character_to_user,
-)
+from skillfarm.tests.testdata.utils import add_alt_character_to_user
 
 MODULE_PATH = "skillfarm.managers.skillfarmaudit"
 

@@ -1,13 +1,15 @@
 # Standard Library
 from http import HTTPStatus
 
+# Third Party
+from evesde_factory.allianceauth import EveCharacterFactory
+
 # Django
 from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory, UserMainFactory
 from skillfarm.tests.testdata.utils import add_alt_character_to_user
 

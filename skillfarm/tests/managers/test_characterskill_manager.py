@@ -4,10 +4,10 @@ from unittest.mock import MagicMock
 
 # Third Party
 import pook
+from evesde_factory.eve_sde import ItemTypeFactory
 
 # AA Skillfarm
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import ItemTypeFactory
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.managers.characterskill"

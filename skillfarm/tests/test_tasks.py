@@ -1,6 +1,10 @@
 # Standard Library
 from unittest.mock import patch
 
+# Third Party
+from evesde_factory.allianceauth import EveCharacterFactory
+from evesde_factory.utils import add_character_to_user
+
 # Django
 from django.db import models
 from django.db.utils import Error
@@ -17,7 +21,6 @@ from skillfarm.models.skillfarmaudit import (
     SkillFarmSetup,
 )
 from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import EveCharacterFactory
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterUpdateStatusFactory,
@@ -26,7 +29,6 @@ from skillfarm.tests.testdata.skillfarm import (
     SkillFarmSetupFactory,
     UserMainFactory,
 )
-from skillfarm.tests.testdata.utils import add_character_to_user
 
 TASK_PATH = "skillfarm.tasks"
 

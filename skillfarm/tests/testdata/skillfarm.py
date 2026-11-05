@@ -3,7 +3,13 @@ import factory
 import factory.fuzzy
 
 # AA EVE SDE Factory
-from evesde_factory.allianceauth import UserFactory
+from evesde_factory.allianceauth import (
+    BaseMetaFactory,
+    EveCharacterFactory,
+    UserFactory,
+)
+from evesde_factory.eve_sde import ItemTypeFactory
+from evesde_factory.utils import add_character_to_user
 
 # Django
 from django.utils import timezone
@@ -20,12 +26,6 @@ from skillfarm.models import (
     UserSettings,
 )
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
-from skillfarm.tests.testdata.factory import (
-    BaseMetaFactory,
-    EveCharacterFactory,
-    ItemTypeFactory,
-)
-from skillfarm.tests.testdata.utils import add_character_to_user
 
 
 class UserMainFactory(UserFactory):

@@ -1,18 +1,22 @@
 """Test to ensure that the factories are working correctly."""
 
-# AA Skillfarm
-from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.factory import (
-    ConstellationFactory,
+# Third Party
+from evesde_factory.allianceauth import (
     EveAllianceInfoFactory,
     EveCharacterFactory,
     EveCorporationInfoFactory,
+)
+from evesde_factory.eve_sde import (
+    ConstellationFactory,
     ItemCategoryFactory,
     ItemGroupFactory,
     ItemTypeFactory,
     RegionFactory,
     SolarSystemFactory,
 )
+
+# AA Skillfarm
+from skillfarm.tests import SkillFarmTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterSkillqueueEntryFactory,
