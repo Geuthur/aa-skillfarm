@@ -17,7 +17,7 @@ from skillfarm.models.helpers.update_manager import (
     UpdateManager,
 )
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterUpdateStatusFactory,
     SkillFarmAuditFactory,
@@ -25,7 +25,7 @@ from skillfarm.tests.testdata.skillfarm import (
 
 
 @override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
-class TestUpdateManager(SkillFarmTestCase):
+class TestUpdateManager(AuthTestCase):
     """
     Tests for the UpdateManager class.
     """

@@ -15,13 +15,13 @@ from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 
 COMMAND_PATH = "skillfarm.management.commands.skillfarm_load_prices"
 
 
 @patch(COMMAND_PATH + ".requests.get")
-class TestLoadPrices(SkillFarmTestCase):
+class TestLoadPrices(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

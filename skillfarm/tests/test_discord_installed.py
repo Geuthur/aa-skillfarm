@@ -6,10 +6,10 @@ from skillfarm.helpers.discord import (
     allianceauth_discordbot_installed,
     discordnotify_installed,
 )
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 
 
-class TestModulesInstalled(SkillFarmTestCase):
+class TestModulesInstalled(AuthTestCase):
     @modify_settings(INSTALLED_APPS={"remove": "aadiscordbot"})
     def test_allianceauth_discordbot_installed_should_return_false(self):
         """

@@ -1,18 +1,19 @@
 # AA Skillfarm
 from skillfarm.api.helpers import core
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory, UserMainFactory
 
 MODULE_PATH = "skillfarm.api.helpers."
 
 
-class TestCoreHelpers(SkillFarmTestCase):
+class TestCoreHelpers(AuthTestCase):
     """Test Core Helper Functions."""
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.superuser_character = cls.superuser.profile.main_character
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
 
     def test_get_skillfarm_character(self):

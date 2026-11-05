@@ -16,7 +16,7 @@ from evesde_factory.eve_sde import (
 )
 
 # AA Skillfarm
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterSkillqueueEntryFactory,
@@ -27,7 +27,7 @@ from skillfarm.tests.testdata.skillfarm import (
 )
 
 
-class TestSkillFarmFactory(SkillFarmTestCase):
+class TestSkillFarmFactory(AuthTestCase):
     """Test the SkillFarm factories."""
 
     def test_can_create_user(self):
@@ -80,7 +80,7 @@ class TestSkillFarmFactory(SkillFarmTestCase):
         self.assertTrue(price)
 
 
-class TestFactory(SkillFarmTestCase):
+class TestFactory(AuthTestCase):
     """Test the factories."""
 
     def test_can_create_eve_character(self):

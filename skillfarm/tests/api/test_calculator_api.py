@@ -7,13 +7,18 @@ from django.utils import timezone
 
 # AA Skillfarm
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.tests import SkillFarmTestCase
-from skillfarm.tests.testdata.skillfarm import EveTypePriceFactory
+from skillfarm.tests import AuthTestCase
+from skillfarm.tests.testdata.skillfarm import EveTypePriceFactory, UserMainFactory
 
 API_URL = "skillfarm:api"
 
 
-class TestCalculatorApiEndpoints(SkillFarmTestCase):
+class TestCalculatorApiEndpoints(AuthTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.no_permission_user = UserMainFactory(permissions__=[])
+
     def setUp(self):
         super().setUp()
         EveTypePriceFactory(

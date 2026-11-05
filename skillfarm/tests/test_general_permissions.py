@@ -6,11 +6,11 @@ from django.contrib.auth.models import AnonymousUser
 
 # AA Skillfarm
 from skillfarm.models.general import General
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import UserMainFactory
 
 
-class TestGeneralPermissions(SkillFarmTestCase):
+class TestGeneralPermissions(AuthTestCase):
     def test_get_perm_should_return_full_permission_string_for_enum(self):
         # Test Data
         perm = General.Permission.BASIC_ACCESS

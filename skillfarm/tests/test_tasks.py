@@ -20,7 +20,7 @@ from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
 )
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterUpdateStatusFactory,
@@ -38,7 +38,7 @@ TASK_PATH = "skillfarm.tasks"
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
 )
 @patch(TASK_PATH + ".update_character", spec=True)
-class TestUpdateAllSkillfarm(SkillFarmTestCase):
+class TestUpdateAllSkillfarm(AuthTestCase):
     """Test the update_all_skillfarm task."""
 
     @classmethod
@@ -93,7 +93,7 @@ class TestUpdateAllSkillfarm(SkillFarmTestCase):
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
 )
 @patch(TASK_PATH + ".logger", spec=True)
-class TestUpdateCharacter(SkillFarmTestCase):
+class TestUpdateCharacter(AuthTestCase):
     """Test the update_character task."""
 
     def test_update_character_should_no_updated(self, mock_logger):
@@ -262,12 +262,13 @@ class TestUpdateCharacter(SkillFarmTestCase):
     CELERY_ALWAYS_EAGER=True,
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
 )
-class TestCheckSkillfarmNotification(SkillFarmTestCase):
+class TestCheckSkillfarmNotification(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         cls.skillfarm_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.no_permission_user = UserMainFactory(permissions__=[])
         cls.skillfarm_audit_2 = SkillFarmAuditFactory(user=cls.no_permission_user)
         cls.skillfarm_audit_3 = SkillFarmAuditFactory(user=cls.superuser)
 
@@ -425,7 +426,7 @@ class TestCheckSkillfarmNotification(SkillFarmTestCase):
     CELERY_ALWAYS_EAGER=True,
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
 )
-class TestSkillfarmPrices(SkillFarmTestCase):
+class TestSkillfarmPrices(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

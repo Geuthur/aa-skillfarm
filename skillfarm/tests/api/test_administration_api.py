@@ -10,17 +10,18 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory, UserMainFactory
 
 API_URL = "skillfarm:api"
 TASK_PATH = "skillfarm.tasks"
 
 
-class TestAdministrationApiEndpoints(SkillFarmTestCase):
+class TestAdministrationApiEndpoints(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.no_permission_user = UserMainFactory(permissions__=[])
         cls.audit = SkillFarmAuditFactory(
             user=cls.user,
             is_training=True,
@@ -475,10 +476,13 @@ class TestAdministrationApiEndpoints(SkillFarmTestCase):
         mock_apply_async.assert_not_called()
 
 
-class TestAdministrationCorporationsApi(SkillFarmTestCase):
+class TestAdministrationCorporationsApi(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.corp = EveCorporationInfoFactory(
+            corporation_id=98_000_000, corporation_name="Test Corporation"
+        )
         cls.other_corp = EveCorporationInfoFactory(corporation_name="Other Corporation")
 
         # Registered character in the own corporation

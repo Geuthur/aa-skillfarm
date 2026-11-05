@@ -11,7 +11,7 @@ from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillqueueEntryFactory,
     SkillFarmAuditFactory,
@@ -23,10 +23,12 @@ from skillfarm.tests.testdata.utils import add_alt_character_to_user
 API_URL = "skillfarm:api"
 
 
-class TestCharactersApiEndpoints(SkillFarmTestCase):
+class TestCharactersApiEndpoints(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.no_permission_user = UserMainFactory(permissions__=[])
+        cls.user_character = cls.user.profile.main_character
         cls.audit = SkillFarmAuditFactory(
             user=cls.user,
             character=cls.user_character,

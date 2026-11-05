@@ -4,13 +4,13 @@ from django.contrib.admin.sites import AdminSite
 # AA Skillfarm
 from skillfarm.admin import SkillFarmAuditAdmin
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory
 
 MODULE_PATH = "skillfarm.admin."
 
 
-class TestAdminView(SkillFarmTestCase):
+class TestAdminView(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

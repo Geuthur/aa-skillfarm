@@ -2,24 +2,28 @@
 from http import HTTPStatus
 
 # Third Party
-from evesde_factory.allianceauth import EveCharacterFactory
+from evesde_factory.allianceauth import EveCharacterFactory, EveCorporationInfoFactory
 
 # Django
 from django.urls import reverse
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.tests import SkillFarmTestCase
+from skillfarm.tests import AuthTestCase
 from skillfarm.tests.testdata.skillfarm import SkillFarmAuditFactory, UserMainFactory
 from skillfarm.tests.testdata.utils import add_alt_character_to_user
 
 API_URL = "skillfarm:api"
 
 
-class TestOverviewApiEndpoints(SkillFarmTestCase):
+class TestOverviewApiEndpoints(AuthTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.corp = EveCorporationInfoFactory(
+            corporation_id=98_000_000, corporation_name="Test Corporation"
+        )
+        cls.user_character = cls.user.profile.main_character
         cls.admin_user = UserMainFactory(
             permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
         )
