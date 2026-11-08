@@ -46,13 +46,13 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] `aa-geuthur-react` raised to `^1.3.0`. The package bundles its own translations and registers them with i18next through `AaReactProvider`, so `Main.tsx` lists only the namespace `translation`, the copies under `skillfarm/static/skillfarm/i18n/<lng>/aa-geuthur-react.json` are removed and `make react-copy-translations` no longer copies them. Untranslated strings in `frontend/i18n/<lng>/translation.json` are empty instead of English (`i18next-scanner` writes the key as value only for `en`); `returnEmptyString: false` shows the English fallback at runtime. Translate on Weblate as before.
+
 - [CHANGE] The shared React base comes from the npm package [`aa-geuthur-react`](https://github.com/Geuthur/aa-geuthur-react) 1.1.0 (BaseTable stack, BaseModal, loaders, `BaseSectionHeader`, menu, `useMenu`, `useUserData`, `useCooldown`, `useFeedback`, `AuthBase`, `ErrorPage`, utils, `createApiClient`, `queryKeys`, styles, ESLint rule `import-headings`). `Routing.tsx` wraps the app in `AaReactProvider`, `Main.tsx` loads the namespace `aa-geuthur-react` next to `translation` and `Styles/index.css` imports `aa-geuthur-react/styles.css` first, `apiClient` is `createApiClient<paths>()`, the app query keys extend the `queryKeys` of the package.
 
 - [CHANGE] Pages use the page layout of the package (`AuthBase`, `aa-react container`, 640 px to 1280 px wide) instead of the own `aa-section` wrapper (up to 128 rem wide).
 
 - [CHANGE] The modals that only show content (skill queue, alts, ESI error, unregistered characters) use the default variant of the shared `BaseModal` and the confirm modals (delete character, skillset setup) `variant="confirm"`; the close button is primary like in the other apps.
-
-- [CHANGE] `make react-copy-translations` also copies `i18n/<lng>/aa-geuthur-react.json` of the package into `static/skillfarm/i18n/<lng>/`.
 
 - [CHANGE] The `UserData` schema documents the contract of the package; `is_admin`, `is_superuser` and `has_corp_access` stay, the Administration reads them with `useUserData<UserData>()`.
 
