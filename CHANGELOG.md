@@ -46,6 +46,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Language files hold only real translations as Weblate writes them, missing keys fall back to English. The i18next scanner now maintains only `frontend/i18n/en/translation.json`; empty placeholder values were removed from all other languages (cs 330, de 16, es 328, fr-FR 332, it-IT 331, ja 313, ko-KR 313, nl-NL 331, pl-PL 330, ru 329, sk 330, uk 329, zh-Hans 313 entries).
+
 - [CHANGE] Real translations from the unmerged Weblate branch were carried over into `frontend/i18n/<lng>/translation.json`, so none are lost after the switch to empty untranslated strings: Weblate values that are not empty and differ from the English text fill the empty values (de 1, es 47, fr-FR 43, it-IT 44, ja 30, ko-KR 30, nl-NL 28, pl-PL 61, ru 62, uk 62, zh-Hans 30). `cs` and `sk` are new (29 translated values each). The Django `.po` files already contained every Weblate translation.
 
 - [CHANGE] `aa-geuthur-react` raised to `^1.3.0`. The package bundles its own translations and registers them with i18next through `AaReactProvider`, so `Main.tsx` lists only the namespace `translation`, the copies under `skillfarm/static/skillfarm/i18n/<lng>/aa-geuthur-react.json` are removed and `make react-copy-translations` no longer copies them. Untranslated strings in `frontend/i18n/<lng>/translation.json` are empty instead of English (`i18next-scanner` writes the key as value only for `en`); `returnEmptyString: false` shows the English fallback at runtime. Translate on Weblate as before.
