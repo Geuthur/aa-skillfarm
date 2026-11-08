@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
+import { formatNumber } from "aa-geuthur-react";
 import {
   AlertTriangle,
   Check,
@@ -36,7 +37,6 @@ import {
   useAdministrationTasks,
   useAuditActions,
 } from "@/Components/Administration/Hooks";
-import { formatNumber } from "@/Utils/format";
 
 export const AdministrationPage: React.FC = () => {
   const { t } = useTranslation();

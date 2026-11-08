@@ -1,3 +1,6 @@
+/* The styles of the shared React base come first, so the rules below can override them. */
+@import "aa-geuthur-react/styles.css";
+
 /*
  * AllianceAuth CSS not colliding with BS5
  */
@@ -178,12 +181,6 @@ html[data-bs-theme="dark"] {
     --aa-input-border: #343439;
 
     --aa-shadow-opacity: 0.1;
-}
-
-/* ═══ General ═══════════════════════════════════════════════════════════════ */
-.aa-section {
-    color: var(--aa-text-primary);
-    max-width: 128rem;
 }
 
 /* ═══ Scroll Bar ═══════════════════════════════════════════════════════════════ */
@@ -438,30 +435,8 @@ html[data-bs-theme="dark"] {
     }
 }
 
-.aa-nav-danger:hover {
-    text-shadow: 0 0 8px rgba(244, 63, 94, 0.4);
-}
 /* Global typography and base overrides (formerly App.css) */
 body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: var(--aa-text-primary);
-}
-
-/* ═══ MENU BADGE PULSE ════════════════════════════════════════════════════════ */
-.aa-menu-badge-pulse {
-    position: relative;
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    animation: aa-menu-badge-ping 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes aa-menu-badge-ping {
-
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
-    }
-
-    50% {
-        box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
-    }
 }

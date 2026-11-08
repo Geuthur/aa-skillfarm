@@ -2,6 +2,7 @@
 import React from "react";
 
 // Third Party
+import { renderTooltip } from "aa-geuthur-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -9,7 +10,6 @@ import styles from "@/Styles/modules/LiveStatusIndicator.module.css";
 
 // AA Skillfarm
 import { formatLastFetch, useLivePing } from "@/Components/Badges/liveStatusHelper";
-import { renderTooltip } from "@/Utils/bootsTrap";
 
 export interface LiveStatusProps {
   isError?: boolean;

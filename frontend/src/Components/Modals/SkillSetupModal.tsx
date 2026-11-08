@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 
 // Third Party
+import { BaseModal, ModalSize } from "aa-geuthur-react";
+import type { ModalData } from "aa-geuthur-react";
 import { Search } from "lucide-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -9,8 +11,6 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/SkillSetupModal.module.css";
 
-import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
-import type { ModalData } from "@/Components/Base/BaseModal";
 import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
 
 interface SkillSetupModalProps {
@@ -54,11 +54,14 @@ export const SkillSetupModal: React.FC<SkillSetupModalProps> = ({ characterId, o
       : t("Farm Skillset Setup"),
     buttonText: t("Save Skillset"),
     color: "primary",
+    text: "",
+    icon: "",
     url: "",
   };
 
   return (
     <BaseModal
+      variant="confirm"
       data={modalData}
       showModal={!!characterId}
       setShowModal={(show) => {

@@ -1,21 +1,8 @@
 // Third Party
-import Cookies from "js-cookie";
-import createClient from "openapi-fetch";
+import { createApiClient } from "aa-geuthur-react";
 
+// AA Skillfarm
 import type { paths } from "@/Api/OpenApi";
 
-// Base openapi-fetch client with CSRF token interceptor
-export const apiClient = createClient<paths>({
-  baseUrl: "/",
-  credentials: "same-origin",
-});
-
-apiClient.use({
-  async onRequest({ request }) {
-    const csrf = Cookies.get("csrftoken");
-    if (csrf) {
-      request.headers.set("X-CSRFToken", csrf);
-    }
-    return request;
-  },
-});
+/** The API client of the app: openapi-fetch with the Django CSRF header, typed with the generated paths. */
+export const apiClient = createApiClient<paths>();

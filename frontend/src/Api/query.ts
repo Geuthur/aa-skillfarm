@@ -1,8 +1,10 @@
+// Third Party
+import { queryKeys as baseQueryKeys } from "aa-geuthur-react";
+
+// `Menu`, `User` and `UserSettings` come from the package, so its hooks and the app share them.
 export const queryKeys = {
-  User: ["user"] as const,
-  UserSettings: ["userSettings"] as const,
+  ...baseQueryKeys,
   UserCharacterStatuses: ["userCharacterStatuses"] as const,
-  Menu: ["menu"] as const,
   CharactersRoot: ["characters"] as const,
   Characters: (filters?: unknown) => ["characters", filters] as const,
   CharacterDetail: (characterId: number | null) => ["characterDetail", characterId] as const,

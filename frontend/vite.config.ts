@@ -11,6 +11,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
+    server: {
+      deps: {
+        inline: ['aa-geuthur-react'],
+      },
+    },
   },
   plugins: [react(),],
   server: {

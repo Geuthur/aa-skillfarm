@@ -3,6 +3,7 @@ import { useState } from "react";
 
 // Third Party
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useFeedback, useUserData } from "aa-geuthur-react";
 import { useTranslation } from "react-i18next";
 
 // AA Skillfarm
@@ -18,8 +19,7 @@ import {
   triggerUpdatePrices,
 } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import { useFeedback } from "@/Hooks/useFeedback";
-import { useUserData } from "@/Hooks/useUserData";
+import type { UserData } from "@/Api/schema";
 
 /** Feedback of a single audit action (update or delete) that stays until it is dismissed. */
 export interface TaskFeedback {
@@ -33,7 +33,7 @@ export interface TaskFeedback {
  * Audits, statistics and tasks require admin access; corp access only sees the corporations section.
  */
 export function useAdministrationAccess() {
-  const { data } = useUserData();
+  const { data } = useUserData<UserData>();
   return {
     isSuperuser: Boolean(data?.user.is_superuser),
     isAdmin: Boolean(data?.user.is_admin),

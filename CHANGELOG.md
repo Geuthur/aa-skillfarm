@@ -44,6 +44,18 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] The shared React base comes from the npm package [`aa-geuthur-react`](https://github.com/Geuthur/aa-geuthur-react) 1.1.0 (BaseTable stack, BaseModal, loaders, `BaseSectionHeader`, menu, `useMenu`, `useUserData`, `useCooldown`, `useFeedback`, `AuthBase`, `ErrorPage`, utils, `createApiClient`, `queryKeys`, styles, ESLint rule `import-headings`). `Routing.tsx` wraps the app in `AaReactProvider`, `Main.tsx` loads the namespace `aa-geuthur-react` next to `translation` and `Styles/index.css` imports `aa-geuthur-react/styles.css` first, `apiClient` is `createApiClient<paths>()`, the app query keys extend the `queryKeys` of the package.
+
+- [CHANGE] Pages use the page layout of the package (`AuthBase`, `aa-react container`, 640 px to 1280 px wide) instead of the own `aa-section` wrapper (up to 128 rem wide).
+
+- [CHANGE] The modals that only show content (skill queue, alts, ESI error, unregistered characters) use the default variant of the shared `BaseModal` and the confirm modals (delete character, skillset setup) `variant="confirm"`; the close button is primary like in the other apps.
+
+- [CHANGE] `make react-copy-translations` also copies `i18n/<lng>/aa-geuthur-react.json` of the package into `static/skillfarm/i18n/<lng>/`.
+
+- [CHANGE] The `UserData` schema documents the contract of the package; `is_admin`, `is_superuser` and `has_corp_access` stay, the Administration reads them with `useUserData<UserData>()`.
+
+- [CHANGE] Menu links keep the query string of the current page when navigating, like the other apps on the package.
+
 - [CHANGE] The test base class `SkillFarmTestCase` was replaced by `AuthTestCase` with the same structure as in the other AA repos (`NoSocketsTestCase`, `AuthTestCase` with `factory`, `user`, `superuser` and `_middleware_process_request`). The extra attributes `corp`, `user_character`, `superuser_character`, `no_permission_user` and `no_perm_character` are now set up in the tests that use them.
 
 - [CHANGE] The test `UserFactory` now comes from `aa-evesde-factory` instead of a local copy, so generated usernames are unique and can no longer match an existing user such as the superuser of a test class.
@@ -71,6 +83,12 @@ Section Order:
 - [REMOVED] Unused theme variables (`--aa-*`), the unused classes `aa-badge` and `aa-status-dot` and the unused `BaseModalQuery` mutation hooks (`useApproveMutation`, `useFormApproveMutation`).
 
 <!-- Your changes go here -->
+
+### Removed
+
+- [REMOVE] The copies of the shared modules and their tests: `Components/Base/{BaseTable,BaseModal,Loader,BaseHeader}`, `Menu/`, `Hooks/{useCooldown,useFeedback,useUserData}`, `Utils/{bootsTrap,eveOnline,format,general}`, `Pages/Base.tsx`, `Pages/404.tsx`, `Styles/table.css`, the CSS modules of the BaseTable, loaders and tooltips, `eslint-rules/` and the rules of `Styles/index.css` the package ships (`aa-section`, `aa-menu-badge-pulse`, `aa-nav-danger`); `loadMenu` and `loadUserData` of `Api/ApiCalls.ts` (now in the package).
+
+- [REMOVE] The legacy redirects of the routes `superuser/` and `admin/` to `administration/`; the menu and all links use `administration/`.
 
 ## [4.1.0] - 2026-10-25
 

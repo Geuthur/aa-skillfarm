@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useUserData } from "aa-geuthur-react";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -12,12 +13,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as ApiCalls from "@/Api/ApiCalls";
 import { AdministrationPage } from "@/Pages/AdministrationPage";
 
+vi.mock("aa-geuthur-react", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("aa-geuthur-react")>()),
+  useUserData: vi.fn(),
+}));
+
 vi.mock("@/Api/ApiCalls", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
   return {
     ...actual,
     fetchAdminStats: vi.fn(),
-    loadUserData: vi.fn(),
     loadAdministrationAudits: vi.fn(),
     triggerAdministrationAuditUpdate: vi.fn(),
     deleteAdministrationAudit: vi.fn(),
@@ -173,6 +178,9 @@ const mockUserData = (isSuperuser: boolean, isAdmin = true) => ({
   },
 });
 
+const mockUser = (data: ReturnType<typeof mockUserData>) =>
+  vi.mocked(useUserData).mockReturnValue({ data } as unknown as ReturnType<typeof useUserData>);
+
 const renderPage = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -191,13 +199,13 @@ const renderPage = () => {
 describe("AdministrationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(true));
+    mockUser(mockUserData(true));
     vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([]);
   });
 
   it("should only show the corporations section for corp access users", async () => {
     // Test Data
-    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false, false));
+    mockUser(mockUserData(false, false));
     vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
       {
         corporation_id: 98000001,
@@ -222,7 +230,7 @@ describe("AdministrationPage", () => {
   it("should collapse the corporations card for administrators and expand it on toggle", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false));
+    mockUser(mockUserData(false));
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
     vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
     vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
@@ -255,7 +263,7 @@ describe("AdministrationPage", () => {
 
   it("should show the corporation description instead of the system-wide text for corp access users", async () => {
     // Test Data
-    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false, false));
+    mockUser(mockUserData(false, false));
 
     // Test Action
     renderPage();
@@ -490,7 +498,7 @@ describe("AdministrationPage", () => {
   it("should hide global task panel, force refresh and delete for administrators without superuser", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.loadUserData).mockResolvedValue(mockUserData(false));
+    mockUser(mockUserData(false));
     vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
     vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
 
@@ -498,7 +506,7 @@ describe("AdministrationPage", () => {
     renderPage();
     expect(await screen.findByText("Farmer Alpha")).toBeInTheDocument();
     await waitFor(() => {
-      expect(ApiCalls.loadUserData).toHaveBeenCalled();
+      expect(useUserData).toHaveBeenCalled();
     });
     await user.click(screen.getByTestId("alts-btn-user_1"));
 

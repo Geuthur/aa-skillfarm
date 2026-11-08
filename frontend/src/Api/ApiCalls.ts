@@ -6,36 +6,18 @@ import type {
   CharacterDetailResponse,
   CharacterFilterParams,
   CharacterListResponse,
-  MenuSchema,
   OverviewResponse,
   OverviewUserCharactersResponse,
   SkillSetupSchema,
   AdministrationAuditSchema,
   AdministrationCorporationSchema,
   AdministrationUnregisteredResponse,
-  UserData,
   UserCharacterStatusResponse,
   UserSettingsSchema,
   UserSettingsUpdateRequest,
 } from "@/Api/schema";
 
 const API_BASE = "/skillfarm/api";
-
-export async function loadUserData(): Promise<{ user: UserData }> {
-  const { data, error } = await apiClient.GET(`${API_BASE}/user/`, {});
-  if (error || !data) {
-    throw new Error("Failed to load user data");
-  }
-  return { user: data as UserData };
-}
-
-export async function loadMenu(): Promise<MenuSchema> {
-  const { data, error } = await apiClient.GET(`${API_BASE}/menu/`, {});
-  if (error || !data) {
-    throw new Error("Failed to load menu");
-  }
-  return data as MenuSchema;
-}
 
 export async function fetchUserSettings(): Promise<UserSettingsSchema> {
   const { data, error } = await apiClient.GET("/skillfarm/api/settings/", {});

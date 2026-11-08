@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
-import importHeadingsRule from './eslint-rules/import-headings.js'
+import importHeadingsRule from 'aa-geuthur-react/eslint-rules/import-headings'
 
 const importHeadingsPlugin = {
   rules: {
@@ -36,9 +36,9 @@ export default defineConfig([
             // 2. Externe Bibliotheken / Third Party
             { heading: '// Third Party', pattern: '^@?\\w' },
 
-            // 3. AA Fenrir (Eigene Komponenten, Helpers, API)
-            //{ heading: '// AA Fenrir', pattern: '^@/' },
-            //{ heading: '// AA Fenrir', pattern: '^\\.(?!.*\\.s?css$)' },
+            // 3. AA Skillfarm (Eigene Komponenten, Helpers, API)
+            //{ heading: '// AA Skillfarm', pattern: '^@/' },
+            //{ heading: '// AA Skillfarm', pattern: '^\\.(?!.*\\.s?css$)' },
 
             // 4. Stylesheets & CSS-Module
             { heading: '// Styles', pattern: '\\.s?css$' },
