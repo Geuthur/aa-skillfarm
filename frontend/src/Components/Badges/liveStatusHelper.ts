@@ -1,8 +1,9 @@
 // React
 import { useEffect, useState } from "react";
 
+// Third Party
 // Utils
-import { formatEveTime } from "@/Utils/eveOnline";
+import { formatEveTime } from "aa-geuthur-react";
 
 /**
  * Formats a numeric timestamp into an EVE Online time string (HH:MM:SS EVE)

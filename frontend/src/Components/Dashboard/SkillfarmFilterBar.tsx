@@ -2,6 +2,8 @@
 import React from "react";
 
 // Third Party
+// Utils
+import { renderTooltip } from "aa-geuthur-react";
 import { CheckCheck, Search, Sparkles } from "lucide-react";
 import { Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -10,8 +12,6 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/SkillfarmFilterBar.module.css";
 
 import type { CharacterFilterParams } from "@/Api/schema";
-// Utils
-import { renderTooltip } from "@/Utils";
 
 interface SkillfarmFilterBarProps {
   filters: CharacterFilterParams;

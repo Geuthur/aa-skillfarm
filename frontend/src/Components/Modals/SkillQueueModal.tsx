@@ -2,6 +2,8 @@
 import React, { useMemo } from "react";
 
 // Third Party
+import { BaseModal, BaseTable, ModalSize, formatNumber } from "aa-geuthur-react";
+import type { BaseColumnDef } from "aa-geuthur-react";
 import { Clock, Sparkles } from "lucide-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -10,14 +12,9 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
 import type { SkillQueueEntrySchema } from "@/Api/schema";
-import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
-import type { ModalData } from "@/Components/Base/BaseModal";
-import { BaseTable } from "@/Components/Base/BaseTable";
-import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { useCharacterDetail } from "@/Components/Modals/Hooks";
-import { formatNumber } from "@/Utils/format";
 
 interface SkillQueueModalProps {
   characterId: number | null;
@@ -104,21 +101,15 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
   if (!characterId) return null;
 
-  const modalData: ModalData = {
-    modal_id: "skillqueue-modal",
-    title: data
-      ? t("{{character}} — Skill Queue", { character: data.character.character_name })
-      : t("Skill Queue"),
-    url: "",
-  };
+  const modalTitle = data
+    ? t("{{character}} — Skill Queue", { character: data.character.character_name })
+    : t("Skill Queue");
 
   return (
     <BaseModal
-      data={modalData}
-      showModal={!!characterId}
-      setShowModal={(show) => {
-        if (!show) onClose();
-      }}
+      show={!!characterId}
+      onHide={onClose}
+      title={modalTitle}
       size={ModalSize.large}
     >
       <div>

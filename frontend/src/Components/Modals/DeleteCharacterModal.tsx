@@ -2,11 +2,11 @@
 import React from "react";
 
 // Third Party
+import { BaseModal, ModalSize } from "aa-geuthur-react";
+import type { ModalData } from "aa-geuthur-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
-import type { ModalData } from "@/Components/Base/BaseModal";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 export interface DeletableCharacter {
@@ -41,11 +41,14 @@ export const DeleteCharacterModal: React.FC<DeleteCharacterModalProps> = ({
     title: t("Delete Character"),
     buttonText: t("Delete Character"),
     color: "danger",
+    text: "",
+    icon: "",
     url: "",
   };
 
   return (
     <BaseModal
+      variant="confirm"
       data={modalData}
       showModal={showModal}
       setShowModal={setShowModal}

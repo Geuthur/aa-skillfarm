@@ -2,6 +2,7 @@
 import { useState } from "react";
 
 // Third Party
+import { ErrorLoader, FetchingLoader } from "aa-geuthur-react";
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
@@ -14,8 +15,6 @@ import {
   useAdministrationCorporations,
   useAdministrationUnregistered,
 } from "@/Components/Administration/Hooks";
-import ErrorLoader from "@/Components/Base/Loader/ErrorLoader";
-import FetchingLoader from "@/Components/Base/Loader/FetchingLoader";
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { UnregisteredModal } from "@/Components/Base/OwnerSettings/UnregisteredModal";
 

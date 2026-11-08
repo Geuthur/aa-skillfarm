@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
+import { BaseModal, BaseTable, ModalSize, createBaseColumnHelper, formatNumber, renderTooltip } from "aa-geuthur-react";
+import type { BaseColumnDef } from "aa-geuthur-react";
 import { Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -12,15 +14,8 @@ import styles from "@/Styles/modules/Administration.module.css";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import type { MainCharacterGroup } from "@/Components/Administration/AdministrationAuditsTable";
 import { AdministrationErrorModal } from "@/Components/Administration/AdministrationErrorModal";
-import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
-import type { ModalData } from "@/Components/Base/BaseModal";
-import { BaseTable } from "@/Components/Base/BaseTable";
-import { createBaseColumnHelper } from "@/Components/Base/BaseTable/tableFeatures";
-import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 // AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
-import { renderTooltip } from "@/Utils";
-import { formatNumber } from "@/Utils/format";
 
 export interface AdministrationAltsModalProps {
   group: MainCharacterGroup | null;
@@ -259,24 +254,18 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
     ];
   }, [t, updatingCharacterId, onInspect, onTriggerUpdate, onDelete, isSuperuser]);
 
-  const modalData: ModalData = {
-    modal_id: "administration-alts-modal",
-    title: group
-      ? `${group.mainCharacterName} — ${group.alts.length} ${
-          group.alts.length === 1 ? t("Alt") : t("Alts")
-        }`
-      : t("Alts"),
-    url: "",
-  };
+  const modalTitle = group
+    ? `${group.mainCharacterName} — ${group.alts.length} ${
+        group.alts.length === 1 ? t("Alt") : t("Alts")
+      }`
+    : t("Alts");
 
   return (
     <>
     <BaseModal
-      data={modalData}
-      showModal={group !== null}
-      setShowModal={(show) => {
-        if (!show) onHide();
-      }}
+      show={group !== null}
+      onHide={onHide}
+      title={modalTitle}
       size={ModalSize.extraLarge}
     >
       <Card>

@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 
 // Third Party
+import { BaseModal } from "aa-geuthur-react";
 import { Search } from "lucide-react";
 import { Form, InputGroup } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -9,7 +10,6 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Components/Base/OwnerSettings/OwnerSettings.module.css";
 
-import { BaseModal } from "@/Components/Base/BaseModal";
 // AA Skillfarm
 import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import type { BaseMissingOwner } from "@/Components/Base/OwnerSettings/types";
@@ -29,7 +29,7 @@ export interface UnregisteredModalProps {
 /** Modal listing characters that are not registered in the app, with search. */
 export function UnregisteredModal({ show, onHide, title, ...content }: UnregisteredModalProps) {
   return (
-    <BaseModal data={{ title, url: "" }} showModal={show} setShowModal={(next) => !next && onHide()}>
+    <BaseModal show={show} onHide={onHide} title={title}>
       {/* Content unmounts with the modal, which resets the search term. */}
       <UnregisteredContent {...content} />
     </BaseModal>

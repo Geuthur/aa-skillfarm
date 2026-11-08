@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
+import { BaseTable, formatIsk, renderTooltip } from "aa-geuthur-react";
+import type { BaseColumnDef } from "aa-geuthur-react";
 import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -9,11 +11,8 @@ import { useTranslation } from "react-i18next";
 // Styles
 import styles from "@/Styles/modules/ProfitCalculator.module.css";
 
-import { BaseTable } from "@/Components/Base/BaseTable";
-import type { BaseColumnDef } from "@/Components/Base/BaseTable/tableFeatures";
 import { useCalculatorData } from "@/Components/Calculator/Hooks";
 // Utils
-import { formatIsk, renderTooltip } from "@/Utils";
 
 export const ProfitCalculator: React.FC = () => {
   const { t } = useTranslation();

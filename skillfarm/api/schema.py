@@ -21,7 +21,12 @@ class ForceRefreshRequest(Schema):
 
 
 class UserData(Schema):
-    """User profile data including character identity and admin state."""
+    """The current user and its main character, as the `UserData` type of aa-geuthur-react expects it.
+
+    `is_admin` is the management access of Skillfarm. `is_superuser` unlocks the global
+    update tasks, the force refresh and the deletion of audits, `has_corp_access` the
+    corporation section of the Administration; both are read by the Skillfarm frontend only.
+    """
 
     user_id: int
     character_id: int

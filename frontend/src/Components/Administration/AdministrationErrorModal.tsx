@@ -2,12 +2,10 @@
 import React from "react";
 
 // Third Party
+// AA Skillfarm
+import { BaseModal, ModalSize } from "aa-geuthur-react";
 import { Badge } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-
-// AA Skillfarm
-import { BaseModal, ModalSize } from "@/Components/Base/BaseModal";
-import type { ModalData } from "@/Components/Base/BaseModal";
 
 /**
  * Shows the full ESI error message of a character audit.
@@ -36,19 +34,11 @@ export const AdministrationErrorModal: React.FC<AdministrationErrorModalProps> =
       ? t("The ESI token is invalid or expired. Re-add the character.")
       : t("No error message available."));
 
-  const modalData: ModalData = {
-    modal_id: "administration-error-modal",
-    title: t("ESI Error Details"),
-    url: "",
-  };
-
   return (
     <BaseModal
-      data={modalData}
-      showModal={show}
-      setShowModal={(value) => {
-        if (!value) onHide();
-      }}
+      show={show}
+      onHide={onHide}
+      title={t("ESI Error Details")}
       size={ModalSize.large}
     >
       <div className="d-flex align-items-center gap-2 mb-3">

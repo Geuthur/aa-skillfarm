@@ -1482,7 +1482,7 @@
     "/skillfarm/api/administration/corporations/": {
       "get": {
         "operationId": "skillfarm_api_administration_list_corporations",
-        "summary": "List corporations with registered and unregistered character counts",
+        "summary": "List corporations with registered characters and their unregistered character counts",
         "parameters": [],
         "responses": {
           "200": {
@@ -1656,7 +1656,7 @@
         "type": "object"
       },
       "UserData": {
-        "description": "User profile data including character identity and admin state.",
+        "description": "The current user and its main character, as the `UserData` type of aa-geuthur-react expects it.\n\n`is_admin` is the management access of Skillfarm. `is_superuser` unlocks the global\nupdate tasks, the force refresh and the deletion of audits, `has_corp_access` the\ncorporation section of the Administration; both are read by the Skillfarm frontend only.",
         "properties": {
           "user_id": {
             "title": "User Id",
