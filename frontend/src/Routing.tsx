@@ -32,7 +32,7 @@ function Routing() {
           <BrowserRouter>
             <NuqsAdapter>
               <Routes>
-                <Route path={`/${ProjectName}/`} element={<AuthBase className="d-flex flex-column gap-4" />}>
+                <Route path={`/${ProjectName}/`} element={<AuthBase className="d-flex flex-column gap-4" fluidOnSmallScreens />}>
                   <Route index element={<OverviewPage />} />
                   <Route path="characters/" element={<DashboardPage />} />
                   <Route path="calculator/" element={<CalculatorPage />} />

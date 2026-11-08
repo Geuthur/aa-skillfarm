@@ -34,6 +34,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] On phones narrower than 640 px the pages were wider than the screen because of the minimum width of the `aa-react container` of `aa-geuthur-react`. `Routing.tsx` sets `fluidOnSmallScreens` on `AuthBase` (`aa-geuthur-react` 1.2.0), so the container shrinks with the screen.
+
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
 
 - [FIX] Section headers, the administration inspection header, the status filter and the character tab filter (All, Active Training, …) overflowing the container on small screens; the headers now wrap and the filter buttons scroll horizontally.
