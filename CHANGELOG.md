@@ -88,6 +88,8 @@ Section Order:
 
 - [REMOVED] Unused theme variables (`--aa-*`), the unused classes `aa-badge` and `aa-status-dot` and the unused `BaseModalQuery` mutation hooks (`useApproveMutation`, `useFormApproveMutation`).
 
+- [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
+
 <!-- Your changes go here -->
 
 ### Removed
