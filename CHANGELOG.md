@@ -32,6 +32,8 @@ Section Order:
 
 - [ADD] Frontend hooks per area (`Components/<Area>/Hooks`, `Menu/Hooks`) that hold the queries and mutations of the Administration, Settings, Overview, Dashboard, Modals, Calculator and menu views, plus the shared hooks `useFeedback`, `useCooldown` and `useUserData`.
 
+- [ADD] Optional extra `tests-allianceauth-development` (test packages plus the Alliance Auth 6 pre-release) with separate test settings `testauth.settings.development` for the tox environment `allianceauth-development` and `make tox-tests-development`; a non-blocking CI job "AA Development" runs it on Python 3.13 and 3.14.
+
 ### Fixed
 
 - [FIX] On phones narrower than 640 px the pages were wider than the screen because of the minimum width of the `aa-react container` of `aa-geuthur-react`. `Routing.tsx` sets `fluidOnSmallScreens` on `AuthBase` (`aa-geuthur-react` 1.2.0), so the container shrinks with the screen.
