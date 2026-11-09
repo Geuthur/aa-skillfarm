@@ -36,6 +36,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] Compatibility with Alliance Auth 6 (pre-release): the `eveonline` migration dependencies of `0001_initial` and `0001_init_v2` now point to `0019_v5squash` (Alliance Auth 6 removed the older `eveonline` migrations, `0019_v5squash` exists in Alliance Auth 5 as well). Works with Alliance Auth 5 and 6.
+
 - [FIX] On phones narrower than 640 px the pages were wider than the screen because of the minimum width of the `aa-react container` of `aa-geuthur-react`. `Routing.tsx` sets `fluidOnSmallScreens` on `AuthBase` (`aa-geuthur-react` 1.2.0), so the container shrinks with the screen.
 
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
