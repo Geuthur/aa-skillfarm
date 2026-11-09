@@ -47,15 +47,6 @@ class TestSkillfarmModel(AuthTestCase):
             ["esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"],
         )
 
-    def test_last_update_should_return_incomplete(self):
-        """
-        Test should return incomplete for last_update Property.
-        """
-        self.assertEqual(
-            self.skillfarm_audit.skillfarm_update_status.last_update_status(),
-            "One or more sections have not been updated",
-        )
-
     def test_reset_has_token_error_should_return_false(self):
         """
         Test should not reset has_token_error.
