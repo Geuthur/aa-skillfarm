@@ -21,7 +21,7 @@ from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.providers import logger
+from skillfarm.providers import logger, retry_task_on_esi_error
 
 MAX_RETRIES_DEFAULT = 3
 
@@ -47,6 +47,9 @@ TASK_DEFAULTS_ONCE_CHARACTER = {
     **TASK_DEFAULTS,
     **{"once": {"keys": ["character_pk"], "graceful": True}},
 }
+
+# Default params for tasks per character that are bound to the task instance.
+TASK_DEFAULTS_BIND_ONCE_CHARACTER = {**TASK_DEFAULTS_ONCE_CHARACTER, **{"bind": True}}
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_USER)
@@ -136,12 +139,18 @@ def update_all_skillfarm(force_refresh=False):
     logger.info("Queued %s Skillfarm Updates", len(queued_pks))
 
 
-@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
 def update_character(
-    character_pk: int, force_refresh: bool = False, update_alts: bool = False
+    self: Task,
+    character_pk: int,
+    force_refresh: bool = False,
+    update_alts: bool = False,
 ) -> bool:
     """
     Update a SkillFarmAudit character by running necessary section updates directly.
+
+    ESI outages and limits retry the whole task through `retry_task_on_esi_error`,
+    errors of a single section end up in its update status.
 
     Args:
         character_pk (int): Primary key of the SkillFarmAudit character to update.
@@ -177,18 +186,19 @@ def update_character(
     else:
         runs = 0
 
-        for section in sections:
-            task_name = f"update_char_{section}"
-            task = globals().get(task_name)
-            if task:
-                task(character_pk=character.pk, force_refresh=force_refresh)
-            else:
-                _update_character_section(
-                    character_pk=character.pk,
-                    section=section,
-                    force_refresh=force_refresh,
-                )
-            runs += 1
+        with retry_task_on_esi_error(self):
+            for section in sections:
+                task_name = f"update_char_{section}"
+                task = globals().get(task_name)
+                if task:
+                    task(character_pk=character.pk, force_refresh=force_refresh)
+                else:
+                    _update_character_section(
+                        character_pk=character.pk,
+                        section=section,
+                        force_refresh=force_refresh,
+                    )
+                runs += 1
 
         logger.debug(
             "Executed %s Audit Updates for %s",
@@ -220,22 +230,24 @@ def update_character(
     return True
 
 
-@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
-def update_char_skills(character_pk: int, force_refresh: bool):
-    return _update_character_section(
-        character_pk=character_pk,
-        section=CharacterUpdateSection.SKILLS,
-        force_refresh=force_refresh,
-    )
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+def update_char_skills(self: Task, character_pk: int, force_refresh: bool):
+    with retry_task_on_esi_error(self):
+        return _update_character_section(
+            character_pk=character_pk,
+            section=CharacterUpdateSection.SKILLS,
+            force_refresh=force_refresh,
+        )
 
 
-@shared_task(**TASK_DEFAULTS_ONCE_CHARACTER)
-def update_char_skillqueue(character_pk: int, force_refresh: bool):
-    return _update_character_section(
-        character_pk=character_pk,
-        section=CharacterUpdateSection.SKILLQUEUE,
-        force_refresh=force_refresh,
-    )
+@shared_task(**TASK_DEFAULTS_BIND_ONCE_CHARACTER)
+def update_char_skillqueue(self: Task, character_pk: int, force_refresh: bool):
+    with retry_task_on_esi_error(self):
+        return _update_character_section(
+            character_pk=character_pk,
+            section=CharacterUpdateSection.SKILLQUEUE,
+            force_refresh=force_refresh,
+        )
 
 
 def _update_character_section(character_pk: int, section: str, force_refresh: bool):

@@ -34,6 +34,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] ESI outages and limits did not retry the update tasks: the tasks had no retry at all, and the `UpdateManager` turned every ESI error except `TokenError` into an update status. `update_character`, `update_char_skills` and `update_char_skillqueue` now run with `bind=True` inside the new `retry_task_on_esi_error()` from `providers.py` (with `DOWNTIME_TIMER` and the daily downtime check that raises `DownTimeError`). `_handle_update_exception` raises the errors the task retries on (`ESIErrorLimitException`, `ESIBucketLimitException`, `HTTPServerError` 502/503/504, `RequestError`, `DownTimeError`), checked by the new `is_retryable_esi_error()`. `execute_section` records them as a failed run of the section before raising, so the section shows the error and stays stale until the retry succeeds. Other errors (e.g. HTTP 500 or 404) still end in the update status only.
+
 - [FIX] On phones narrower than 640 px the pages were wider than the screen because of the minimum width of the `aa-react container` of `aa-geuthur-react`. `Routing.tsx` sets `fluidOnSmallScreens` on `AuthBase` (`aa-geuthur-react` 1.2.0), so the container shrinks with the screen.
 
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.

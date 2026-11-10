@@ -1,26 +1,42 @@
 # Standard Library
+from http import HTTPStatus
 from unittest.mock import patch
 
 # Third Party
+import pook
+from aiopenapi3 import RequestError
+from celery.exceptions import Retry
 from evesde_factory.allianceauth import EveCharacterFactory
 from evesde_factory.utils import add_character_to_user
 
 # Django
+from django.core.cache import cache
 from django.db import models
 from django.db.utils import Error
 from django.test import override_settings
 from django.utils import timezone
 
+# Alliance Auth
+from esi.exceptions import (
+    ESIBucketLimitException,
+    ESIErrorLimitException,
+    HTTPServerError,
+)
+
 # AA Skillfarm
 from skillfarm import tasks
+from skillfarm.errors import DownTimeError
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import (
     CharacterSkill,
+    CharacterUpdateStatus,
     SkillFarmAudit,
     SkillFarmSetup,
 )
+from skillfarm.providers import DOWNTIME_TIMER
 from skillfarm.tests import AuthTestCase
+from skillfarm.tests.testdata.esi import clear_esi_limits, skillqueue_url, skills_url
 from skillfarm.tests.testdata.skillfarm import (
     CharacterSkillFactory,
     CharacterUpdateStatusFactory,
@@ -227,9 +243,10 @@ class TestUpdateCharacter(AuthTestCase):
         self.assertEqual(len(queued_pks), 2)
 
     @patch(TASK_PATH + ".update_char_skills")
+    @patch(TASK_PATH + ".update_char_skillqueue")
     @patch(TASK_PATH + ".update_character.apply_async")
     def test_update_character_with_update_alts_should_queue_alts(
-        self, mock_apply_async, mock_update_skills, mock_logger
+        self, mock_apply_async, mock_update_skillqueue, mock_update_skills, mock_logger
     ):
         """
         Test that update_character queues active alts when update_alts=True.
@@ -255,6 +272,198 @@ class TestUpdateCharacter(AuthTestCase):
         mock_apply_async.assert_called_once_with(
             args=[alt.pk], kwargs={"force_refresh": True, "update_alts": False}
         )
+
+
+@override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
+@patch.object(tasks.update_character, "retry", side_effect=Retry)
+class TestUpdateCharacterEsiErrors(AuthTestCase):
+    """ESI errors of a section reach `retry_task_on_esi_error` through the UpdateManager."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.audit = SkillFarmAuditFactory(user=cls.user)
+
+    def setUp(self):
+        super().setUp()
+        clear_esi_limits(self.audit)
+        self.addCleanup(clear_esi_limits, self.audit)
+
+    def _assert_retried(self, mock_retry, exc_type, countdown_min: float):
+        mock_retry.assert_called_once()
+        kwargs = mock_retry.call_args.kwargs
+        self.assertIsInstance(kwargs["exc"], exc_type)
+        self.assertGreaterEqual(kwargs["countdown"], countdown_min)
+        status = CharacterUpdateStatus.objects.get(
+            owner=self.audit, section=CharacterUpdateSection.SKILLS
+        )
+        self.assertFalse(status.is_success)
+        self.assertTrue(status.error_message.startswith(exc_type.__name__))
+
+    def test_should_retry_on_esi_server_errors(self, mock_retry):
+        for status_code in [
+            HTTPStatus.BAD_GATEWAY,
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            HTTPStatus.GATEWAY_TIMEOUT,
+        ]:
+            with self.subTest(status_code=status_code), pook.use():
+                # Test Data
+                mock_retry.reset_mock()
+                pook.get(
+                    skills_url(self.audit),
+                    reply=status_code,
+                    response_json={"error": status_code.phrase},
+                )
+
+                # Test Action
+                with self.assertRaises(Retry):
+                    tasks.update_character(self.audit.pk, force_refresh=True)
+
+                # Expected Result
+                self._assert_retried(mock_retry, HTTPServerError, DOWNTIME_TIMER)
+
+    @pook.on
+    def test_should_retry_on_the_esi_error_limit(self, mock_retry):
+        # Test Data
+        pook.get(
+            skills_url(self.audit),
+            reply=420,
+            response_json={"error": "Error limited"},
+            response_headers={"X-RateLimit-Reset": "30"},
+        )
+
+        # Test Action
+        with self.assertRaises(Retry):
+            tasks.update_character(self.audit.pk, force_refresh=True)
+
+        # Expected Result
+        self._assert_retried(mock_retry, ESIErrorLimitException, 30)
+
+    @pook.on
+    def test_should_retry_on_the_esi_bucket_limit(self, mock_retry):
+        # Test Data: the char-detail bucket of the character is used up
+        cache.set(
+            f"esi:bucket:char-detail:{self.audit.character.character_id}",
+            0,
+            timeout=900,
+        )
+
+        # Test Action
+        with self.assertRaises(Retry):
+            tasks.update_character(self.audit.pk, force_refresh=True)
+
+        # Expected Result
+        self._assert_retried(mock_retry, ESIBucketLimitException, 1)
+
+    @pook.on
+    @patch("esi.app_settings.ESI_SERVER_ERROR_MAX_RETRIES", 1)
+    def test_should_retry_on_request_errors(self, mock_retry):
+        # Test Data
+        pook.get(skills_url(self.audit)).error(ConnectionError("Connection reset"))
+
+        # Test Action
+        with self.assertRaises(Retry):
+            tasks.update_character(self.audit.pk, force_refresh=True)
+
+        # Expected Result
+        self._assert_retried(mock_retry, RequestError, DOWNTIME_TIMER)
+
+    @patch(TASK_PATH + ".SkillFarmAudit.update_skills", autospec=True)
+    def test_should_retry_on_downtime_errors_of_a_section(
+        self, mock_update_skills, mock_retry
+    ):
+        # Test Data
+        mock_update_skills.side_effect = DownTimeError("ESI is in daily downtime")
+
+        # Test Action
+        with self.assertRaises(Retry):
+            tasks.update_character(self.audit.pk, force_refresh=True)
+
+        # Expected Result
+        self._assert_retried(mock_retry, DownTimeError, DOWNTIME_TIMER)
+
+    @override_settings(DISABLE_DAILY_DOWNTIME_CHECK=False)
+    @patch(TASK_PATH + ".SkillFarmAudit.execute_section")
+    def test_should_retry_during_the_daily_downtime(
+        self, mock_execute_section, mock_retry
+    ):
+        # Test Data
+        with patch("skillfarm.providers.timezone.now") as mock_now:
+            mock_now.return_value = timezone.datetime.strptime("11:05", "%H:%M")
+
+            # Test Action
+            with self.assertRaises(Retry):
+                tasks.update_character(self.audit.pk, force_refresh=True)
+
+        # Expected Result
+        mock_execute_section.assert_not_called()
+        self.assertIsInstance(mock_retry.call_args.kwargs["exc"], DownTimeError)
+
+    def test_should_record_other_esi_errors_without_retry(self, mock_retry):
+        for status_code in [HTTPStatus.INTERNAL_SERVER_ERROR, HTTPStatus.NOT_FOUND]:
+            with self.subTest(status_code=status_code), pook.use():
+                # Test Data
+                for url in (skills_url(self.audit), skillqueue_url(self.audit)):
+                    pook.get(
+                        url,
+                        reply=status_code,
+                        response_json={"error": status_code.phrase},
+                    )
+
+                # Test Action
+                result = tasks.update_character(self.audit.pk, force_refresh=True)
+
+                # Expected Result
+                self.assertTrue(result)
+                mock_retry.assert_not_called()
+                for section in CharacterUpdateSection:
+                    status = CharacterUpdateStatus.objects.get(
+                        owner=self.audit, section=section
+                    )
+                    self.assertFalse(status.is_success)
+                    self.assertIn(str(status_code.value), status.error_message)
+
+
+@override_settings(CELERY_ALWAYS_EAGER=True, CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
+class TestUpdateCharSectionEsiErrors(AuthTestCase):
+    """The section tasks retry on their own when they run alone."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.audit = SkillFarmAuditFactory(user=cls.user)
+
+    def setUp(self):
+        super().setUp()
+        clear_esi_limits(self.audit)
+        self.addCleanup(clear_esi_limits, self.audit)
+
+    @pook.on
+    def test_section_tasks_should_retry_on_esi_server_errors(self):
+        for task, url in (
+            (tasks.update_char_skills, skills_url(self.audit)),
+            (tasks.update_char_skillqueue, skillqueue_url(self.audit)),
+        ):
+            with (
+                self.subTest(task=task.name),
+                patch.object(task, "retry", side_effect=Retry) as mock_retry,
+            ):
+                # Test Data
+                pook.get(
+                    url,
+                    reply=HTTPStatus.BAD_GATEWAY,
+                    response_json={"error": "Bad Gateway"},
+                )
+
+                # Test Action
+                with self.assertRaises(Retry):
+                    task(character_pk=self.audit.pk, force_refresh=True)
+
+                # Expected Result
+                mock_retry.assert_called_once()
+                self.assertIsInstance(
+                    mock_retry.call_args.kwargs["exc"], HTTPServerError
+                )
 
 
 @patch(TASK_PATH + ".SkillFarmAudit.objects.filter", spec=True)
