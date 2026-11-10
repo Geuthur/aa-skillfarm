@@ -16,19 +16,16 @@ from django.utils.translation import gettext as _
 # Alliance Auth
 from allianceauth.eveonline.evelinks.eveimageserver import corporation_logo_url
 from allianceauth.eveonline.models import EveCharacter, EveCorporationInfo
-from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
-from skillfarm import __title__, tasks
+from skillfarm import tasks
 from skillfarm.api import schema
 from skillfarm.api.characters import _serialize_character_summary
 from skillfarm.api.helpers.core import arabic_number_to_roman
 from skillfarm.helpers.lazy import get_character_portrait_url
 from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 
 # pylint: disable=too-many-locals

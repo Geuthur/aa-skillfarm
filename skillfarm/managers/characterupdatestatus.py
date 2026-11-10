@@ -6,15 +6,8 @@ from django.db import models
 from django.db.models import Case, Count, Q, Value, When
 from django.utils.translation import gettext_lazy as _
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 if TYPE_CHECKING:
     # AA Skillfarm

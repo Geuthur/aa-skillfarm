@@ -6,18 +6,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 from django.utils import timezone
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # Alliance Auth (External Libs)
 from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_BULK_METHODS_BATCH_SIZE
 from skillfarm.decorators import log_timing
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
-from skillfarm.providers import AppLogger, esi
+from skillfarm.providers import esi, logger
 
 if TYPE_CHECKING:
     # Alliance Auth
@@ -26,8 +22,6 @@ if TYPE_CHECKING:
     # AA Skillfarm
     from skillfarm.models.general import UpdateSectionResult
     from skillfarm.models.skillfarmaudit import CharacterSkillqueueEntry, SkillFarmAudit
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 class SkillqueueQuerySet(models.QuerySet):

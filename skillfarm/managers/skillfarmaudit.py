@@ -5,15 +5,9 @@ from typing import TYPE_CHECKING
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.managers.general import AccessManager, AccessQuerySet
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 if TYPE_CHECKING:
     # AA Skillfarm

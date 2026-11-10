@@ -10,13 +10,6 @@ from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.authentication.models import User
-from allianceauth.services.hooks import get_extension_logger
-
-# AA Skillfarm
-from skillfarm import __title__
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 class General(models.Model):

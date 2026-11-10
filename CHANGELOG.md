@@ -46,6 +46,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] The `AppLogger` is created only once in `skillfarm/providers.py`. The API, helper, management command, manager, model and task modules import it with `from skillfarm.providers import logger` instead of building their own. `views.py`, `models/general.py` and `managers/characterupdatestatus.py` built a logger they never used; it was removed there. Log records now carry the logger name `skillfarm.providers` instead of the module name; the `[Skillfarm]` prefix is unchanged.
+
 - [CHANGE] Language files hold only real translations as Weblate writes them, missing keys fall back to English. The i18next scanner now maintains only `frontend/i18n/en/translation.json`; empty placeholder values were removed from all other languages (cs 330, de 16, es 328, fr-FR 332, it-IT 331, ja 313, ko-KR 313, nl-NL 331, pl-PL 330, ru 329, sk 330, uk 329, zh-Hans 313 entries).
 
 - [CHANGE] Real translations from the unmerged Weblate branch were carried over into `frontend/i18n/<lng>/translation.json`, so none are lost after the switch to empty untranslated strings: Weblate values that are not empty and differ from the English text fill the empty values (de 1, es 47, fr-FR 43, it-IT 44, ja 30, ko-KR 30, nl-NL 28, pl-PL 61, ru 62, uk 62, zh-Hans 30). `cs` and `sk` are new (29 translated values each). The Django `.po` files already contained every Weblate translation.
