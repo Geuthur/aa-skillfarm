@@ -43,13 +43,11 @@ TASK_DEFAULTS_BIND_ONCE_USER = {
     **{"once": {"keys": ["user_id"], "graceful": True}},
 }
 
-TASK_DEFAULTS_ONCE_CHARACTER = {
-    **TASK_DEFAULTS,
+# Default params for tasks that run once per character and are bound to the task instance.
+TASK_DEFAULTS_BIND_ONCE_CHARACTER = {
+    **TASK_DEFAULTS_BIND_ONCE,
     **{"once": {"keys": ["character_pk"], "graceful": True}},
 }
-
-# Default params for tasks per character that are bound to the task instance.
-TASK_DEFAULTS_BIND_ONCE_CHARACTER = {**TASK_DEFAULTS_ONCE_CHARACTER, **{"bind": True}}
 
 
 @shared_task(**TASK_DEFAULTS_BIND_ONCE_USER)
