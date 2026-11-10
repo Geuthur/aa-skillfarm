@@ -15,14 +15,13 @@ from django.utils.translation import gettext_lazy as _
 # Alliance Auth
 from allianceauth.authentication.models import User
 from allianceauth.eveonline.models import EveCharacter, Token
-from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
 
 # Alliance Auth (External Libs)
 from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
-from skillfarm import __title__, app_settings
+from skillfarm import app_settings
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.characterupdatestatus import UpdateStatusManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
@@ -32,9 +31,7 @@ from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManagerMixin,
 )
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 
 # pylint: disable=too-many-public-methods

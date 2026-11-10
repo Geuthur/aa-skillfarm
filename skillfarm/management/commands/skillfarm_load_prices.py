@@ -6,19 +6,13 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # Alliance Auth (External Libs)
 from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.app_settings import SKILLFARM_PRICE_SOURCE_ID
 from skillfarm.models.prices import EveTypePrice
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 
 # pylint: disable=too-many-locals

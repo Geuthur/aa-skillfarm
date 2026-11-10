@@ -9,16 +9,12 @@ from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
 from allianceauth.eveonline.models import EveCharacter
-from allianceauth.services.hooks import get_extension_logger
 from esi.decorators import token_required
 
 # AA Skillfarm
-from skillfarm import __title__, __version__, tasks
+from skillfarm import __version__, tasks
 from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 @login_required

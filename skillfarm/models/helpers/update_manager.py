@@ -13,19 +13,15 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.models.general import (
     UpdateSectionResult,
     _NeedsUpdate,
 )
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(get_extension_logger(__name__), __title__)
+from skillfarm.providers import logger
 
 
 class UpdateStatus(models.TextChoices):

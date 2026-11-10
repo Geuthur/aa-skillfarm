@@ -13,18 +13,15 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
 from allianceauth.services.tasks import QueueOnce
 
 # AA Skillfarm
-from skillfarm import __title__, app_settings
+from skillfarm import app_settings
 from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 MAX_RETRIES_DEFAULT = 3
 

@@ -12,11 +12,8 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # AA Skillfarm
-from skillfarm import __title__, tasks
+from skillfarm import tasks
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import arabic_number_to_roman, get_skillfarm_character
 from skillfarm.helpers.lazy import get_character_portrait_url
@@ -25,9 +22,7 @@ from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
 )
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
+from skillfarm.providers import logger
 
 
 # pylint: disable=too-many-locals, duplicate-code
