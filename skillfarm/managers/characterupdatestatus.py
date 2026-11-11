@@ -2,20 +2,12 @@
 from typing import TYPE_CHECKING
 
 # Django
-from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db import models
 from django.db.models import Case, Count, Q, Value, When
 from django.utils.translation import gettext_lazy as _
 
-# Alliance Auth
-from allianceauth.services.hooks import get_extension_logger
-
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection, UpdateStatus
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 if TYPE_CHECKING:
     # AA Skillfarm
@@ -25,20 +17,6 @@ if TYPE_CHECKING:
 
 
 class UpdateStatusQuerySet(models.QuerySet["CharacterUpdateStatusType"]):
-    def last_update_status(self) -> str:
-        """Return the last update status."""
-        # Filter update status
-        update_status = (
-            self.order_by("last_update_finished_at")
-            .exclude(last_update_finished_at__isnull=True)
-            .first()
-        )
-
-        if update_status:
-            last_update_display = naturaltime(update_status.last_update_finished_at)
-            return last_update_display
-        return UpdateStatus.description(UpdateStatus.INCOMPLETE)
-
     def get_status(self) -> UpdateStatus:
         """Return the current aggregate update status."""
         total_update_status = (
@@ -125,9 +103,6 @@ class UpdateStatusQuerySet(models.QuerySet["CharacterUpdateStatusType"]):
 class UpdateStatusManager(models.Manager["CharacterUpdateStatusType"]):
     def get_queryset(self):
         return UpdateStatusQuerySet(model=self.model, using=self._db)
-
-    def last_update_status(self) -> str:
-        return self.get_queryset().last_update_status()
 
     def get_status(self) -> UpdateStatus:
         """Return the last update status for the given character."""

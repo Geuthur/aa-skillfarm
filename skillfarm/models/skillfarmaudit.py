@@ -15,26 +15,22 @@ from django.utils.translation import gettext_lazy as _
 # Alliance Auth
 from allianceauth.authentication.models import User
 from allianceauth.eveonline.models import EveCharacter, Token
-from allianceauth.services.hooks import get_extension_logger
 from esi.errors import TokenError
 
 # Alliance Auth (External Libs)
 from eve_sde.models.types import ItemType as EveType
 
 # AA Skillfarm
-from skillfarm import __title__, app_settings
 from skillfarm.managers.characterskill import SkillManager
 from skillfarm.managers.characterupdatestatus import UpdateStatusManager
 from skillfarm.managers.skillfarmaudit import SkillFarmManager
 from skillfarm.managers.skillqueue import SkillqueueManager
-from skillfarm.models.general import UpdateSectionResult
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManagerMixin,
+    UpdateSectionResult,
+    UpdateStatusBaseModel,
 )
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(my_logger=get_extension_logger(__name__), prefix=__title__)
 
 
 # pylint: disable=too-many-public-methods
@@ -375,10 +371,10 @@ class CharacterSkillqueueEntry(models.Model):
         return f"{self.character}-{self.queue_position}"
 
 
-class CharacterUpdateStatus(models.Model):
-    """A Model to track the status of the last update."""
+class CharacterUpdateStatus(UpdateStatusBaseModel):
+    """The update status of one section of a SkillFarmAudit."""
 
-    class Meta:
+    class Meta(UpdateStatusBaseModel.Meta):
         default_permissions = ()
 
     objects: UpdateStatusManager = UpdateStatusManager()
@@ -389,79 +385,9 @@ class CharacterUpdateStatus(models.Model):
         related_name="skillfarm_update_status",
         db_column="character_id",
     )
-
-    @property
-    def character(self) -> SkillFarmAudit:
-        """Backward-compatible property for character."""
-        return self.owner
-
-    @character.setter
-    def character(self, value: SkillFarmAudit) -> None:
-        self.owner = value
-
     section = models.CharField(
         max_length=32, choices=CharacterUpdateSection.choices, db_index=True
     )
-    is_success = models.BooleanField(default=None, null=True, db_index=True)
-    error_message = models.TextField()
-    has_token_error = models.BooleanField(default=False)
-
-    last_run_at = models.DateTimeField(
-        default=None,
-        null=True,
-        db_index=True,
-        help_text="Last run has been started at this time",
-    )
-    last_run_finished_at = models.DateTimeField(
-        default=None,
-        null=True,
-        db_index=True,
-        help_text="Last run has been successful finished at this time",
-    )
-    last_update_at = models.DateTimeField(
-        default=None,
-        null=True,
-        db_index=True,
-        help_text="Last update has been started at this time",
-    )
-    last_update_finished_at = models.DateTimeField(
-        default=None,
-        null=True,
-        db_index=True,
-        help_text="Last update has been successful finished at this time",
-    )
-
-    def __str__(self) -> str:
-        return f"{self.owner} - {self.section}"
-
-    def need_update(self) -> bool:
-        """Check if the update is needed."""
-        if self.has_token_error:
-            logger.info(
-                "%s: Ignoring update because of token error, section: %s",
-                self.owner,
-                self.section,
-            )
-            return False
-
-        if not self.is_success or not self.last_run_finished_at:
-            return True
-
-        section_time_stale = app_settings.SKILLFARM_STALE_TYPES.get(self.section, 60)
-        stale = timezone.now() - timezone.timedelta(minutes=section_time_stale)
-        try:
-            return self.last_run_finished_at <= stale
-        except AttributeError:
-            return True
-
-    def reset(self) -> None:
-        """Reset this update status."""
-        self.is_success = None
-        self.error_message = ""
-        self.has_token_error = False
-        self.last_run_at = timezone.now()
-        self.last_run_finished_at = None
-        self.save()
 
 
 SkillFarmAudit.update_status_model = CharacterUpdateStatus

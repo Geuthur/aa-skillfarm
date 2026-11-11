@@ -38,6 +38,12 @@ Section Order:
 
 - [FIX] Compatibility with Alliance Auth 6 (pre-release): the `eveonline` migration dependencies of `0001_initial` and `0001_init_v2` now point to `0019_v5squash` (Alliance Auth 6 removed the older `eveonline` migrations, `0019_v5squash` exists in Alliance Auth 5 as well). Works with Alliance Auth 5 and 6.
 
+- [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` and `testauth/settings/development/local.py` give each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
+
+- [FIX] The per-character lock of `update_character`, `update_char_skills` and `update_char_skillqueue` never worked: `TASK_DEFAULTS_ONCE_CHARACTER` set `once` (key `character_pk`) but not `base=QueueOnce`, so celery_once ignored it and the same character could be updated several times in parallel. `TASK_DEFAULTS_BIND_ONCE_CHARACTER` now builds on `TASK_DEFAULTS_BIND_ONCE` like in aa-example, and a second `apply_async` for the same character is skipped while the first is queued or running. `TASK_DEFAULTS_ONCE_CHARACTER` is removed.
+
+- [FIX] ESI outages and limits did not retry the update tasks: the tasks had no retry at all, and the `UpdateManager` turned every ESI error except `TokenError` into an update status. `update_character`, `update_char_skills` and `update_char_skillqueue` now run with `bind=True` inside the new `retry_task_on_esi_error()` from `providers.py` (with `DOWNTIME_TIMER` and the daily downtime check that raises `DownTimeError`). `_handle_update_exception` raises the errors the task retries on (`ESIErrorLimitException`, `ESIBucketLimitException`, `HTTPServerError` 502/503/504, `RequestError`, `DownTimeError`), checked by the new `is_retryable_esi_error()`. `execute_section` records them as a failed run of the section before raising, so the section shows the error and stays stale until the retry succeeds. Other errors (e.g. HTTP 500 or 404) still end in the update status only.
+
 - [FIX] On phones narrower than 640 px the pages were wider than the screen because of the minimum width of the `aa-react container` of `aa-geuthur-react`. `Routing.tsx` sets `fluidOnSmallScreens` on `AuthBase` (`aa-geuthur-react` 1.2.0), so the container shrinks with the screen.
 
 - [FIX] The pulse animation of the status dot in the character table sync badges had no CSS and never played.
@@ -49,6 +55,10 @@ Section Order:
 - [FIX] The pulsing menu and tab badges scaled up and down with their number. Only the glow around the badge pulses now.
 
 ### Changed
+
+- [CHANGE] `skillfarm/models/helpers/update_manager.py` follows the update manager of aa-example: `UpdateSectionResult` and `_NeedsUpdate` moved there from `models/general.py`, the new abstract `UpdateStatusBaseModel` holds the status fields, `__str__`, `need_update()` and `reset()`, and `CharacterUpdateSection` builds on the new `UpdateSection` base class. `CharacterUpdateStatus` inherits `UpdateStatusBaseModel` and only defines `owner` (still stored in the column `character_id`) and `section`; fields and table are unchanged, so no migration is needed. The backward-compatible alias `character` for `owner` on `CharacterUpdateStatus` and `UpdateManager` is removed; use `owner`. Update behaviour is unchanged. Tests cover `need_update()` (token error, never run, within and beyond the stale time), `__str__` and the error branch of `_handle_update_exception`.
+
+- [CHANGE] The `AppLogger` is created only once in `skillfarm/providers.py`. The API, helper, management command, manager, model and task modules import it with `from skillfarm.providers import logger` instead of building their own. `views.py`, `models/general.py` and `managers/characterupdatestatus.py` built a logger they never used; it was removed there. Log records now carry the logger name `skillfarm.providers` instead of the module name; the `[Skillfarm]` prefix is unchanged.
 
 - [CHANGE] Language files hold only real translations as Weblate writes them, missing keys fall back to English. The i18next scanner now maintains only `frontend/i18n/en/translation.json`; empty placeholder values were removed from all other languages (cs 330, de 16, es 328, fr-FR 332, it-IT 331, ja 313, ko-KR 313, nl-NL 331, pl-PL 330, ru 329, sk 330, uk 329, zh-Hans 313 entries).
 
@@ -91,6 +101,8 @@ Section Order:
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
 
 - [REMOVED] Unused theme variables (`--aa-*`), the unused classes `aa-badge` and `aa-status-dot` and the unused `BaseModalQuery` mutation hooks (`useApproveMutation`, `useFormApproveMutation`).
+
+- [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
 
 <!-- Your changes go here -->
 
