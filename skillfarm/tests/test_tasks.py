@@ -5,6 +5,7 @@ from unittest.mock import patch
 # Third Party
 import pook
 from aiopenapi3 import RequestError
+from celery import Task, states
 from celery.exceptions import Retry
 from evesde_factory.allianceauth import EveCharacterFactory
 from evesde_factory.utils import add_character_to_user
@@ -733,3 +734,35 @@ class TestSkillfarmPrices(AuthTestCase):
         mock_logger.error.assert_called_once_with(
             "Error updating prices: %s", error_instance
         )
+
+
+class TestUpdateCharacterQueueOnce(AuthTestCase):
+    """`update_character` runs only once per `character_pk` at a time."""
+
+    def setUp(self):
+        super().setUp()
+        self._clear_locks()
+        self.addCleanup(self._clear_locks)
+
+    @staticmethod
+    def _clear_locks():
+        for character_pk in (1, 2):
+            key = tasks.update_character.get_key(args=[character_pk], kwargs={})
+            tasks.update_character.once_backend.clear_lock(key)
+
+    @patch.object(Task, "apply_async")
+    def test_should_skip_second_apply_async_for_same_character(self, mock_apply_async):
+        # when
+        tasks.update_character.apply_async(args=[1])
+        result = tasks.update_character.apply_async(args=[1])
+        # then
+        mock_apply_async.assert_called_once()
+        self.assertEqual(result.state, states.REJECTED)
+
+    @patch.object(Task, "apply_async")
+    def test_should_queue_apply_async_for_other_character(self, mock_apply_async):
+        # when
+        tasks.update_character.apply_async(args=[1])
+        tasks.update_character.apply_async(args=[2])
+        # then
+        self.assertEqual(mock_apply_async.call_count, 2)
