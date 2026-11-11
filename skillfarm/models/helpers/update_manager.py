@@ -1,8 +1,25 @@
+"""
+Update manager: tracks per-section ESI updates of an owner model.
+
+A section is one ESI data set (e.g. the skillqueue). Every owner has one
+`UpdateStatusBaseModel` row per section that records when the section was
+last fetched, whether it succeeded and whether the token failed.
+`UpdateManager` runs the `update_<section>` methods of the owner, handles the
+ESI errors and writes the status rows. Owners get it through
+`UpdateManagerMixin`.
+
+ESI errors that `retry_task_on_esi_error` retries (error and bucket limits,
+HTTP 502/503/504, request errors, downtime) are not swallowed: they are
+recorded in the status row of the section and raised again, so the task
+around the update can retry. All other errors end in the status row.
+"""
+
 # Standard Library
 import inspect
 from collections.abc import Callable
+from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any
+from typing import Any, NamedTuple
 
 # Django
 from django.db import models
@@ -14,14 +31,40 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
 
 # AA Skillfarm
-from skillfarm.models.general import (
-    UpdateSectionResult,
-    _NeedsUpdate,
-)
+from skillfarm import app_settings
 from skillfarm.providers import is_retryable_esi_error, logger
 
 
+class UpdateSectionResult(NamedTuple):
+    """A result of an attempted section update."""
+
+    is_changed: bool | None
+    is_updated: bool
+    has_token_error: bool = False
+    error_message: str | None = None
+    data: Any = None
+
+
+@dataclass(frozen=True)
+class _NeedsUpdate:
+    """An Object to track if an update is needed."""
+
+    section_map: dict[str, bool]
+
+    def __bool__(self) -> bool:
+        """Check if any section needs an update."""
+        return any(self.section_map.values())
+
+    def for_section(self, section: str) -> bool:
+        """Check if an update is needed for a specific section."""
+        return self.section_map.get(section, False)
+
+
 class UpdateStatus(models.TextChoices):
+    """Status for ESI data updates.
+    Used to indicate the overall status of an Owner.
+    """
+
     DISABLED = "disabled", _("Disabled")
     TOKEN_ERROR = "token_error", _("Token Error")
     ERROR = "error", _("Error")
@@ -30,9 +73,12 @@ class UpdateStatus(models.TextChoices):
     IN_PROGRESS = "in_progress", _("In Progress")
 
 
-class CharacterUpdateSection(models.TextChoices):
-    SKILLS = "skills", _("Skills")
-    SKILLQUEUE = "skillqueue", _("Skillqueue")
+class UpdateSection(models.TextChoices):
+    """
+    Base Class for Update Sections.
+
+    Every value needs an `update_<value>` method on the owner model.
+    """
 
     @classmethod
     def get_sections(cls) -> list[str]:
@@ -43,6 +89,88 @@ class CharacterUpdateSection(models.TextChoices):
     def method_name(self) -> str:
         """Return method name for this section."""
         return f"update_{self.value}"
+
+
+class CharacterUpdateSection(UpdateSection):
+    """Sections for character updates."""
+
+    SKILLS = "skills", _("Skills")
+    SKILLQUEUE = "skillqueue", _("Skillqueue")
+
+
+class UpdateStatusBaseModel(models.Model):
+    """
+    A Model to track the status of the last update of one section.
+
+    The concrete model adds the `owner` foreign key and the `section` field
+    with the choices of its `UpdateSection` class.
+    """
+
+    class Meta:
+        abstract = True
+        default_permissions = ()
+
+    is_success = models.BooleanField(default=None, null=True, db_index=True)
+    error_message = models.TextField()
+    has_token_error = models.BooleanField(default=False)
+
+    last_run_at = models.DateTimeField(
+        default=None,
+        null=True,
+        db_index=True,
+        help_text="Last run has been started at this time",
+    )
+    last_run_finished_at = models.DateTimeField(
+        default=None,
+        null=True,
+        db_index=True,
+        help_text="Last run has been successful finished at this time",
+    )
+    last_update_at = models.DateTimeField(
+        default=None,
+        null=True,
+        db_index=True,
+        help_text="Last update has been started at this time",
+    )
+    last_update_finished_at = models.DateTimeField(
+        default=None,
+        null=True,
+        db_index=True,
+        help_text="Last update has been successful finished at this time",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.owner} - {self.section}"
+
+    def need_update(self) -> bool:
+        """Check if the update is needed."""
+        if self.has_token_error:
+            logger.info(
+                "%s: Ignoring update because of token error, section: %s",
+                self.owner,
+                self.section,
+            )
+            return False
+
+        if not self.is_success or not self.last_run_finished_at:
+            return True
+
+        section_time_stale = app_settings.SKILLFARM_STALE_TYPES.get(self.section, 60)
+        stale = timezone.now() - timezone.timedelta(minutes=section_time_stale)
+
+        try:
+            return self.last_run_finished_at <= stale
+        except AttributeError:
+            return True
+
+    def reset(self) -> None:
+        """Reset this update status."""
+        self.is_success = None
+        self.error_message = ""
+        self.has_token_error = False
+        self.last_run_at = timezone.now()
+        self.last_run_finished_at = None
+        self.save()
 
 
 class UpdateManager:
@@ -64,11 +192,6 @@ class UpdateManager:
         self.owner = owner
         self.update_section = update_section
         self.update_status = update_status
-
-    @property
-    def character(self) -> Any:
-        """Backward-compatible property referencing self.owner."""
-        return self.owner
 
     # Shared methods
     def calc_update_needed(self) -> _NeedsUpdate:
@@ -136,7 +259,6 @@ class UpdateManager:
         section = self.update_section(section)
         try:
             data = fetch_func(owner=self.owner, force_refresh=force_refresh)
-
             logger.debug(
                 "%s: Update has changed, section: %s", self.owner, section.label
             )
@@ -235,28 +357,26 @@ class UpdateManager:
         ]
         if is_token_problem:
             logger.warning(
-                (
-                    "%s: %s: Update has Token Error: %s %s"
-                    if isinstance(exc, HTTPClientError)
-                    else "%s: %s: Update has Token Error: %s"
-                ),
+                "%s: %s: Update has Token Error: %s %s",
                 self.owner,
                 section.label,
                 error_message,
-                *([exc.status_code] if isinstance(exc, HTTPClientError) else []),
+                exc.status_code,
+            )
+        elif isinstance(exc, HTTPClientError):
+            logger.debug(
+                "%s: %s: Update has Client Error: %s %s",
+                self.owner,
+                section.label,
+                error_message,
+                exc.status_code,
             )
         else:
-            log_fn = logger.debug if isinstance(exc, HTTPClientError) else logger.error
-            log_fn(
-                (
-                    "%s: %s: Update has Client Error: %s %s"
-                    if isinstance(exc, HTTPClientError)
-                    else "%s: %s: Error during update status: %s"
-                ),
+            logger.error(
+                "%s: %s: Error during update status: %s",
                 self.owner,
                 section.label,
                 error_message,
-                *([exc.status_code] if isinstance(exc, HTTPClientError) else []),
             )
 
         return UpdateSectionResult(
@@ -308,7 +428,7 @@ class UpdateManager:
             *args: Positional arguments for the method.
             **kwargs: Keyword arguments for the method.
         Returns:
-            UpdateSectionResult: The result of the method call.
+            UpdateSectionResult: The result of the update operation.
         """
         try:
             return method(*args, **kwargs)
@@ -446,7 +566,12 @@ class UpdateManagerMixin:
 
     @property
     def get_status(self) -> UpdateStatus:
-        """Get the current aggregate update status of this owner."""
+        """
+        Get the current aggregate update status of this owner.
+
+        Needs `annotate_total_update_status()` on the manager of `update_status_model`
+        (see `managers/characterupdatestatus.py`). An inactive owner is `DISABLED`.
+        """
         if getattr(self, "active", True) is False:
             return UpdateStatus.DISABLED
 

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from esi.stubs import CharactersSkills, CharactersSkillsSkill
 
     # AA Skillfarm
-    from skillfarm.models.general import UpdateSectionResult
+    from skillfarm.models.helpers.update_manager import UpdateSectionResult
     from skillfarm.models.skillfarmaudit import CharacterSkill, SkillFarmAudit
 
 

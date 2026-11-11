@@ -32,7 +32,7 @@ class TestCharacterAnnotateTotalUpdateStatus(AuthTestCase):
         sections = CharacterUpdateSection.get_sections()
         for section in sections:
             CharacterUpdateStatusFactory(
-                character=character,
+                owner=character,
                 section=section,
                 is_success=True,
                 error_message="",
@@ -66,7 +66,7 @@ class TestCharacterAnnotateTotalUpdateStatus(AuthTestCase):
         # given
         character = SkillFarmAuditFactory(user=self.user)
         CharacterUpdateStatusFactory(
-            character=character,
+            owner=character,
             section=CharacterUpdateSection.SKILLS,
             is_success=False,
             error_message="",
@@ -90,7 +90,7 @@ class TestCharacterAnnotateTotalUpdateStatus(AuthTestCase):
         sections = CharacterUpdateSection.get_sections()
         for section in sections:
             CharacterUpdateStatusFactory(
-                character=character,
+                owner=character,
                 section=section,
                 is_success=True,
                 error_message="",
@@ -115,7 +115,7 @@ class TestCharacterAnnotateTotalUpdateStatus(AuthTestCase):
         sections = CharacterUpdateSection.get_sections()
         for section in sections:
             CharacterUpdateStatusFactory(
-                character=character,
+                owner=character,
                 section=section,
                 is_success=False,
                 error_message="",
