@@ -1,20 +1,35 @@
 """Tests for the providers module."""
 
 # Standard Library
-from unittest.mock import MagicMock
+from datetime import timedelta
+from http import HTTPStatus
+from unittest.mock import MagicMock, patch
+
+# Third Party
+from aiopenapi3 import RequestError
 
 # Django
 from django.test import override_settings
+from django.utils import timezone
 
 # Alliance Auth
 from esi.errors import TokenError
-from esi.exceptions import HTTPClientError, HTTPNotModified, HTTPServerError
+from esi.exceptions import (
+    ESIBucketLimitException,
+    ESIErrorLimitException,
+    HTTPClientError,
+    HTTPNotModified,
+    HTTPServerError,
+)
+from esi.rate_limiting import ESIRateLimitBucket
 
 # AA Skillfarm
-from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
+from skillfarm.errors import DownTimeError
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManager,
+    UpdateSectionResult,
+    _NeedsUpdate,
 )
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus
 from skillfarm.tests import AuthTestCase
@@ -115,7 +130,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             has_token_error=True,
             error_message="Token error occurred.",
@@ -299,7 +314,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -337,7 +352,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -371,7 +386,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
             is_success=False,
@@ -405,7 +420,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             has_token_error=True,
         )
@@ -468,6 +483,65 @@ class TestUpdateManager(AuthTestCase):
         self.assertTrue(status.is_success)
         self.assertFalse(status.has_token_error)
 
+    def _manager(self) -> UpdateManager:
+        if not hasattr(self, "audit"):
+            self.audit = SkillFarmAuditFactory(user=self.user)
+        return self.updater(
+            owner=self.audit,
+            update_section=CharacterUpdateSection,
+            update_status=CharacterUpdateStatus,
+        )
+
+    def test_perform_update_status_should_raise_retryable_esi_errors(self):
+        for exc in retryable_errors():
+            with self.subTest(exc=type(exc).__name__):
+                # Test Data
+                manager = self._manager()
+                mock_method = MagicMock(side_effect=exc)
+
+                # Test Action & Expected Result
+                with self.assertRaises(type(exc)) as ctx:
+                    manager.perform_update_status(
+                        section=CharacterUpdateSection.SKILLS,
+                        method=mock_method,
+                    )
+                self.assertIs(ctx.exception, exc)
+
+    def test_update_section_if_changed_should_raise_retryable_esi_errors(self):
+        for exc in retryable_errors():
+            with self.subTest(exc=type(exc).__name__):
+                # Test Data
+                manager = self._manager()
+                fetch_func = MagicMock(side_effect=exc)
+
+                # Test Action & Expected Result
+                with self.assertRaises(type(exc)):
+                    manager.update_section_if_changed(
+                        section=CharacterUpdateSection.SKILLS,
+                        fetch_func=fetch_func,
+                    )
+
+    def test_execute_section_should_record_and_raise_retryable_esi_errors(self):
+        for exc in retryable_errors():
+            with self.subTest(exc=type(exc).__name__):
+                # Test Data
+                manager = self._manager()
+                self.audit.update_skills = MagicMock(side_effect=exc)
+
+                # Test Action
+                with self.assertRaises(type(exc)):
+                    manager.execute_section(CharacterUpdateSection.SKILLS)
+
+                # Expected Result: a failed run, not success and not in progress
+                status = CharacterUpdateStatus.objects.get(
+                    owner=self.audit, section=CharacterUpdateSection.SKILLS
+                )
+                self.assertFalse(status.is_success)
+                self.assertFalse(status.has_token_error)
+                self.assertTrue(status.error_message.startswith(type(exc).__name__))
+                self.assertIsNotNone(status.last_run_finished_at)
+                self.assertTrue(status.need_update())
+
     def test_mixin_provides_update_manager_and_shortcuts(self):
         """Test that UpdateManagerMixin provides update_manager and shortcut methods."""
         # Test Data
@@ -478,3 +552,112 @@ class TestUpdateManager(AuthTestCase):
         self.assertEqual(self.audit.update_manager.owner, self.audit)
         sections = self.audit.get_sections_to_update(force_refresh=True)
         self.assertEqual(sections, CharacterUpdateSection.get_sections())
+
+    def test_perform_update_status_should_log_error_on_unexpected_exception(self):
+        """Test that an unexpected exception ends in the update status as error."""
+        # Test Data
+        self.audit = SkillFarmAuditFactory(user=self.user)
+        manager = self.updater(
+            owner=self.audit,
+            update_section=CharacterUpdateSection,
+            update_status=CharacterUpdateStatus,
+        )
+        mock_method = MagicMock(side_effect=ValueError("boom"))
+
+        # Test Action
+        with patch("skillfarm.models.helpers.update_manager.logger") as mock_logger:
+            result = manager.perform_update_status(
+                CharacterUpdateSection.SKILLS, mock_method
+            )
+
+        # Expected Result
+        self.assertFalse(result.is_changed)
+        self.assertFalse(result.is_updated)
+        self.assertFalse(result.has_token_error)
+        self.assertEqual(result.error_message, "ValueError: boom")
+        mock_logger.error.assert_called_once()
+
+
+class TestCharacterUpdateStatus(AuthTestCase):
+    """Tests for the status logic from `UpdateStatusBaseModel`."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.audit = SkillFarmAuditFactory(user=cls.user)
+
+    def test_str_should_name_owner_and_section(self):
+        # Test Data
+        status = CharacterUpdateStatusFactory(
+            owner=self.audit, section=CharacterUpdateSection.SKILLS
+        )
+
+        # Test Action & Expected Result
+        self.assertEqual(str(status), f"{self.audit} - skills")
+
+    def test_need_update_should_return_false_when_has_token_error(self):
+        # Test Data
+        status = CharacterUpdateStatusFactory(
+            owner=self.audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            has_token_error=True,
+            last_run_finished_at=timezone.now() - timedelta(hours=5),
+        )
+
+        # Test Action & Expected Result
+        self.assertFalse(status.need_update())
+
+    def test_need_update_should_return_true_when_never_run(self):
+        # Test Data
+        status = CharacterUpdateStatusFactory(
+            owner=self.audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            has_token_error=False,
+            last_run_finished_at=None,
+        )
+
+        # Test Action & Expected Result
+        self.assertTrue(status.need_update())
+
+    def test_need_update_should_return_false_when_within_stale_time(self):
+        # Test Data: skills are stale after 30 minutes, run 10 minutes ago
+        status = CharacterUpdateStatusFactory(
+            owner=self.audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            has_token_error=False,
+            last_run_finished_at=timezone.now() - timedelta(minutes=10),
+        )
+
+        # Test Action & Expected Result
+        self.assertFalse(status.need_update())
+
+    def test_need_update_should_return_true_when_beyond_stale_time(self):
+        # Test Data: skills are stale after 30 minutes, run 40 minutes ago
+        status = CharacterUpdateStatusFactory(
+            owner=self.audit,
+            section=CharacterUpdateSection.SKILLS,
+            is_success=True,
+            has_token_error=False,
+            last_run_finished_at=timezone.now() - timedelta(minutes=40),
+        )
+
+        # Test Action & Expected Result
+        self.assertTrue(status.need_update())
+
+
+def retryable_errors() -> list[Exception]:
+    """Errors on which `retry_task_on_esi_error` retries the task."""
+    return [
+        ESIErrorLimitException(reset=60),
+        ESIBucketLimitException(ESIRateLimitBucket("char-detail:1", 600, 900), 60),
+        HTTPServerError(HTTPStatus.BAD_GATEWAY, {}, b"Bad Gateway"),
+        HTTPServerError(HTTPStatus.SERVICE_UNAVAILABLE, {}, b"Service Unavailable"),
+        HTTPServerError(HTTPStatus.GATEWAY_TIMEOUT, {}, b"Gateway Timeout"),
+        RequestError(
+            operation=None, request=None, data="Request failed", parameters={}
+        ),
+        DownTimeError("ESI is in daily downtime"),
+    ]

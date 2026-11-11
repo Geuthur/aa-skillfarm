@@ -6,14 +6,10 @@ from django.db import models
 
 # Alliance Auth
 from allianceauth.authentication.models import User
-from allianceauth.services.hooks import get_extension_logger
 
 # AA Skillfarm
-from skillfarm import __title__
 from skillfarm.models.general import General
-from skillfarm.providers import AppLogger
-
-logger = AppLogger(get_extension_logger(__name__), __title__)
+from skillfarm.providers import logger
 
 T = TypeVar("T", bound=models.Model)
 

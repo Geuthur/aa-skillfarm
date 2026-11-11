@@ -9,8 +9,10 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPServerError
 
 # AA Skillfarm
-from skillfarm.models.general import UpdateSectionResult
-from skillfarm.models.helpers.update_manager import CharacterUpdateSection
+from skillfarm.models.helpers.update_manager import (
+    CharacterUpdateSection,
+    UpdateSectionResult,
+)
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
 )
@@ -47,15 +49,6 @@ class TestSkillfarmModel(AuthTestCase):
             ["esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"],
         )
 
-    def test_last_update_should_return_incomplete(self):
-        """
-        Test should return incomplete for last_update Property.
-        """
-        self.assertEqual(
-            self.skillfarm_audit.skillfarm_update_status.last_update_status(),
-            "One or more sections have not been updated",
-        )
-
     def test_reset_has_token_error_should_return_false(self):
         """
         Test should not reset has_token_error.
@@ -68,7 +61,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=False,
             error_message="",
@@ -116,7 +109,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -145,7 +138,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -171,7 +164,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
             has_token_error=False,
