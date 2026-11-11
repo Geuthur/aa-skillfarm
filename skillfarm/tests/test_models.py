@@ -9,8 +9,10 @@ from esi.errors import TokenError
 from esi.exceptions import HTTPServerError
 
 # AA Skillfarm
-from skillfarm.models.general import UpdateSectionResult
-from skillfarm.models.helpers.update_manager import CharacterUpdateSection
+from skillfarm.models.helpers.update_manager import (
+    CharacterUpdateSection,
+    UpdateSectionResult,
+)
 from skillfarm.models.skillfarmaudit import (
     CharacterUpdateStatus,
 )
@@ -59,7 +61,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=False,
             error_message="",
@@ -107,7 +109,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -136,7 +138,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
         )
@@ -162,7 +164,7 @@ class TestSkillfarmModel(AuthTestCase):
         """
         # Test Data
         CharacterUpdateStatusFactory(
-            character=self.skillfarm_audit,
+            owner=self.skillfarm_audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             error_message="",
             has_token_error=False,

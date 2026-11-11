@@ -50,6 +50,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] `skillfarm/models/helpers/update_manager.py` follows the update manager of aa-example: `UpdateSectionResult` and `_NeedsUpdate` moved there from `models/general.py`, the new abstract `UpdateStatusBaseModel` holds the status fields, `__str__`, `need_update()` and `reset()`, and `CharacterUpdateSection` builds on the new `UpdateSection` base class. `CharacterUpdateStatus` inherits `UpdateStatusBaseModel` and only defines `owner` (still stored in the column `character_id`) and `section`; fields and table are unchanged, so no migration is needed. The backward-compatible alias `character` for `owner` on `CharacterUpdateStatus` and `UpdateManager` is removed; use `owner`. Update behaviour is unchanged.
+
 - [CHANGE] The `AppLogger` is created only once in `skillfarm/providers.py`. The API, helper, management command, manager, model and task modules import it with `from skillfarm.providers import logger` instead of building their own. `views.py`, `models/general.py` and `managers/characterupdatestatus.py` built a logger they never used; it was removed there. Log records now carry the logger name `skillfarm.providers` instead of the module name; the `[Skillfarm]` prefix is unchanged.
 
 - [CHANGE] Language files hold only real translations as Weblate writes them, missing keys fall back to English. The i18next scanner now maintains only `frontend/i18n/en/translation.json`; empty placeholder values were removed from all other languages (cs 330, de 16, es 328, fr-FR 332, it-IT 331, ja 313, ko-KR 313, nl-NL 331, pl-PL 330, ru 329, sk 330, uk 329, zh-Hans 313 entries).

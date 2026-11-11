@@ -23,10 +23,11 @@ from esi.rate_limiting import ESIRateLimitBucket
 
 # AA Skillfarm
 from skillfarm.errors import DownTimeError
-from skillfarm.models.general import UpdateSectionResult, _NeedsUpdate
 from skillfarm.models.helpers.update_manager import (
     CharacterUpdateSection,
     UpdateManager,
+    UpdateSectionResult,
+    _NeedsUpdate,
 )
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus
 from skillfarm.tests import AuthTestCase
@@ -127,7 +128,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             has_token_error=True,
             error_message="Token error occurred.",
@@ -311,7 +312,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -349,7 +350,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
         )
@@ -383,7 +384,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             error_message="",
             is_success=False,
@@ -417,7 +418,7 @@ class TestUpdateManager(AuthTestCase):
             update_status=CharacterUpdateStatus,
         )
         CharacterUpdateStatusFactory(
-            character=self.audit,
+            owner=self.audit,
             section=CharacterUpdateSection.SKILLS,
             has_token_error=True,
         )

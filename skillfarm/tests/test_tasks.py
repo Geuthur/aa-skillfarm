@@ -121,7 +121,7 @@ class TestUpdateCharacter(AuthTestCase):
         user = UserMainFactory()
         audit = SkillFarmAuditFactory(user=user)
         CharacterUpdateStatusFactory(
-            character=audit,
+            owner=audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",
@@ -132,7 +132,7 @@ class TestUpdateCharacter(AuthTestCase):
             last_update_finished_at=timezone.now(),
         )
         CharacterUpdateStatusFactory(
-            character=audit,
+            owner=audit,
             section=CharacterUpdateSection.SKILLQUEUE,
             is_success=True,
             error_message="",
@@ -164,7 +164,7 @@ class TestUpdateCharacter(AuthTestCase):
         user = UserMainFactory()
         audit = SkillFarmAuditFactory(user=user)
         CharacterUpdateStatusFactory(
-            character=audit,
+            owner=audit,
             section=CharacterUpdateSection.SKILLS,
             is_success=True,
             error_message="",

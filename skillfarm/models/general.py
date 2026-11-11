@@ -1,8 +1,7 @@
 """Model for Permission."""
 
 # Standard Library
-from dataclasses import dataclass
-from typing import Any, NamedTuple
+from typing import Any
 
 # Django
 from django.db import models
@@ -116,28 +115,3 @@ class UserSettings(models.Model):
     )
 
     disable_notifications = models.BooleanField(default=False)
-
-
-class UpdateSectionResult(NamedTuple):
-    """A result of an attempted section update."""
-
-    is_changed: bool | None
-    is_updated: bool
-    has_token_error: bool = False
-    error_message: str | None = None
-    data: Any = None
-
-
-@dataclass(frozen=True)
-class _NeedsUpdate:
-    """An Object to track if an update is needed."""
-
-    section_map: dict[str, bool]
-
-    def __bool__(self) -> bool:
-        """Check if any section needs an update."""
-        return any(self.section_map.values())
-
-    def for_section(self, section: str) -> bool:
-        """Check if an update is needed for a specific section."""
-        return self.section_map.get(section, False)
