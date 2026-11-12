@@ -84,7 +84,7 @@ class ApiEndpoints:
                 )
             )
 
-            if General.has_management_access(request.user):
+            if General.objects.has_management_access(request.user):
                 right_menu.append(
                     schema.MenuLink(
                         name=_("Administration"),
@@ -107,7 +107,7 @@ class ApiEndpoints:
             summary="Get current user data and permissions",
         )
         def get_user(request: WSGIRequest):
-            if not General.has_basic_access(request.user):
+            if not General.objects.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             main_char = getattr(
@@ -123,7 +123,7 @@ class ApiEndpoints:
 
             portrait = get_character_portrait_url(char_id, size=64) if char_id else None
 
-            is_admin = General.has_administration_access(request.user)
+            is_admin = General.objects.has_admin_access(request.user)
 
             return schema.UserData(
                 user_id=request.user.id,
@@ -135,8 +135,8 @@ class ApiEndpoints:
                 alliance_name=alliance_name,
                 portrait=portrait,
                 is_admin=is_admin,
-                has_corp_access=General.has_corporation_access(request.user),
-                is_superuser=General.is_superuser_only(request.user),
+                has_corp_access=General.objects.has_corporation_access(request.user),
+                is_superuser=General.objects.has_superuser_access(request.user),
             )
 
         @api.get(
@@ -149,7 +149,7 @@ class ApiEndpoints:
             summary="Get current user's Skillfarm settings",
         )
         def get_user_settings(request: WSGIRequest):
-            if not General.has_basic_access(request.user):
+            if not General.objects.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -169,7 +169,7 @@ class ApiEndpoints:
         def update_user_settings(
             request: WSGIRequest, payload: schema.UserSettingsUpdateRequest
         ):
-            if not General.has_basic_access(request.user):
+            if not General.objects.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
@@ -190,7 +190,7 @@ class ApiEndpoints:
         )
         # pylint: disable=too-many-locals
         def get_user_character_statuses(request: WSGIRequest):
-            if not General.has_basic_access(request.user):
+            if not General.objects.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             user_char_ids = list(

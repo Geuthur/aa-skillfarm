@@ -29,7 +29,7 @@ class ApiEndpoints:
             summary="Get skillfarm market prices and profit margins",
         )
         def get_calculator_data(request):
-            if not General.has_basic_access(request.user):
+            if not General.objects.has_basic_access(request.user):
                 return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
 
             try:
