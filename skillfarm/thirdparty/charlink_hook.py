@@ -16,6 +16,10 @@ from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tasks import update_character
 
 
+def _has_basic_access(user):
+    return General.objects.has_basic_access(user)
+
+
 # pylint: disable=unused-argument, duplicate-code
 def _add_character_charaudit(request, token):
     skillfarm = SkillFarmAudit.objects.update_or_create(
@@ -36,7 +40,7 @@ def _users_with_perms_charaudit():
     permission = Permission.objects.get(
         content_type__app_label=__app_name__,
         # pylint: disable-next=no-member
-        codename=General.Permission.BASIC_ACCESS.value,
+        codename="basic_access",
     )
     # Use Alliance Auth's User model to get users with the permission, including those in groups and superusers (Fix Issue with Proxy Model)
     user_model = permission.user_set.model
@@ -63,7 +67,7 @@ app_import = AppImport(
             field_label=SKILLFARM_APP_NAME,
             add_character=_add_character_charaudit,
             scopes=SkillFarmAudit.get_esi_scopes(),
-            check_permissions=General.has_basic_access,
+            check_permissions=_has_basic_access,
             is_character_added=_is_character_added_charaudit,
             is_character_added_annotation=Exists(
                 SkillFarmAudit.objects.filter(character_id=OuterRef("pk"))
