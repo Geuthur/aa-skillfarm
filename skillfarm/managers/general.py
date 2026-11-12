@@ -8,10 +8,55 @@ from django.db import models
 from allianceauth.authentication.models import User
 
 # AA Skillfarm
-from skillfarm.models.general import General
 from skillfarm.providers import logger
 
 T = TypeVar("T", bound=models.Model)
+
+
+class GeneralManager(models.Manager):
+    """
+    Manager of `General` for the app's own permission rules.
+
+    Django checks single permissions (`user.has_perm("skillfarm.basic_access")`).
+    This manager only holds the rules that combine them. `General` is not
+    managed, so these methods never query the database.
+    """
+
+    @staticmethod
+    def has_administration_access(user) -> bool:
+        """Users with `admin_access` see and manage everything."""
+        return bool(user.has_perm("skillfarm.admin_access"))
+
+    @staticmethod
+    def has_corporation_access(user) -> bool:
+        """Users with `corp_access` see and manage their own corporation."""
+        return bool(user.has_perm("skillfarm.corp_access"))
+
+    @staticmethod
+    def has_management_access(user) -> bool:
+        """Users with `admin_access` or `corp_access` may use the Administration."""
+        return bool(
+            user.has_perm("skillfarm.admin_access")
+            or user.has_perm("skillfarm.corp_access")
+        )
+
+    @staticmethod
+    def get_corporation_scope(user) -> tuple[bool, bool, int | None]:
+        """
+        Resolve which corporations the user may see in the Administration.
+
+        Returns:
+            Tuple of (has_access, sees_all, own_corporation_id).
+            `admin_access` sees all corporations, `corp_access` only the own one.
+        """
+        if not user.has_perm("skillfarm.basic_access"):
+            return False, False, None
+        if user.has_perm("skillfarm.admin_access"):
+            return True, True, None
+        if user.has_perm("skillfarm.corp_access"):
+            main_char = getattr(getattr(user, "profile", None), "main_character", None)
+            return True, False, getattr(main_char, "corporation_id", None)
+        return False, False, None
 
 
 class AccessQuerySet(models.QuerySet[T], Generic[T]):
@@ -30,7 +75,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def visible_to(self, user: User):
         """Get all objects visible to the user."""
-        if General.has_administration_access(user):
+        if GeneralManager.has_administration_access(user):
             logger.debug("Returning all objects for admin user %s.", user)
             return self
 
@@ -39,7 +84,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if General.has_corporation_access(user):
+            if GeneralManager.has_corporation_access(user):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s visible.", len(queries), user)
@@ -54,7 +99,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def manage_to(self, user: User):
         """Get QuerySet of objects that the user can manage."""
-        if General.has_administration_access(user):
+        if GeneralManager.has_administration_access(user):
             logger.debug("Returning all manageable queries for admin user %s.", user)
             return self
 
@@ -63,7 +108,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             assert char
             queries = [models.Q(character__character_ownership__user=user)]
 
-            if General.has_corporation_access(user):
+            if GeneralManager.has_corporation_access(user):
                 queries.append(models.Q(character__corporation_id=char.corporation_id))
 
             logger.debug("%s queries for user %s manageable.", len(queries), user)

@@ -8,7 +8,6 @@ from allianceauth import hooks
 from allianceauth.services.hooks import MenuItemHook, UrlHook
 
 from . import app_settings, urls
-from .models.general import General
 
 
 class SkillfarmMenuItem(MenuItemHook):
@@ -23,7 +22,7 @@ class SkillfarmMenuItem(MenuItemHook):
         )
 
     def render(self, request):
-        if General.has_basic_access(request.user):
+        if request.user.has_perm("skillfarm.basic_access"):
             return MenuItemHook.render(self, request)
         return ""
 
