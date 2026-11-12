@@ -13,12 +13,11 @@ from esi.decorators import token_required
 
 # AA Skillfarm
 from skillfarm import __version__, tasks
-from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 
 @login_required
-@permission_required(General.get_perm(General.Permission.BASIC_ACCESS))
+@permission_required("skillfarm.basic_access")
 def react_base(request, *args, **kwargs):  # pylint: disable=unused-argument
     """React Frontend SPA Base View."""
     context = {
@@ -31,7 +30,7 @@ def react_base(request, *args, **kwargs):  # pylint: disable=unused-argument
 
 @login_required
 @token_required(scopes=SkillFarmAudit.get_esi_scopes())
-@permission_required(General.get_perm(General.Permission.BASIC_ACCESS))
+@permission_required("skillfarm.basic_access")
 def add_char(request, token):
     """Add Character to Skillfarm."""
     character = EveCharacter.objects.get_character_by_id(token.character_id)
