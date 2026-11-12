@@ -11,12 +11,13 @@ from allianceauth.eveonline.models import EveCharacter
 # AA Skillfarm
 from skillfarm import __app_name__
 from skillfarm.app_settings import SKILLFARM_APP_NAME
+from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tasks import update_character
 
 
 def _has_basic_access(user):
-    return user.has_perm("skillfarm.basic_access")
+    return General.objects.has_basic_access(user)
 
 
 # pylint: disable=unused-argument, duplicate-code

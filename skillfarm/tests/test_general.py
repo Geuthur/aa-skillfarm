@@ -63,14 +63,25 @@ class TestGeneralManager(AuthTestCase):
         # Expected Result
         self.assertEqual(results, [True, True, False])
 
+    def test_has_basic_and_superuser_access(self):
+        # Test Data
+        basic = UserMainFactory(permissions__=["skillfarm.basic_access"])
+        other = UserMainFactory(permissions__=["skillfarm.corp_access"])
+
+        # Expected Result
+        self.assertTrue(General.objects.has_basic_access(basic))
+        self.assertFalse(General.objects.has_basic_access(other))
+        self.assertTrue(General.objects.has_superuser_access(self.superuser))
+        self.assertFalse(General.objects.has_superuser_access(basic))
+
     def test_has_administration_and_corporation_access(self):
         # Test Data
         admin = UserMainFactory(permissions__=["skillfarm.admin_access"])
         corp = UserMainFactory(permissions__=["skillfarm.corp_access"])
 
         # Expected Result
-        self.assertTrue(General.objects.has_administration_access(admin))
-        self.assertFalse(General.objects.has_administration_access(corp))
+        self.assertTrue(General.objects.has_admin_access(admin))
+        self.assertFalse(General.objects.has_admin_access(corp))
         self.assertTrue(General.objects.has_corporation_access(corp))
         self.assertFalse(General.objects.has_corporation_access(admin))
 

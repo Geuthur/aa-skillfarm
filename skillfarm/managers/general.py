@@ -23,7 +23,12 @@ class GeneralManager(models.Manager):
     """
 
     @staticmethod
-    def has_administration_access(user) -> bool:
+    def has_basic_access(user) -> bool:
+        """Users with `basic_access` may use the app."""
+        return bool(user.has_perm("skillfarm.basic_access"))
+
+    @staticmethod
+    def has_admin_access(user) -> bool:
         """Users with `admin_access` see and manage everything."""
         return bool(user.has_perm("skillfarm.admin_access"))
 
@@ -33,11 +38,16 @@ class GeneralManager(models.Manager):
         return bool(user.has_perm("skillfarm.corp_access"))
 
     @staticmethod
+    def has_superuser_access(user) -> bool:
+        """Superusers only (global tasks, deleting audits)."""
+        return bool(user.is_superuser)
+
+    @staticmethod
     def has_management_access(user) -> bool:
         """Users with `admin_access` or `corp_access` may use the Administration."""
         return bool(
-            user.has_perm("skillfarm.admin_access")
-            or user.has_perm("skillfarm.corp_access")
+            GeneralManager.has_admin_access(user)
+            or GeneralManager.has_corporation_access(user)
         )
 
     @staticmethod
@@ -49,11 +59,11 @@ class GeneralManager(models.Manager):
             Tuple of (has_access, sees_all, own_corporation_id).
             `admin_access` sees all corporations, `corp_access` only the own one.
         """
-        if not user.has_perm("skillfarm.basic_access"):
+        if not GeneralManager.has_basic_access(user):
             return False, False, None
-        if user.has_perm("skillfarm.admin_access"):
+        if GeneralManager.has_admin_access(user):
             return True, True, None
-        if user.has_perm("skillfarm.corp_access"):
+        if GeneralManager.has_corporation_access(user):
             main_char = getattr(getattr(user, "profile", None), "main_character", None)
             return True, False, getattr(main_char, "corporation_id", None)
         return False, False, None
@@ -75,7 +85,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def visible_to(self, user: User):
         """Get all objects visible to the user."""
-        if GeneralManager.has_administration_access(user):
+        if GeneralManager.has_admin_access(user):
             logger.debug("Returning all objects for admin user %s.", user)
             return self
 
@@ -99,7 +109,7 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
 
     def manage_to(self, user: User):
         """Get QuerySet of objects that the user can manage."""
-        if GeneralManager.has_administration_access(user):
+        if GeneralManager.has_admin_access(user):
             logger.debug("Returning all manageable queries for admin user %s.", user)
             return self
 
