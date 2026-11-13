@@ -271,6 +271,7 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isAnyUpdating}
+                    className="aa-react"
                   />,
                 )}
                 <Dropdown.Menu

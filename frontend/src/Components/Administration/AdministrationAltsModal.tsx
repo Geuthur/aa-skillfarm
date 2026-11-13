@@ -212,6 +212,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isUpdating}
+                    className="aa-react"
                   />,
                 )}
                 <Dropdown.Menu
