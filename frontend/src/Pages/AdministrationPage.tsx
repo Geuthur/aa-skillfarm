@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { formatNumber } from "aa-geuthur-react";
+import { FilterButtonGroup, formatNumber } from "aa-geuthur-react";
 import {
   AlertTriangle,
   Check,
@@ -16,7 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { Badge, Button, ButtonGroup, Card, CardBody, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Card, CardBody, Col, Form, Modal, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
 // Styles
@@ -322,34 +322,17 @@ export const AdministrationPage: React.FC = () => {
 
         {/* Filter and Search Bar */}
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mt-4 mb-2">
-          <div className="mw-100 overflow-x-auto">
-            <ButtonGroup size="sm">
-              <Button
-                variant={statusFilter === "all" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("all")}
-              >
-                {t("All")} <Badge bg="secondary" className="ms-1">{totalCount}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "training" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("training")}
-              >
-                {t("In Training")} <Badge bg="secondary" className="ms-1">{trainingCount}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "paused" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("paused")}
-              >
-                {t("Paused")} <Badge bg="secondary" className="ms-1">{pausedCount}</Badge>
-              </Button>
-              <Button
-                variant={statusFilter === "issues" ? "primary" : "secondary"}
-                onClick={() => setStatusFilter("issues")}
-              >
-                {t("Issues")} <Badge bg="secondary" className="ms-1">{issuesCount}</Badge>
-              </Button>
-            </ButtonGroup>
-          </div>
+          <FilterButtonGroup<"all" | "training" | "paused" | "issues">
+            options={[
+              { value: "all", label: t("All"), count: totalCount },
+              { value: "training", label: t("In Training"), count: trainingCount },
+              { value: "paused", label: t("Paused"), count: pausedCount },
+              { value: "issues", label: t("Issues"), count: issuesCount },
+            ]}
+            value={statusFilter}
+            onChange={setStatusFilter}
+            ariaLabel={t("Filter characters by status")}
+          />
 
           <div className={`${styles.searchContainer} w-100`}>
             <Form.Control

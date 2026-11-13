@@ -448,9 +448,12 @@ describe("AdministrationPage", () => {
     expect(screen.getByText("Farmer Bravo")).toBeInTheDocument();
 
     const pausedFilterBtn = screen.getByRole("button", { name: /Paused/i });
+    expect(screen.getByRole("button", { name: /^All/ })).toHaveAttribute("aria-pressed", "true");
+    expect(pausedFilterBtn).toHaveAttribute("aria-pressed", "false");
     await user.click(pausedFilterBtn);
 
     // Expected Result
+    expect(pausedFilterBtn).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText("Farmer Bravo")).toBeInTheDocument();
     expect(screen.queryByText("Farmer Alpha")).not.toBeInTheDocument();
 
@@ -461,6 +464,25 @@ describe("AdministrationPage", () => {
     // Expected Result
     expect(screen.getByText("Farmer Alpha")).toBeInTheDocument();
     expect(screen.queryByText("Farmer Bravo")).not.toBeInTheDocument();
+  });
+
+  it("should render the row actions as icon buttons with accessible names", async () => {
+    // Test Data
+    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+
+    // Test Action
+    renderPage();
+    expect(await screen.findByText("Farmer Alpha")).toBeInTheDocument();
+
+    // Expected Result
+    const altsBtn = screen.getByTestId("view-alts-btn-user_1");
+    expect(altsBtn).toHaveAttribute("aria-label", "Alts");
+    expect(altsBtn).toHaveTextContent("");
+    expect(screen.getByTestId("update-all-alts-user_1")).toHaveAttribute(
+      "aria-label",
+      "Update All Alts",
+    );
   });
 
   it("should trigger global update all characters with force refresh switch", async () => {

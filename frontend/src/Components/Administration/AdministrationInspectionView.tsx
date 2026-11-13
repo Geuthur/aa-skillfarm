@@ -99,6 +99,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                 variant="danger"
                 aria-label={t("More update options")}
                 disabled={isUpdating}
+                className="aa-react"
               />
               <Dropdown.Menu align="end">
                 <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}>
