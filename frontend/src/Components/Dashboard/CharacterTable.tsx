@@ -87,15 +87,17 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         id: "extractions",
         header: t("Extractions"),
         accessorFn: (row) => row.extractions_ready_count,
-        meta: { className: styles["col-extractions"] },
         cell: ({ row }) => {
           const char = row.original;
+          // The table ignores meta.className, so the min-width sits on the cell content
           return (
-            <ExtractionBadge
-              readyCount={char.extractions_ready_count}
-              isAcknowledged={char.extraction_acknowledged}
-              acknowledgedAt={char.extraction_acknowledged_at}
-            />
+            <div className={styles["col-extractions"]}>
+              <ExtractionBadge
+                readyCount={char.extractions_ready_count}
+                isAcknowledged={char.extraction_acknowledged}
+                acknowledgedAt={char.extraction_acknowledged_at}
+              />
+            </div>
           );
         },
       },
