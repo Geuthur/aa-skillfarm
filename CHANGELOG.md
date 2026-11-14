@@ -34,6 +34,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] Character table: the green "Active (%)" badge sits inline after the skill name instead of wrapping as its own block, and the training queue column gets its minimum width again (the table ignored `meta.className`).
+
 - [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` gives each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
 
 - [FIX] The per-character lock of `update_character`, `update_char_skills` and `update_char_skillqueue` never worked: `TASK_DEFAULTS_ONCE_CHARACTER` set `once` (key `character_pk`) but not `base=QueueOnce`, so celery_once ignored it and the same character could be updated several times in parallel. `TASK_DEFAULTS_BIND_ONCE_CHARACTER` now builds on `TASK_DEFAULTS_BIND_ONCE` like in aa-example, and a second `apply_async` for the same character is skipped while the first is queued or running. `TASK_DEFAULTS_ONCE_CHARACTER` is removed.
