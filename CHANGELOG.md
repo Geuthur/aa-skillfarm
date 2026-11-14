@@ -34,6 +34,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] Character table: the extractions column gets its minimum width again, so the badge (e.g. "12 Reviewed") no longer wraps onto two lines (the table ignored `meta.className`).
+
 - [FIX] Character table: the green "Active (%)" badge sits inline after the skill name instead of wrapping as its own block, and the training queue column gets its minimum width again (the table ignored `meta.className`).
 
 - [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` gives each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
