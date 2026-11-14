@@ -65,19 +65,21 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         id: "training_queue",
         header: t("Training Queue"),
         accessorFn: (row) => row.current_training_skill ?? "",
-        meta: { className: styles["col-queue"] },
         cell: ({ row }) => {
           const char = row.original;
+          // The table ignores meta.className, so the min-width sits on the cell content
           return (
-            <TrainingProgressBar
-              isTraining={char.is_training}
-              currentSkill={char.current_training_skill}
-              trainingStartDate={char.training_start_date}
-              trainingFinishDate={char.training_finish_date}
-              queueFinishDate={char.queue_finish_date}
-              queuePausedAcknowledged={char.queue_paused_acknowledged}
-              progressPercent={char.progress_percent}
-            />
+            <div className={styles["col-queue"]}>
+              <TrainingProgressBar
+                isTraining={char.is_training}
+                currentSkill={char.current_training_skill}
+                trainingStartDate={char.training_start_date}
+                trainingFinishDate={char.training_finish_date}
+                queueFinishDate={char.queue_finish_date}
+                queuePausedAcknowledged={char.queue_paused_acknowledged}
+                progressPercent={char.progress_percent}
+              />
+            </div>
           );
         },
       },
