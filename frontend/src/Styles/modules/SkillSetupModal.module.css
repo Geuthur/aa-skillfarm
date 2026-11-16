@@ -54,8 +54,8 @@
 }
 
 .skill-option-selected {
-    background-color: rgba(245, 158, 11, 0.15);
-    border-color: rgba(245, 158, 11, 0.4);
+    background-color: rgb(245 158 11 / 15%);
+    border-color: rgb(245 158 11 / 40%);
 }
 
 .skill-label {

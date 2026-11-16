@@ -3,28 +3,28 @@
     color: var(--aa-text-emerald-light);
 }
 
-.dropdownMenu {
+.dropdown-menu {
     z-index: 1060;
 }
 
-.skillTruncate {
+.skill-truncate {
     max-width: 180px;
 }
 
-.progressCol {
+.progress-col {
     min-width: 120px;
 }
 
-.searchContainer {
+.search-container {
     max-width: 300px;
 }
 
-.cursorPointer {
+.cursor-pointer {
     cursor: pointer;
 }
 
 /* Status badge that opens the error details modal (role="button" already gets cursor: pointer) */
-.statusBadgeButton:focus-visible {
+.status-badge-button:focus-visible {
     outline: 2px solid var(--aa-color-emerald-light);
     outline-offset: 2px;
 }

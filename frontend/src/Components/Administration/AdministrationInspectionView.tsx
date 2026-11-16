@@ -241,7 +241,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                         )}
                       </td>
                       <td>{entry.finished_level_roman}</td>
-                      <td className={styles.progressCol}>
+                      <td className={styles["progress-col"]}>
                         <ProgressBar
                           now={entry.progress_percent}
                           label={`${entry.progress_percent}%`}
