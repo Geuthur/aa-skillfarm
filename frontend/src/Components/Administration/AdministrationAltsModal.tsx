@@ -95,7 +95,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
               {...(hasIssue && {
                 role: "button",
                 tabIndex: 0,
-                className: styles.statusBadgeButton,
+                className: styles["status-badge-button"],
                 "aria-label": t("Show error details for {{name}}", {
                   name: audit.character_name,
                 }),
@@ -136,7 +136,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
               </Badge>
               {audit.current_training_skill && (
                 <div
-                  className={`small text-muted text-truncate ${styles.skillTruncate}`}
+                  className={`small text-muted text-truncate ${styles["skill-truncate"]}`}
                 >
                   {audit.current_training_skill}
                 </div>
@@ -217,7 +217,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                 )}
                 <Dropdown.Menu
                   align="end"
-                  className={`shadow-lg ${styles.dropdownMenu}`}
+                  className={`shadow-lg ${styles["dropdown-menu"]}`}
                 >
                   <Dropdown.Item
                     onClick={() => onTriggerUpdate(audit.character_id, false)}

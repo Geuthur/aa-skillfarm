@@ -7,14 +7,14 @@
 
 .dot-ping {
     inset: 0;
-    background-color: var(--aa-color-emerald-light, #34d399);
+    background-color: var(--aa-color-emerald-light, rgb(52 211 153));
     opacity: 0.75;
 }
 
 .label {
     font-family: monospace;
     font-size: var(--aa-font-size-xs, 0.75rem);
-    color: var(--aa-text-muted, #888);
+    color: var(--aa-text-muted, rgb(136 136 136));
 }
 
 .dot {
@@ -23,14 +23,14 @@
 }
 
 .dot-ok {
-    background-color: var(--aa-color-emerald, #10b981);
+    background-color: var(--aa-color-emerald, rgb(16 185 129));
 }
 
 .dot-busy {
-    background-color: var(--aa-color-amber, #f59e0b);
+    background-color: var(--aa-color-amber, rgb(245 158 11));
 }
 
 .dot-error {
-    background-color: var(--aa-color-rose, #ef4444);
-    box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    background-color: var(--aa-color-rose, rgb(239 68 68));
+    box-shadow: 0 0 6px rgb(239 68 68 / 60%);
 }

@@ -102,6 +102,8 @@ Section Order:
 
 - [CHANGE] ESI compatibility date updated to `2026-08-18`; the OpenAPI spec file was refreshed to match, its name in `providers.py` now follows the date, and `.make/conf.d/eve-esi.mk` was added for `make update-compatibility-date`.
 
+- [CHANGE] The stylelint pre-commit hook now checks the source CSS in `frontend/src/` (built bundles stay excluded); its findings are fixed with equivalent CSS (hex colors as `rgb()`), only Firefox now also shows the panel/card `backdrop-filter`
+
 ### Removed
 
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.

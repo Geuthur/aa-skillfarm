@@ -10,7 +10,7 @@
     padding-left: 34px;
 }
 
-.tab-alert:global(.aa-tab-btn) {
+.tab-alert[class~="aa-tab-btn"] {
     border-color: var(--aa-color-amber);
     color: var(--aa-text-amber-light);
 }

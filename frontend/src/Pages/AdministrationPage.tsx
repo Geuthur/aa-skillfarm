@@ -334,7 +334,7 @@ export const AdministrationPage: React.FC = () => {
             ariaLabel={t("Filter characters by status")}
           />
 
-          <div className={`${styles.searchContainer} w-100`}>
+          <div className={`${styles["search-container"]} w-100`}>
             <Form.Control
               type="search"
               placeholder={t("Search by character, user, or corp…")}
