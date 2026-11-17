@@ -58,6 +58,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Discord notifications moved from `helpers/discord.py` to `thirdparty/discord.py` and aligned with the aa-example building block (webhook sender included, embed colours in the module); behaviour is unchanged.
+
 - [CHANGE] Administration: the status filter uses `FilterButtonGroup` from `aa-geuthur-react` 1.4.0, and the row actions of the audit table are one icon `ButtonGroup` with tooltips.
 
 - [CHANGE] Permissions are defined only in `General.Meta.permissions` (plain tuples, texts now translatable; codenames and texts unchanged; migration `0008_alter_general_permissions` only updates the model options) and checked directly with Django and the full string, e.g. `@permission_required("skillfarm.basic_access")` or `user.has_perm("skillfarm.admin_access")`. `General.Permission`, `General.get_perm`, `has_perm`, `has_any_perm` and the wrappers `has_basic_access`, `is_superuser_only` and `get_own_corporation_id` are removed. The Django views check with `@permission_required`; the Ninja API, the menu hook, the Charlink hook and the access querysets (`visible_to`, `manage_to`) ask `General.objects` (`GeneralManager` in `managers/general.py`, no database queries) with `has_basic_access`, `has_admin_access`, `has_corporation_access`, `has_management_access`, `has_superuser_access` and `get_corporation_scope`. A new test compares every permission string used in code and templates (`<app_label>.<codename>`) with `General.Meta.permissions`.
