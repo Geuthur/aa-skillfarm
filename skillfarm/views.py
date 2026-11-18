@@ -29,8 +29,8 @@ def react_base(request, *args, **kwargs):  # pylint: disable=unused-argument
 
 
 @login_required
-@token_required(scopes=SkillFarmAudit.get_esi_scopes())
 @permission_required("skillfarm.basic_access")
+@token_required(scopes=SkillFarmAudit.get_esi_scopes())
 def add_char(request, token):
     """Add Character to Skillfarm."""
     character = EveCharacter.objects.get_character_by_id(token.character_id)
