@@ -39,6 +39,8 @@ Section Order:
 > [!WARNING]
 > Users with `admin_access` or `corp_access` but without `basic_access` lose access to the API and the pages. Grant them `basic_access` as well.
 
+- [FIX] `char/add/` checks `basic_access` before the token selection and the SSO flow start, not after.
+
 - [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
 
 - [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
