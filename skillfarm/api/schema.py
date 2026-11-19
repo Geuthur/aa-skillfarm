@@ -7,6 +7,12 @@ from typing import Literal
 from ninja import Field, FilterSchema, Schema
 
 
+class ErrorSchema(Schema):
+    """Error response of an endpoint, e.g. for 403 and 404."""
+
+    error: str
+
+
 class ActionResponse(Schema):
     """Generic action response schema."""
 

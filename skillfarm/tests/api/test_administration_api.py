@@ -209,6 +209,26 @@ class TestAdministrationApiEndpoints(AuthTestCase):
             SkillFarmAudit.objects.filter(character__character_id=char_id).exists()
         )
 
+    def test_audit_endpoints_for_unknown_character_should_return_not_found(self):
+        # Test Data
+        self.client.force_login(self.superuser)
+        requests = {
+            "trigger_audit_update": self.client.post,
+            "delete_audit": self.client.delete,
+            "inspect_audit": self.client.get,
+        }
+
+        for name, request in requests.items():
+            with self.subTest(endpoint=name):
+                url = reverse(f"{API_URL}:{name}", kwargs={"character_id": 1})
+
+                # Test Action
+                response = request(url, content_type="application/json")
+
+                # Expected Result
+                self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+                self.assertEqual(response.json(), {"error": "Character not found."})
+
     def test_get_admin_stats_as_superuser_should_return_aggregated_stats(self):
         # Test Data
         url = reverse(f"{API_URL}:get_admin_stats")
@@ -702,6 +722,7 @@ class TestAdministrationCorporationsApi(AuthTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response.json(), {"error": "Corporation not found."})
 
     def test_get_menu_as_corp_access_user_should_include_administration(self):
         # Test Data
