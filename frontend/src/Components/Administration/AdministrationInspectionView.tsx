@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 // Third Party
-import { formatNumber, renderTooltip } from "aa-geuthur-react";
+import { formatNumber, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import { ArrowLeft, Clock, RefreshCw } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Nav, ProgressBar, Spinner, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,6 @@ import styles from "@/Styles/modules/Administration.module.css";
 
 import type { CharacterDetailResponse, AdministrationAuditSchema } from "@/Api/schema";
 // AA Skillfarm
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 interface AdministrationInspectionViewProps {
   inspectingAudit: AdministrationAuditSchema;

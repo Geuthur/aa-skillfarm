@@ -67,6 +67,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Frontend on `aa-geuthur-react` 1.5.0: owner settings (`BaseOwnerSettingsSection`, `UnregisteredModal`) and `OwnerPortrait` come from the package, `Main.tsx` uses `initI18n`, the settings page uses `useUserSettings`, and the design tokens come from the package CSS. On the settings page the section header has rounded corners, the ticker sits closer to the name, a card with a token error is red and the delete dialog is wider; cards with an error pulse now, and "Characters not in Skillfarm" has an icon and a description.
+
 - [CHANGE] Discord notifications moved from `helpers/discord.py` to `thirdparty/discord.py` and aligned with the aa-example building block (webhook sender included, embed colours in the module); behaviour is unchanged.
 
 - [CHANGE] Administration: the status filter uses `FilterButtonGroup` from `aa-geuthur-react` 1.4.0, and the row actions of the audit table are one icon `ButtonGroup` with tooltips.
@@ -116,6 +118,8 @@ Section Order:
 - [CHANGE] The stylelint pre-commit hook now checks the source CSS in `frontend/src/` (built bundles stay excluded); its findings are fixed with equivalent CSS (hex colors as `rgb()`), only Firefox now also shows the panel/card `backdrop-filter`
 
 ### Removed
+
+- [REMOVED] Frontend copies of building blocks the package ships since `aa-geuthur-react` 1.5.0 (`Components/Base/OwnerSettings`, `Components/Base/OwnerPortrait`, `Components/Badges`), the unused `Components/Forms/validation.ts`, the own settings query and mutation, and the design tokens and keyframes of `Styles/index.css` that the package provides.
 
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
 

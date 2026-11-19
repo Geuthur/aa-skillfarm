@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import { BaseModal, BaseTable, ModalSize, formatNumber } from "aa-geuthur-react";
+import { BaseModal, BaseTable, formatNumber, ModalSize, OwnerPortrait } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { Clock, Sparkles } from "lucide-react";
 import { Card } from "react-bootstrap";
@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
 import type { SkillQueueEntrySchema } from "@/Api/schema";
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { useCharacterDetail } from "@/Components/Modals/Hooks";
 

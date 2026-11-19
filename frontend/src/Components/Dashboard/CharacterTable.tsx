@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import { BaseTable, renderTooltip } from "aa-geuthur-react";
+import { BaseTable, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";

@@ -10,53 +10,20 @@ import { useTranslation } from "react-i18next";
 import {
   deleteCharacter,
   fetchUserCharacterStatuses,
-  fetchUserSettings,
   toggleNotification,
   triggerCharacterUpdate,
   triggerUpdateAll,
-  updateUserSettings,
 } from "@/Api/ApiCalls";
 import { queryKeys } from "@/Api/query";
-import type { UserSettingsSchema } from "@/Api/schema";
 
 /** Cooldown in seconds after an update was queued. */
 const UPDATE_COOLDOWN = 60;
-
-/** Loads the settings of the current user. */
-export function useUserSettings() {
-  return useQuery({
-    queryKey: queryKeys.UserSettings,
-    queryFn: fetchUserSettings,
-  });
-}
 
 /** Loads the registered and missing characters of the current user with their sync status. */
 export function useUserCharacterStatuses() {
   return useQuery({
     queryKey: queryKeys.UserCharacterStatuses,
     queryFn: fetchUserCharacterStatuses,
-  });
-}
-
-/** Saves the user settings optimistically and rolls back when the request fails. */
-export function useUpdateUserSettings() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: updateUserSettings,
-    onMutate: async (settings) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.UserSettings });
-      const previous = queryClient.getQueryData<UserSettingsSchema>(queryKeys.UserSettings);
-      queryClient.setQueryData<UserSettingsSchema>(queryKeys.UserSettings, settings);
-      return { previous };
-    },
-    onError: (_error, _settings, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(queryKeys.UserSettings, context.previous);
-      }
-    },
-    onSuccess: (settings) => {
-      queryClient.setQueryData(queryKeys.UserSettings, settings);
-    },
   });
 }
 

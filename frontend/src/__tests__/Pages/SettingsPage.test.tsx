@@ -3,8 +3,9 @@ import { MemoryRouter } from "react-router-dom";
 
 // Third Party
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useUserSettings } from "aa-geuthur-react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
@@ -15,8 +16,6 @@ vi.mock("@/Api/ApiCalls", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
   return {
     ...actual,
-    fetchUserSettings: vi.fn(),
-    updateUserSettings: vi.fn(),
     fetchUserCharacterStatuses: vi.fn(),
     triggerUpdateAll: vi.fn(),
     triggerCharacterUpdate: vi.fn(),
@@ -24,6 +23,24 @@ vi.mock("@/Api/ApiCalls", async (importOriginal) => {
     deleteCharacter: vi.fn(),
   };
 });
+
+// The hook itself is tested in the package, here only the page is checked against its result.
+vi.mock("aa-geuthur-react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("aa-geuthur-react")>();
+  return { ...actual, useUserSettings: vi.fn() };
+});
+
+const mutate = vi.fn();
+
+const mockSettings = (overrides: Record<string, unknown> = {}, mutation: Record<string, unknown> = {}) => {
+  vi.mocked(useUserSettings).mockReturnValue({
+    data: { disable_notifications: false },
+    isLoading: false,
+    isError: false,
+    updateMutation: { mutate, isPending: false, isError: false, ...mutation },
+    ...overrides,
+  } as unknown as ReturnType<typeof useUserSettings>);
+};
 
 const renderPage = () => {
   const queryClient = new QueryClient({
@@ -41,13 +58,55 @@ const renderPage = () => {
 describe("SettingsPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSettings();
+  });
+
+  it("should show the loading state while the settings load", () => {
+    // Test Data
+    mockSettings({ data: undefined, isLoading: true });
+    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+      characters: [],
+      missing_characters: [],
+    });
+
+    // Test Action
+    renderPage();
+
+    // Expected Result
+    expect(screen.getByText("Loading settings…")).toBeInTheDocument();
+  });
+
+  it("should show an error when the settings cannot be loaded", () => {
+    // Test Data
+    mockSettings({ data: undefined, isError: true });
+
+    // Test Action
+    renderPage();
+
+    // Expected Result
+    expect(screen.getByRole("alert")).toHaveTextContent("Failed to load settings.");
+  });
+
+  it("should show the save status and the save error", () => {
+    // Test Data
+    mockSettings({}, { isPending: true, isError: true });
+    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+      characters: [],
+      missing_characters: [],
+    });
+
+    // Test Action
+    renderPage();
+
+    // Expected Result
+    expect(screen.getByRole("status")).toHaveTextContent("Saving…");
+    expect(screen.getByRole("alert")).toHaveTextContent("Could not save this setting.");
+    expect(screen.getByRole("switch", { name: "Disable all notifications" })).toBeDisabled();
   });
 
   it("should load the saved global notification preference", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValueOnce({
-      disable_notifications: true,
-    });
+    mockSettings({ data: { disable_notifications: true } });
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValueOnce({
       characters: [],
       missing_characters: [],
@@ -62,18 +121,13 @@ describe("SettingsPage", () => {
     ).toBeChecked();
   });
 
-  it("should save the global preference when the switch is enabled", async () => {
+  it("should send the global preference when the switch is enabled", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
-      disable_notifications: false,
-    });
+    mockSettings();
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [],
-    });
-    vi.mocked(ApiCalls.updateUserSettings).mockResolvedValue({
-      disable_notifications: true,
     });
 
     // Test Action
@@ -84,18 +138,12 @@ describe("SettingsPage", () => {
     await user.click(toggle);
 
     // Expected Result
-    expect(ApiCalls.updateUserSettings).toHaveBeenCalledWith(
-      { disable_notifications: true },
-      expect.any(Object),
-    );
-    await waitFor(() => expect(toggle).toBeChecked());
+    expect(mutate).toHaveBeenCalledWith({ disable_notifications: true });
   });
 
   it("should display characters with their update status and highlight errors", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
-      disable_notifications: false,
-    });
+    mockSettings();
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {
@@ -157,7 +205,7 @@ describe("SettingsPage", () => {
 
     // Expected Result
     expect(await screen.findByText("Farm Pilot Alpha")).toBeInTheDocument();
-    expect(screen.getByText("Farm Pilot Bravo")).toBeInTheDocument();
+    expect(await screen.findByText("Farm Pilot Bravo")).toBeInTheDocument();
     expect(screen.getByText("ESI connection timed out")).toBeInTheDocument();
     expect(screen.getAllByText("OK").length).toBeGreaterThan(0);
     expect(screen.getByText("Error")).toBeInTheDocument();
@@ -165,9 +213,7 @@ describe("SettingsPage", () => {
 
   it("should display missing characters not yet added to Skillfarm", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
-      disable_notifications: false,
-    });
+    mockSettings();
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [
@@ -197,9 +243,7 @@ describe("SettingsPage", () => {
   it("should trigger update all and individual character update with force_refresh false", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
-      disable_notifications: false,
-    });
+    mockSettings();
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {
@@ -246,9 +290,7 @@ describe("SettingsPage", () => {
   it("should toggle character notifications and open delete modal", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchUserSettings).mockResolvedValue({
-      disable_notifications: false,
-    });
+    mockSettings();
     vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {

@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // Third Party
-import { ErrorLoader, FetchingLoader } from "aa-geuthur-react";
+import { ErrorLoader, FetchingLoader, OwnerPortrait, UnregisteredModal } from "aa-geuthur-react";
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
@@ -15,8 +15,6 @@ import {
   useAdministrationCorporations,
   useAdministrationUnregistered,
 } from "@/Components/Administration/Hooks";
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
-import { UnregisteredModal } from "@/Components/Base/OwnerSettings/UnregisteredModal";
 
 /** Corporations (own corporation or all) with their registered and unregistered characters. */
 export const AdministrationCorporationsTable = () => {
@@ -88,6 +86,9 @@ export const AdministrationCorporationsTable = () => {
         isError={isErrorUnregistered}
         errorMessage={t("Failed to load unregistered entries.")}
         emptyMessage={t("Everything is registered.")}
+        searchPlaceholder={t("Search characters…")}
+        searchLabel={t("Search characters")}
+        noMatchMessage={t("No matching characters found.")}
       />
     </>
   );
