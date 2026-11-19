@@ -183,6 +183,9 @@ class TestCharactersApiEndpoints(AuthTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(
+            response.json(), {"error": "Character not found or not accessible"}
+        )
 
     def test_acknowledge_extractions_should_mark_extractions_as_reviewed(self):
         # Test Data

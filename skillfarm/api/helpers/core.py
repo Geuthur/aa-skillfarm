@@ -1,8 +1,4 @@
-# Alliance Auth
-from allianceauth.authentication.models import User
-
 # AA Skillfarm
-from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
 
@@ -13,11 +9,6 @@ def arabic_number_to_roman(value) -> str:
         return my_map[value]
     except KeyError:
         return "-"
-
-
-def can_view_overview(user: User) -> bool:
-    """Check if the user may view the overview of characters."""
-    return General.objects.has_basic_access(user)
 
 
 def get_skillfarm_character(request, character_id, manage: bool = False):

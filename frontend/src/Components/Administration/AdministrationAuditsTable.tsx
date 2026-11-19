@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { BaseTable, createBaseColumnHelper, formatNumber, renderTooltip } from "aa-geuthur-react";
+import { BaseTable, createBaseColumnHelper, formatNumber, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
@@ -14,7 +14,6 @@ import styles from "@/Styles/modules/Administration.module.css";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 // AA Skillfarm
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 // Utils
 
 export interface MainCharacterGroup {
@@ -232,37 +231,35 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
           );
 
           return (
-            <div className="d-flex align-items-center justify-content-end gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setSelectedAltsGroup(group)}
-                className="d-inline-flex align-items-center gap-1"
-                data-testid={`view-alts-btn-${group.id}`}
-              >
-                <Users size={13} />
-                <span>{t("Alts")}</span>
-              </Button>
-
+            <div className="d-flex align-items-center justify-content-end">
               <Dropdown as={ButtonGroup} size="sm">
+                {renderTooltip(
+                  t("Show alts of this pilot"),
+                  <Button
+                    variant="secondary"
+                    aria-label={t("Alts")}
+                    onClick={() => setSelectedAltsGroup(group)}
+                    data-testid={`view-alts-btn-${group.id}`}
+                  >
+                    <Users size={14} />
+                  </Button>,
+                )}
                 {renderTooltip(
                   t("Trigger updates for all alts of this pilot"),
                   <Button
                     variant="danger"
-                    size="sm"
+                    aria-label={t("Update All Alts")}
                     disabled={isAnyUpdating}
                     onClick={() =>
                       group.alts.forEach((a) => onTriggerUpdate(a.character_id, false))
                     }
-                    className="d-inline-flex align-items-center gap-1"
                     data-testid={`update-all-alts-${group.id}`}
                   >
                     {isAnyUpdating ? (
                       <Spinner size="sm" animation="border" />
                     ) : (
-                      <RefreshCw size={13} />
+                      <RefreshCw size={14} />
                     )}
-                    <span>{t("Update All Alts")}</span>
                   </Button>,
                 )}
                 {renderTooltip(
@@ -273,11 +270,12 @@ export const AdministrationAuditsTable: React.FC<AdministrationAuditsTableProps>
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isAnyUpdating}
+                    className="aa-react"
                   />,
                 )}
                 <Dropdown.Menu
                   align="end"
-                  className={`shadow-lg ${styles.dropdownMenu}`}
+                  className={`shadow-lg ${styles["dropdown-menu"]}`}
                 >
                   <Dropdown.Item
                     onClick={() =>

@@ -3,14 +3,13 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 
 // Third Party
-import { ErrorPage, renderTooltip } from "aa-geuthur-react";
+import { ErrorPage, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 // Styles
 import styles from "@/Styles/modules/OverviewUserPage.module.css";
 
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { CharacterDashboard } from "@/Components/Sections/CharacterDashboard";
 import { ProjectName } from "@/constants";
 // Utils

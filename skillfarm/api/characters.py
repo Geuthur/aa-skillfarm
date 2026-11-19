@@ -17,7 +17,6 @@ from skillfarm import tasks
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import arabic_number_to_roman, get_skillfarm_character
 from skillfarm.helpers.lazy import get_character_portrait_url
-from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,
@@ -172,7 +171,7 @@ class ApiEndpoints:
             "characters/",
             response={
                 HTTPStatus.OK: schema.CharacterListResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="List skillfarm characters with filterable metrics",
@@ -181,9 +180,6 @@ class ApiEndpoints:
             request: WSGIRequest,
             filters: schema.CharacterFilter = Query(...),
         ):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             characters = SkillFarmAudit.objects.owned_by(request.user)
             return build_character_list(characters, filters)
 
@@ -191,8 +187,8 @@ class ApiEndpoints:
             "characters/{character_id}/",
             response={
                 HTTPStatus.OK: schema.CharacterDetailResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get character details including skillqueue and farm setup",
@@ -309,8 +305,8 @@ class ApiEndpoints:
             "characters/{character_id}/acknowledge-extractions/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Acknowledge ready skill extractions for a character",
@@ -338,8 +334,8 @@ class ApiEndpoints:
             "characters/{character_id}/acknowledge-paused/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Acknowledge paused or empty queue for a character",
@@ -367,8 +363,8 @@ class ApiEndpoints:
             "characters/{character_id}/toggle-notification/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Toggle notifications for a character",
@@ -398,8 +394,8 @@ class ApiEndpoints:
             "characters/{character_id}/setup/",
             response={
                 HTTPStatus.OK: schema.SkillSetupSchema,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get configured skillset for character",
@@ -437,8 +433,8 @@ class ApiEndpoints:
             "characters/{character_id}/setup/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Update configured skillset for character",
@@ -475,8 +471,8 @@ class ApiEndpoints:
             "characters/{character_id}/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Remove character from skillfarm",
@@ -507,15 +503,12 @@ class ApiEndpoints:
             "acknowledge-all-extractions/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Bulk acknowledge all pending ready extractions",
         )
         def acknowledge_all_extractions(request: WSGIRequest):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             audits = SkillFarmAudit.objects.owned_by(request.user).filter(
                 active=True,
                 extractions_ready_count__gt=0,
@@ -539,8 +532,8 @@ class ApiEndpoints:
             "characters/{int:character_id}/update/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Trigger an update for a specific skillfarm character",
@@ -550,9 +543,6 @@ class ApiEndpoints:
             character_id: int,
             payload: schema.ForceRefreshRequest | None = None,
         ):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             perms, audit = get_skillfarm_character(request, character_id, manage=True)
             if audit is None:
                 return HTTPStatus.NOT_FOUND, {

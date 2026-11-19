@@ -17,11 +17,11 @@ from allianceauth.services.tasks import QueueOnce
 
 # AA Skillfarm
 from skillfarm import app_settings
-from skillfarm.helpers.discord import send_user_notification
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.prices import EveTypePrice
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.providers import logger, retry_task_on_esi_error
+from skillfarm.thirdparty.discord import send_user_notification
 
 MAX_RETRIES_DEFAULT = 3
 

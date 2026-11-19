@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 
 // Third Party
-import { BaseTable, renderTooltip } from "aa-geuthur-react";
+import { BaseTable, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/CharacterTable.module.css";
 
 import type { CharacterSummarySchema } from "@/Api/schema";
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
@@ -65,19 +64,21 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         id: "training_queue",
         header: t("Training Queue"),
         accessorFn: (row) => row.current_training_skill ?? "",
-        meta: { className: styles["col-queue"] },
         cell: ({ row }) => {
           const char = row.original;
+          // The table ignores meta.className, so the min-width sits on the cell content
           return (
-            <TrainingProgressBar
-              isTraining={char.is_training}
-              currentSkill={char.current_training_skill}
-              trainingStartDate={char.training_start_date}
-              trainingFinishDate={char.training_finish_date}
-              queueFinishDate={char.queue_finish_date}
-              queuePausedAcknowledged={char.queue_paused_acknowledged}
-              progressPercent={char.progress_percent}
-            />
+            <div className={styles["col-queue"]}>
+              <TrainingProgressBar
+                isTraining={char.is_training}
+                currentSkill={char.current_training_skill}
+                trainingStartDate={char.training_start_date}
+                trainingFinishDate={char.training_finish_date}
+                queueFinishDate={char.queue_finish_date}
+                queuePausedAcknowledged={char.queue_paused_acknowledged}
+                progressPercent={char.progress_percent}
+              />
+            </div>
           );
         },
       },
@@ -85,15 +86,17 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
         id: "extractions",
         header: t("Extractions"),
         accessorFn: (row) => row.extractions_ready_count,
-        meta: { className: styles["col-extractions"] },
         cell: ({ row }) => {
           const char = row.original;
+          // The table ignores meta.className, so the min-width sits on the cell content
           return (
-            <ExtractionBadge
-              readyCount={char.extractions_ready_count}
-              isAcknowledged={char.extraction_acknowledged}
-              acknowledgedAt={char.extraction_acknowledged_at}
-            />
+            <div className={styles["col-extractions"]}>
+              <ExtractionBadge
+                readyCount={char.extractions_ready_count}
+                isAcknowledged={char.extraction_acknowledged}
+                acknowledgedAt={char.extraction_acknowledged_at}
+              />
+            </div>
           );
         },
       },

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 
 // Third Party
-import { formatNumber, renderTooltip } from "aa-geuthur-react";
+import { formatNumber, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import { ArrowLeft, Clock, RefreshCw } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Nav, ProgressBar, Spinner, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,6 @@ import styles from "@/Styles/modules/Administration.module.css";
 
 import type { CharacterDetailResponse, AdministrationAuditSchema } from "@/Api/schema";
 // AA Skillfarm
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 interface AdministrationInspectionViewProps {
   inspectingAudit: AdministrationAuditSchema;
@@ -99,6 +98,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                 variant="danger"
                 aria-label={t("More update options")}
                 disabled={isUpdating}
+                className="aa-react"
               />
               <Dropdown.Menu align="end">
                 <Dropdown.Item onClick={() => onTriggerUpdate(inspectingAudit.character_id, false)}>
@@ -240,7 +240,7 @@ export const AdministrationInspectionView: React.FC<AdministrationInspectionView
                         )}
                       </td>
                       <td>{entry.finished_level_roman}</td>
-                      <td className={styles.progressCol}>
+                      <td className={styles["progress-col"]}>
                         <ProgressBar
                           now={entry.progress_percent}
                           label={`${entry.progress_percent}%`}

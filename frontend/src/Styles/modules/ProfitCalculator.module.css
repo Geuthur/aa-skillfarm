@@ -12,12 +12,12 @@
 }
 
 .error-title {
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
 }
 
 .error-text {
     color: var(--aa-text-secondary);
-    margin: 0 0 16px 0;
+    margin: 0 0 16px;
 }
 
 .title {
@@ -29,7 +29,7 @@
 }
 
 .subtitle {
-    margin: 4px 0 0 0;
+    margin: 4px 0 0;
     color: var(--aa-text-secondary);
     font-size: var(--aa-font-size-sm);
 }
@@ -77,7 +77,7 @@
     border: 1px solid var(--aa-border-light);
     border-radius: var(--aa-border-radius);
     background-color: var(--aa-color-body);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 14px rgb(0 0 0 / 35%);
 }
 
 .breakdown-table {
@@ -94,7 +94,7 @@
 
 .breakdown-total-row {
     font-weight: var(--aa-font-weight-bold);
-    background-color: rgba(255, 255, 255, 0.08) !important;
+    background-color: rgb(255 255 255 / 8%) !important;
 }
 
 .breakdown-total-row td {

@@ -6,11 +6,12 @@
 @keyframes sf-pulse-glow {
     0%, 100% {
         transform: scale(1);
-        filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.4));
+        filter: drop-shadow(0 0 2px rgb(245 158 11 / 40%));
     }
+
     50% {
         transform: scale(1.15);
-        filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.95));
+        filter: drop-shadow(0 0 10px rgb(245 158 11 / 95%));
     }
 }
 
@@ -27,10 +28,10 @@
 
 /* ═══ INACTIVE TRAINING BANNER ══════════════════════════════════════════════ */
 .sf-inactive-banner {
-    background: linear-gradient(90deg, rgba(180, 83, 9, 0.25) 0%, rgba(24, 24, 27, 0.9) 100%);
+    background: linear-gradient(90deg, rgb(180 83 9 / 25%) 0%, rgb(24 24 27 / 90%) 100%);
     border: 2px solid var(--aa-border-amber);
     border-radius: var(--aa-border-radius);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    box-shadow: 0 4px 12px rgb(245 158 11 / 15%);
 }
 
 .sf-inactive-banner-title {
@@ -46,7 +47,7 @@
 
 /* ═══ ROW / CARD TRAINING ACCENTS ════════════════════════════════════════════ */
 .sf-card-idle {
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, transparent 35%);
+    background: linear-gradient(90deg, rgb(245 158 11 / 6%) 0%, transparent 35%);
 }
 
 .sf-card-idle > td:first-child {
@@ -79,15 +80,15 @@
 }
 
 .sf-badge-extraction-pending {
-    background-color: rgba(180, 83, 9, 0.35);
+    background-color: rgb(180 83 9 / 35%);
     color: var(--aa-text-amber-light);
     border: 1px solid var(--aa-color-amber);
     font-size: var(--aa-font-size-xs);
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 8px rgb(245 158 11 / 30%);
 }
 
 .sf-badge-extraction-reviewed {
-    background-color: rgba(4, 120, 87, 0.3);
+    background-color: rgb(4 120 87 / 30%);
     color: var(--aa-text-emerald-light);
     border: 1px solid var(--aa-color-emerald);
     font-size: var(--aa-font-size-xs);
@@ -96,7 +97,7 @@
 .sf-badge-none {
     background-color: var(--aa-color-light);
     color: var(--aa-text-muted);
-    border: 1px solid #3f3f46;
+    border: 1px solid rgb(63 63 70);
     font-size: var(--aa-font-size-xs);
 }
 
@@ -107,9 +108,9 @@
 
 .sf-progress-track {
     height: 8px;
-    background-color: #27272a;
+    background-color: rgb(39 39 42);
     border-radius: 4px;
-    border: 1px solid #3f3f46;
+    border: 1px solid rgb(63 63 70);
 }
 
 .sf-progress-fill {
@@ -127,7 +128,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgb(255 255 255 / 35%) 50%, transparent 100%);
     transform: translateX(-100%);
     animation: sf-progress-shimmer 2s linear infinite;
 }
@@ -163,9 +164,9 @@
 }
 
 .sf-search-input {
-    background-color: var(--aa-input-bg, #27272a);
-    border: 1px solid var(--aa-input-border, #3f3f46);
-    color: var(--aa-input-color, #e4e4e7);
+    background-color: var(--aa-input-bg, rgb(39 39 42));
+    border: 1px solid var(--aa-input-border, rgb(63 63 70));
+    color: var(--aa-input-color, rgb(228 228 231));
     font-size: var(--aa-font-size-sm);
     border-radius: 6px;
     padding: 6px 12px;
@@ -206,10 +207,10 @@
 
 .sf-table td {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--aa-table-row-border, #27272a);
+    border-bottom: 1px solid var(--aa-table-row-border, rgb(39 39 42));
     vertical-align: middle;
 }
 
 .sf-table tr:hover td {
-    background-color: var(--aa-table-row-hover, rgba(39, 39, 42, 0.4));
+    background-color: var(--aa-table-row-hover, rgb(39 39 42 / 40%));
 }

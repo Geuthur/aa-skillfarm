@@ -2,12 +2,11 @@
 import React from "react";
 
 // Third Party
-import { BaseModal, ModalSize } from "aa-geuthur-react";
+import { BaseModal, ModalSize, OwnerPortrait } from "aa-geuthur-react";
 import type { ModalData } from "aa-geuthur-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 export interface DeletableCharacter {
   character_id: number;

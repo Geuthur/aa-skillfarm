@@ -157,3 +157,4 @@ class TestOverviewApiEndpoints(AuthTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(response.json(), {"error": "User not found or not accessible"})

@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { BaseModal, BaseTable, ModalSize, createBaseColumnHelper, formatNumber, renderTooltip } from "aa-geuthur-react";
+import { BaseModal, BaseTable, createBaseColumnHelper, formatNumber, ModalSize, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
@@ -15,7 +15,6 @@ import type { AdministrationAuditSchema } from "@/Api/schema";
 import type { MainCharacterGroup } from "@/Components/Administration/AdministrationAuditsTable";
 import { AdministrationErrorModal } from "@/Components/Administration/AdministrationErrorModal";
 // AA Skillfarm
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 
 export interface AdministrationAltsModalProps {
   group: MainCharacterGroup | null;
@@ -95,7 +94,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
               {...(hasIssue && {
                 role: "button",
                 tabIndex: 0,
-                className: styles.statusBadgeButton,
+                className: styles["status-badge-button"],
                 "aria-label": t("Show error details for {{name}}", {
                   name: audit.character_name,
                 }),
@@ -136,7 +135,7 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
               </Badge>
               {audit.current_training_skill && (
                 <div
-                  className={`small text-muted text-truncate ${styles.skillTruncate}`}
+                  className={`small text-muted text-truncate ${styles["skill-truncate"]}`}
                 >
                   {audit.current_training_skill}
                 </div>
@@ -212,11 +211,12 @@ export const AdministrationAltsModal: React.FC<AdministrationAltsModalProps> = (
                     variant="danger"
                     aria-label={t("More update options")}
                     disabled={isUpdating}
+                    className="aa-react"
                   />,
                 )}
                 <Dropdown.Menu
                   align="end"
-                  className={`shadow-lg ${styles.dropdownMenu}`}
+                  className={`shadow-lg ${styles["dropdown-menu"]}`}
                 >
                   <Dropdown.Item
                     onClick={() => onTriggerUpdate(audit.character_id, false)}

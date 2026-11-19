@@ -40,6 +40,23 @@ Section Order:
 
 - [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` and `testauth/settings/development/local.py` give each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
 
+- [FIX] Basic access is only granted by `basic_access`: every URL of the API now answers 403 without it (`basic_access_required` around the API URLs). Before, 15 of 27 endpoints (`menu/`, Administration, `characters/{id}/…`) did not check it.
+
+> [!WARNING]
+> Users with `admin_access` or `corp_access` but without `basic_access` lose access to the API and the pages. Grant them `basic_access` as well.
+
+- [FIX] `char/add/` checks `basic_access` before the token selection and the SSO flow start, not after.
+
+- [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
+
+- [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
+
+- [FIX] Character table: the extractions column gets its minimum width again, so the badge (e.g. "12 Reviewed") no longer wraps onto two lines (the table ignored `meta.className`).
+
+- [FIX] Character table: the green "Active (%)" badge sits inline after the skill name instead of wrapping as its own block, and the training queue column gets its minimum width again (the table ignored `meta.className`).
+
+- [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` gives each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
+
 - [FIX] The per-character lock of `update_character`, `update_char_skills` and `update_char_skillqueue` never worked: `TASK_DEFAULTS_ONCE_CHARACTER` set `once` (key `character_pk`) but not `base=QueueOnce`, so celery_once ignored it and the same character could be updated several times in parallel. `TASK_DEFAULTS_BIND_ONCE_CHARACTER` now builds on `TASK_DEFAULTS_BIND_ONCE` like in aa-example, and a second `apply_async` for the same character is skipped while the first is queued or running. `TASK_DEFAULTS_ONCE_CHARACTER` is removed.
 
 - [FIX] ESI outages and limits did not retry the update tasks: the tasks had no retry at all, and the `UpdateManager` turned every ESI error except `TokenError` into an update status. `update_character`, `update_char_skills` and `update_char_skillqueue` now run with `bind=True` inside the new `retry_task_on_esi_error()` from `providers.py` (with `DOWNTIME_TIMER` and the daily downtime check that raises `DownTimeError`). `_handle_update_exception` raises the errors the task retries on (`ESIErrorLimitException`, `ESIBucketLimitException`, `HTTPServerError` 502/503/504, `RequestError`, `DownTimeError`), checked by the new `is_retryable_esi_error()`. `execute_section` records them as a failed run of the section before raising, so the section shows the error and stays stale until the retry succeeds. Other errors (e.g. HTTP 500 or 404) still end in the update status only.
@@ -55,6 +72,16 @@ Section Order:
 - [FIX] The pulsing menu and tab badges scaled up and down with their number. Only the glow around the badge pulses now.
 
 ### Changed
+
+- [CHANGE] Uniform error format of the API: every error response of an endpoint is an `ErrorSchema` (`{"error": "<text>"}`) in the OpenAPI schema, and every endpoint lists its 403. The Administration audit endpoints (`update/`, `inspect/`, delete) answer 404 for an unknown character with `{"error": "Character not found."}` instead of `{"detail": "Not Found"}`. Status codes are unchanged.
+
+- [CHANGE] The frontend shows the reason the API gives for a failed action (e.g. "Permission Denied") instead of a fixed text (`apiErrorMessage` of `aa-geuthur-react`).
+
+- [CHANGE] Frontend on `aa-geuthur-react` 1.5.0: owner settings (`BaseOwnerSettingsSection`, `UnregisteredModal`) and `OwnerPortrait` come from the package, `Main.tsx` uses `initI18n`, the settings page uses `useUserSettings`, and the design tokens come from the package CSS. On the settings page the section header has rounded corners, the ticker sits closer to the name, a card with a token error is red and the delete dialog is wider; cards with an error pulse now, and "Characters not in Skillfarm" has an icon and a description.
+
+- [CHANGE] Discord notifications moved from `helpers/discord.py` to `thirdparty/discord.py` and aligned with the aa-example building block (webhook sender included, embed colours in the module); behaviour is unchanged.
+
+- [CHANGE] Administration: the status filter uses `FilterButtonGroup` from `aa-geuthur-react` 1.4.0, and the row actions of the audit table are one icon `ButtonGroup` with tooltips.
 
 - [CHANGE] Permissions are defined only in `General.Meta.permissions` (plain tuples, texts now translatable; codenames and texts unchanged; migration `0008_alter_general_permissions` only updates the model options) and checked directly with Django and the full string, e.g. `@permission_required("skillfarm.basic_access")` or `user.has_perm("skillfarm.admin_access")`. `General.Permission`, `General.get_perm`, `has_perm`, `has_any_perm` and the wrappers `has_basic_access`, `is_superuser_only` and `get_own_corporation_id` are removed. The Django views check with `@permission_required`; the Ninja API, the menu hook, the Charlink hook and the access querysets (`visible_to`, `manage_to`) ask `General.objects` (`GeneralManager` in `managers/general.py`, no database queries) with `has_basic_access`, `has_admin_access`, `has_corporation_access`, `has_management_access`, `has_superuser_access` and `get_corporation_scope`. A new test compares every permission string used in code and templates (`<app_label>.<codename>`) with `General.Meta.permissions`.
 
@@ -98,7 +125,11 @@ Section Order:
 
 - [CHANGE] ESI compatibility date updated to `2026-08-18`; the OpenAPI spec file was refreshed to match, its name in `providers.py` now follows the date, and `.make/conf.d/eve-esi.mk` was added for `make update-compatibility-date`.
 
+- [CHANGE] The stylelint pre-commit hook now checks the source CSS in `frontend/src/` (built bundles stay excluded); its findings are fixed with equivalent CSS (hex colors as `rgb()`), only Firefox now also shows the panel/card `backdrop-filter`
+
 ### Removed
+
+- [REMOVED] Frontend copies of building blocks the package ships since `aa-geuthur-react` 1.5.0 (`Components/Base/OwnerSettings`, `Components/Base/OwnerPortrait`, `Components/Badges`), the unused `Components/Forms/validation.ts`, the own settings query and mutation, and the design tokens and keyframes of `Styles/index.css` that the package provides.
 
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
 

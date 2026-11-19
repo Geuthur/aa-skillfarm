@@ -9,7 +9,6 @@ from ninja import NinjaAPI, Schema
 # Django
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -137,6 +136,10 @@ def _corporations_denied() -> dict:
     return {"error": _("Corporation access permission required.")}
 
 
+def _character_not_found() -> dict:
+    return {"error": _("Character not found.")}
+
+
 class ApiEndpoints:
     tags = ["Administration"]
 
@@ -146,7 +149,7 @@ class ApiEndpoints:
             "administration/audits/",
             response={
                 HTTPStatus.OK: list[schema.AdministrationAuditSchema],
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="List all Skillfarm character audits across the system for administrators",
@@ -171,8 +174,8 @@ class ApiEndpoints:
             "administration/audits/{int:character_id}/update/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Trigger single character update task for administrators",
@@ -185,10 +188,13 @@ class ApiEndpoints:
             if not General.objects.has_admin_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
-            audit = get_object_or_404(
-                SkillFarmAudit.objects.select_related("character"),
-                character__character_id=character_id,
+            audit = (
+                SkillFarmAudit.objects.select_related("character")
+                .filter(character__character_id=character_id)
+                .first()
             )
+            if audit is None:
+                return HTTPStatus.NOT_FOUND, _character_not_found()
 
             force = payload.force_refresh if payload else False
             if force and not General.objects.has_superuser_access(request.user):
@@ -220,8 +226,8 @@ class ApiEndpoints:
             "administration/audits/{int:character_id}/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Delete a character audit permanently (superusers only)",
@@ -230,10 +236,13 @@ class ApiEndpoints:
             if not General.objects.has_superuser_access(request.user):
                 return HTTPStatus.FORBIDDEN, _superuser_denied()
 
-            audit = get_object_or_404(
-                SkillFarmAudit.objects.select_related("character"),
-                character__character_id=character_id,
+            audit = (
+                SkillFarmAudit.objects.select_related("character")
+                .filter(character__character_id=character_id)
+                .first()
             )
+            if audit is None:
+                return HTTPStatus.NOT_FOUND, _character_not_found()
 
             char_name = audit.character.character_name
             audit.delete()
@@ -255,8 +264,8 @@ class ApiEndpoints:
             "administration/audits/{int:character_id}/inspect/",
             response={
                 HTTPStatus.OK: schema.CharacterDetailResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get character detailed inspection view for administrators",
@@ -266,16 +275,20 @@ class ApiEndpoints:
             if not General.objects.has_admin_access(request.user):
                 return HTTPStatus.FORBIDDEN, _administration_denied()
 
-            audit = get_object_or_404(
+            audit = (
                 SkillFarmAudit.objects.select_related(
                     "character",
-                ).prefetch_related(
+                )
+                .prefetch_related(
                     "skillfarm_update_status",
                     "skillfarm_skillqueue",
                     "skillfarm_skillqueue__eve_type",
-                ),
-                character__character_id=character_id,
+                )
+                .filter(character__character_id=character_id)
+                .first()
             )
+            if audit is None:
+                return HTTPStatus.NOT_FOUND, _character_not_found()
 
             setup = SkillFarmSetup.objects.filter(character=audit).first()
             skillset = setup.skillset if setup and setup.skillset else []
@@ -371,7 +384,7 @@ class ApiEndpoints:
             "administration/stats/",
             response={
                 HTTPStatus.OK: AdminStatsResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get administrative statistics for all Skillfarm characters",
@@ -410,7 +423,7 @@ class ApiEndpoints:
             "administration/update-all/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Queue full update task for all Skillfarm characters (superusers only)",
@@ -436,7 +449,7 @@ class ApiEndpoints:
             "administration/update-prices/",
             response={
                 HTTPStatus.OK: schema.ActionResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Queue market prices update task (superusers only)",
@@ -456,7 +469,7 @@ class ApiEndpoints:
             "administration/corporations/",
             response={
                 HTTPStatus.OK: list[schema.AdministrationCorporationSchema],
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="List corporations with registered characters and their unregistered character counts",
@@ -513,8 +526,8 @@ class ApiEndpoints:
             "administration/corporations/{int:corporation_id}/unregistered/",
             response={
                 HTTPStatus.OK: schema.AdministrationUnregisteredResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="List characters of a corporation that are not registered in Skillfarm",

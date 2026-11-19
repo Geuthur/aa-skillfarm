@@ -2,6 +2,8 @@
 import { useMemo } from "react";
 
 // Third Party
+import { BaseOwnerSettingsSection, useUserSettings } from "aa-geuthur-react";
+import type { BaseMissingOwner, BaseOwner } from "aa-geuthur-react";
 import { Bell, BellOff, Settings2, Users } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
@@ -10,24 +12,20 @@ import { useTranslation } from "react-i18next";
 import styles from "@/Styles/modules/SettingsPage.module.css";
 
 // AA Skillfarm
-import { BaseOwnerSettingsSection } from "@/Components/Base/OwnerSettings";
-import type { BaseMissingOwner, BaseOwner } from "@/Components/Base/OwnerSettings/types";
-import {
-  useCharacterActions,
-  useUpdateUserSettings,
-  useUserCharacterStatuses,
-  useUserSettings,
-} from "@/Components/Settings/Hooks";
+import type { UserSettingsSchema, UserSettingsUpdateRequest } from "@/Api/schema";
+import { useCharacterActions, useUserCharacterStatuses } from "@/Components/Settings/Hooks";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const { data, isLoading, isError } = useUserSettings();
+  const { data, isLoading, isError, updateMutation } = useUserSettings<
+    UserSettingsSchema,
+    UserSettingsUpdateRequest
+  >();
   const {
     data: charactersData,
     isLoading: isLoadingChars,
     isError: isErrorChars,
   } = useUserCharacterStatuses();
-  const updateMutation = useUpdateUserSettings();
   const {
     feedback,
     clearFeedback,
@@ -148,6 +146,8 @@ export const SettingsPage: React.FC = () => {
           isUpdatingAll={updateAll.isPending}
           globalCooldown={globalCooldown}
           feedbackMessage={feedback}
+          bodyClassName="bg-secondary text-light"
+          cardClassName="bg-dark"
           onDismissFeedback={clearFeedback}
           onTriggerSingleUpdate={triggerCharacterUpdate}
           updatingOwnerId={updatingCharacterId}

@@ -1,3 +1,7 @@
+// Third Party
+import { apiErrorMessage } from "aa-geuthur-react";
+
+// AA Skillfarm
 import { apiClient } from "@/Api/Api";
 import type {
   ActionResponse,
@@ -13,36 +17,14 @@ import type {
   AdministrationCorporationSchema,
   AdministrationUnregisteredResponse,
   UserCharacterStatusResponse,
-  UserSettingsSchema,
-  UserSettingsUpdateRequest,
 } from "@/Api/schema";
 
 const API_BASE = "/skillfarm/api";
 
-export async function fetchUserSettings(): Promise<UserSettingsSchema> {
-  const { data, error } = await apiClient.GET("/skillfarm/api/settings/", {});
-  if (error || !data) {
-    throw new Error("Failed to load user settings");
-  }
-  return data;
-}
-
-export async function updateUserSettings(
-  settings: UserSettingsUpdateRequest,
-): Promise<UserSettingsSchema> {
-  const { data, error } = await apiClient.PUT("/skillfarm/api/settings/", {
-    body: settings,
-  });
-  if (error || !data) {
-    throw new Error("Failed to update user settings");
-  }
-  return data;
-}
-
 export async function fetchUserCharacterStatuses(): Promise<UserCharacterStatusResponse> {
   const { data, error } = await apiClient.GET("/skillfarm/api/user/characters/status/", {});
   if (error || !data) {
-    throw new Error("Failed to load character update statuses");
+    throw new Error(apiErrorMessage(error, "Failed to load character update statuses"));
   }
   return data as UserCharacterStatusResponse;
 }
@@ -64,7 +46,7 @@ export async function fetchCharacters(filters: CharacterFilterParams): Promise<C
     params: { query: queryParams },
   });
   if (error || !data) {
-    throw new Error("Failed to fetch characters");
+    throw new Error(apiErrorMessage(error, "Failed to fetch characters"));
   }
   return data as CharacterListResponse;
 }
@@ -72,7 +54,7 @@ export async function fetchCharacters(filters: CharacterFilterParams): Promise<C
 export async function fetchOverview(): Promise<OverviewResponse> {
   const { data, error } = await apiClient.GET(`${API_BASE}/overview/`, {});
   if (error || !data) {
-    throw new Error("Failed to load overview");
+    throw new Error(apiErrorMessage(error, "Failed to load overview"));
   }
   return data as OverviewResponse;
 }
@@ -85,7 +67,7 @@ export async function fetchOverviewUser(
     params: { path: { user_id: userId }, query: buildFilterQuery(filters) },
   });
   if (error || !data) {
-    throw new Error(`Failed to fetch characters for user ${userId}`);
+    throw new Error(apiErrorMessage(error, `Failed to fetch characters for user ${userId}`));
   }
   return data as OverviewUserCharactersResponse;
 }
@@ -95,7 +77,7 @@ export async function fetchCharacterDetail(characterId: number): Promise<Charact
     params: { path: { character_id: characterId } },
   });
   if (error || !data) {
-    throw new Error(`Failed to fetch details for character ${characterId}`);
+    throw new Error(apiErrorMessage(error, `Failed to fetch details for character ${characterId}`));
   }
   return data as CharacterDetailResponse;
 }
@@ -108,7 +90,7 @@ export async function acknowledgeExtractions(characterId: number): Promise<Actio
     }
   );
   if (error || !data) {
-    throw new Error("Failed to acknowledge extractions");
+    throw new Error(apiErrorMessage(error, "Failed to acknowledge extractions"));
   }
   return data as ActionResponse;
 }
@@ -121,7 +103,7 @@ export async function acknowledgePaused(characterId: number): Promise<ActionResp
     }
   );
   if (error || !data) {
-    throw new Error("Failed to acknowledge paused status");
+    throw new Error(apiErrorMessage(error, "Failed to acknowledge paused status"));
   }
   return data as ActionResponse;
 }
@@ -134,7 +116,7 @@ export async function toggleNotification(characterId: number): Promise<ActionRes
     }
   );
   if (error || !data) {
-    throw new Error("Failed to toggle notification");
+    throw new Error(apiErrorMessage(error, "Failed to toggle notification"));
   }
   return data as ActionResponse;
 }
@@ -144,7 +126,7 @@ export async function fetchSkillSetup(characterId: number): Promise<SkillSetupSc
     params: { path: { character_id: characterId } },
   });
   if (error || !data) {
-    throw new Error("Failed to load skill setup");
+    throw new Error(apiErrorMessage(error, "Failed to load skill setup"));
   }
   return data as SkillSetupSchema;
 }
@@ -155,7 +137,7 @@ export async function updateSkillSetup(characterId: number, selectedSkills: stri
     body: { selected_skills: selectedSkills },
   });
   if (error || !data) {
-    throw new Error("Failed to update skill setup");
+    throw new Error(apiErrorMessage(error, "Failed to update skill setup"));
   }
   return data as ActionResponse;
 }
@@ -165,7 +147,7 @@ export async function deleteCharacter(characterId: number): Promise<ActionRespon
     params: { path: { character_id: characterId } },
   });
   if (error || !data) {
-    throw new Error("Failed to delete character");
+    throw new Error(apiErrorMessage(error, "Failed to delete character"));
   }
   return data as ActionResponse;
 }
@@ -182,7 +164,7 @@ export async function triggerCharacterUpdate(
     },
   );
   if (error || !data) {
-    throw new Error("Failed to trigger character update");
+    throw new Error(apiErrorMessage(error, "Failed to trigger character update"));
   }
   return data as ActionResponse;
 }
@@ -190,7 +172,7 @@ export async function triggerCharacterUpdate(
 export async function acknowledgeAllExtractions(): Promise<ActionResponse> {
   const { data, error } = await apiClient.POST(`${API_BASE}/acknowledge-all-extractions/`, {});
   if (error || !data) {
-    throw new Error("Failed to bulk acknowledge extractions");
+    throw new Error(apiErrorMessage(error, "Failed to bulk acknowledge extractions"));
   }
   return data as ActionResponse;
 }
@@ -198,7 +180,7 @@ export async function acknowledgeAllExtractions(): Promise<ActionResponse> {
 export async function fetchCalculatorData(): Promise<CalculatorResponse> {
   const { data, error } = await apiClient.GET(`${API_BASE}/calculator/`, {});
   if (error || !data) {
-    throw new Error("Failed to load calculator data");
+    throw new Error(apiErrorMessage(error, "Failed to load calculator data"));
   }
   return data as CalculatorResponse;
 }
@@ -206,7 +188,7 @@ export async function fetchCalculatorData(): Promise<CalculatorResponse> {
 export async function fetchAdminStats(): Promise<AdminStatsResponse> {
   const { data, error } = await apiClient.GET(`${API_BASE}/administration/stats/`, {});
   if (error || !data) {
-    throw new Error("Failed to load admin stats");
+    throw new Error(apiErrorMessage(error, "Failed to load admin stats"));
   }
   return data as AdminStatsResponse;
 }
@@ -216,7 +198,7 @@ export async function triggerUpdateAll(forceRefresh: boolean = false): Promise<A
     body: { force_refresh: forceRefresh },
   });
   if (error || !data) {
-    throw new Error("Failed to trigger update all");
+    throw new Error(apiErrorMessage(error, "Failed to trigger update all"));
   }
   return data as ActionResponse;
 }
@@ -224,7 +206,7 @@ export async function triggerUpdateAll(forceRefresh: boolean = false): Promise<A
 export async function triggerUpdatePrices(): Promise<ActionResponse> {
   const { data, error } = await apiClient.POST(`${API_BASE}/administration/update-prices/`, {});
   if (error || !data) {
-    throw new Error("Failed to trigger price update");
+    throw new Error(apiErrorMessage(error, "Failed to trigger price update"));
   }
   return data as ActionResponse;
 }
@@ -232,7 +214,7 @@ export async function triggerUpdatePrices(): Promise<ActionResponse> {
 export async function loadAdministrationAudits(): Promise<AdministrationAuditSchema[]> {
   const { data, error } = await apiClient.GET(`${API_BASE}/administration/audits/`, {});
   if (error || !data) {
-    throw new Error("Failed to load administration audits");
+    throw new Error(apiErrorMessage(error, "Failed to load administration audits"));
   }
   return data as AdministrationAuditSchema[];
 }
@@ -249,7 +231,7 @@ export async function triggerAdministrationAuditUpdate(
     },
   );
   if (error || !data) {
-    throw new Error("Failed to trigger audit update");
+    throw new Error(apiErrorMessage(error, "Failed to trigger audit update"));
   }
   return data as ActionResponse;
 }
@@ -262,7 +244,7 @@ export async function deleteAdministrationAudit(characterId: number): Promise<Ac
     },
   );
   if (error || !data) {
-    throw new Error("Failed to delete character audit");
+    throw new Error(apiErrorMessage(error, "Failed to delete character audit"));
   }
   return data as ActionResponse;
 }
@@ -277,7 +259,7 @@ export async function loadAdministrationAuditInspect(
     },
   );
   if (error || !data) {
-    throw new Error("Failed to load character inspection details");
+    throw new Error(apiErrorMessage(error, "Failed to load character inspection details"));
   }
   return data as CharacterDetailResponse;
 }
@@ -285,7 +267,7 @@ export async function loadAdministrationAuditInspect(
 export async function loadAdministrationCorporations(): Promise<AdministrationCorporationSchema[]> {
   const { data, error } = await apiClient.GET(`${API_BASE}/administration/corporations/`, {});
   if (error || !data) {
-    throw new Error("Failed to load administration corporations");
+    throw new Error(apiErrorMessage(error, "Failed to load administration corporations"));
   }
   return data as AdministrationCorporationSchema[];
 }
@@ -300,7 +282,7 @@ export async function loadAdministrationUnregistered(
     },
   );
   if (error || !data) {
-    throw new Error("Failed to load unregistered characters");
+    throw new Error(apiErrorMessage(error, "Failed to load unregistered characters"));
   }
   return data as AdministrationUnregisteredResponse;
 }

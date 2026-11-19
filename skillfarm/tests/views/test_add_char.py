@@ -13,9 +13,11 @@ from django.urls import reverse
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 from skillfarm.tests import AuthTestCase
+from skillfarm.tests.testdata.skillfarm import UserMainFactory
 from skillfarm.views import add_char
 
 MODULE_PATH = "skillfarm.views"
+LOGIN_PATH = "/account/login/"
 
 
 @patch(MODULE_PATH + ".messages")
@@ -64,3 +66,31 @@ class TestAddCharView(AuthTestCase):
                 character__character_id=self.user.profile.main_character.character_id
             ).exists()
         )
+
+
+class TestAddCharViewPermission(AuthTestCase):
+    """`add_char` checks `basic_access` before it starts the SSO flow."""
+
+    def test_add_char_should_not_start_sso_without_basic_access(self):
+        # Test Data
+        user = UserMainFactory(permissions__=["skillfarm.admin_access"])
+        self.client.force_login(user)
+
+        # Test Action
+        response = self.client.get(reverse("skillfarm:add_char"))
+
+        # Expected Result: sent to the login page, no token selection and no SSO
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertIn(LOGIN_PATH, response["Location"])
+        self.assertFalse(SkillFarmAudit.objects.exists())
+
+    def test_add_char_should_start_sso_with_basic_access(self):
+        # Test Data
+        self.client.force_login(self.user)
+
+        # Test Action
+        response = self.client.get(reverse("skillfarm:add_char"))
+
+        # Expected Result: token selection (200) or redirect to the SSO, not the login page
+        self.assertIn(response.status_code, (HTTPStatus.OK, HTTPStatus.FOUND))
+        self.assertNotIn(LOGIN_PATH, response.get("Location", ""))
