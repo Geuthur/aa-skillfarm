@@ -2,7 +2,7 @@
 import React, { useMemo, useState } from "react";
 
 // Third Party
-import { BaseTable, createBaseColumnHelper, formatNumber, renderTooltip } from "aa-geuthur-react";
+import { BaseTable, createBaseColumnHelper, formatNumber, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import type { BaseColumnDef } from "aa-geuthur-react";
 import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
@@ -14,7 +14,6 @@ import styles from "@/Styles/modules/Administration.module.css";
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
 // AA Skillfarm
-import { OwnerPortrait } from "@/Components/Base/OwnerPortrait";
 // Utils
 
 export interface MainCharacterGroup {

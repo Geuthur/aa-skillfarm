@@ -3,9 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 // Third Party
-import i18n from "i18next";
-import Backend from "i18next-http-backend";
-import { initReactI18next } from "react-i18next";
+import { initI18n } from "aa-geuthur-react";
 
 // Styles
 import "@/Styles/index.css";
@@ -15,31 +13,7 @@ import { AppName, ProjectName } from "@/constants";
 import Routing from "@/Routing";
 export { AppName, ProjectName };
 
-// Read language directly from Django's LANGUAGE_CODE (set as lang="..." on root div)
-const djangoLanguage = typeof document !== "undefined" ? document.getElementById(`${AppName}-root`)?.getAttribute("lang") ?? "en" : "en";
-
-i18n
-  .use(Backend)
-  .use(initReactI18next)
-  .init({
-    lng: djangoLanguage,
-    fallbackLng: "en",
-    ns: ["translation"],
-    defaultNS: "translation",
-    // Untranslated strings are empty in the language files; show the English fallback instead.
-    returnEmptyString: false,
-    keySeparator: false,
-    nsSeparator: false,
-    interpolation: {
-      escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
-    },
-    react: {
-      useSuspense: false, //   <---- this will do the magic
-    },
-    backend: {
-      loadPath: `/static/${ProjectName}/i18n/{{lng}}/{{ns}}.json`,
-    },
-  });
+initI18n(ProjectName, `${AppName}-root`);
 
 const container = document.getElementById(`${AppName}-root`);
 
