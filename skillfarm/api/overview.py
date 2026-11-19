@@ -17,7 +17,6 @@ from allianceauth.authentication.models import User
 # AA Skillfarm
 from skillfarm.api import schema
 from skillfarm.api.characters import build_character_list
-from skillfarm.api.helpers.core import can_view_overview
 from skillfarm.helpers.lazy import get_character_portrait_url
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
 
@@ -96,15 +95,12 @@ class ApiEndpoints:
             "overview/",
             response={
                 HTTPStatus.OK: schema.OverviewResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="List all users with visible skillfarm characters",
         )
         def get_overview(request: WSGIRequest):
-            if not can_view_overview(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             audits = SkillFarmAudit.objects.visible_to(request.user)
             return schema.OverviewResponse(users=_serialize_overview_users(audits))
 
@@ -112,8 +108,8 @@ class ApiEndpoints:
             "overview/{user_id}/",
             response={
                 HTTPStatus.OK: schema.OverviewUserCharactersResponse,
-                HTTPStatus.FORBIDDEN: dict,
-                HTTPStatus.NOT_FOUND: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get the skillfarm characters of a single user",
@@ -123,9 +119,6 @@ class ApiEndpoints:
             user_id: int,
             filters: schema.CharacterFilter = Query(...),
         ):
-            if not can_view_overview(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             audits = SkillFarmAudit.objects.visible_to(request.user).filter(
                 character__character_ownership__user_id=user_id
             )

@@ -67,6 +67,10 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Uniform error format of the API: every error response of an endpoint is an `ErrorSchema` (`{"error": "<text>"}`) in the OpenAPI schema, and every endpoint lists its 403. The Administration audit endpoints (`update/`, `inspect/`, delete) answer 404 for an unknown character with `{"error": "Character not found."}` instead of `{"detail": "Not Found"}`. Status codes are unchanged.
+
+- [CHANGE] The frontend shows the reason the API gives for a failed action (e.g. "Permission Denied") instead of a fixed text (`apiErrorMessage` of `aa-geuthur-react`).
+
 - [CHANGE] Frontend on `aa-geuthur-react` 1.5.0: owner settings (`BaseOwnerSettingsSection`, `UnregisteredModal`) and `OwnerPortrait` come from the package, `Main.tsx` uses `initI18n`, the settings page uses `useUserSettings`, and the design tokens come from the package CSS. On the settings page the section header has rounded corners, the ticker sits closer to the name, a card with a token error is red and the delete dialog is wider; cards with an error pulse now, and "Characters not in Skillfarm" has an icon and a description.
 
 - [CHANGE] Discord notifications moved from `helpers/discord.py` to `thirdparty/discord.py` and aligned with the aa-example building block (webhook sender included, embed colours in the module); behaviour is unchanged.

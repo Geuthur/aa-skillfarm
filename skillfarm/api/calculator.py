@@ -11,7 +11,6 @@ from django.utils.translation import gettext as _
 
 # AA Skillfarm
 from skillfarm.api import schema
-from skillfarm.models.general import General
 from skillfarm.models.prices import EveTypePrice
 
 
@@ -23,15 +22,12 @@ class ApiEndpoints:
             "calculator/",
             response={
                 HTTPStatus.OK: schema.CalculatorResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get skillfarm market prices and profit margins",
         )
-        def get_calculator_data(request):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
+        def get_calculator_data(request):  # pylint: disable=unused-argument
             try:
                 plex = EveTypePrice.objects.select_related("eve_type").get(
                     eve_type__id=44992

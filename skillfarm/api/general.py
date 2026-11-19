@@ -32,6 +32,7 @@ class ApiEndpoints:
             "menu/",
             response={
                 HTTPStatus.OK: schema.MenuSchema,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get Skillfarm navigation menu",
@@ -101,15 +102,12 @@ class ApiEndpoints:
             "user/",
             response={
                 HTTPStatus.OK: schema.UserData,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get current user data and permissions",
         )
         def get_user(request: WSGIRequest):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             main_char = getattr(
                 getattr(request.user, "profile", None), "main_character", None
             )
@@ -143,15 +141,12 @@ class ApiEndpoints:
             "settings/",
             response={
                 HTTPStatus.OK: schema.UserSettingsSchema,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get current user's Skillfarm settings",
         )
         def get_user_settings(request: WSGIRequest):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
             return schema.UserSettingsSchema(
                 disable_notifications=user_settings.disable_notifications
@@ -161,7 +156,7 @@ class ApiEndpoints:
             "settings/",
             response={
                 HTTPStatus.OK: schema.UserSettingsSchema,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Update current user's Skillfarm settings",
@@ -169,9 +164,6 @@ class ApiEndpoints:
         def update_user_settings(
             request: WSGIRequest, payload: schema.UserSettingsUpdateRequest
         ):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             user_settings = UserSettings.objects.get_or_create(user=request.user)[0]
             user_settings.disable_notifications = payload.disable_notifications
             user_settings.save(update_fields=["disable_notifications"])
@@ -183,16 +175,13 @@ class ApiEndpoints:
             "user/characters/status/",
             response={
                 HTTPStatus.OK: schema.UserCharacterStatusResponse,
-                HTTPStatus.FORBIDDEN: dict,
+                HTTPStatus.FORBIDDEN: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get current user's character update statuses for settings overview",
         )
         # pylint: disable=too-many-locals
         def get_user_character_statuses(request: WSGIRequest):
-            if not General.objects.has_basic_access(request.user):
-                return HTTPStatus.FORBIDDEN, {"error": _("Permission Denied")}
-
             user_char_ids = list(
                 CharacterOwnership.objects.filter(user=request.user).values_list(
                     "character__character_id", flat=True

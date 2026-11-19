@@ -97,13 +97,15 @@ export function useAdministrationTasks() {
       showFeedback("success", res.message);
       queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
     },
-    onError: () => showFeedback("danger", t("Failed to queue character update task.")),
+    onError: (err: unknown) =>
+      showFeedback("danger", err instanceof Error ? err.message : t("Failed to queue character update task.")),
   });
 
   const updatePrices = useMutation({
     mutationFn: triggerUpdatePrices,
     onSuccess: (res) => showFeedback("success", res.message),
-    onError: () => showFeedback("danger", t("Failed to queue price update task.")),
+    onError: (err: unknown) =>
+      showFeedback("danger", err instanceof Error ? err.message : t("Failed to queue price update task.")),
   });
 
   return { feedback, updateAll, updatePrices };
