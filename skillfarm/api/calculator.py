@@ -23,6 +23,7 @@ class ApiEndpoints:
             response={
                 HTTPStatus.OK: schema.CalculatorResponse,
                 HTTPStatus.FORBIDDEN: schema.ErrorSchema,
+                HTTPStatus.NOT_FOUND: schema.ErrorSchema,
             },
             tags=self.tags,
             summary="Get skillfarm market prices and profit margins",
@@ -67,7 +68,6 @@ class ApiEndpoints:
                     )
 
                 return schema.CalculatorResponse(
-                    error=False,
                     plex=to_item(plex),
                     injector=to_item(injector),
                     extractor=to_item(extractor),
@@ -76,9 +76,8 @@ class ApiEndpoints:
                     month24_calc=round(month24_calc, 2),
                 )
             except EveTypePrice.DoesNotExist:
-                return schema.CalculatorResponse(
-                    error=True,
-                    error_message=_(
+                return HTTPStatus.NOT_FOUND, {
+                    "error": _(
                         "Market price data is currently not available. Please run market update tasks."
-                    ),
-                )
+                    )
+                }

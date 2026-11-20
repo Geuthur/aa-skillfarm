@@ -913,13 +913,6 @@ export interface components {
          * @description Skillfarm calculation and ROI summary.
          */
         CalculatorResponse: {
-            /**
-             * Error
-             * @default false
-             */
-            error: boolean;
-            /** Error Message */
-            error_message?: string | null;
             plex?: components["schemas"]["CalculatorItemSchema"] | null;
             injector?: components["schemas"]["CalculatorItemSchema"] | null;
             extractor?: components["schemas"]["CalculatorItemSchema"] | null;
@@ -1736,6 +1729,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorSchema"];
+                };
+            };
+            /** @description Not Found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

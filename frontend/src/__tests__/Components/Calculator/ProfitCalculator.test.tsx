@@ -29,7 +29,6 @@ describe("ProfitCalculator", () => {
   });
 
   const mockData: CalculatorResponse = {
-    error: false,
     plex: { type_id: 44992, name: "PLEX", buy: 4800000, sell: 5000000, updated_at: "2026-10-01" },
     injector: { type_id: 40520, name: "Skill Injector", buy: 900000000, sell: 1000000000, updated_at: "2026-10-01" },
     extractor: { type_id: 40519, name: "Skill Extractor", buy: 400000000, sell: 500000000, updated_at: "2026-10-01" },
@@ -81,5 +80,27 @@ describe("ProfitCalculator", () => {
 
     // Expected Result: custom PLEX input appears
     expect(screen.getByPlaceholderText(/PLEX amount/i)).toBeInTheDocument();
+  });
+
+  it("should show the error message of the API when market prices are missing", async () => {
+    // Test Data
+    vi.mocked(ApiCalls.fetchCalculatorData).mockRejectedValueOnce(
+      new Error("Market price data is currently not available. Please run market update tasks.")
+    );
+
+    // Test Action
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <ProfitCalculator />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    // Expected Result
+    expect(await screen.findByText("Market Data Unavailable")).toBeInTheDocument();
+    expect(
+      screen.getByText("Market price data is currently not available. Please run market update tasks.")
+    ).toBeInTheDocument();
   });
 });

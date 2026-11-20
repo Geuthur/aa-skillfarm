@@ -162,14 +162,14 @@ export const ProfitCalculator: React.FC = () => {
     );
   }
 
-  if (error || data?.error) {
+  if (error) {
     return (
       <Card>
         <Card.Body className={`${styles["error-panel"]} p-4 text-center`}>
           <AlertCircle size={28} className={styles["error-icon"]} />
           <h4 className={styles["error-title"]}>{t("Market Data Unavailable")}</h4>
           <p className={styles["error-text"]}>
-            {data?.error_message || t("Could not retrieve price aggregates. Please ensure price sync tasks have run.")}
+            {error.message || t("Could not retrieve price aggregates. Please ensure price sync tasks have run.")}
           </p>
           <Button variant="secondary"
             onClick={() => refetch()}
