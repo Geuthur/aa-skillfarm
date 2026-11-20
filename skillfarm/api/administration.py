@@ -21,7 +21,7 @@ from skillfarm import tasks
 from skillfarm.api import schema
 from skillfarm.api.characters import _serialize_character_summary
 from skillfarm.api.helpers.core import arabic_number_to_roman
-from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.helpers.eveonline import get_character_portrait_url
 from skillfarm.models.general import General
 from skillfarm.models.skillfarmaudit import SkillFarmAudit, SkillFarmSetup
 from skillfarm.providers import logger

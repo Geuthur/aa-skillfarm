@@ -67,6 +67,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] `helpers/eveonline.py` as in aa-example (portraits and logos of characters, corporations, alliances and types with `display_name`, `get_character_portrait_url` returns an empty string for an invalid ID); `helpers/lazy.py` only keeps `str_normalize_time`. The admin list picture uses the public `character_portrait_url` of Alliance Auth instead of its private function.
+
 - [CHANGE] `GET calculator/` answers missing market prices with 404 and `ErrorSchema` instead of 200 with `error`/`error_message`, which are removed from `CalculatorResponse`.
 
 - [CHANGE] Uniform error format of the API: every error response of an endpoint is an `ErrorSchema` (`{"error": "<text>"}`) in the OpenAPI schema, and every endpoint lists its 403. The Administration audit endpoints (`update/`, `inspect/`, delete) answer 404 for an unknown character with `{"error": "Character not found."}` instead of `{"detail": "Not Found"}`. Status codes are unchanged.

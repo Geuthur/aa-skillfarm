@@ -17,7 +17,7 @@ from allianceauth.eveonline.models import EveCharacter
 
 # AA Skillfarm
 from skillfarm.api import schema
-from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.helpers.eveonline import get_character_portrait_url
 from skillfarm.models.general import General, UserSettings
 from skillfarm.models.helpers.update_manager import CharacterUpdateSection
 from skillfarm.models.skillfarmaudit import SkillFarmAudit
