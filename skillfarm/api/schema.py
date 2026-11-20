@@ -281,8 +281,6 @@ class CalculatorItemSchema(Schema):
 class CalculatorResponse(Schema):
     """Skillfarm calculation and ROI summary."""
 
-    error: bool = False
-    error_message: str | None = None
     plex: CalculatorItemSchema | None = None
     injector: CalculatorItemSchema | None = None
     extractor: CalculatorItemSchema | None = None

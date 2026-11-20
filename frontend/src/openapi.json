@@ -866,6 +866,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorSchema"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -2475,22 +2485,6 @@
       "CalculatorResponse": {
         "description": "Skillfarm calculation and ROI summary.",
         "properties": {
-          "error": {
-            "default": false,
-            "title": "Error",
-            "type": "boolean"
-          },
-          "error_message": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error Message"
-          },
           "plex": {
             "anyOf": [
               {
