@@ -54,7 +54,7 @@ class TestCalculatorApiEndpoints(AuthTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.OK)
         data = response.json()
-        self.assertFalse(data["error"])
+        self.assertNotIn("error", data)
         self.assertIn("plex", data)
         self.assertIn("injector", data)
         self.assertIn("extractor", data)
@@ -76,7 +76,7 @@ class TestCalculatorApiEndpoints(AuthTestCase):
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
-    def test_get_calculator_data_missing_prices_should_return_error_response(self):
+    def test_get_calculator_data_missing_prices_should_return_not_found(self):
         # Test Data
         EveTypePrice.objects.filter(eve_type_id=44992).delete()
         url = reverse(f"{API_URL}:get_calculator_data")
@@ -86,7 +86,10 @@ class TestCalculatorApiEndpoints(AuthTestCase):
         response = self.client.get(url)
 
         # Expected Result
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        data = response.json()
-        self.assertTrue(data["error"])
-        self.assertIn("error_message", data)
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+        self.assertEqual(
+            response.json(),
+            {
+                "error": "Market price data is currently not available. Please run market update tasks."
+            },
+        )
