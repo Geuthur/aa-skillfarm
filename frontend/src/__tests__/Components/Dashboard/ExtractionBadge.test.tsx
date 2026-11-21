@@ -2,6 +2,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+// AA Skillfarm
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 
 describe("ExtractionBadge", () => {

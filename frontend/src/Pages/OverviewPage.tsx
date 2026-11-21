@@ -8,12 +8,12 @@ import { Eye, Search, Shield } from "lucide-react";
 import { Badge, Card, Col, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/OverviewPage.module.css";
-
 // AA Skillfarm
 import { useOverview } from "@/Components/Overview/Hooks";
 import { ProjectName } from "@/constants";
+
+// Styles
+import styles from "@/Styles/modules/OverviewPage.module.css";
 
 export const OverviewPage: React.FC = () => {
   const { t } = useTranslation();

@@ -7,12 +7,12 @@ import { ErrorPage, OwnerPortrait, renderTooltip } from "aa-geuthur-react";
 import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/OverviewUserPage.module.css";
-
+// AA Skillfarm
 import { CharacterDashboard } from "@/Components/Sections/CharacterDashboard";
 import { ProjectName } from "@/constants";
-// Utils
+
+// Styles
+import styles from "@/Styles/modules/OverviewUserPage.module.css";
 
 export const OverviewUserPage: React.FC = () => {
   const { t } = useTranslation();

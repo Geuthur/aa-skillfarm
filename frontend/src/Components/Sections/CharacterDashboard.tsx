@@ -6,9 +6,7 @@ import { useQueryState } from "nuqs";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/CharacterDashboard.module.css";
-
+// AA Skillfarm
 import type {
   CharacterFilterParams,
   OverviewUserSchema,
@@ -16,6 +14,9 @@ import type {
 import { CharacterTable, InactiveTrainingAlert, SkillfarmFilterBar } from "@/Components/Dashboard";
 import { SkillQueueModal, SkillSetupModal } from "@/Components/Modals";
 import { useCharacterAcknowledgements, useCharacters } from "@/Components/Sections/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/CharacterDashboard.module.css";
 
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */

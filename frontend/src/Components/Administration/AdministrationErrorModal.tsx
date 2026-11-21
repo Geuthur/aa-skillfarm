@@ -2,7 +2,6 @@
 import React from "react";
 
 // Third Party
-// AA Skillfarm
 import { BaseModal, ModalSize } from "aa-geuthur-react";
 import { Badge } from "react-bootstrap";
 import { useTranslation } from "react-i18next";

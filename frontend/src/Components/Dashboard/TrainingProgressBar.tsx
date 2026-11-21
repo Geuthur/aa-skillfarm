@@ -5,10 +5,11 @@ import React from "react";
 import { PauseCircle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+// AA Skillfarm
+import { useLiveProgress } from "@/Utils/liveProgress";
+
 // Styles
 import styles from "@/Styles/modules/TrainingProgressBar.module.css";
-
-import { useLiveProgress } from "@/Utils/liveProgress";
 
 interface TrainingProgressBarProps {
   isTraining: boolean;
