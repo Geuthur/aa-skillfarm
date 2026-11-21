@@ -7,14 +7,16 @@ import { useCooldown, useFeedback, useOwnerCooldowns } from "aa-geuthur-react";
 import { useTranslation } from "react-i18next";
 
 // AA Skillfarm
+import { triggerUpdateAll } from "@/Api/calls/administration";
+import { charactersQueryKeys } from "@/Api/calls/characters";
+import { overviewQueryKeys } from "@/Api/calls/overview";
 import {
   deleteCharacter,
   fetchUserCharacterStatuses,
+  settingsQueryKeys,
   toggleNotification,
   triggerCharacterUpdate,
-  triggerUpdateAll,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
+} from "@/Api/calls/settings";
 
 /** Cooldown in seconds after an update was queued. */
 const UPDATE_COOLDOWN = 60;
@@ -22,7 +24,7 @@ const UPDATE_COOLDOWN = 60;
 /** Loads the registered and missing characters of the current user with their sync status. */
 export function useUserCharacterStatuses() {
   return useQuery({
-    queryKey: queryKeys.UserCharacterStatuses,
+    queryKey: settingsQueryKeys.statuses,
     queryFn: fetchUserCharacterStatuses,
   });
 }
@@ -40,9 +42,9 @@ export function useCharacterActions() {
   const [updatingCharacterId, setUpdatingCharacterId] = useState<number | null>(null);
 
   const invalidateQueries = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.UserCharacterStatuses });
-    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
+    queryClient.invalidateQueries({ queryKey: settingsQueryKeys.statuses });
+    queryClient.invalidateQueries({ queryKey: charactersQueryKeys.root });
+    queryClient.invalidateQueries({ queryKey: overviewQueryKeys.all });
   };
 
   const errorMessage = (err: unknown, fallback: string) =>

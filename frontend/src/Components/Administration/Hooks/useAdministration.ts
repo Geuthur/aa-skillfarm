@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 // AA Skillfarm
 import {
+  administrationQueryKeys,
   deleteAdministrationAudit,
   fetchAdminStats,
   loadAdministrationAuditInspect,
@@ -17,8 +18,7 @@ import {
   triggerAdministrationAuditUpdate,
   triggerUpdateAll,
   triggerUpdatePrices,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
+} from "@/Api/calls/administration";
 import type { UserData } from "@/Api/schema";
 
 /** Feedback of a single audit action (update or delete) that stays until it is dismissed. */
@@ -43,7 +43,7 @@ export function useAdministrationAccess() {
 /** Loads the system-wide character statistics. */
 export function useAdministrationStats(enabled: boolean) {
   return useQuery({
-    queryKey: queryKeys.AdminStats,
+    queryKey: administrationQueryKeys.stats,
     queryFn: fetchAdminStats,
     enabled,
   });
@@ -52,7 +52,7 @@ export function useAdministrationStats(enabled: boolean) {
 /** Loads all character audits. */
 export function useAdministrationAudits(enabled: boolean) {
   return useQuery({
-    queryKey: queryKeys.AdministrationAudits,
+    queryKey: administrationQueryKeys.audits,
     queryFn: loadAdministrationAudits,
     enabled,
   });
@@ -61,7 +61,7 @@ export function useAdministrationAudits(enabled: boolean) {
 /** Loads the detail data of the audit that is currently inspected. */
 export function useAdministrationAuditInspect(characterId: number | null) {
   return useQuery({
-    queryKey: queryKeys.AdministrationAuditInspect(characterId),
+    queryKey: administrationQueryKeys.auditInspect(characterId),
     queryFn: () =>
       characterId ? loadAdministrationAuditInspect(characterId) : Promise.reject(new Error("No audit")),
     enabled: characterId !== null,
@@ -71,7 +71,7 @@ export function useAdministrationAuditInspect(characterId: number | null) {
 /** Loads the corporations with their registered and unregistered character counts. */
 export function useAdministrationCorporations() {
   return useQuery({
-    queryKey: queryKeys.AdministrationCorporations,
+    queryKey: administrationQueryKeys.corporations,
     queryFn: loadAdministrationCorporations,
   });
 }
@@ -79,7 +79,7 @@ export function useAdministrationCorporations() {
 /** Loads the unregistered characters of a corporation, once one is selected. */
 export function useAdministrationUnregistered(corporationId: number | null) {
   return useQuery({
-    queryKey: queryKeys.AdministrationUnregistered(corporationId),
+    queryKey: administrationQueryKeys.unregistered(corporationId),
     queryFn: () => loadAdministrationUnregistered(corporationId as number),
     enabled: corporationId !== null,
   });
@@ -95,7 +95,7 @@ export function useAdministrationTasks() {
     mutationFn: (force: boolean) => triggerUpdateAll(force),
     onSuccess: (res) => {
       showFeedback("success", res.message);
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
+      queryClient.invalidateQueries({ queryKey: administrationQueryKeys.audits });
     },
     onError: (err: unknown) =>
       showFeedback("danger", err instanceof Error ? err.message : t("Failed to queue character update task.")),
@@ -129,7 +129,7 @@ export function useAuditActions(onDeleteSettled: () => void) {
         variant: "success",
         message: res.message || t("Update task queued successfully."),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
+      queryClient.invalidateQueries({ queryKey: administrationQueryKeys.audits });
     },
     onError: (err: unknown) => {
       setTaskFeedback({
@@ -148,7 +148,7 @@ export function useAuditActions(onDeleteSettled: () => void) {
         variant: "success",
         message: res.message || t("Character audit deleted successfully."),
       });
-      queryClient.invalidateQueries({ queryKey: queryKeys.AdministrationAudits });
+      queryClient.invalidateQueries({ queryKey: administrationQueryKeys.audits });
     },
     onError: (err: unknown) => {
       setTaskFeedback({

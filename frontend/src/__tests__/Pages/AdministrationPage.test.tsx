@@ -10,7 +10,7 @@ import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as administrationCalls from "@/Api/calls/administration";
 import { AdministrationPage } from "@/Pages/AdministrationPage";
 
 vi.mock("aa-geuthur-react", async (importOriginal) => ({
@@ -18,8 +18,8 @@ vi.mock("aa-geuthur-react", async (importOriginal) => ({
   useUserData: vi.fn(),
 }));
 
-vi.mock("@/Api/ApiCalls", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
+vi.mock("@/Api/calls/administration", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/administration")>();
   return {
     ...actual,
     fetchAdminStats: vi.fn(),
@@ -200,13 +200,13 @@ describe("AdministrationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUser(mockUserData(true));
-    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([]);
+    vi.mocked(administrationCalls.loadAdministrationCorporations).mockResolvedValue([]);
   });
 
   it("should only show the corporations section for corp access users", async () => {
     // Test Data
     mockUser(mockUserData(false, false));
-    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
+    vi.mocked(administrationCalls.loadAdministrationCorporations).mockResolvedValue([
       {
         corporation_id: 98000001,
         corporation_name: "Farm Holdings",
@@ -223,17 +223,17 @@ describe("AdministrationPage", () => {
     // Expected Result
     expect(await screen.findByText("Farm Holdings")).toBeInTheDocument();
     expect(screen.queryByText("Total Characters")).not.toBeInTheDocument();
-    expect(ApiCalls.loadAdministrationAudits).not.toHaveBeenCalled();
-    expect(ApiCalls.fetchAdminStats).not.toHaveBeenCalled();
+    expect(administrationCalls.loadAdministrationAudits).not.toHaveBeenCalled();
+    expect(administrationCalls.fetchAdminStats).not.toHaveBeenCalled();
   });
 
   it("should collapse the corporations card for administrators and expand it on toggle", async () => {
     // Test Data
     const user = userEvent.setup();
     mockUser(mockUserData(false));
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.loadAdministrationCorporations).mockResolvedValue([
       {
         corporation_id: 98000001,
         corporation_name: "Farm Holdings",
@@ -281,8 +281,8 @@ describe("AdministrationPage", () => {
 
   it("should render global admin metrics and list all audits", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValueOnce(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValueOnce(mockAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValueOnce(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValueOnce(mockAudits);
 
     // Test Action
     renderPage();
@@ -297,9 +297,9 @@ describe("AdministrationPage", () => {
   it("should trigger update task when clicking update button in alts modal", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.triggerAdministrationAuditUpdate).mockResolvedValueOnce({
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.triggerAdministrationAuditUpdate).mockResolvedValueOnce({
       success: true,
       message: "Queued update task for Farmer Alpha",
     });
@@ -317,7 +317,7 @@ describe("AdministrationPage", () => {
 
     // Expected Result
     await waitFor(() => {
-      expect(ApiCalls.triggerAdministrationAuditUpdate).toHaveBeenCalledWith(95000001, false);
+      expect(administrationCalls.triggerAdministrationAuditUpdate).toHaveBeenCalledWith(95000001, false);
     });
     expect(await screen.findByText("Queued update task for Farmer Alpha")).toBeInTheDocument();
   });
@@ -325,9 +325,9 @@ describe("AdministrationPage", () => {
   it("should open inspection view when clicking inspect button in alts modal and allow going back", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.loadAdministrationAuditInspect).mockResolvedValue(mockDetail);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.loadAdministrationAuditInspect).mockResolvedValue(mockDetail);
 
     // Test Action
     renderPage();
@@ -355,9 +355,9 @@ describe("AdministrationPage", () => {
   it("should open delete confirmation modal and delete character audit", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.deleteAdministrationAudit).mockResolvedValueOnce({
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.deleteAdministrationAudit).mockResolvedValueOnce({
       success: true,
       message: "Character audit deleted successfully.",
     });
@@ -384,15 +384,15 @@ describe("AdministrationPage", () => {
     await user.click(confirmBtn);
 
     await waitFor(() => {
-      expect(ApiCalls.deleteAdministrationAudit).toHaveBeenCalledWith(95000001);
+      expect(administrationCalls.deleteAdministrationAudit).toHaveBeenCalledWith(95000001);
     });
   });
 
   it("should filter character audits by search term", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -410,8 +410,8 @@ describe("AdministrationPage", () => {
   it("should match group and open modal when searching by alt character name", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -439,8 +439,8 @@ describe("AdministrationPage", () => {
   it("should filter character audits by status filter button", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockFilterAudits);
 
     // Test Action
     renderPage();
@@ -468,8 +468,8 @@ describe("AdministrationPage", () => {
 
   it("should render the row actions as icon buttons with accessible names", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
 
     // Test Action
     renderPage();
@@ -488,9 +488,9 @@ describe("AdministrationPage", () => {
   it("should trigger global update all characters with force refresh switch", async () => {
     // Test Data
     const user = userEvent.setup();
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
-    vi.mocked(ApiCalls.triggerUpdateAll).mockResolvedValue({
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.triggerUpdateAll).mockResolvedValue({
       success: true,
       message: "Queued character update task.",
     });
@@ -513,7 +513,7 @@ describe("AdministrationPage", () => {
 
     // Expected Result
     await waitFor(() => {
-      expect(ApiCalls.triggerUpdateAll).toHaveBeenCalledWith(true);
+      expect(administrationCalls.triggerUpdateAll).toHaveBeenCalledWith(true);
     });
   });
 
@@ -521,8 +521,8 @@ describe("AdministrationPage", () => {
     // Test Data
     const user = userEvent.setup();
     mockUser(mockUserData(false));
-    vi.mocked(ApiCalls.fetchAdminStats).mockResolvedValue(mockStats);
-    vi.mocked(ApiCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
+    vi.mocked(administrationCalls.fetchAdminStats).mockResolvedValue(mockStats);
+    vi.mocked(administrationCalls.loadAdministrationAudits).mockResolvedValue(mockAudits);
 
     // Test Action
     renderPage();

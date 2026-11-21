@@ -7,12 +7,12 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as overviewCalls from "@/Api/calls/overview";
 import type { OverviewUserSchema } from "@/Api/schema";
 import { OverviewPage } from "@/Pages/OverviewPage";
 
-vi.mock("@/Api/ApiCalls", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
+vi.mock("@/Api/calls/overview", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/overview")>();
   return { ...actual, fetchOverview: vi.fn() };
 });
 
@@ -50,7 +50,7 @@ describe("OverviewPage", () => {
 
   it("should render a row with a link to the user detail page", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchOverview).mockResolvedValueOnce({ users: [buildUser()] });
+    vi.mocked(overviewCalls.fetchOverview).mockResolvedValueOnce({ users: [buildUser()] });
 
     // Test Action
     renderPage();
@@ -64,7 +64,7 @@ describe("OverviewPage", () => {
 
   it("should render an empty state when no users are visible", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchOverview).mockResolvedValueOnce({ users: [] });
+    vi.mocked(overviewCalls.fetchOverview).mockResolvedValueOnce({ users: [] });
 
     // Test Action
     renderPage();
@@ -75,7 +75,7 @@ describe("OverviewPage", () => {
 
   it("should render permission denied when the request fails", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchOverview).mockRejectedValueOnce(new Error("Failed"));
+    vi.mocked(overviewCalls.fetchOverview).mockRejectedValueOnce(new Error("Failed"));
 
     // Test Action
     renderPage();

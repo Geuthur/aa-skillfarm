@@ -8,11 +8,11 @@ import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as overviewCalls from "@/Api/calls/overview";
 import { OverviewUserPage } from "@/Pages/OverviewUserPage";
 
-vi.mock("@/Api/ApiCalls", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
+vi.mock("@/Api/calls/overview", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/overview")>();
   return { ...actual, fetchOverviewUser: vi.fn() };
 });
 
@@ -38,7 +38,7 @@ describe("OverviewUserPage", () => {
 
   it("should load the characters of the user from the route and show a back link", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchOverviewUser).mockResolvedValueOnce({
+    vi.mocked(overviewCalls.fetchOverviewUser).mockResolvedValueOnce({
       characters: [],
       total_count: 0,
       active_training_count: 0,
@@ -65,7 +65,7 @@ describe("OverviewUserPage", () => {
 
     // Expected Result
     expect(await screen.findByText("Alice Pilot")).toBeInTheDocument();
-    expect(vi.mocked(ApiCalls.fetchOverviewUser).mock.calls[0][0]).toBe(7);
+    expect(vi.mocked(overviewCalls.fetchOverviewUser).mock.calls[0][0]).toBe(7);
     const back = screen.getByRole("link", { name: /Overview/ });
     expect(back.getAttribute("href")).toBe("/skillfarm/overview/");
   });

@@ -69,6 +69,8 @@ Section Order:
 
 ### Changed
 
+- Internal: The frontend API calls are split by area into `Api/calls/{characters,overview,settings,calculator,administration}.ts`, each with its own query keys, replacing `Api/ApiCalls.ts` and `Api/query.ts`.
+
 - [CHANGE] `helpers/eveonline.py` as in aa-example (portraits and logos of characters, corporations, alliances and types with `display_name`, `get_character_portrait_url` returns an empty string for an invalid ID); `helpers/lazy.py` only keeps `str_normalize_time`. The admin list picture uses the public `character_portrait_url` of Alliance Auth instead of its private function.
 
 - [CHANGE] `GET calculator/` answers missing market prices with 404 and `ErrorSchema` instead of 200 with `error`/`error_message`, which are removed from `CalculatorResponse`.
