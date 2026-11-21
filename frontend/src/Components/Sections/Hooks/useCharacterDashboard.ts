@@ -6,10 +6,10 @@ import {
   acknowledgeAllExtractions,
   acknowledgeExtractions,
   acknowledgePaused,
+  charactersQueryKeys,
   fetchCharacters,
-  fetchOverviewUser,
-} from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
+} from "@/Api/calls/characters";
+import { fetchOverviewUser, overviewQueryKeys } from "@/Api/calls/overview";
 import type {
   CharacterFilterParams,
   CharacterListResponse,
@@ -23,8 +23,8 @@ export function useCharacters(filterParams: CharacterFilterParams, userId?: numb
   const isForeignUser = userId !== undefined;
   return useQuery<CharacterListResponse & { user?: OverviewUserSchema }>({
     queryKey: isForeignUser
-      ? queryKeys.OverviewUser(userId, filterParams)
-      : queryKeys.Characters(filterParams),
+      ? overviewQueryKeys.user(userId, filterParams)
+      : charactersQueryKeys.list(filterParams),
     queryFn: () =>
       isForeignUser ? fetchOverviewUser(userId, filterParams) : fetchCharacters(filterParams),
   });
@@ -34,8 +34,8 @@ export function useCharacters(filterParams: CharacterFilterParams, userId?: numb
 export function useCharacterAcknowledgements() {
   const queryClient = useQueryClient();
   const invalidateCharacters = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-    queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
+    queryClient.invalidateQueries({ queryKey: charactersQueryKeys.root });
+    queryClient.invalidateQueries({ queryKey: overviewQueryKeys.all });
   };
 
   const acknowledgeExtraction = useMutation({

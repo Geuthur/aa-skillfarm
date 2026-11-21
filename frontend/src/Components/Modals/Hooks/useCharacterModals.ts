@@ -2,13 +2,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // AA Skillfarm
-import { fetchCharacterDetail, fetchSkillSetup, updateSkillSetup } from "@/Api/ApiCalls";
-import { queryKeys } from "@/Api/query";
+import {
+  charactersQueryKeys,
+  fetchCharacterDetail,
+  fetchSkillSetup,
+  updateSkillSetup,
+} from "@/Api/calls/characters";
+import { overviewQueryKeys } from "@/Api/calls/overview";
 
 /** Loads the skill queue of a character. */
 export function useCharacterDetail(characterId: number | null) {
   return useQuery({
-    queryKey: queryKeys.CharacterDetail(characterId),
+    queryKey: charactersQueryKeys.detail(characterId),
     queryFn: () => (characterId ? fetchCharacterDetail(characterId) : Promise.reject("No ID")),
     enabled: !!characterId,
   });
@@ -17,7 +22,7 @@ export function useCharacterDetail(characterId: number | null) {
 /** Loads the farm skillset and the selectable skills of a character. */
 export function useSkillSetup(characterId: number | null) {
   return useQuery({
-    queryKey: queryKeys.SkillSetup(characterId),
+    queryKey: charactersQueryKeys.skillSetup(characterId),
     queryFn: () => (characterId ? fetchSkillSetup(characterId) : Promise.reject("No ID")),
     enabled: !!characterId,
   });
@@ -35,10 +40,10 @@ export function useSaveSkillSetup(characterId: number | null, onSaved: () => voi
       return updateSkillSetup(characterId, skills);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharactersRoot });
-      queryClient.invalidateQueries({ queryKey: queryKeys.Overview });
-      queryClient.invalidateQueries({ queryKey: queryKeys.CharacterDetail(characterId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.SkillSetup(characterId) });
+      queryClient.invalidateQueries({ queryKey: charactersQueryKeys.root });
+      queryClient.invalidateQueries({ queryKey: overviewQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: charactersQueryKeys.detail(characterId) });
+      queryClient.invalidateQueries({ queryKey: charactersQueryKeys.skillSetup(characterId) });
       onSaved();
     },
   });

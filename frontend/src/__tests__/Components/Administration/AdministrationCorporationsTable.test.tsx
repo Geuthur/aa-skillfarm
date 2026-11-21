@@ -5,11 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as administrationCalls from "@/Api/calls/administration";
 import { AdministrationCorporationsTable } from "@/Components/Administration/AdministrationCorporationsTable";
 
-vi.mock("@/Api/ApiCalls", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
+vi.mock("@/Api/calls/administration", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/administration")>();
   return {
     ...actual,
     loadAdministrationCorporations: vi.fn(),
@@ -56,8 +56,8 @@ const renderTable = () => {
 describe("AdministrationCorporationsTable", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(ApiCalls.loadAdministrationCorporations).mockResolvedValue([corporation]);
-    vi.mocked(ApiCalls.loadAdministrationUnregistered).mockResolvedValue(unregistered);
+    vi.mocked(administrationCalls.loadAdministrationCorporations).mockResolvedValue([corporation]);
+    vi.mocked(administrationCalls.loadAdministrationUnregistered).mockResolvedValue(unregistered);
   });
 
   it("should show the unregistered count on the button", async () => {
@@ -83,7 +83,7 @@ describe("AdministrationCorporationsTable", () => {
     // Expected Result
     expect(await screen.findByText("Alpha Pilot")).toBeInTheDocument();
     expect(screen.getByText("Zulu Pilot")).toBeInTheDocument();
-    expect(ApiCalls.loadAdministrationUnregistered).toHaveBeenCalledWith(98000001);
+    expect(administrationCalls.loadAdministrationUnregistered).toHaveBeenCalledWith(98000001);
   });
 
   it("should filter the unregistered characters by search", async () => {

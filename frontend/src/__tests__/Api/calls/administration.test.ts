@@ -4,49 +4,82 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // AA Skillfarm
 import { apiClient } from "@/Api/Api";
 import {
-  acknowledgeAllExtractions,
-  acknowledgeExtractions,
-  acknowledgePaused,
+  administrationQueryKeys,
   deleteAdministrationAudit,
-  deleteCharacter,
   fetchAdminStats,
-  fetchCalculatorData,
-  fetchCharacterDetail,
-  fetchCharacters,
-  fetchOverview,
-  fetchOverviewUser,
-  fetchSkillSetup,
-  fetchUserCharacterStatuses,
   loadAdministrationAuditInspect,
   loadAdministrationAudits,
   loadAdministrationCorporations,
   loadAdministrationUnregistered,
-  toggleNotification,
   triggerAdministrationAuditUpdate,
-  triggerCharacterUpdate,
   triggerUpdateAll,
   triggerUpdatePrices,
-  updateSkillSetup,
-} from "@/Api/ApiCalls";
+} from "@/Api/calls/administration";
+
+describe("administrationQueryKeys", () => {
+  it("should provide the administration keys", () => {
+    expect(administrationQueryKeys.stats).toEqual(["adminStats"]);
+    expect(administrationQueryKeys.audits).toEqual(["administrationAudits"]);
+    expect(administrationQueryKeys.auditInspect(1001)).toEqual(["administrationAuditInspect", 1001]);
+    expect(administrationQueryKeys.corporations).toEqual(["administrationCorporations"]);
+    expect(administrationQueryKeys.unregistered(2001)).toEqual(["administrationUnregistered", 2001]);
+  });
+});
+
+describe("Administration API calls", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("loadAdministrationUnregistered", () => {
+    it("should pass the corporation id as path parameter", async () => {
+      // Test Data
+      const response = { corporation_id: 2001, items: [] };
+      vi.spyOn(apiClient, "GET").mockResolvedValueOnce({
+        data: response,
+        error: undefined,
+        response: new Response(),
+      } as never);
+
+      // Test Action
+      const result = await loadAdministrationUnregistered(2001);
+
+      // Expected Result
+      expect(result).toEqual(response);
+      expect(apiClient.GET).toHaveBeenCalledWith(
+        "/skillfarm/api/administration/corporations/{corporation_id}/unregistered/",
+        { params: { path: { corporation_id: 2001 } } },
+      );
+    });
+  });
+
+  describe("triggerAdministrationAuditUpdate", () => {
+    it("should pass the character id as path parameter and the force flag as body", async () => {
+      // Test Data
+      const response = { success: true, message: "Queued" };
+      vi.spyOn(apiClient, "POST").mockResolvedValueOnce({
+        data: response,
+        error: undefined,
+        response: new Response(),
+      } as never);
+
+      // Test Action
+      const result = await triggerAdministrationAuditUpdate(1001, true);
+
+      // Expected Result
+      expect(result).toEqual(response);
+      expect(apiClient.POST).toHaveBeenCalledWith(
+        "/skillfarm/api/administration/audits/{character_id}/update/",
+        { params: { path: { character_id: 1001 } }, body: { force_refresh: true } },
+      );
+    });
+  });
+});
 
 type Method = "GET" | "POST" | "DELETE";
 
-/** Every call of `ApiCalls.ts`: [name, HTTP method, call, fixed text]. */
+/** Every call of `Api/calls/administration.ts`: [name, HTTP method, call, fixed text]. */
 const calls: [string, Method, () => Promise<unknown>, string][] = [
-  ["fetchUserCharacterStatuses", "GET", () => fetchUserCharacterStatuses(), "Failed to load character update statuses"],
-  ["fetchCharacters", "GET", () => fetchCharacters({}), "Failed to fetch characters"],
-  ["fetchOverview", "GET", () => fetchOverview(), "Failed to load overview"],
-  ["fetchOverviewUser", "GET", () => fetchOverviewUser(7, {}), "Failed to fetch characters for user 7"],
-  ["fetchCharacterDetail", "GET", () => fetchCharacterDetail(1001), "Failed to fetch details for character 1001"],
-  ["acknowledgeExtractions", "POST", () => acknowledgeExtractions(1001), "Failed to acknowledge extractions"],
-  ["acknowledgePaused", "POST", () => acknowledgePaused(1001), "Failed to acknowledge paused status"],
-  ["toggleNotification", "POST", () => toggleNotification(1001), "Failed to toggle notification"],
-  ["fetchSkillSetup", "GET", () => fetchSkillSetup(1001), "Failed to load skill setup"],
-  ["updateSkillSetup", "POST", () => updateSkillSetup(1001, ["Spaceship Command"]), "Failed to update skill setup"],
-  ["deleteCharacter", "DELETE", () => deleteCharacter(1001), "Failed to delete character"],
-  ["triggerCharacterUpdate", "POST", () => triggerCharacterUpdate(1001), "Failed to trigger character update"],
-  ["acknowledgeAllExtractions", "POST", () => acknowledgeAllExtractions(), "Failed to bulk acknowledge extractions"],
-  ["fetchCalculatorData", "GET", () => fetchCalculatorData(), "Failed to load calculator data"],
   ["fetchAdminStats", "GET", () => fetchAdminStats(), "Failed to load admin stats"],
   ["triggerUpdateAll", "POST", () => triggerUpdateAll(), "Failed to trigger update all"],
   ["triggerUpdatePrices", "POST", () => triggerUpdatePrices(), "Failed to trigger price update"],
@@ -85,7 +118,7 @@ const failWith = (method: Method, error: unknown) =>
     response: new Response(),
   } as never);
 
-describe("API calls", () => {
+describe("API error messages", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
