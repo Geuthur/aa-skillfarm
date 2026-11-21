@@ -45,6 +45,8 @@ Section Order:
 
 - [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
 
+- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task, which would attach the webhook URL with its token to the log record.
+
 - [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
 
 - [FIX] Character table: the extractions column gets its minimum width again, so the badge (e.g. "12 Reviewed") no longer wraps onto two lines (the table ignored `meta.className`).
