@@ -2,7 +2,6 @@
 import React from "react";
 
 // Third Party
-// Utils
 import { renderTooltip } from "aa-geuthur-react";
 import { CheckCircle2, Sparkles, Minus } from "lucide-react";
 import { useTranslation } from "react-i18next";

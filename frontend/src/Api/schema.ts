@@ -1,3 +1,4 @@
+// AA Skillfarm
 import type { components } from "@/Api/OpenApi";
 
 export type MenuLink = components["schemas"]["MenuLink"];

@@ -8,12 +8,13 @@ import { Clock, Sparkles } from "lucide-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/SkillQueueModal.module.css";
-
+// AA Skillfarm
 import type { SkillQueueEntrySchema } from "@/Api/schema";
 import { QueueEntryProgress, TrainingProgressBar } from "@/Components/Dashboard";
 import { useCharacterDetail } from "@/Components/Modals/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/SkillQueueModal.module.css";
 
 interface SkillQueueModalProps {
   characterId: number | null;

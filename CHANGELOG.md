@@ -69,6 +69,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] ESLint enforces the import order React, third party, `@/`, styles (`// AA Skillfarm` group in `frontend/eslint.config.js`); `Main.tsx` keeps the global stylesheets first.
+
 - Internal: The frontend API calls are split by area into `Api/calls/{characters,overview,settings,calculator,administration}.ts`, each with its own query keys, replacing `Api/ApiCalls.ts` and `Api/query.ts`.
 
 - [CHANGE] `helpers/eveonline.py` as in aa-example (portraits and logos of characters, corporations, alliances and types with `display_name`, `get_character_portrait_url` returns an empty string for an invalid ID); `helpers/lazy.py` only keeps `str_normalize_time`. The admin list picture uses the public `character_portrait_url` of Alliance Auth instead of its private function.

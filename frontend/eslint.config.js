@@ -37,8 +37,7 @@ export default defineConfig([
             { heading: '// Third Party', pattern: '^@?\\w' },
 
             // 3. AA Skillfarm (Eigene Komponenten, Helpers, API)
-            //{ heading: '// AA Skillfarm', pattern: '^@/' },
-            //{ heading: '// AA Skillfarm', pattern: '^\\.(?!.*\\.s?css$)' },
+            { heading: '// AA Skillfarm', pattern: '^@/(?!.*\\.s?css$)' },
 
             // 4. Stylesheets & CSS-Module
             { heading: '// Styles', pattern: '\\.s?css$' },

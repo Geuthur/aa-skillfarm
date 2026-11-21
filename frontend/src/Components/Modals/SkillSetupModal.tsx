@@ -8,10 +8,11 @@ import { Search } from "lucide-react";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// AA Skillfarm
+import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
+
 // Styles
 import styles from "@/Styles/modules/SkillSetupModal.module.css";
-
-import { useSaveSkillSetup, useSkillSetup } from "@/Components/Modals/Hooks";
 
 interface SkillSetupModalProps {
   characterId: number | null;

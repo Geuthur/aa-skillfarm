@@ -8,14 +8,14 @@ import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/CharacterTable.module.css";
-
+// AA Skillfarm
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-// Utils
+
+// Styles
+import styles from "@/Styles/modules/CharacterTable.module.css";
 
 interface CharacterTableProps {
   characters: CharacterSummarySchema[];
