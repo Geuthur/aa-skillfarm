@@ -71,6 +71,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] `AccessQuerySet` has the shape of the app template (`owned_by_q`, `visible_q`, `manage_q`, `sees_all`, `manages_all`) instead of two copies of the same rule with `assert`; the rules are unchanged and now tested one by one.
+
 - [CHANGE] Node 26 (CI and pre-commit) and updated npm packages (minor and patch, jsdom 31, `@testing-library/jest-dom` 8); `stylelint`, `typescript`, `i18next` and `react-i18next` stay on their major versions.
 
 - [CHANGE] `stylelint` 18 and `stylelint-config-standard` 41; the pre-commit hook now passes its own `node_modules` as `--config-basedir`, because stylelint 18 no longer resolves `extends` from global modules.
