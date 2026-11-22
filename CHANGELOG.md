@@ -34,7 +34,7 @@ Section Order:
 
 ### Fixed
 
-- [FIX] `corp_access` alone no longer allows managing other characters of the own corporation (acknowledge, notification, skill setup, update, delete): it only widens what a user sees, managing stays limited to the own characters unless the user has `admin_access`
+- [FIX] `corp_access` alone no longer allows managing other characters of the own corporation (acknowledge, notification, skill setup, update, delete): it only widens what a user sees, managing stays limited to the own characters unless the user has `admin_access`. The user page of the Overview shows the acknowledge and skill setup buttons to admins only
 
 - [FIX] React Query no longer retries 403, 404 and other 4xx answers three times, so the error shows at once instead of after about seven seconds: `Routing.tsx` uses `createQueryClient` of `aa-geuthur-react` (`^1.7.0`), which retries only network errors and 502/503/504
 
