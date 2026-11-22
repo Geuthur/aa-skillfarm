@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+// AA Skillfarm
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { DeleteCharacterModal } from "@/Components/Modals/DeleteCharacterModal";
 

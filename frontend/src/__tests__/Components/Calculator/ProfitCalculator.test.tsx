@@ -8,13 +8,14 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as calculatorCalls from "@/Api/calls/calculator";
 import type { CalculatorResponse } from "@/Api/schema";
 import { ProfitCalculator } from "@/Components/Calculator/ProfitCalculator";
 
-vi.mock("@/Api/ApiCalls", () => ({
-  fetchCalculatorData: vi.fn(),
-}));
+vi.mock("@/Api/calls/calculator", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/calculator")>();
+  return { ...actual, fetchCalculatorData: vi.fn() };
+});
 
 describe("ProfitCalculator", () => {
   let queryClient: QueryClient;
@@ -39,7 +40,7 @@ describe("ProfitCalculator", () => {
 
   it("should render inputs and compute profit correctly with defaults", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchCalculatorData).mockResolvedValueOnce(mockData);
+    vi.mocked(calculatorCalls.fetchCalculatorData).mockResolvedValueOnce(mockData);
 
     // Test Action
     render(
@@ -61,7 +62,7 @@ describe("ProfitCalculator", () => {
 
   it("should update profit when custom PLEX amount is selected", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchCalculatorData).mockResolvedValueOnce(mockData);
+    vi.mocked(calculatorCalls.fetchCalculatorData).mockResolvedValueOnce(mockData);
     const user = userEvent.setup();
 
     render(
@@ -84,7 +85,7 @@ describe("ProfitCalculator", () => {
 
   it("should show the error message of the API when market prices are missing", async () => {
     // Test Data
-    vi.mocked(ApiCalls.fetchCalculatorData).mockRejectedValueOnce(
+    vi.mocked(calculatorCalls.fetchCalculatorData).mockRejectedValueOnce(
       new Error("Market price data is currently not available. Please run market update tasks.")
     );
 

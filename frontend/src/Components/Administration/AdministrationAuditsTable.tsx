@@ -8,13 +8,12 @@ import { AlertTriangle, RefreshCw, Shield, Users } from "lucide-react";
 import { Alert, Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/Administration.module.css";
-
+// AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAltsModal } from "@/Components/Administration/AdministrationAltsModal";
-// AA Skillfarm
-// Utils
+
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
 
 export interface MainCharacterGroup {
   id: string;

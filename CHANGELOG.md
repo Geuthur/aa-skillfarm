@@ -40,6 +40,10 @@ Section Order:
 
 - [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` and `testauth/settings/development/local.py` give each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
 
+- [FIX] `corp_access` alone no longer allows managing other characters of the own corporation (acknowledge, notification, skill setup, update, delete): it only widens what a user sees, managing stays limited to the own characters unless the user has `admin_access`. The user page of the Overview shows the acknowledge and skill setup buttons to admins only
+
+- [FIX] React Query no longer retries 403, 404 and other 4xx answers three times, so the error shows at once instead of after about seven seconds: `Routing.tsx` uses `createQueryClient` of `aa-geuthur-react` (`^1.7.0`), which retries only network errors and 502/503/504
+
 - [FIX] Basic access is only granted by `basic_access`: every URL of the API now answers 403 without it (`basic_access_required` around the API URLs). Before, 15 of 27 endpoints (`menu/`, Administration, `characters/{id}/…`) did not check it.
 
 > [!WARNING]
@@ -49,13 +53,15 @@ Section Order:
 
 - [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
 
+- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) is no longer retried, because it is raised before any request is sent; `RequestException` and a rejected response are still retried
+
+- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task, which would attach the webhook URL with its token to the log record.
+
 - [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
 
 - [FIX] Character table: the extractions column gets its minimum width again, so the badge (e.g. "12 Reviewed") no longer wraps onto two lines (the table ignored `meta.className`).
 
 - [FIX] Character table: the green "Active (%)" badge sits inline after the skill name instead of wrapping as its own block, and the training queue column gets its minimum width again (the table ignored `meta.className`).
-
-- [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` gives each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
 
 - [FIX] The per-character lock of `update_character`, `update_char_skills` and `update_char_skillqueue` never worked: `TASK_DEFAULTS_ONCE_CHARACTER` set `once` (key `character_pk`) but not `base=QueueOnce`, so celery_once ignored it and the same character could be updated several times in parallel. `TASK_DEFAULTS_BIND_ONCE_CHARACTER` now builds on `TASK_DEFAULTS_BIND_ONCE` like in aa-example, and a second `apply_async` for the same character is skipped while the first is queued or running. `TASK_DEFAULTS_ONCE_CHARACTER` is removed.
 
@@ -72,6 +78,22 @@ Section Order:
 - [FIX] The pulsing menu and tab badges scaled up and down with their number. Only the glow around the badge pulses now.
 
 ### Changed
+
+- [CHANGE] Tests of the app template: `is_retryable_esi_error` and `ESI_RETRY_STATUS_CODES` in `test_providers.py`, exact URLs and HTML (including `display_name`) of the EVE image helpers in `test_helpers_eveonline.py`.
+
+- [CHANGE] `AccessQuerySet` has the shape of the app template (`owned_by_q`, `visible_q`, `manage_q`, `sees_all`, `manages_all`) instead of two copies of the same rule with `assert`; the rules are unchanged and now tested one by one.
+
+- [CHANGE] Node 26 (CI and pre-commit) and updated npm packages (minor and patch, jsdom 31, `@testing-library/jest-dom` 8); `stylelint`, `typescript`, `i18next` and `react-i18next` stay on their major versions.
+
+- [CHANGE] `stylelint` 18 and `stylelint-config-standard` 41; the pre-commit hook now passes its own `node_modules` as `--config-basedir`, because stylelint 18 no longer resolves `extends` from global modules.
+
+- [CHANGE] `i18next` 27 and `react-i18next` 18; when a plural form is missing or empty, `t()` now falls back to `_other` of the same language before English (affects Czech and Slovak `{{count}} Rows` for counts 2 to 4).
+
+- [CHANGE] ESLint enforces the import order React, third party, `@/`, styles (`// AA Skillfarm` group in `frontend/eslint.config.js`); `Main.tsx` keeps the global stylesheets first.
+
+- Internal: The frontend API calls are split by area into `Api/calls/{characters,overview,settings,calculator,administration}.ts`, each with its own query keys, replacing `Api/ApiCalls.ts` and `Api/query.ts`.
+
+- [CHANGE] `helpers/eveonline.py` as in aa-example (portraits and logos of characters, corporations, alliances and types with `display_name`, `get_character_portrait_url` returns an empty string for an invalid ID); `helpers/lazy.py` only keeps `str_normalize_time`. The admin list picture uses the public `character_portrait_url` of Alliance Auth instead of its private function.
 
 - [CHANGE] `GET calculator/` answers missing market prices with 404 and `ErrorSchema` instead of 200 with `error`/`error_message`, which are removed from `CalculatorResponse`.
 
@@ -136,6 +158,10 @@ Section Order:
 - [REMOVED] Unused frontend CSS: global helper classes (`aa-bg-*`, `aa-color-*`, `aa-status-*`, `sf-modal-*` and others), unused CSS module classes and the unused modules `BaseModal.module.css`, `DeleteCharacterModal.module.css` and `BaseTableForm.module.css`.
 
 - [REMOVED] Unused theme variables (`--aa-*`), the unused classes `aa-badge` and `aa-status-dot` and the unused `BaseModalQuery` mutation hooks (`useApproveMutation`, `useFormApproveMutation`).
+
+- [REMOVED] The unused `helpers/lazy.py` (only `str_normalize_time` was left) and the empty `hooks.py`.
+
+- [REMOVED] The unused static ESI operations `GetUniverseTypesTypeId`, `GetUniverseGroupsGroupId` and `GetUniverseCategoriesCategoryId` from `__operations__`; CCP removes these routes with compatibility date `2026-11-19` in favour of the SDE.
 
 - [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
 

@@ -8,7 +8,7 @@ from django.utils.timesince import timesince
 from django.utils.translation import gettext_lazy as _
 
 # Alliance Auth
-from allianceauth.eveonline.evelinks import eveimageserver
+from allianceauth.eveonline.evelinks.eveimageserver import character_portrait_url
 
 # AA Skillfarm
 from skillfarm.models.skillfarmaudit import CharacterUpdateStatus, SkillFarmAudit
@@ -127,7 +127,7 @@ class SkillFarmAuditAdmin(admin.ModelAdmin):
         eve_id = obj.character.character_id
         return format_html(
             '<img src="{}" class="img-circle">',
-            eveimageserver._eve_entity_image_url("character", eve_id, 32),
+            character_portrait_url(eve_id, 32),
         )
 
     @admin.display(description="Character ID", ordering="character__character_id")

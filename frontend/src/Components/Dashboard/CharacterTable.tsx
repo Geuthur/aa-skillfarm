@@ -8,14 +8,14 @@ import { Check, Eye, PauseCircle, Settings } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/CharacterTable.module.css";
-
+// AA Skillfarm
 import type { CharacterSummarySchema } from "@/Api/schema";
 import { ExtractionBadge } from "@/Components/Dashboard/ExtractionBadge";
 import { SyncStatusBadge } from "@/Components/Dashboard/SyncStatusBadge";
 import { TrainingProgressBar } from "@/Components/Dashboard/TrainingProgressBar";
-// Utils
+
+// Styles
+import styles from "@/Styles/modules/CharacterTable.module.css";
 
 interface CharacterTableProps {
   characters: CharacterSummarySchema[];
@@ -23,6 +23,8 @@ interface CharacterTableProps {
   onOpenSetup: (characterId: number) => void;
   onAcknowledgeExtractions: (characterId: number) => void;
   onAcknowledgePaused: (characterId: number) => void;
+  /** Show the write actions (acknowledge, skill setup). False for characters the user may only see. */
+  canManage?: boolean;
 }
 
 export const CharacterTable: React.FC<CharacterTableProps> = ({
@@ -31,6 +33,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
   onOpenSetup,
   onAcknowledgeExtractions,
   onAcknowledgePaused,
+  canManage = true,
 }) => {
   const { t } = useTranslation();
 
@@ -152,7 +155,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
             <div className="text-end">
               <div className="d-inline-flex align-items-center gap-1">
                 {/* Acknowledge Extraction action */}
-                {hasPendingExtractions &&
+                {canManage && hasPendingExtractions &&
                   renderTooltip(
                     t("Mark extractions as reviewed"),
                     <Button variant="warning" size="sm"
@@ -164,7 +167,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                   )}
 
                 {/* Acknowledge Paused queue */}
-                {hasUnacknowledgedPaused &&
+                {canManage && hasUnacknowledgedPaused &&
                   renderTooltip(
                     t("Acknowledge paused training"),
                     <Button variant="secondary" size="sm"
@@ -186,7 +189,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
                 )}
 
                 {/* Skill Setup */}
-                {renderTooltip(
+                {canManage && renderTooltip(
                   t("Configure Farm Skillset"),
                   <Button variant="secondary" size="sm"
                     onClick={() => onOpenSetup(char.character_id)}
@@ -206,6 +209,7 @@ export const CharacterTable: React.FC<CharacterTableProps> = ({
       onOpenSetup,
       onAcknowledgeExtractions,
       onAcknowledgePaused,
+      canManage,
     ],
   );
 

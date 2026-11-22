@@ -8,12 +8,12 @@ import { Bell, BellOff, Settings2, Users } from "lucide-react";
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/SettingsPage.module.css";
-
 // AA Skillfarm
 import type { UserSettingsSchema, UserSettingsUpdateRequest } from "@/Api/schema";
 import { useCharacterActions, useUserCharacterStatuses } from "@/Components/Settings/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/SettingsPage.module.css";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();

@@ -19,9 +19,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { Button, Card, CardBody, Col, Form, Modal, Row } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/Administration.module.css";
-
 // AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import { AdministrationAuditsTable } from "@/Components/Administration/AdministrationAuditsTable";
@@ -37,6 +34,9 @@ import {
   useAdministrationTasks,
   useAuditActions,
 } from "@/Components/Administration/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
 
 export const AdministrationPage: React.FC = () => {
   const { t } = useTranslation();

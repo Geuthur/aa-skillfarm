@@ -3,10 +3,11 @@ import React from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 // Third Party
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AaReactProvider, AuthBase, ErrorPage } from "aa-geuthur-react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { AaReactProvider, AuthBase, createQueryClient, ErrorPage } from "aa-geuthur-react";
 import { NuqsAdapter } from "nuqs/adapters/react-router/v8";
 
+// AA Skillfarm
 import { AppName, ProjectName } from "@/constants";
 import { AdministrationPage } from "@/Pages/AdministrationPage";
 import { CalculatorPage } from "@/Pages/CalculatorPage";
@@ -15,7 +16,7 @@ import { OverviewPage } from "@/Pages/OverviewPage";
 import { OverviewUserPage } from "@/Pages/OverviewUserPage";
 import { SettingsPage } from "@/Pages/SettingsPage";
 
-const queryClient = new QueryClient({
+const queryClient = createQueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 30, // 30 seconds

@@ -8,13 +8,13 @@ import { Eye, RefreshCw, Trash2 } from "lucide-react";
 import { Badge, Button, ButtonGroup, Card, Dropdown, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/Administration.module.css";
-
+// AA Skillfarm
 import type { AdministrationAuditSchema } from "@/Api/schema";
 import type { MainCharacterGroup } from "@/Components/Administration/AdministrationAuditsTable";
 import { AdministrationErrorModal } from "@/Components/Administration/AdministrationErrorModal";
-// AA Skillfarm
+
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
 
 export interface AdministrationAltsModalProps {
   group: MainCharacterGroup | null;

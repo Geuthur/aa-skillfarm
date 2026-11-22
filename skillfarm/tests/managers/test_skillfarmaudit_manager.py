@@ -1,5 +1,9 @@
 # Third Party
-from evesde_factory.allianceauth import EveCharacterFactory, EveCorporationInfoFactory
+from evesde_factory.allianceauth import (
+    EveCharacterFactory,
+    EveCorporationInfoFactory,
+    UserFactory,
+)
 
 # Django
 from django.utils import timezone
@@ -248,6 +252,163 @@ class TestSkillfarmAuditCorpAccess(AuthTestCase):
 
         # Expected Result
         self.assertEqual(list(qs), [colleague_audit])
+
+
+class TestSkillfarmAuditAccessRules(AuthTestCase):
+    """Each access rule of `visible_to` and `manage_to`; they differ only for `corp_access`."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.corp = EveCorporationInfoFactory()
+        cls.own_audit = SkillFarmAuditFactory(user=cls.user)
+        cls.colleague = UserMainFactory(
+            main_character__character=EveCharacterFactory(corporation=cls.corp)
+        )
+        cls.colleague_audit = SkillFarmAuditFactory(user=cls.colleague)
+        cls.foreign_audit = SkillFarmAuditFactory(user=UserMainFactory())
+
+    def _results(self, user):
+        """Return the audits of `visible_to` and `manage_to` for the user."""
+        return {
+            "visible_to": list(SkillFarmAudit.objects.visible_to(user)),
+            "manage_to": list(SkillFarmAudit.objects.manage_to(user)),
+        }
+
+    def _corp_user(self):
+        return UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.corp_access"],
+            main_character__character=EveCharacterFactory(corporation=self.corp),
+        )
+
+    def test_admin_access_should_return_all_audits(self):
+        # Test Data
+        admin_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        )
+
+        # Test Action
+        for method, audits in self._results(admin_user).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertCountEqual(
+                    audits, [self.own_audit, self.colleague_audit, self.foreign_audit]
+                )
+
+    def test_admin_access_without_main_character_should_return_all_audits(self):
+        # Test Data
+        admin_user = UserFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.admin_access"]
+        )
+
+        # Test Action
+        for method, audits in self._results(admin_user).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertCountEqual(
+                    audits, [self.own_audit, self.colleague_audit, self.foreign_audit]
+                )
+
+    def test_corp_access_should_see_but_not_manage_audits_of_same_corporation(self):
+        # Test Data
+        corp_user = self._corp_user()
+
+        # Test Action
+        results = self._results(corp_user)
+
+        # Expected Result
+        self.assertEqual(results["visible_to"], [self.colleague_audit])
+        self.assertEqual(results["manage_to"], [])
+
+    def test_corp_access_should_manage_only_own_audits(self):
+        # Test Data
+        corp_user = self._corp_user()
+        own_audit = SkillFarmAuditFactory(user=corp_user)
+        alt = EveCharacterFactory()
+        add_alt_character_to_user(user=corp_user, character_id=alt.character_id)
+        alt_audit = SkillFarmAuditFactory(user=corp_user, character=alt)
+
+        # Test Action
+        results = self._results(corp_user)
+
+        # Expected Result
+        self.assertCountEqual(
+            results["visible_to"], [self.colleague_audit, own_audit, alt_audit]
+        )
+        self.assertCountEqual(results["manage_to"], [own_audit, alt_audit])
+
+    def test_own_character_should_return_only_own_audits(self):
+        # Test Action
+        for method, audits in self._results(self.user).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertEqual(audits, [self.own_audit])
+
+    def test_same_corporation_without_corp_access_should_return_only_own_audits(self):
+        # Test Action
+        for method, audits in self._results(self.colleague).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertEqual(audits, [self.colleague_audit])
+
+    def test_foreign_character_should_return_nothing(self):
+        # Test Data
+        other_user = UserMainFactory()
+
+        # Test Action
+        for method, audits in self._results(other_user).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertEqual(audits, [])
+
+    def test_user_without_main_character_should_return_nothing(self):
+        # Test Data
+        for permissions in (
+            ["skillfarm.basic_access"],
+            ["skillfarm.basic_access", "skillfarm.corp_access"],
+        ):
+            user = UserFactory(permissions__=permissions)
+            alt = EveCharacterFactory(corporation=self.corp)
+            add_alt_character_to_user(user=user, character_id=alt.character_id)
+            SkillFarmAuditFactory(user=user, character=alt)
+
+            # Test Action
+            for method, audits in self._results(user).items():
+                # Expected Result
+                with self.subTest(method=method, permissions=permissions):
+                    self.assertEqual(audits, [])
+
+    def test_superuser_should_return_all_audits(self):
+        """Superusers pass every `has_perm` check, so `admin_access` applies."""
+        # Test Action
+        for method, audits in self._results(self.superuser).items():
+            # Expected Result
+            with self.subTest(method=method):
+                self.assertCountEqual(
+                    audits, [self.own_audit, self.colleague_audit, self.foreign_audit]
+                )
+
+    def test_owned_by_should_ignore_main_character_and_permissions(self):
+        # Test Data
+        user = UserFactory(permissions__=["skillfarm.basic_access"])
+        alt = EveCharacterFactory()
+        add_alt_character_to_user(user=user, character_id=alt.character_id)
+        alt_audit = SkillFarmAuditFactory(user=user, character=alt)
+
+        # Test Action
+        qs = SkillFarmAudit.objects.owned_by(user)
+
+        # Expected Result
+        self.assertEqual(list(qs), [alt_audit])
+
+    def test_access_methods_should_work_on_filtered_queryset(self):
+        # Test Action
+        qs = SkillFarmAudit.objects.filter(pk=self.foreign_audit.pk)
+
+        # Expected Result
+        self.assertEqual(list(qs.visible_to(self.user)), [])
+        self.assertEqual(list(qs.manage_to(self.user)), [])
+        self.assertEqual(list(qs.owned_by(self.user)), [])
 
 
 class TestSkillfarmFilterMethods(AuthTestCase):

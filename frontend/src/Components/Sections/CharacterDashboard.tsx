@@ -2,20 +2,23 @@
 import React, { useState } from "react";
 
 // Third Party
+import { useUserData } from "aa-geuthur-react";
 import { useQueryState } from "nuqs";
 import { Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/CharacterDashboard.module.css";
-
+// AA Skillfarm
 import type {
   CharacterFilterParams,
   OverviewUserSchema,
+  UserData,
 } from "@/Api/schema";
 import { CharacterTable, InactiveTrainingAlert, SkillfarmFilterBar } from "@/Components/Dashboard";
 import { SkillQueueModal, SkillSetupModal } from "@/Components/Modals";
 import { useCharacterAcknowledgements, useCharacters } from "@/Components/Sections/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/CharacterDashboard.module.css";
 
 interface CharacterDashboardProps {
   /** Show the characters of this user (overview detail) instead of the own characters. */
@@ -26,6 +29,9 @@ interface CharacterDashboardProps {
 export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, renderHeader }) => {
   const { t } = useTranslation();
   const isForeignUser = userId !== undefined;
+  const { data: userData } = useUserData<UserData>();
+  // The API lets only admins manage the characters of other users (`corp_access` only sees them).
+  const canManage = !isForeignUser || Boolean(userData?.user.is_admin);
 
   // URL state via nuqs for filterable, bookmarkable, and shareable URLs
   const [search, setSearch] = useQueryState("search", { defaultValue: "" });
@@ -109,6 +115,7 @@ export const CharacterDashboard: React.FC<CharacterDashboardProps> = ({ userId, 
           onOpenSetup={(id) => setSelectedSetupCharId(id)}
           onAcknowledgeExtractions={(id) => acknowledgeExtraction.mutate(id)}
           onAcknowledgePaused={(id) => acknowledgePausedTraining.mutate(id)}
+          canManage={canManage}
         />
       )}
 

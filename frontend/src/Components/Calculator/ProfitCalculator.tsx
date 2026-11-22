@@ -8,11 +8,11 @@ import { Coins, AlertCircle, RefreshCw, Calculator, RotateCcw } from "lucide-rea
 import { Button, Card } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
+// AA Skillfarm
+import { useCalculatorData } from "@/Components/Calculator/Hooks";
+
 // Styles
 import styles from "@/Styles/modules/ProfitCalculator.module.css";
-
-import { useCalculatorData } from "@/Components/Calculator/Hooks";
-// Utils
 
 export const ProfitCalculator: React.FC = () => {
   const { t } = useTranslation();

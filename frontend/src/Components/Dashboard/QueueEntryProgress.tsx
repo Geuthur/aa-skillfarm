@@ -1,10 +1,11 @@
 // React
 import React from "react";
 
+// AA Skillfarm
+import { useLiveProgress } from "@/Utils/liveProgress";
+
 // Styles
 import styles from "@/Styles/modules/QueueEntryProgress.module.css";
-
-import { useLiveProgress } from "@/Utils/liveProgress";
 
 interface QueueEntryProgressProps {
   startDate?: string | null;

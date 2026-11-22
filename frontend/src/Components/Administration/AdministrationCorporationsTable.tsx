@@ -6,15 +6,15 @@ import { ErrorLoader, FetchingLoader, OwnerPortrait, UnregisteredModal } from "a
 import { Button, Table } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-// Styles
-import styles from "@/Styles/modules/Administration.module.css";
-
 // AA Skillfarm
 import type { AdministrationCorporationSchema } from "@/Api/schema";
 import {
   useAdministrationCorporations,
   useAdministrationUnregistered,
 } from "@/Components/Administration/Hooks";
+
+// Styles
+import styles from "@/Styles/modules/Administration.module.css";
 
 /** Corporations (own corporation or all) with their registered and unregistered characters. */
 export const AdministrationCorporationsTable = () => {

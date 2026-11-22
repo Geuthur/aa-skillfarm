@@ -16,7 +16,7 @@ from django.utils.translation import gettext as _
 from skillfarm import tasks
 from skillfarm.api import schema
 from skillfarm.api.helpers.core import arabic_number_to_roman, get_skillfarm_character
-from skillfarm.helpers.lazy import get_character_portrait_url
+from skillfarm.helpers.eveonline import get_character_portrait_url
 from skillfarm.models.skillfarmaudit import (
     SkillFarmAudit,
     SkillFarmSetup,

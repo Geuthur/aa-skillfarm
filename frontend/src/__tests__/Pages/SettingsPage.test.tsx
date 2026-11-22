@@ -9,19 +9,24 @@ import { useUserSettings } from "aa-geuthur-react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // AA Skillfarm
-import * as ApiCalls from "@/Api/ApiCalls";
+import * as administrationCalls from "@/Api/calls/administration";
+import * as settingsCalls from "@/Api/calls/settings";
 import { SettingsPage } from "@/Pages/SettingsPage";
 
-vi.mock("@/Api/ApiCalls", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/Api/ApiCalls")>();
+vi.mock("@/Api/calls/settings", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/settings")>();
   return {
     ...actual,
     fetchUserCharacterStatuses: vi.fn(),
-    triggerUpdateAll: vi.fn(),
     triggerCharacterUpdate: vi.fn(),
     toggleNotification: vi.fn(),
     deleteCharacter: vi.fn(),
   };
+});
+
+vi.mock("@/Api/calls/administration", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/Api/calls/administration")>();
+  return { ...actual, triggerUpdateAll: vi.fn() };
 });
 
 // The hook itself is tested in the package, here only the page is checked against its result.
@@ -64,7 +69,7 @@ describe("SettingsPage", () => {
   it("should show the loading state while the settings load", () => {
     // Test Data
     mockSettings({ data: undefined, isLoading: true });
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [],
     });
@@ -90,7 +95,7 @@ describe("SettingsPage", () => {
   it("should show the save status and the save error", () => {
     // Test Data
     mockSettings({}, { isPending: true, isError: true });
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [],
     });
@@ -107,7 +112,7 @@ describe("SettingsPage", () => {
   it("should load the saved global notification preference", async () => {
     // Test Data
     mockSettings({ data: { disable_notifications: true } });
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValueOnce({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValueOnce({
       characters: [],
       missing_characters: [],
     });
@@ -125,7 +130,7 @@ describe("SettingsPage", () => {
     // Test Data
     const user = userEvent.setup();
     mockSettings();
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [],
     });
@@ -144,7 +149,7 @@ describe("SettingsPage", () => {
   it("should display characters with their update status and highlight errors", async () => {
     // Test Data
     mockSettings();
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {
           character_id: 1001,
@@ -214,7 +219,7 @@ describe("SettingsPage", () => {
   it("should display missing characters not yet added to Skillfarm", async () => {
     // Test Data
     mockSettings();
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [],
       missing_characters: [
         {
@@ -244,7 +249,7 @@ describe("SettingsPage", () => {
     // Test Data
     const user = userEvent.setup();
     mockSettings();
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {
           character_id: 1001,
@@ -264,11 +269,11 @@ describe("SettingsPage", () => {
       ],
       missing_characters: [],
     });
-    vi.mocked(ApiCalls.triggerUpdateAll).mockResolvedValue({
+    vi.mocked(administrationCalls.triggerUpdateAll).mockResolvedValue({
       success: true,
       message: "Update all task queued.",
     });
-    vi.mocked(ApiCalls.triggerCharacterUpdate).mockResolvedValue({
+    vi.mocked(settingsCalls.triggerCharacterUpdate).mockResolvedValue({
       success: true,
       message: "Character update task queued.",
     });
@@ -283,15 +288,15 @@ describe("SettingsPage", () => {
     await user.click(updateCharBtn);
 
     // Expected Result
-    expect(ApiCalls.triggerUpdateAll).toHaveBeenCalledWith(false);
-    expect(ApiCalls.triggerCharacterUpdate).toHaveBeenCalledWith(1001, false);
+    expect(administrationCalls.triggerUpdateAll).toHaveBeenCalledWith(false);
+    expect(settingsCalls.triggerCharacterUpdate).toHaveBeenCalledWith(1001, false);
   });
 
   it("should toggle character notifications and open delete modal", async () => {
     // Test Data
     const user = userEvent.setup();
     mockSettings();
-    vi.mocked(ApiCalls.fetchUserCharacterStatuses).mockResolvedValue({
+    vi.mocked(settingsCalls.fetchUserCharacterStatuses).mockResolvedValue({
       characters: [
         {
           character_id: 1001,
@@ -311,11 +316,11 @@ describe("SettingsPage", () => {
       ],
       missing_characters: [],
     });
-    vi.mocked(ApiCalls.toggleNotification).mockResolvedValue({
+    vi.mocked(settingsCalls.toggleNotification).mockResolvedValue({
       success: true,
       message: "Notification toggled",
     });
-    vi.mocked(ApiCalls.deleteCharacter).mockResolvedValue({
+    vi.mocked(settingsCalls.deleteCharacter).mockResolvedValue({
       success: true,
       message: "Character deleted",
     });
@@ -330,7 +335,7 @@ describe("SettingsPage", () => {
     await user.click(deleteBtn);
 
     // Expected Result
-    expect(ApiCalls.toggleNotification).toHaveBeenCalledWith(1001);
+    expect(settingsCalls.toggleNotification).toHaveBeenCalledWith(1001);
     expect(await screen.findByText("Remove Character from Skillfarm")).toBeInTheDocument();
   });
 });
