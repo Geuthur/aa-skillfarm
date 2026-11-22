@@ -71,6 +71,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Node 26 (CI and pre-commit) and updated npm packages (minor and patch, jsdom 31, `@testing-library/jest-dom` 8); `stylelint`, `typescript`, `i18next` and `react-i18next` stay on their major versions.
+
 - [CHANGE] ESLint enforces the import order React, third party, `@/`, styles (`// AA Skillfarm` group in `frontend/eslint.config.js`); `Main.tsx` keeps the global stylesheets first.
 
 - Internal: The frontend API calls are split by area into `Api/calls/{characters,overview,settings,calculator,administration}.ts`, each with its own query keys, replacing `Api/ApiCalls.ts` and `Api/query.ts`.
