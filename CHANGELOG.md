@@ -157,6 +157,8 @@ Section Order:
 
 - [REMOVED] The unused `helpers/lazy.py` (only `str_normalize_time` was left) and the empty `hooks.py`.
 
+- [REMOVED] The unused static ESI operations `GetUniverseTypesTypeId`, `GetUniverseGroupsGroupId` and `GetUniverseCategoriesCategoryId` from `__operations__`; CCP removes these routes with compatibility date `2026-11-19` in favour of the SDE.
+
 - [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
 
 <!-- Your changes go here -->
