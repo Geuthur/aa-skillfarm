@@ -73,6 +73,10 @@ Section Order:
 
 - [CHANGE] Node 26 (CI and pre-commit) and updated npm packages (minor and patch, jsdom 31, `@testing-library/jest-dom` 8); `stylelint`, `typescript`, `i18next` and `react-i18next` stay on their major versions.
 
+- [CHANGE] `stylelint` 18 and `stylelint-config-standard` 41; the pre-commit hook now passes its own `node_modules` as `--config-basedir`, because stylelint 18 no longer resolves `extends` from global modules.
+
+- [CHANGE] `i18next` 27 and `react-i18next` 18; when a plural form is missing or empty, `t()` now falls back to `_other` of the same language before English (affects Czech and Slovak `{{count}} Rows` for counts 2 to 4).
+
 - [CHANGE] ESLint enforces the import order React, third party, `@/`, styles (`// AA Skillfarm` group in `frontend/eslint.config.js`); `Main.tsx` keeps the global stylesheets first.
 
 - Internal: The frontend API calls are split by area into `Api/calls/{characters,overview,settings,calculator,administration}.ts`, each with its own query keys, replacing `Api/ApiCalls.ts` and `Api/query.ts`.
