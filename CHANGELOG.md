@@ -75,6 +75,8 @@ Section Order:
 
 ### Changed
 
+- [CHANGE] Skillfarm Calculator: the monthly reference projections (1-, 12- and 24-month plan) now sit directly below the header, above the price cards.
+
 - [CHANGE] Tests of the app template: `is_retryable_esi_error` and `ESI_RETRY_STATUS_CODES` in `test_providers.py`, exact URLs and HTML (including `display_name`) of the EVE image helpers in `test_helpers_eveonline.py`.
 
 - [CHANGE] `AccessQuerySet` has the shape of the app template (`owned_by_q`, `visible_q`, `manage_q`, `sees_all`, `manages_all`) instead of two copies of the same rule with `assert`; the rules are unchanged and now tested one by one.

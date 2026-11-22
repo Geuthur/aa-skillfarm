@@ -218,6 +218,60 @@ export const ProfitCalculator: React.FC = () => {
         </Card.Body>
       </Card>
 
+      {/* Benchmark Monthly Projections (Standard 3.5 Injectors) */}
+      <h4 className={`${styles["results-title"]} text-uppercase mt-4`}>
+        {t("Monthly Reference Projections (3.5 Injectors / mo)")}
+      </h4>
+
+      <div
+        className={`${styles["results-grid"]} d-grid gap-3`}
+      >
+        <Card>
+          <Card.Body className={styles["result-card-blue"]}>
+            <div className="d-flex justify-content-between align-items-center">
+              <span className={`${styles["result-name"]} fw-semibold`}>{t("1-Month Plan")}</span>
+              <span className={styles["result-duration"]}>{t("500 PLEX/mo")}</span>
+            </div>
+            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month_calc ?? 0)}`}>
+              {data ? formatIsk(data.month_calc) : "-"}
+            </div>
+            <p className={`${styles["result-note"]} m-0`}>
+              {t("Standard monthly subscription rate with PLEX.")}
+            </p>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Body className={styles["result-card-amber"]}>
+            <div className="d-flex justify-content-between align-items-center">
+              <span className={`${styles["result-name"]} fw-semibold`}>{t("12-Month Plan")}</span>
+              <span className={styles["result-duration"]}>{t("300 PLEX/mo")}</span>
+            </div>
+            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month12_calc ?? 0)}`}>
+              {data ? formatIsk(data.month12_calc) : "-"}
+            </div>
+            <p className={`${styles["result-note"]} m-0`}>
+              {t("Annual package rate discount (~40% PLEX savings).")}
+            </p>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Body className={styles["result-card-emerald"]}>
+            <div className="d-flex justify-content-between align-items-center">
+              <span className={`${styles["result-name"]} fw-semibold`}>{t("24-Month Plan")}</span>
+              <span className={styles["result-duration"]}>{t("275 PLEX/mo")}</span>
+            </div>
+            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month24_calc ?? 0)}`}>
+              {data ? formatIsk(data.month24_calc) : "-"}
+            </div>
+            <p className={`${styles["result-note"]} m-0`}>
+              {t("Maximum 2-year package rate discount.")}
+            </p>
+          </Card.Body>
+        </Card>
+      </div>
+
       {/* Editable Market Prices Cards */}
       <div
         className={`${styles["price-panel"]} d-grid gap-3 mb-4 mt-4`}
@@ -411,60 +465,6 @@ export const ProfitCalculator: React.FC = () => {
           </div>
         </Card.Body>
       </Card>
-
-      {/* Benchmark Monthly Projections (Standard 3.5 Injectors) */}
-      <h4 className={`${styles["results-title"]} text-uppercase`}>
-        {t("Monthly Reference Projections (3.5 Injectors / mo)")}
-      </h4>
-
-      <div
-        className={`${styles["results-grid"]} d-grid gap-3`}
-      >
-        <Card>
-          <Card.Body className={styles["result-card-blue"]}>
-            <div className="d-flex justify-content-between align-items-center">
-              <span className={`${styles["result-name"]} fw-semibold`}>{t("1-Month Plan")}</span>
-              <span className={styles["result-duration"]}>{t("500 PLEX/mo")}</span>
-            </div>
-            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month_calc ?? 0)}`}>
-              {data ? formatIsk(data.month_calc) : "-"}
-            </div>
-            <p className={`${styles["result-note"]} m-0`}>
-              {t("Standard monthly subscription rate with PLEX.")}
-            </p>
-          </Card.Body>
-        </Card>
-
-        <Card>
-          <Card.Body className={styles["result-card-amber"]}>
-            <div className="d-flex justify-content-between align-items-center">
-              <span className={`${styles["result-name"]} fw-semibold`}>{t("12-Month Plan")}</span>
-              <span className={styles["result-duration"]}>{t("300 PLEX/mo")}</span>
-            </div>
-            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month12_calc ?? 0)}`}>
-              {data ? formatIsk(data.month12_calc) : "-"}
-            </div>
-            <p className={`${styles["result-note"]} m-0`}>
-              {t("Annual package rate discount (~40% PLEX savings).")}
-            </p>
-          </Card.Body>
-        </Card>
-
-        <Card>
-          <Card.Body className={styles["result-card-emerald"]}>
-            <div className="d-flex justify-content-between align-items-center">
-              <span className={`${styles["result-name"]} fw-semibold`}>{t("24-Month Plan")}</span>
-              <span className={styles["result-duration"]}>{t("275 PLEX/mo")}</span>
-            </div>
-            <div className={`${styles["result-value"]} fw-bold ${getProfitClass(data?.month24_calc ?? 0)}`}>
-              {data ? formatIsk(data.month24_calc) : "-"}
-            </div>
-            <p className={`${styles["result-note"]} m-0`}>
-              {t("Maximum 2-year package rate discount.")}
-            </p>
-          </Card.Body>
-        </Card>
-      </div>
     </div>
   );
 };
