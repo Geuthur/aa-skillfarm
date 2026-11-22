@@ -34,6 +34,8 @@ Section Order:
 
 ### Fixed
 
+- [FIX] `corp_access` alone no longer allows managing other characters of the own corporation (acknowledge, notification, skill setup, update, delete): it only widens what a user sees, managing stays limited to the own characters unless the user has `admin_access`
+
 - [FIX] React Query no longer retries 403, 404 and other 4xx answers three times, so the error shows at once instead of after about seven seconds: `Routing.tsx` uses `createQueryClient` of `aa-geuthur-react` (`^1.7.0`), which retries only network errors and 502/503/504
 
 - [FIX] Basic access is only granted by `basic_access`: every URL of the API now answers 403 without it (`basic_access_required` around the API URLs). Before, 15 of 27 endpoints (`menu/`, Administration, `characters/{id}/…`) did not check it.

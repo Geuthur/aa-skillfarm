@@ -4,7 +4,7 @@ from http import HTTPStatus
 from unittest.mock import patch
 
 # Third Party
-from evesde_factory.allianceauth import EveCharacterFactory
+from evesde_factory.allianceauth import EveCharacterFactory, EveCorporationInfoFactory
 
 # Django
 from django.urls import reverse
@@ -438,3 +438,94 @@ class TestCharactersApiEndpoints(AuthTestCase):
 
         # Expected Result
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+
+
+class TestCharactersApiCorpAccess(AuthTestCase):
+    """`corp_access` only widens what a user sees: write actions stay limited to own characters."""
+
+    WRITE_ENDPOINTS = [
+        ("post", "acknowledge_extractions", None),
+        ("post", "acknowledge_paused", None),
+        ("post", "toggle_notification", None),
+        ("get", "get_skillsetup", None),
+        ("post", "update_skillsetup", {"selected_skills": ["Cybernetics"]}),
+        ("post", "trigger_character_update", {}),
+        ("delete", "delete_character", None),
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.corp = EveCorporationInfoFactory()
+        cls.corp_user = UserMainFactory(
+            permissions__=["skillfarm.basic_access", "skillfarm.corp_access"],
+            main_character__character=EveCharacterFactory(corporation=cls.corp),
+        )
+        cls.colleague = UserMainFactory(
+            main_character__character=EveCharacterFactory(corporation=cls.corp)
+        )
+
+    def setUp(self):
+        super().setUp()
+        self.own_audit = SkillFarmAuditFactory(
+            user=self.corp_user, extractions_ready_count=2, notification=False
+        )
+        self.colleague_audit = SkillFarmAuditFactory(
+            user=self.colleague, extractions_ready_count=2, notification=False
+        )
+        self.client.force_login(self.corp_user)
+
+    def _request(self, method, name, payload, audit):
+        url = reverse(
+            f"{API_URL}:{name}",
+            kwargs={"character_id": audit.character.character_id},
+        )
+        kwargs = {}
+        if payload is not None:
+            kwargs = {"data": json.dumps(payload), "content_type": "application/json"}
+        return getattr(self.client, method)(url, **kwargs)
+
+    def test_character_detail_of_corporation_character_should_stay_visible(self):
+        # Test Action
+        response = self._request(
+            "get", "get_character_detail", None, self.colleague_audit
+        )
+
+        # Expected Result
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    @patch("skillfarm.tasks.update_character.apply_async")
+    def test_write_actions_on_corporation_character_should_return_forbidden(
+        self, mock_apply_async
+    ):
+        for method, name, payload in self.WRITE_ENDPOINTS:
+            with self.subTest(endpoint=name):
+                # Test Action
+                response = self._request(method, name, payload, self.colleague_audit)
+
+                # Expected Result
+                self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
+                self.assertEqual(response.json(), {"error": "Permission Denied"})
+
+        # Nothing of the colleague changed
+        mock_apply_async.assert_not_called()
+        self.colleague_audit.refresh_from_db()
+        self.assertFalse(self.colleague_audit.extraction_acknowledged)
+        self.assertFalse(self.colleague_audit.queue_paused_acknowledged)
+        self.assertFalse(self.colleague_audit.notification)
+        self.assertFalse(
+            SkillFarmSetup.objects.filter(character=self.colleague_audit).exists()
+        )
+
+    @patch("skillfarm.tasks.update_character.apply_async")
+    def test_write_actions_on_own_character_should_succeed(self, mock_apply_async):
+        for method, name, payload in self.WRITE_ENDPOINTS:
+            with self.subTest(endpoint=name):
+                # Test Action
+                response = self._request(method, name, payload, self.own_audit)
+
+                # Expected Result
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        mock_apply_async.assert_called_once()
+        self.assertFalse(SkillFarmAudit.objects.filter(pk=self.own_audit.pk).exists())
