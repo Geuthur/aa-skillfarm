@@ -155,4 +155,35 @@ describe("CharacterTable", () => {
     expect(screen.getByText("Sync Error")).toBeInTheDocument();
     expect(screen.getByText("Token Error")).toBeInTheDocument();
   });
+
+  it("should hide the write actions when the user may only see the characters", () => {
+    // Test Data
+    const char = buildCharacter({
+      is_training: false,
+      queue_paused_acknowledged: false,
+      extractions_ready_count: 2,
+      extraction_acknowledged: false,
+    });
+
+    // Test Action
+    render(
+      <MemoryRouter>
+        <CharacterTable
+          characters={[char]}
+          onViewQueue={vi.fn()}
+          onOpenSetup={vi.fn()}
+          onAcknowledgeExtractions={vi.fn()}
+          onAcknowledgePaused={vi.fn()}
+          canManage={false}
+        />
+      </MemoryRouter>,
+    );
+
+    // Expected Result
+    expect(screen.getByText("Test Pilot")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Acknowledge$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Acknowledge Idle/i })).not.toBeInTheDocument();
+    // Only the skill queue button is left in the actions cell
+    expect(screen.getByText("Test Pilot").closest("tr")?.querySelectorAll("button")).toHaveLength(1);
+  });
 });

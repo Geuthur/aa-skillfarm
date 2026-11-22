@@ -33,7 +33,7 @@ class GeneralManager(models.Manager):
 
     @staticmethod
     def has_corporation_access(user) -> bool:
-        """Users with `corp_access` see and manage their own corporation."""
+        """Users with `corp_access` see their own corporation. They manage only their own characters."""
         return bool(user.has_perm("skillfarm.corp_access"))
 
     @staticmethod
@@ -82,7 +82,8 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
     - `sees_all` and `manages_all` replace the `has_full_access` check: who has
       `admin_access` gets everything. There is no own superuser branch.
     - `corp_access` adds the characters of the own corporation (the
-      corporation of the main character) to `visible_q` and `manage_q`.
+      corporation of the main character) to `visible_q` only. It never widens
+      `manage_q`: without `admin_access` a user manages the own characters.
     - `_restricted_to` takes the Q method instead of the Q object and calls it
       only after the main character check: the rule for `corp_access` reads
       the main character, which a user without one does not have.
@@ -113,19 +114,16 @@ class AccessQuerySet(models.QuerySet[T], Generic[T]):
             character__corporation_id=user.profile.main_character.corporation_id
         )
 
-    def _owned_or_corporation_q(self, user) -> models.Q:
+    def visible_q(self, user) -> models.Q:
+        """Q object for the objects a user who does not see all may see."""
         query = self.owned_by_q(user)
         if GeneralManager.has_corporation_access(user):
             query |= self.corporation_q(user)
         return query
 
-    def visible_q(self, user) -> models.Q:
-        """Q object for the objects a user who does not see all may see."""
-        return self._owned_or_corporation_q(user)
-
     def manage_q(self, user) -> models.Q:
         """Q object for the objects a user who does not manage all may manage."""
-        return self._owned_or_corporation_q(user)
+        return self.owned_by_q(user)
 
     def _restricted_to(self, user, has_all: bool, query, what: str):
         if has_all:

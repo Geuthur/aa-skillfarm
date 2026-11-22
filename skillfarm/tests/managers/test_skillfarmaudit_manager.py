@@ -255,7 +255,7 @@ class TestSkillfarmAuditCorpAccess(AuthTestCase):
 
 
 class TestSkillfarmAuditAccessRules(AuthTestCase):
-    """Each access rule of `visible_to` and `manage_to`, which share their rules."""
+    """Each access rule of `visible_to` and `manage_to`; they differ only for `corp_access`."""
 
     @classmethod
     def setUpClass(cls):
@@ -309,28 +309,33 @@ class TestSkillfarmAuditAccessRules(AuthTestCase):
                     audits, [self.own_audit, self.colleague_audit, self.foreign_audit]
                 )
 
-    def test_corp_access_should_return_audits_of_same_corporation(self):
+    def test_corp_access_should_see_but_not_manage_audits_of_same_corporation(self):
         # Test Data
         corp_user = self._corp_user()
 
         # Test Action
-        for method, audits in self._results(corp_user).items():
-            # Expected Result
-            with self.subTest(method=method):
-                self.assertEqual(audits, [self.colleague_audit])
+        results = self._results(corp_user)
 
-    def test_corp_access_should_also_return_own_audits_of_other_corporation(self):
+        # Expected Result
+        self.assertEqual(results["visible_to"], [self.colleague_audit])
+        self.assertEqual(results["manage_to"], [])
+
+    def test_corp_access_should_manage_only_own_audits(self):
         # Test Data
         corp_user = self._corp_user()
+        own_audit = SkillFarmAuditFactory(user=corp_user)
         alt = EveCharacterFactory()
         add_alt_character_to_user(user=corp_user, character_id=alt.character_id)
         alt_audit = SkillFarmAuditFactory(user=corp_user, character=alt)
 
         # Test Action
-        for method, audits in self._results(corp_user).items():
-            # Expected Result
-            with self.subTest(method=method):
-                self.assertCountEqual(audits, [self.colleague_audit, alt_audit])
+        results = self._results(corp_user)
+
+        # Expected Result
+        self.assertCountEqual(
+            results["visible_to"], [self.colleague_audit, own_audit, alt_audit]
+        )
+        self.assertCountEqual(results["manage_to"], [own_audit, alt_audit])
 
     def test_own_character_should_return_only_own_audits(self):
         # Test Action
