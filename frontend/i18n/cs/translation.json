@@ -11,6 +11,7 @@
   "Next Page": "Další stránka",
   "Last Page": "Poslední stránka",
   "{{count}} Rows_one": "{{count}} řádek",
+  "{{count}} Rows_few": "{{count}} řádky",
   "{{count}} Rows_other": "{{count}} řádků",
   "True": "Ano",
   "False": "Ne",
