@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-19 16:22+0000\n"
-"PO-Revision-Date: 2026-10-25 10:29+0000\n"
+"PO-Revision-Date: 2026-11-23 08:25+0000\n"
 "Last-Translator: Geuthur <devgeuthur@gmail.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
 "skillfarm/de/>\n"
@@ -17,13 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.15.1\n"
+"X-Generator: Weblate 2026.11.2\n"
 
 msgid "last update run"
 msgstr "Letztes Update ausgeführt"
 
 msgid "Administration permission required."
-msgstr "Administrationsrecht erforderlich."
+msgstr "Verwaltungsberechtigung erforderlich."
 
 msgid "Superuser permission required."
 msgstr "Superuser-Berechtigung erforderlich."
@@ -34,15 +34,15 @@ msgstr "Corporation-Zugriffsrecht erforderlich."
 #, python-format
 msgid "Queued update task for %(name)s (force_refresh=%(force)s)"
 msgstr ""
+"Aktualisierungsaufgabe für %(name)s eingereiht (force_refresh=%(force)s)"
 
 #, python-format
 msgid "Successfully deleted %(name)s from Skillfarm"
-msgstr ""
+msgstr "%(name)s erfolgreich aus der Skillfarm gelöscht"
 
 #, python-format
 msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
-msgstr ""
-"Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
+msgstr "Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
 
 msgid "Queued market price update task"
 msgstr "Task zur Aktualisierung der Marktpreise eingereiht"
@@ -92,13 +92,13 @@ msgstr "Extraktionen für %d Charaktere erfolgreich bestätigt"
 
 #, python-format
 msgid "Update task queued for %s"
-msgstr ""
+msgstr "Aktualisierungsaufgabe für %s eingereiht"
 
 msgid "Overview"
 msgstr "Übersicht"
 
 msgid "My Characters"
-msgstr ""
+msgstr "Meine Charaktere"
 
 msgid "Calculator"
 msgstr "Rechner"
@@ -116,13 +116,13 @@ msgid "User not found or not accessible"
 msgstr "Benutzer nicht gefunden oder nicht zugänglich"
 
 msgid "Can access this app, Skillfarm."
-msgstr ""
+msgstr "Kann auf diese App zugreifen, Skillfarm."
 
 msgid "Has access to all characters in the corporation."
-msgstr ""
+msgstr "Hat Zugriff auf alle Charaktere der Corporation."
 
 msgid "Has access to all characters."
-msgstr ""
+msgstr "Hat Zugriff auf alle Charaktere."
 
 msgid "Disabled"
 msgstr "Deaktiviert"
