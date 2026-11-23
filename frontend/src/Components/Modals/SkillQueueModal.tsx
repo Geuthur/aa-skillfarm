@@ -195,7 +195,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
 
             {/* Queue List */}
             <h6 className={`${styles["section-title"]} text-uppercase mt-4`}>
-              {t("Active Training Queue ({{count}})", { count: data.skillqueue.length })}
+              {t("Active Training Queue ({{total}})", { total: data.skillqueue.length })}
             </h6>
 
             {data.skillqueue.length === 0 ? (
@@ -218,7 +218,7 @@ export const SkillQueueModal: React.FC<SkillQueueModalProps> = ({ characterId, o
             {data.farmed_skills.length > 0 && (
               <div className="mt-4">
                 <h6 className={`${styles["section-title"]} text-uppercase`}>
-                  {t("Configured Farm Skills ({{count}})", { count: data.farmed_skills.length })}
+                  {t("Configured Farm Skills ({{total}})", { total: data.farmed_skills.length })}
                 </h6>
                 <div className="sf-table-container overflow-x-auto">
                   <table className="sf-table w-100">

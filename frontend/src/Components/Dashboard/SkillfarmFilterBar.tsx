@@ -76,7 +76,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "all" ? "active" : ""}`}
           onClick={() => handleTabClick("all")}
         >
-          {t("All ({{count}})", { count: totalCount })}
+          {t("All ({{total}})", { total: totalCount })}
         </button>
 
         <button
@@ -84,7 +84,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "training" ? "active" : ""}`}
           onClick={() => handleTabClick("training")}
         >
-          {t("Active Training ({{count}})", { count: activeCount })}
+          {t("Active Training ({{total}})", { total: activeCount })}
         </button>
 
         <button
@@ -92,7 +92,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "paused" ? "active" : ""} ${pausedCount > 0 ? styles["tab-alert"] : ""}`}
           onClick={() => handleTabClick("paused")}
         >
-          {t("Paused Training ({{count}})", { count: pausedCount })}
+          {t("Paused Training ({{total}})", { total: pausedCount })}
         </button>
 
         <button
@@ -105,7 +105,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
               <Sparkles size={14} />
             </span>
           )}
-          {t("Pending Extractions ({{count}})", { count: pendingCount })}
+          {t("Pending Extractions ({{total}})", { total: pendingCount })}
         </button>
 
         <button
@@ -113,7 +113,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
           className={`aa-tab-btn d-flex align-items-center gap-2 px-3 py-1 fw-bold text-uppercase text-nowrap flex-shrink-0 ${activeTab === "reviewed" ? "active" : ""}`}
           onClick={() => handleTabClick("reviewed")}
         >
-          {t("Reviewed ({{count}})", { count: reviewedCount })}
+          {t("Reviewed ({{total}})", { total: reviewedCount })}
         </button>
       </div>
 
@@ -141,7 +141,7 @@ export const SkillfarmFilterBar: React.FC<SkillfarmFilterBarProps> = ({
               disabled={isBulkAcknowledging}
             >
               <CheckCheck size={16} />
-              <span>{t("Acknowledge All ({{count}})", { count: pendingCount })}</span>
+              <span>{t("Acknowledge All ({{total}})", { total: pendingCount })}</span>
             </Button>
           )
         )}
