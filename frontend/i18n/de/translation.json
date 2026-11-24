@@ -341,5 +341,14 @@
   "Alt": "Alt",
   "Logo": "Logo",
   "Show alts of this pilot": "Alts dieses Piloten anzeigen",
-  "Filter characters by status": "Charaktere nach Status filtern"
+  "Filter characters by status": "Charaktere nach Status filtern",
+  "View Paused Characters ({{total}})": "Pausierte Charaktere anzeigen ({{total}})",
+  "All ({{total}})": "Alle ({{total}})",
+  "Active Training ({{total}})": "Aktives Training ({{total}})",
+  "Paused Training ({{total}})": "Pausiertes Training ({{total}})",
+  "Pending Extractions ({{total}})": "Ausstehende Extraktionen ({{total}})",
+  "Reviewed ({{total}})": "Überprüft ({{total}})",
+  "Acknowledge All ({{total}})": "Alle bestätigen ({{total}})",
+  "Active Training Queue ({{total}})": "Aktive Trainingswarteschlange ({{total}})",
+  "Configured Farm Skills ({{total}})": "Konfigurierte Farm-Skills ({{total}})"
 }
