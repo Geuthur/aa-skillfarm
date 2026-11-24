@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 16:22+0000\n"
+"Project-Id-Version: AA Skillfarm\n"
+"Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-skillfarm/\n"
+"POT-Creation-Date: 2026-11-24 10:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,141 +17,194 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: skillfarm/admin.py:141
 msgid "last update run"
 msgstr ""
 
+#: skillfarm/api/administration.py:124
 msgid "Administration permission required."
 msgstr ""
 
+#: skillfarm/api/administration.py:132
 msgid "Superuser permission required."
 msgstr ""
 
+#: skillfarm/api/administration.py:136
 msgid "Corporation access permission required."
 msgstr ""
 
+#: skillfarm/api/administration.py:140
+msgid "Character not found."
+msgstr ""
+
+#: skillfarm/api/administration.py:218
 #, python-format
 msgid "Queued update task for %(name)s (force_refresh=%(force)s)"
 msgstr ""
 
+#: skillfarm/api/administration.py:259
 #, python-format
 msgid "Successfully deleted %(name)s from Skillfarm"
 msgstr ""
 
+#: skillfarm/api/administration.py:443
 #, python-format
 msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
 msgstr ""
 
+#: skillfarm/api/administration.py:465
 msgid "Queued market price update task"
 msgstr ""
 
+#: skillfarm/api/administration.py:546
 msgid "Corporation not found."
 msgstr ""
 
+#: skillfarm/api/auth.py:28 skillfarm/api/characters.py:206
+#: skillfarm/api/characters.py:323 skillfarm/api/characters.py:352
+#: skillfarm/api/characters.py:381 skillfarm/api/characters.py:412
+#: skillfarm/api/characters.py:455 skillfarm/api/characters.py:489
+#: skillfarm/api/characters.py:552
 msgid "Permission Denied"
 msgstr ""
 
-msgid ""
-"Market price data is currently not available. Please run market update tasks."
+#: skillfarm/api/calculator.py:81
+msgid "Market price data is currently not available. Please run market update tasks."
 msgstr ""
 
+#: skillfarm/api/characters.py:202 skillfarm/api/characters.py:319
+#: skillfarm/api/characters.py:348 skillfarm/api/characters.py:377
+#: skillfarm/api/characters.py:408 skillfarm/api/characters.py:451
+#: skillfarm/api/characters.py:485 skillfarm/api/characters.py:549
 msgid "Character not found or not accessible"
 msgstr ""
 
+#: skillfarm/api/characters.py:330
 msgid "Extractions successfully marked as reviewed/acknowledged"
 msgstr ""
 
+#: skillfarm/api/characters.py:359
 msgid "Inactive training status acknowledged"
 msgstr ""
 
+#: skillfarm/api/characters.py:385
 msgid "enabled"
 msgstr ""
 
+#: skillfarm/api/characters.py:385
 msgid "disabled"
 msgstr ""
 
+#: skillfarm/api/characters.py:389
 #, python-format
 msgid "Notifications %s for %s"
 msgstr ""
 
+#: skillfarm/api/characters.py:466
 #, python-format
 msgid "Skillset successfully updated for %s"
 msgstr ""
 
+#: skillfarm/api/characters.py:499
 #, python-format
 msgid "%s successfully removed from Skillfarm"
 msgstr ""
 
+#: skillfarm/api/characters.py:527
 #, python-format
 msgid "Successfully acknowledged extractions for %d characters"
 msgstr ""
 
+#: skillfarm/api/characters.py:563
 #, python-format
 msgid "Update task queued for %s"
 msgstr ""
 
+#: skillfarm/api/general.py:43
 msgid "Overview"
 msgstr ""
 
+#: skillfarm/api/general.py:47
 msgid "My Characters"
 msgstr ""
 
+#: skillfarm/api/general.py:51
 msgid "Calculator"
 msgstr ""
 
+#: skillfarm/api/general.py:71
 msgid "Settings"
 msgstr ""
 
+#: skillfarm/api/general.py:82
 msgid "Add Character"
 msgstr ""
 
+#: skillfarm/api/general.py:91
 msgid "Administration"
 msgstr ""
 
+#: skillfarm/api/overview.py:128
 msgid "User not found or not accessible"
 msgstr ""
 
+#: skillfarm/models/general.py:30
 msgid "Can access this app, Skillfarm."
 msgstr ""
 
+#: skillfarm/models/general.py:33
 msgid "Has access to all characters in the corporation."
 msgstr ""
 
+#: skillfarm/models/general.py:35
 msgid "Has access to all characters."
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:68
 msgid "Disabled"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:69
 msgid "Token Error"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:70
 msgid "Error"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:71
 msgid "OK"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:72
 msgid "Incomplete"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:73
 msgid "In Progress"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:97
 msgid "Skills"
 msgstr ""
 
+#: skillfarm/models/helpers/update_manager.py:98
 msgid "Skillqueue"
 msgstr ""
 
+#: skillfarm/tasks.py:333
 msgid "Skillfarm Notifications"
 msgstr ""
 
+#: skillfarm/templates/skillfarm/react_skillfarm.html:18
 msgid "Error loading Skillfarm frontend"
 msgstr ""
 
+#: skillfarm/templates/skillfarm/react_skillfarm.html:23
 msgid "Loading Skillfarm..."
 msgstr ""
 
+#: skillfarm/views.py:43
 #, python-brace-format
 msgid "{character_name} successfully added or updated to Skillfarm System"
 msgstr ""

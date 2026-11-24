@@ -26,6 +26,10 @@ Section Order:
 ### Removed
 -->
 
+<!-- Your changes go here -->
+
+## [5.0.0] - 2026-11-24
+
 ### Added
 
 - [ADD] Reusable frontend components `OwnerPortrait` (character, corporation and alliance portraits with a fallback icon) and `SyncStatusBadge`, replacing several inline copies.
@@ -49,9 +53,7 @@ Section Order:
 
 - [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
 
-- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) is no longer retried, because it is raised before any request is sent; `RequestException` and a rejected response are still retried
-
-- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task, which would attach the webhook URL with its token to the log record.
+- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task (which would attach the webhook URL with its token to the log record) and is not retried, because it is raised before any request is sent; `RequestException` and a rejected response are still retried.
 
 - [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
 
@@ -164,10 +166,6 @@ Section Order:
 - [REMOVED] The unused static ESI operations `GetUniverseTypesTypeId`, `GetUniverseGroupsGroupId` and `GetUniverseCategoriesCategoryId` from `__operations__`; CCP removes these routes with compatibility date `2026-11-19` in favour of the SDE.
 
 - [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
-
-<!-- Your changes go here -->
-
-### Removed
 
 - [REMOVE] The copies of the shared modules and their tests: `Components/Base/{BaseTable,BaseModal,Loader,BaseHeader}`, `Menu/`, `Hooks/{useCooldown,useFeedback,useUserData}`, `Utils/{bootsTrap,eveOnline,format,general}`, `Pages/Base.tsx`, `Pages/404.tsx`, `Styles/table.css`, the CSS modules of the BaseTable, loaders and tooltips, `eslint-rules/` and the rules of `Styles/index.css` the package ships (`aa-section`, `aa-menu-badge-pulse`, `aa-nav-danger`); `loadMenu` and `loadUserData` of `Api/ApiCalls.ts` (now in the package).
 
@@ -907,5 +905,6 @@ This will load all necessary prices
 [4.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...v4.0.1 "v4.0.1"
 [4.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...v4.0.2 "v4.0.2"
 [4.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.2...v4.1.0 "v4.1.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.1.0...HEAD "In Development"
+[5.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v4.1.0...v5.0.0 "v5.0.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v5.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
