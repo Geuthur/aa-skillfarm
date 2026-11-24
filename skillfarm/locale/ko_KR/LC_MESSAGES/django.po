@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 16:22+0000\n"
+"Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-"
+"skillfarm/\n"
+"POT-Creation-Date: 2026-11-24 10:18+0100\n"
 "PO-Revision-Date: 2026-01-10 15:38+0000\n"
 "Last-Translator: Geuthur <geuthur@users.noreply.github.com>\n"
 "Language-Team: Korean <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -29,6 +30,9 @@ msgid "Superuser permission required."
 msgstr ""
 
 msgid "Corporation access permission required."
+msgstr ""
+
+msgid "Character not found."
 msgstr ""
 
 #, python-format

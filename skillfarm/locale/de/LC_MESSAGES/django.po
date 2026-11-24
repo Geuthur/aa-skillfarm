@@ -6,8 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: AA Skillfarm\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 16:22+0000\n"
+"Report-Msgid-Bugs-To: https://weblate.geuthur.de/projects/alliance-auth/aa-"
+"skillfarm/\n"
+"POT-Creation-Date: 2026-11-24 10:18+0100\n"
 "PO-Revision-Date: 2026-11-23 12:03+0000\n"
 "Last-Translator: Geuthur <devgeuthur@gmail.com>\n"
 "Language-Team: German <https://weblate.geuthur.de/projects/allianceauth/aa-"
@@ -31,6 +32,9 @@ msgstr "Superuser-Berechtigung erforderlich."
 msgid "Corporation access permission required."
 msgstr "Corporation-Zugriffsrecht erforderlich."
 
+msgid "Character not found."
+msgstr ""
+
 #, python-format
 msgid "Queued update task for %(name)s (force_refresh=%(force)s)"
 msgstr ""
@@ -42,7 +46,8 @@ msgstr "%(name)s erfolgreich aus der Skillfarm gelöscht"
 
 #, python-format
 msgid "Queued Skillfarm update task for all characters (force_refresh=%s)"
-msgstr "Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
+msgstr ""
+"Skillfarm-Update-Task für alle Charaktere eingereiht (force_refresh=%s)"
 
 msgid "Queued market price update task"
 msgstr "Task zur Aktualisierung der Marktpreise eingereiht"
