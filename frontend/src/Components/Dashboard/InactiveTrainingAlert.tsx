@@ -49,7 +49,7 @@ export const InactiveTrainingAlert: React.FC<InactiveTrainingAlertProps> = ({
       <Button variant="warning"
         onClick={onFilterInactive}
       >
-        <span>{t("View Paused Characters ({{count}})", { count: pausedCount })}</span>
+        <span>{t("View Paused Characters ({{total}})", { total: pausedCount })}</span>
         <ArrowRight size={16} />
       </Button>
     </div>

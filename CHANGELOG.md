@@ -26,19 +26,23 @@ Section Order:
 ### Removed
 -->
 
+<!-- Your changes go here -->
+
+- [ADD] Optional extra `tests-allianceauth-development` (test packages plus the Alliance Auth 6 pre-release) with separate test settings `testauth.settings.development` for the tox environment `allianceauth-development` and `make tox-tests-development`; a non-blocking CI job "AA Development" runs it on Python 3.13 and 3.14.
+- [FIX] Compatibility with Alliance Auth 6 (pre-release): the `eveonline` migration dependencies of `0001_initial` and `0001_init_v2` now point to `0019_v5squash` (Alliance Auth 6 removed the older `eveonline` migrations, `0019_v5squash` exists in Alliance Auth 5 as well). Works with Alliance Auth 5 and 6.
+- [FIX] Tests against the Alliance Auth 6 pre-release: `testauth/settings/development/local.py` also gives each test run its own random cache `KEY_PREFIX`, as `testauth/settings/local.py` does.
+
+## [5.0.0] - 2026-11-24
+
 ### Added
 
 - [ADD] Reusable frontend components `OwnerPortrait` (character, corporation and alliance portraits with a fallback icon) and `SyncStatusBadge`, replacing several inline copies.
 
 - [ADD] Frontend hooks per area (`Components/<Area>/Hooks`, `Menu/Hooks`) that hold the queries and mutations of the Administration, Settings, Overview, Dashboard, Modals, Calculator and menu views, plus the shared hooks `useFeedback`, `useCooldown` and `useUserData`.
 
-- [ADD] Optional extra `tests-allianceauth-development` (test packages plus the Alliance Auth 6 pre-release) with separate test settings `testauth.settings.development` for the tox environment `allianceauth-development` and `make tox-tests-development`; a non-blocking CI job "AA Development" runs it on Python 3.13 and 3.14.
-
 ### Fixed
 
-- [FIX] Compatibility with Alliance Auth 6 (pre-release): the `eveonline` migration dependencies of `0001_initial` and `0001_init_v2` now point to `0019_v5squash` (Alliance Auth 6 removed the older `eveonline` migrations, `0019_v5squash` exists in Alliance Auth 5 as well). Works with Alliance Auth 5 and 6.
-
-- [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` and `testauth/settings/development/local.py` give each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
+- [FIX] Counter labels like "Reviewed (n)" no longer use i18next plural keys (`_one`/`_other`), because the number only stands in brackets; translators fill one form instead of up to four identical ones. Existing translations of these nine labels have to be entered again in Weblate
 
 - [FIX] `corp_access` alone no longer allows managing other characters of the own corporation (acknowledge, notification, skill setup, update, delete): it only widens what a user sees, managing stays limited to the own characters unless the user has `admin_access`. The user page of the Overview shows the acknowledge and skill setup buttons to admins only
 
@@ -53,15 +57,15 @@ Section Order:
 
 - [FIX] Discord webhook notifications no longer write the webhook URL with its token to the log when sending fails or the retries are exhausted (`thirdparty/discord.py` as in aa-example).
 
-- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) is no longer retried, because it is raised before any request is sent; `RequestException` and a rejected response are still retried
-
-- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task, which would attach the webhook URL with its token to the log record.
+- [FIX] Discord webhook: a `ValueError` or `TypeError` of `dhooks_lite` (e.g. content over 2000 characters) no longer fails the Celery task (which would attach the webhook URL with its token to the log record) and is not retried, because it is raised before any request is sent; `RequestException` and a rejected response are still retried.
 
 - [FIX] Dev dependencies: `minimatch` 11 (Dependabot alert, DoS) via eslint 10.15 and typescript-eslint 8.73 plus an override for `@typescript-eslint/typescript-estree`, and `zod` 4.6.7 (GHSA-mrhx-c7xc-m3w5).
 
 - [FIX] Character table: the extractions column gets its minimum width again, so the badge (e.g. "12 Reviewed") no longer wraps onto two lines (the table ignored `meta.className`).
 
 - [FIX] Character table: the green "Active (%)" badge sits inline after the skill name instead of wrapping as its own block, and the training queue column gets its minimum width again (the table ignored `meta.className`).
+
+- [FIX] Tests no longer share the Redis cache with other processes. `testauth/settings/local.py` gives each test run its own random cache `KEY_PREFIX`. Before, ESI responses cached by a running testauth instance on the same Redis were returned instead of the pook responses. Redis stays the cache backend because Alliance Auth needs `django_redis`.
 
 - [FIX] The per-character lock of `update_character`, `update_char_skills` and `update_char_skillqueue` never worked: `TASK_DEFAULTS_ONCE_CHARACTER` set `once` (key `character_pk`) but not `base=QueueOnce`, so celery_once ignored it and the same character could be updated several times in parallel. `TASK_DEFAULTS_BIND_ONCE_CHARACTER` now builds on `TASK_DEFAULTS_BIND_ONCE` like in aa-example, and a second `apply_async` for the same character is skipped while the first is queued or running. `TASK_DEFAULTS_ONCE_CHARACTER` is removed.
 
@@ -78,6 +82,8 @@ Section Order:
 - [FIX] The pulsing menu and tab badges scaled up and down with their number. Only the glow around the badge pulses now.
 
 ### Changed
+
+- [CHANGE] Skillfarm Calculator: the monthly reference projections (1-, 12- and 24-month plan) now sit directly below the header, above the price cards.
 
 - [CHANGE] Tests of the app template: `is_retryable_esi_error` and `ESI_RETRY_STATUS_CODES` in `test_providers.py`, exact URLs and HTML (including `display_name`) of the EVE image helpers in `test_helpers_eveonline.py`.
 
@@ -164,10 +170,6 @@ Section Order:
 - [REMOVED] The unused static ESI operations `GetUniverseTypesTypeId`, `GetUniverseGroupsGroupId` and `GetUniverseCategoriesCategoryId` from `__operations__`; CCP removes these routes with compatibility date `2026-11-19` in favour of the SDE.
 
 - [REMOVED] Unused backend helpers that built HTML for the update status: `UpdateStatus.bootstrap_icon()`, `UpdateStatus.bootstrap_text_style_class()` and `UpdateStatus.description()`, plus `last_update_status()` of the `CharacterUpdateStatus` manager and queryset, which had no caller. The frontend reads the update status from the API and renders it itself.
-
-<!-- Your changes go here -->
-
-### Removed
 
 - [REMOVE] The copies of the shared modules and their tests: `Components/Base/{BaseTable,BaseModal,Loader,BaseHeader}`, `Menu/`, `Hooks/{useCooldown,useFeedback,useUserData}`, `Utils/{bootsTrap,eveOnline,format,general}`, `Pages/Base.tsx`, `Pages/404.tsx`, `Styles/table.css`, the CSS modules of the BaseTable, loaders and tooltips, `eslint-rules/` and the rules of `Styles/index.css` the package ships (`aa-section`, `aa-menu-badge-pulse`, `aa-nav-danger`); `loadMenu` and `loadUserData` of `Api/ApiCalls.ts` (now in the package).
 
@@ -907,5 +909,6 @@ This will load all necessary prices
 [4.0.1]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.0...v4.0.1 "v4.0.1"
 [4.0.2]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.1...v4.0.2 "v4.0.2"
 [4.1.0]: https://github.com/Geuthur/aa-skillfarm/compare/v4.0.2...v4.1.0 "v4.1.0"
-[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v4.1.0...HEAD "In Development"
+[5.0.0]: https://github.com/Geuthur/aa-skillfarm/compare/v4.1.0...v5.0.0 "v5.0.0"
+[in development]: https://github.com/Geuthur/aa-skillfarm/compare/v5.0.0...HEAD "In Development"
 [report any issues]: https://github.com/Geuthur/aa-skillfarm/issues "report any issues"
